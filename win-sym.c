@@ -176,8 +176,6 @@ void show_win_sym()
 
   gwin_sym = win_syms[current_IC->in_method];
 
-
-
   if (!gwin_sym || !win_sym_enabled)
     return;
 #if 0

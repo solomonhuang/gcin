@@ -6,7 +6,7 @@ include config.mak
 
 OBJS=gcin.o IC.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
-     gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o
+     gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \

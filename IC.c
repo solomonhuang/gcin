@@ -99,6 +99,8 @@ IC *FindIC(CARD16 icid)
     return NULL;
 }
 
+void hide_in_win(IC *ic);
+
 void DeleteIC(CARD16 icid)
 {
     IC *rec, *last;
@@ -147,21 +149,34 @@ static void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
   XSetErrorHandler(olderr);
 }
 
-void move_win0(int x, int y);
-void set_current_input_style(InputStyle_E style);
-
-void move_IC_in_win(IC *rec)
+Window get_ic_win(IC *rec)
 {
    Window inpwin = rec->focus_win;
-#if DEBUG
-   dbg("move_IC_in_win\n");
-#endif
    if (!inpwin)
       inpwin = rec->client_win;
 
+   return inpwin;
+}
+
+
+void move_in_win(IC *ic, int x, int y);
+void show_in_win(IC *ic);
+void set_current_input_style(InputStyle_E style);
+extern Window focus_win;
+
+void move_IC_in_win(IC *rec)
+{
+#if DEBUG
+   dbg("move_IC_in_win\n");
+#endif
+   Window inpwin = get_ic_win(rec);
+
    if (!inpwin)
       return;
-
+#if 1
+   if (inpwin != focus_win)
+      return;
+#endif
    int inpx = rec->pre_attr.spot_location.x;
    int inpy = rec->pre_attr.spot_location.y;
    XWindowAttributes att;
@@ -184,14 +199,18 @@ void move_IC_in_win(IC *rec)
 
 void load_IC(IC *rec)
 {
-   if (current_IC != rec)
+   Window win = get_ic_win(rec);
+
+   if (current_IC != rec && (win == focus_win || !current_IC))
      current_IC = rec;
 
-   if (!rec->b_im_enabled)
-     hide_in_win(rec);
-   else
-   if (rec->b_im_enabled)
-     show_in_win(rec);
+   if (win == focus_win) {
+     if (!rec->b_im_enabled)
+       hide_in_win(rec);
+     else
+     if (rec->b_im_enabled)
+       show_in_win(rec);
+   }
 
    if (rec->input_style & XIMPreeditCallbacks) {
 #if DEBUG

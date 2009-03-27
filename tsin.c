@@ -1169,6 +1169,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
         for(j=3;j>=0;j--)
           if (typ_pho[j]) {
             typ_pho[j]=0;
+            inph[j]=0;
             disp_in_area_pho_tsin();
             return 1;
           }

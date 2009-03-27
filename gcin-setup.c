@@ -35,7 +35,7 @@ int tsin_eng_ch_swN = sizeof(tsin_eng_ch_sw) / sizeof(tsin_eng_ch_sw[0]);
 
 static int kbm_selN = sizeof(kbm_sel) / sizeof(kbm_sel[0]);
 
-static GtkWidget *gcin_kbm_window = NULL, *gcin_win0_conf_window;
+static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
 
 static int new_select_idx, new_select_idx_tsin_sw;
 
@@ -367,7 +367,7 @@ struct {
 
 static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol;
 
-static gboolean cb_win0_conf_ok( GtkWidget *widget,
+static gboolean cb_appearance_conf_ok( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
@@ -381,6 +381,85 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
   int font_size_symbol = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_symbol));
   save_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, font_size_symbol);
 
+  send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
+  gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
+
+  return TRUE;
+}
+
+static gboolean close_appearance_conf_window( GtkWidget *widget,
+                                   GdkEvent  *event,
+                                   gpointer   data )
+{
+  gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
+  return TRUE;
+}
+
+
+void create_appearance_conf_window()
+{
+  load_setttings();
+
+  gcin_appearance_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+  g_signal_connect (G_OBJECT (gcin_appearance_conf_window), "delete_event",
+                    G_CALLBACK (close_appearance_conf_window),
+                    NULL);
+
+  gtk_window_set_title (GTK_WINDOW (gcin_appearance_conf_window), "輸入視窗外觀設定");
+  gtk_container_set_border_width (GTK_CONTAINER (gcin_appearance_conf_window), 3);
+
+  GtkWidget *vbox_top = gtk_vbox_new (FALSE, 10);
+  gtk_container_add (GTK_CONTAINER (gcin_appearance_conf_window), vbox_top);
+
+  GtkWidget *frame_font_size = gtk_frame_new("字型大小");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size), 3);
+  GtkAdjustment *adj =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size, 8.0, 24.0, 1.0, 1.0, 0.0);
+  spinner = gtk_spin_button_new (adj, 0, 0);
+  gtk_container_add (GTK_CONTAINER (frame_font_size), spinner);
+
+
+  GtkWidget *frame_font_size_tsin_presel = gtk_frame_new("詞音預選詞視窗字型大小");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_tsin_presel, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_tsin_presel), 3);
+  GtkAdjustment *adj_tsin_presel =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_presel, 8.0, 24.0, 1.0, 1.0, 0.0);
+  spinner_tsin_presel = gtk_spin_button_new (adj_tsin_presel, 0, 0);
+  gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_presel), spinner_tsin_presel);
+
+
+  GtkWidget *frame_font_size_symbol = gtk_frame_new("符號選擇視窗字型大小");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_symbol, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_symbol), 3);
+  GtkAdjustment *adj_symbol =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 24.0, 1.0, 1.0, 0.0);
+  spinner_symbol = gtk_spin_button_new (adj_symbol, 0, 0);
+  gtk_container_add (GTK_CONTAINER (frame_font_size_symbol), spinner_symbol);
+
+
+  GtkWidget *button_close = gtk_button_new_with_label ("OK");
+  gtk_box_pack_start (GTK_BOX (vbox_top), button_close, TRUE, TRUE, 0);
+
+  g_signal_connect_swapped (G_OBJECT (button_close), "clicked",
+                            G_CALLBACK (cb_appearance_conf_ok),
+                            G_OBJECT (gcin_kbm_window));
+
+  GTK_WIDGET_SET_FLAGS (button_close, GTK_CAN_DEFAULT);
+  gtk_widget_grab_default (button_close);
+
+  gtk_widget_show_all (gcin_appearance_conf_window);
+
+  return;
+}
+
+static GtkWidget *gcin_gtab_conf_window;
+
+static gboolean cb_gtab_conf_ok( GtkWidget *widget,
+                                   GdkEvent  *event,
+                                   gpointer   data )
+{
   save_gcin_conf_int(GTAB_DUP_SELECT_BELL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_dup_select_bell)));
 
@@ -401,20 +480,19 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
-  gtk_widget_destroy(gcin_win0_conf_window); gcin_win0_conf_window = NULL;
+  gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
 
   return TRUE;
 }
 
-static gboolean close_win0_conf_window( GtkWidget *widget,
+
+static gboolean close_gtab_conf_window( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
-  gtk_widget_destroy(gcin_win0_conf_window); gcin_win0_conf_window = NULL;
+  gtk_widget_destroy(gcin_gtab_conf_window); gcin_gtab_conf_window = NULL;
   return TRUE;
 }
-
-
 
 
 static GtkWidget *create_spc_opts()
@@ -445,48 +523,23 @@ static GtkWidget *create_spc_opts()
   return hbox;
 }
 
+static GtkWidget *gcin_gtab_conf_window;
 
-void create_win0_conf_window()
+void create_gtab_conf_window()
 {
   load_setttings();
 
-    gcin_win0_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gcin_gtab_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-    g_signal_connect (G_OBJECT (gcin_win0_conf_window), "delete_event",
-                      G_CALLBACK (close_win0_conf_window),
+    g_signal_connect (G_OBJECT (gcin_gtab_conf_window), "delete_event",
+                      G_CALLBACK (close_gtab_conf_window),
                       NULL);
 
-    gtk_window_set_title (GTK_WINDOW (gcin_win0_conf_window), "輸入視窗外觀設定");
-    gtk_container_set_border_width (GTK_CONTAINER (gcin_win0_conf_window), 3);
+    gtk_window_set_title (GTK_WINDOW (gcin_gtab_conf_window), "倉頡/行列/嘸蝦米/大易設定");
+    gtk_container_set_border_width (GTK_CONTAINER (gcin_gtab_conf_window), 3);
 
     GtkWidget *vbox_top = gtk_vbox_new (FALSE, 10);
-    gtk_container_add (GTK_CONTAINER (gcin_win0_conf_window), vbox_top);
-
-    GtkWidget *frame_font_size = gtk_frame_new("字型大小");
-    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size, FALSE, FALSE, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (frame_font_size), 3);
-    GtkAdjustment *adj =
-     (GtkAdjustment *) gtk_adjustment_new (gcin_font_size, 8.0, 24.0, 1.0, 1.0, 0.0);
-    spinner = gtk_spin_button_new (adj, 0, 0);
-    gtk_container_add (GTK_CONTAINER (frame_font_size), spinner);
-
-
-    GtkWidget *frame_font_size_tsin_presel = gtk_frame_new("詞音預選詞視窗字型大小");
-    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_tsin_presel, FALSE, FALSE, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_tsin_presel), 3);
-    GtkAdjustment *adj_tsin_presel =
-     (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_presel, 8.0, 24.0, 1.0, 1.0, 0.0);
-    spinner_tsin_presel = gtk_spin_button_new (adj_tsin_presel, 0, 0);
-    gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_presel), spinner_tsin_presel);
-
-
-    GtkWidget *frame_font_size_symbol = gtk_frame_new("符號選擇視窗字型大小");
-    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_symbol, FALSE, FALSE, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_symbol), 3);
-    GtkAdjustment *adj_symbol =
-     (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 24.0, 1.0, 1.0, 0.0);
-    spinner_symbol = gtk_spin_button_new (adj_symbol, 0, 0);
-    gtk_container_add (GTK_CONTAINER (frame_font_size_symbol), spinner_symbol);
+    gtk_container_add (GTK_CONTAINER (gcin_gtab_conf_window), vbox_top);
 
 
     GtkWidget *frame_gtab = gtk_frame_new("倉頡/行列/嘸蝦米/大易");
@@ -558,20 +611,28 @@ void create_win0_conf_window()
     gtk_box_pack_start (GTK_BOX (vbox_top), button_close, TRUE, TRUE, 0);
 
     g_signal_connect_swapped (G_OBJECT (button_close), "clicked",
-                              G_CALLBACK (cb_win0_conf_ok),
+                              G_CALLBACK (cb_gtab_conf_ok),
                               G_OBJECT (gcin_kbm_window));
 
     GTK_WIDGET_SET_FLAGS (button_close, GTK_CAN_DEFAULT);
     gtk_widget_grab_default (button_close);
 
-    gtk_widget_show_all (gcin_win0_conf_window);
+    gtk_widget_show_all (gcin_gtab_conf_window);
 
     return;
 }
 
-static void cb_win0_conf()
+
+
+static void cb_appearance_conf()
 {
-  create_win0_conf_window();
+  create_appearance_conf_window();
+}
+
+
+static void cb_gtab_conf()
+{
+  create_gtab_conf_window();
 }
 
 
@@ -598,10 +659,17 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_kbm), "clicked",
                     G_CALLBACK (cb_kbm), NULL);
 
-  GtkWidget *button_win0_conf = gtk_button_new_with_label("外觀鈴聲行為設定");
-  gtk_box_pack_start (GTK_BOX (vbox), button_win0_conf, TRUE, TRUE, 0);
-  g_signal_connect (G_OBJECT (button_win0_conf), "clicked",
-                    G_CALLBACK (cb_win0_conf), NULL);
+  GtkWidget *button_appearance_conf = gtk_button_new_with_label("外觀設定");
+  gtk_box_pack_start (GTK_BOX (vbox), button_appearance_conf, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_appearance_conf), "clicked",
+                    G_CALLBACK (cb_appearance_conf), NULL);
+
+  GtkWidget *button_gtab_conf = gtk_button_new_with_label("倉頡/行列/嘸蝦米/大易設定");
+  gtk_box_pack_start (GTK_BOX (vbox), button_gtab_conf, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_gtab_conf), "clicked",
+                    G_CALLBACK (cb_gtab_conf), NULL);
+
+
   GtkWidget *button_default_input_method = gtk_button_new_with_label("內定輸入法 & 開啟/關閉");
   gtk_box_pack_start (GTK_BOX (vbox), button_default_input_method, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_default_input_method), "clicked",

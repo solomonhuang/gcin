@@ -78,3 +78,5 @@ typedef struct DUAL_XIM_ENTRY {
 } DUAL_XIM_ENTRY;
 
 extern DUAL_XIM_ENTRY *pxim_arr;
+
+Window get_ic_win(IC *rec);

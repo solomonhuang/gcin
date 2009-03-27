@@ -11,7 +11,7 @@ extern int default_input_method;
 static IMForwardEventStruct *current_forward_eve;
 
 static char callback_str_buffer[32];
-
+Window focus_win;
 
 
 static void send_fake_key_eve()
@@ -157,7 +157,8 @@ void move_in_win(IC *ic, int x, int y)
 #endif
     return;
   }
-#if 0
+
+#if DEBUG
   dbg("move_in_win %d %d\n",x, y);
 #endif
   switch (ic->in_method) {
@@ -192,12 +193,10 @@ void update_in_win_pos()
     winx++; winy++;
 
     if (current_IC) {
-      Window inpwin = current_IC->focus_win;
+      Window inpwin = get_ic_win(current_IC);
 #if DEBUG
       dbg("update_in_win_pos\n");
 #endif
-      if (!inpwin)
-         inpwin = current_IC->client_win;
 
       if (inpwin) {
         int tx, ty;
@@ -327,6 +326,8 @@ void ProcessKey()
   char strbuf[STRBUFLEN];
   KeySym keysym;
 
+  focus_win = current_IC->client_win;
+
   memset(strbuf, 0, STRBUFLEN);
   XKeyEvent *kev = (XKeyEvent*)&current_forward_eve->event;
   XLookupString(kev, strbuf, STRBUFLEN, &keysym, NULL);
@@ -377,6 +378,7 @@ void ProcessKey()
     return;
   }
 
+
   switch(current_IC->in_method) {
     case 3:
       status = feedkey_pho(keysym);
@@ -420,8 +422,16 @@ int gcin_FocusIn(IMChangeFocusStruct *call_data)
 {
     IC *ic = FindIC(call_data->icid);
 
-    if (ic)
+    if (ic) {
+      Window win = get_ic_win(ic);
+
+      if (focus_win != win) {
+        hide_in_win(current_IC);
+        focus_win = win;
+      }
+
       load_IC(ic);
+    }
 
 #if DEBUG
     dbg("focus in %d\n", call_data->icid);
@@ -439,7 +449,7 @@ int gcin_FocusOut(IMChangeFocusStruct *call_data)
 #if DEBUG
     dbg("focus out %d\n", call_data->icid);
 #endif
+//    focus_win = 0;
+
     return True;
 }
-
-
