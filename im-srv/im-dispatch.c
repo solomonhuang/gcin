@@ -142,7 +142,6 @@ void process_client_req(int fd)
       break;
     case GCIN_req_focus_in:
 //      dbg("GCIN_req_focus_in  %d %d\n", cs->spot_location.x, cs->spot_location.y);
-
       gcin_FocusIn(cs);
       break;
     case GCIN_req_focus_out:

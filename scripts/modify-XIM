@@ -1,3 +1,5 @@
+#!/bin/bash
+
 xinitdir=/etc/X11/xinit
 ximorig=XIM.orig.gcin
 if  [ -d $xinitdir ]; then

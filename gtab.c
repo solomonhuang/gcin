@@ -270,6 +270,7 @@ void init_gtab(int inmdno, int usenow)
   struct TableHead th;
   struct TableHead2 th2;
 
+  current_CS->b_half_full_char = FALSE;
 
   if (!inmd[inmdno].filename[0] || !strcmp(inmd[inmdno].filename,"-"))
     return;
@@ -284,6 +285,8 @@ void init_gtab(int inmdno, int usenow)
     dbg("init_tab:1 err open %s\n", ttt);
     return;
   }
+
+
 
   if (st.st_mtime == inp->file_modify_time) {
 //    dbg("unchanged\n");
@@ -499,7 +502,9 @@ static void putstr_inp(u_char *p)
       return;
     }
 
-    lookup_gtab(p, tt);
+    if (gtab_disp_key_codes || wild_mode)
+      lookup_gtab(p, tt);
+
     sendkey_b5(p);
 
 
@@ -749,6 +754,69 @@ void reset_gtab_all()
   ClrInArea();
 }
 
+static void disp_selection(gboolean phrase_selected)
+{
+  ClrSelArea();
+
+  char tt[MAX_SEL_BUF];
+  tt[0]=0;
+
+  int ofs;
+
+  if (exa_match && (gtab_space_auto_first & GTAB_space_auto_first_any)) {
+    strcat(tt, seltab[0]);
+    strcat(tt, " ");
+    ofs = 1;
+  } else {
+    ofs = 0;
+  }
+
+  int i;
+  for(i=ofs; i<10 + ofs; i++) {
+    if (seltab[i][0]) {
+      b1_cat(tt, cur_inmd->selkey[i - ofs]);
+
+      if (phrase_selected && i==sel1st_i) {
+        strcat(tt, "<span foreground=\"blue\">");
+        strcat(strcat(tt, seltab[i]), " ");
+        strcat(tt, "</span>");
+      } else {
+        strcat(strcat(tt, seltab[i]), " ");
+      }
+    } else {
+      extern gboolean b_use_full_space;
+
+      if (b_use_full_space)
+         strcat(tt, " 　 ");
+      else
+         strcat(tt, "   ");
+    }
+  }
+
+  if (gtab_pre_select || wild_mode || spc_pressed || last_full)
+    disp_gtab_sel(tt);
+}
+
+static gboolean has_wild_card()
+{
+  int i;
+
+  for(i=0; i < cur_inmd->MaxPress; i++)
+    if (inch[i]>60) {
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void proc_wild_disp()
+{
+   DispInArea();
+   wild_page = 0;
+   wildcard();
+   disp_selection(0);
+}
+
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -806,13 +874,21 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   switch (key) {
     case XK_BackSpace:
-#if     DELETE_K
-    case XK_Delete:
-#endif
       clear_phrase_match_buf();
       last_idx=0;
-      if (ci==0) return 0;
-      if (ci>0) inch[--ci]=0;
+
+      if (ci==0)
+        return 0;
+
+      if (ci>0)
+        inch[--ci]=0;
+
+      if (has_wild_card()) {
+        proc_wild_disp();
+        return 1;
+      }
+
+
       wild_mode=spc_pressed=0;
       if (ci==1 && cur_inmd->use_quick) {
         int i;
@@ -844,10 +920,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
       return 0;
     case ' ':
-      for(i=0;i<5;i++)
-        if (inch[i]>60) {
-          has_wild = TRUE;
-        }
+      has_wild = has_wild_card();
 
       if (wild_mode) {
         if (defselN==10)
@@ -901,7 +974,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         inkey=cur_inmd->keymap[key];
         inch[ci++]=inkey;
         DispInArea();
-        if (ci==cur_inmd->MaxPress) {
+//        if (ci==cur_inmd->MaxPress)
+        {
           wild_page=0;
           wild_mode=1;
           wildcard();
@@ -927,16 +1001,30 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
           return 0;
       }
 
+      char *pendkey = strchr(cur_inmd->endkey, key);
+
       // for array30
       if (!ci) {
-        if (cur_inmd->endkey[0] && strchr(cur_inmd->endkey, key))
+        if (cur_inmd->endkey[0] && pendkey)
           return 0;
       }
 
       pselkey=ptr_selkey(key);
 
+
+      if ((key < 32 || key > 0x7e) && (gtab_full_space_auto_first||spc_pressed)) {
+//        dbg("sel1st_i:%d  '%c'\n", sel1st_i, seltab[sel1st_i][0]);
+        if (seltab[sel1st_i][0])
+          putstr_inp(seltab[sel1st_i]);  /* select 1st */
+
+        return 0;
+      }
+
+
+      inkey=cur_inmd->keymap[key];
+
 #if 1 // for dayi, testcase :  6 space keypad6
-      if (spc_pressed && pselkey) {
+      if ((spc_pressed||(wild_mode && (!inkey ||pendkey))) && pselkey) {
         int vv = pselkey - cur_inmd->selkey;
 
         if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
@@ -952,35 +1040,30 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
 #endif
 
-      if ((key < 32 || key > 0x7e) && (gtab_full_space_auto_first||spc_pressed)) {
-//        dbg("sel1st_i:%d  '%c'\n", sel1st_i, seltab[sel1st_i][0]);
-        if (seltab[sel1st_i][0])
-          putstr_inp(seltab[sel1st_i]);  /* select 1st */
-
-        return 0;
-      }
-
 //      dbg("iii %x\n", pselkey);
       if (seltab[sel1st_i][0] && !wild_mode &&
            (gtab_full_space_auto_first||spc_pressed)) {
         putstr_inp(seltab[sel1st_i]);  /* select 1st */
       }
 
-
+#if 0
       if (wild_mode)
         goto XXXX;
-
+#endif
       if (key > 0x7f)
         return 0;
 
-      inkey=cur_inmd->keymap[key];
       spc_pressed=0;
 
-#if 1
       // for cj & boshiamy to input digits
       if (!ci && !inkey)
           return 0;
-#endif
+
+      if (wild_mode && inkey>=1 && ci< cur_inmd->MaxPress) {
+        inch[ci++]=inkey;
+        proc_wild_disp();
+        return 1;
+      }
 
       if (inkey>=1 && ci< cur_inmd->MaxPress) {
         inch[ci++]=inkey;
@@ -1030,6 +1113,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     return 1;
   }
 
+  char *pendkey = strchr(cur_inmd->endkey, key);
+
   DispInArea();
 
   static u_int64_t val; // needs static
@@ -1070,7 +1155,7 @@ XXXX:
 
   if ((CONVT2(cur_inmd, s1) & vmaskci)!=val || (wild_mode && defselN) ||
                   ((ci==cur_inmd->MaxPress||spc_pressed) && defselN &&
-      (pselkey && (!strchr(cur_inmd->endkey, key) || spc_pressed)) ) ) {
+      (pselkey && ( pendkey || spc_pressed)) ) ) {
 YYYY:
     if ((pselkey || wild_mode) && defselN) {
       int vv = pselkey - cur_inmd->selkey;
@@ -1199,46 +1284,7 @@ next_pg:
   }
 
 Disp_opt:
-
-  ClrSelArea();
-
-  char tt[MAX_SEL_BUF];
-  tt[0]=0;
-
-  int ofs;
-
-  if (exa_match && (gtab_space_auto_first & GTAB_space_auto_first_any)) {
-    strcat(tt, seltab[0]);
-    strcat(tt, " ");
-    ofs = 1;
-  } else {
-    ofs = 0;
-  }
-
-
-  for(i=ofs; i<10 + ofs; i++) {
-    if (seltab[i][0]) {
-      b1_cat(tt, cur_inmd->selkey[i - ofs]);
-
-      if (phrase_selected && i==sel1st_i) {
-        strcat(tt, "<span foreground=\"blue\">");
-        strcat(strcat(tt, seltab[i]), " ");
-        strcat(tt, "</span>");
-      } else {
-        strcat(strcat(tt, seltab[i]), " ");
-      }
-    } else {
-      extern gboolean b_use_full_space;
-
-      if (b_use_full_space)
-         strcat(tt, " 　 ");
-      else
-         strcat(tt, "   ");
-    }
-  }
-
-  if (gtab_pre_select || spc_pressed || last_full)
-    disp_gtab_sel(tt);
+  disp_selection(phrase_selected);
 
   return 1;
 }

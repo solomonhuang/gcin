@@ -17,6 +17,8 @@
 #define GTAB_PRE_SELECT "gtab-pre-select"
 #define GTAB_PRESS_FULL_AUTO_SEND "gtab-press-full-auto-send"
 #define GTAB_DISP_PARTIAL_MATCH "gtab-disp-partial-match"
+#define GTAB_SIMPLE_WIN "gtab-simple-win"
+#define GTAB_DISP_KEY_CODES "gtab-disp-key-codes"
 
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
 #define TSIN_CHINESE_ENGLISH_TOGGLE_KEY "tsin-chinese-english-toggle_key"
@@ -31,7 +33,8 @@
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_chars_big5_only,
-           gcin_flags_im_enabled, gcin_remote_client;
+           gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
+           gtab_disp_key_codes;
 
 extern int default_input_method;
 extern int left_right_button_tips;

@@ -45,13 +45,12 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event)
 
   GdkEventButton *event_button;
 
-  if (event->type == GDK_BUTTON_PRESS)
-    {
-      event_button = (GdkEventButton *) event;
-      gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL,
-                      event_button->button, event_button->time);
-      return TRUE;
-    }
+  if (event->type == GDK_BUTTON_PRESS) {
+    event_button = (GdkEventButton *) event;
+    gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL,
+                    event_button->button, event_button->time);
+    return TRUE;
+  }
 
   return FALSE;
 }

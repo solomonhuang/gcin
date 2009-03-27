@@ -13,6 +13,8 @@ int gtab_auto_select_by_phrase;
 int gtab_press_full_auto_send;
 int gtab_pre_select;
 int gtab_disp_partial_match;
+int gtab_simple_win;
+int gtab_disp_key_codes;
 
 int tsin_phrase_pre_select;
 int phonetic_char_dynamic_sequence;
@@ -45,6 +47,8 @@ void load_setttings()
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
+  gtab_simple_win = get_gcin_conf_int(GTAB_SIMPLE_WIN, 0);
+  gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
 
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,

@@ -51,6 +51,16 @@ void set_label_font_size(GtkWidget *label, int size)
 }
 
 
+void set_label_font_family(GtkWidget *label, char *family)
+{
+  PangoContext *pango_context = gtk_widget_get_pango_context (label);
+  PangoFontDescription* font=pango_context_get_font_description
+       (pango_context);
+  pango_font_description_set_family(font, family);
+  gtk_widget_modify_font(label, font);
+}
+
+
 static void create_char(int index)
 {
   if (chars[index].vbox)
@@ -413,7 +423,6 @@ void create_win0()
                    G_CALLBACK(mouse_button_callback), NULL);
 }
 
-gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 #define PHO_IN_AREA_FONT_SIZE_DELTA 6
 

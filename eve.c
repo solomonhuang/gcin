@@ -346,8 +346,9 @@ gboolean init_in_method(int in_no)
   if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
     return FALSE;
 
-  if (current_CS->in_method != in_no)
+  if (current_CS->in_method != in_no) {
     hide_in_win(current_CS);
+  }
 
   reset_current_in_win_xy();
 
