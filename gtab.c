@@ -812,7 +812,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       return 1;
     default:
       if (key>=XK_KP_0 && key<=XK_KP_9)
+#if 0
         key-=XK_KP_0-'0';
+#else
+        return 0;
+#endif
 
       if ((key < 32 || key > 0x7e) && (gtab_full_space_auto_first||spc_pressed)) {
 //        dbg("sel1st_i:%d  '%c'\n", sel1st_i, seltab[sel1st_i][0]);
@@ -932,6 +936,9 @@ YYYY:
     if ((pselkey || wild_mode) && defselN) {
       int vv=pselkey - cur_inmd->selkey;
 
+      if ((gtab_space_auto_first & GTAB_space_auto_first_any))
+        vv++;
+
       if (vv<0)
         vv=9;
 
@@ -1048,9 +1055,20 @@ Disp_opt:
   char tt[MAX_SEL_BUF];
   tt[0]=0;
 
-  for(i=0;i<10;i++) {
+  int ofs;
+
+  if (exa_match && (gtab_space_auto_first & GTAB_space_auto_first_any)) {
+    strcat(tt, seltab[0]);
+    strcat(tt, " ");
+    ofs = 1;
+  } else {
+    ofs = 0;
+  }
+
+
+  for(i=ofs; i<10 + ofs; i++) {
     if (seltab[i][0]) {
-      b1_cat(tt, (i+1)%10 + '0');
+      b1_cat(tt, cur_inmd->selkey[i - ofs]);
 
       if (phrase_selected && i==sel1st_i) {
         strcat(tt, "<span foreground=\"blue\">");

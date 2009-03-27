@@ -285,7 +285,7 @@ void get_win0_geom();
 
 void update_active_in_win_geom()
 {
-  dbg("update_active_in_win_geom\n");
+//  dbg("update_active_in_win_geom\n");
   switch (current_CS->in_method) {
     case 3:
       get_win0_geom();

@@ -23,11 +23,10 @@ gboolean b_hsu_kbm;
 #define MAX_HASH_PHO 27
 u_short hash_pho[MAX_HASH_PHO+1];
 
-char typ_pho_len[]={5, 2, 4, 3};
+static char typ_pho_len[]={5, 2, 4, 3};
 
 phokey_t pho2key(char typ_pho[])
 {
-#if 1
   phokey_t key=typ_pho[0];
   int i;
 
@@ -36,13 +35,9 @@ phokey_t pho2key(char typ_pho[])
   }
 
   return key;
-#else
-  return (u_short)typ_pho[0]<<9 | (u_short) typ_pho[1]<<7 |
-         (u_short)typ_pho[2]<<3 | typ_pho[3];
-#endif
 }
 
-static void key_typ_pho(phokey_t phokey, char rtyp_pho[])
+void key_typ_pho(phokey_t phokey, char rtyp_pho[])
 {
 #if 1
   rtyp_pho[3] = phokey & 7;
@@ -53,9 +48,11 @@ static void key_typ_pho(phokey_t phokey, char rtyp_pho[])
   phokey >>=2;
   rtyp_pho[0] = phokey;
 #else
+  int i;
+
   for(i=3; i>=0; i++) {
-    rtyp_pho[i] = ((1<<rtyp_pho_len[i]) - 1) & phokey;
-    phokey >>= type_pho_len[i];
+    rtyp_pho[i] = ((1<<typ_pho_len[i]) - 1) & phokey;
+    phokey >>= typ_pho_len[i];
   }
 #endif
 }
@@ -282,7 +279,7 @@ static void ClrSelArea()
 extern char *TableDir;
 extern char phofname[128];
 
-static void get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
+void get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
 {
   int typ_pho0 = key >> 9;
   int vv=hash_pho[typ_pho0];
@@ -367,6 +364,7 @@ void inc_pho_count(phokey_t key, int ch_idx)
 
 void lookup_gtab(char *ch, char out[]);
 gboolean is_gtab_query_mode();
+void set_gtab_target_displayed();
 
 void putkey_pho(u_short key, int idx)
 {

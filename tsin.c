@@ -235,7 +235,7 @@ static void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
 }
 
 
-#if 1
+#if 0
 void nputs(u_char *s, u_char len)
 {
   char tt[16];
@@ -757,6 +757,7 @@ static void clear_tsin_buffer()
 }
 
 void clr_in_area_pho_tsin();
+void close_win_pho_near();
 
 static void tsin_reset_in_pho()
 {
@@ -766,6 +767,8 @@ static void tsin_reset_in_pho()
   close_selection_win();
   pre_selN = 0;
   drawcursor();
+
+  close_win_pho_near();
 }
 
 gboolean flush_tsin_buffer()
@@ -1005,7 +1008,6 @@ static gboolean pre_punctuation(KeySym xkey)
   return 0;
 }
 
-phokey_t pho2key(char typ_pho[]);
 gboolean inph_typ_pho(char newkey);
 
 static gboolean b_shift_pressed;
@@ -1029,6 +1031,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
        return 0;
    }
 
+   close_win_pho_near();
 
    switch (xkey) {
      case XK_Escape:
@@ -1223,8 +1226,16 @@ int feedkey_pp(KeySym xkey, int kbstate)
         return 1;
      case XK_Up:
        if (!sel_pho) {
-         if (c_len)
+         if (c_len && c_idx == c_len) {
+           int idx = c_len-1;
+           phokey_t pk = ph_buf[idx];
+
+           if (pk) {
+             create_win_pho_near(pk);
+           }
+
            return 1;
+         }
          return 0;
        }
 
@@ -1594,4 +1605,12 @@ int feedkey_pp_release(KeySym xkey, int kbstate)
      default:
         return 0;
   }
+}
+
+void tsin_remove_last()
+{
+  if (!c_len)
+    return;
+  c_len--;
+  c_idx--;
 }
