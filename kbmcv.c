@@ -5,7 +5,7 @@
 #include "gcin.h"
 #include "pho.h"
 
-int lookup(u_char *s, char *num, char *typ)
+int pho_lookup(u_char *s, char *num, char *typ)
 {
   int i;
   char tt[CH_SZ+1], *pp;
@@ -27,7 +27,7 @@ int lookup(u_char *s, char *num, char *typ)
     return 0;
 
   *typ=i;
-  *num=(pp - pho_chars[i])/CH_SZ;
+  *num=(pp - pho_chars[i])/3;
 
   return 1;
 }
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     if (!len)
       break;
 
-    if (!lookup(s, &num, &typ))
+    if (!pho_lookup(s, &num, &typ))
       p_err("err found");
 
     int utf8sz = utf8_sz(s);

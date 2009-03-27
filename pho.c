@@ -326,11 +326,14 @@ void inc_pho_count(phokey_t key, int ch_idx)
   get_start_stop_idx(key, &start_i, &stop_i);
 
 //  dbg("start_i %d %d    %d %d\n", start_i, stop_i, start_idx, stop_idx);
-  if (ch_pho[ch_idx].count == 65535) {
+  if (ch_pho[ch_idx].count == 32767) {
     int i;
 
     for(i=start_i; i < stop_i; i++) {
-      ch_pho[start_i].count /= 2;
+      if (ch_pho[i].count < 0)
+        continue;
+
+      ch_pho[i].count /= 2;
     }
   }
 
@@ -450,9 +453,9 @@ void init_tab_pho()
   clrin_pho();
 }
 
+gboolean shift_char_proc(KeySym key, int kbstate);
 
-
-int feedkey_pho(KeySym xkey)
+int feedkey_pho(KeySym xkey, int kbstate)
 {
   int ctyp = 0;
   static unsigned int vv, ii;
@@ -462,6 +465,11 @@ int feedkey_pho(KeySym xkey)
   int i,j,jj=0,kk=0;
   char out_buffer[(CH_SZ+2) * 10 + 4];
   int out_bufferN;
+
+  if ((kbstate & ShiftMask)) {
+    return shift_char_proc(xkey, kbstate);
+  }
+
 
   if (xkey >= 'A' && xkey <='Z')
     xkey+=0x20;
@@ -735,6 +743,6 @@ void start_gtab_pho_query(char *utf8)
     xkeys[3] = ' ';
 
   for(i=0; i < 4; i++) {
-    feedkey_pho(xkeys[i]);
+    feedkey_pho(xkeys[i], 0);
   }
 }

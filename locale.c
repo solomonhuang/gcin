@@ -67,7 +67,7 @@ int utf8_sz(char *s)
   if ((*s & 0xf8) == 0xf0)
     return 4;
 
-  p_err("bad utf8 char %x", *s);
+  p_err("bad utf8 char %x %c%c%c", *s, *s, *(s+1), *(s+2));
   return -1;
 }
 
@@ -78,6 +78,16 @@ void utf8cpy(char *t, char *s)
 
   memcpy(t, s, utf8sz);
   t[utf8sz] = 0;
+}
+
+
+void utf8cpyN(char *t, char *s, int N)
+{
+  int len = utf8_tlen(s, N);
+
+  memcpy(t, s, len);
+
+  t[len] = 0;
 }
 
 

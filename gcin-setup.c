@@ -9,7 +9,8 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_disp_partial_match,
                  *check_button_gtab_simple_win,
                  *check_button_gtab_disp_key_codes,
-                 *check_button_gtab_disp_im_name;
+                 *check_button_gtab_disp_im_name,
+                 *check_button_gtab_invalid_key_in;
 
 static GtkWidget *opt_spc_opts;
 
@@ -340,6 +341,10 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_DISP_IM_NAME,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_im_name)));
 
+  save_gcin_conf_int(GTAB_INVALID_KEY_IN,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_invalid_key_in)));
+
+
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
@@ -505,6 +510,18 @@ void create_gtab_conf_window()
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_im_name),
        gtab_disp_im_name);
+
+
+    GtkWidget *hbox_gtab_invalid_key_in = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_invalid_key_in, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_gtab_invalid_key_in = gtk_label_new("錯誤鍵進入 & space 清除(傳統)");
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_invalid_key_in), label_gtab_gtab_invalid_key_in,  FALSE, FALSE, 0);
+    check_button_gtab_invalid_key_in = gtk_check_button_new ();
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_invalid_key_in), check_button_gtab_invalid_key_in,  FALSE, FALSE, 0);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_invalid_key_in),
+       gtab_invalid_key_in);
+
 
 
     GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

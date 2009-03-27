@@ -253,6 +253,8 @@ void get_char_index_xy(int index, int *rx, int *ry)
 
 //  dbg("wy: %d %d   wx:%d\n", wy, sz.height, wx);
 
+  int win_x, win_y;
+
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
 
   *rx = win_x + wx;
@@ -309,11 +311,6 @@ void compact_win0()
 
 void move_win0(int x, int y)
 {
-  if (current_CS && current_CS->fixed_pos) {
-    x = current_CS->fixed_x;
-    y = current_CS->fixed_y;
-  }
-
   best_win_x = x;
   best_win_y = y;
 
@@ -329,7 +326,6 @@ void move_win0(int x, int y)
   if (y < 0)
     y = 0;
 
-  win_x = x;  win_y = y;
   gtk_window_move(GTK_WINDOW(gwin0), x, y);
 
   show_win_sym();

@@ -224,7 +224,7 @@ static void disp_in_area_pho_tsin()
   int i;
 
   for(i=0;i<4;i++) {
-    disp_tsin_pho(i, &pho_chars[i][typ_pho[i] * CH_SZ]);
+    disp_tsin_pho(i, &pho_chars[i][typ_pho[i] * 3]);
   }
 }
 
@@ -500,7 +500,7 @@ static void get_sel_phrase()
     if (chpho_eq_pho(c_idx, stk, len)) {
       sellen[phrase_count]=len;
       selidx[phrase_count]=sti;
-      memcpy(selstr[phrase_count++], stch, CH_SZ*len);
+      utf8cpyN(selstr[phrase_count++], stch, len);
     }
 
     sti++;
@@ -1253,7 +1253,6 @@ int feedkey_pp(KeySym xkey, int kbstate)
 
         for(k=c_idx;k<c_len;k++) {
           chpho[k] = chpho[k+1];
-//          memcpy(ch_obuf[k], ch_obuf[k+1], CH_SZ);
           chpho[k].psta=chpho[k+1].psta-1;
         }
 
@@ -1316,7 +1315,6 @@ int feedkey_pp(KeySym xkey, int kbstate)
 
         for(k=c_idx;k<c_len;k++) {
           chpho[k]=chpho[k+1];
-//          memcpy(ch_obuf[k], ch_obuf[k+1], CH_SZ);
           chpho[k].psta=chpho[k+1].psta-1;
         }
 

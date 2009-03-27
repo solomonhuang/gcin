@@ -5,7 +5,7 @@
 Display *dpy;
 Window root;
 int win_xl, win_yl;
-int win_x, win_y;
+int win_x, win_y;   // actual win x/y
 int dpy_xl, dpy_yl;
 gboolean dual_xim=TRUE;
 

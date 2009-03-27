@@ -367,9 +367,6 @@ int main(int argc, char **argv)
       char out[CH_SZ+1];
       int u8len = utf8_sz(arg);
 
-      if (u8len > 3)
-        p_err("error found");
-
       bzero(out, sizeof(out));
       memcpy(out, arg, len);
 

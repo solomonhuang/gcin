@@ -126,7 +126,7 @@ void create_win_pho_near(phokey_t pho)
       for(i=start_i; i<stop_i; i++) {
         char tt[CH_SZ+1];
         bzero(tt, sizeof(tt));
-        memcpy(tt, ch_pho[i].ch, CH_SZ);
+        utf8cpy(tt, ch_pho[i].ch);
 
         GtkWidget *button = gtk_button_new();
         gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);

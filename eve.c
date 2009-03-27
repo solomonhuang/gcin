@@ -110,7 +110,7 @@ void hide_win_gtab();
 void hide_win_int();
 void hide_win_pho();
 
-static int current_in_win_x = -1, current_in_win_y = -1;
+int current_in_win_x = -1, current_in_win_y = -1;  // request x/y
 
 void reset_current_in_win_xy()
 {
@@ -184,11 +184,11 @@ void move_win_pho(int x, int y);
 
 void move_in_win(ClientState *cs, int x, int y)
 {
-  if (!cs) {
-#if DEBUG
-    dbg("move_in_win: cs is null");
-#endif
-    return;
+  check_CS();
+
+  if (current_CS && current_CS->fixed_pos) {
+    x = current_CS->fixed_x;
+    y = current_CS->fixed_y;
   }
 
 #if DEBUG || 0
@@ -252,6 +252,9 @@ void update_in_win_pos()
   }
 }
 
+void win_pho_disp_half_full();
+void win_tsin_disp_half_full();
+void win_gtab_disp_half_full();
 
 void disp_im_half_full()
 {
@@ -326,7 +329,7 @@ void update_active_in_win_geom()
 //  dbg("update_active_in_win_geom\n");
   switch (current_CS->in_method) {
     case 3:
-      get_win0_geom();
+      get_win_pho_geom();
       break;
     case 6:
       get_win0_geom();
@@ -361,12 +364,8 @@ void toggle_half_full_char(u_int kev_state)
       current_CS->im_state = GCIN_STATE_ENG_FULL;
     } else
     if (current_CS->im_state == GCIN_STATE_CHINESE) {
-      current_CS->im_state = GCIN_STATE_CH_ENG_FULL;
-    } else
-    if (current_CS->im_state == GCIN_STATE_CH_ENG_FULL) {
-      current_CS->im_state = GCIN_STATE_CHINESE;
+      current_CS->b_half_full_char = !current_CS->b_half_full_char;
     }
-
 //    dbg("current_CS->in_method %d\n", current_CS->in_method);
     disp_im_half_full();
   }
@@ -449,8 +448,23 @@ static void cycle_next_in_method()
   }
 }
 
+gboolean full_char_proc(KeySym keysym)
+{
+  char *s = half_char_to_full_char(keysym);
 
-int feedkey_pho(KeySym xkey);
+  if (!s)
+    return 0;
+
+  char tt[CH_SZ+1];
+
+  utf8cpy(tt, s);
+
+  send_text(tt);
+  return 1;
+}
+
+
+int feedkey_pho(KeySym xkey, int kbstate);
 int feedkey_pp(KeySym xkey, int state);
 int feedkey_gtab(KeySym key, int kbstate);
 int feed_phrase(KeySym ksym);
@@ -501,22 +515,16 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     return TRUE;
   }
 
-//  dbg("state %x\n", kev_state);
-  if ((current_CS->im_state & (GCIN_STATE_ENG_FULL|GCIN_STATE_CH_ENG_FULL))) {
-     char *s = half_char_to_full_char(keysym);
-     if (!s)
-       return 0;
-     char tt[CH_SZ+1];
-
-     memcpy(tt, s, CH_SZ); tt[CH_SZ]=0;
-     send_text(tt);
-     return 1;
-  }
-
 
   if ((kev_state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
     return feed_phrase(keysym);
   }
+
+//  dbg("state %x\n", kev_state);
+  if ((current_CS->im_state & (GCIN_STATE_ENG_FULL)) ) {
+    return full_char_proc(keysym);
+  }
+
 
   if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
     current_CS->im_state = GCIN_STATE_CHINESE;
@@ -540,10 +548,9 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   }
 
 
-
   switch(current_CS->in_method) {
     case 3:
-      return feedkey_pho(keysym);
+      return feedkey_pho(keysym, kev_state);
     case 6:
       return feedkey_pp(keysym, kev_state);
     case 0:

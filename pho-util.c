@@ -84,12 +84,26 @@ void free_pho_mem()
     free(ch_pho);
 }
 
+typedef struct {
+  phokey_t key;
+  short count;
+} PH_COUNT;
+
+static int qcmp_pho_count(const void *aa, const void *bb)
+{
+  PH_COUNT *a = (PH_COUNT *)aa;
+  PH_COUNT *b = (PH_COUNT *)bb;
+
+  return b->count - a->count;
+}
+
+
 int utf8_pho_keys(char *big5, phokey_t *phkeys)
 {
+  int i;
   int ofs=0;
   int phkeysN=0;
-
-  phkeys[0];
+  PH_COUNT phcou[256];
 
   do {
     for(; ofs < ch_phoN; ofs++)
@@ -99,10 +113,10 @@ int utf8_pho_keys(char *big5, phokey_t *phkeys)
     if (ofs==ch_phoN)
       goto ret;
 
-    int i;
     for(i=0; i < idxnum_pho; i++) {
       if (idx_pho[i].start<= ofs && ofs < idx_pho[i+1].start) {
-        phkeys[phkeysN++] = idx_pho[i].key;
+        phcou[phkeysN].count = ch_pho[ofs].count;
+        phcou[phkeysN++].key = idx_pho[i].key;
         break;
       }
     }
@@ -111,6 +125,11 @@ int utf8_pho_keys(char *big5, phokey_t *phkeys)
   } while (ofs < ch_phoN);
 
 ret:
+  qsort(phcou, phkeysN, sizeof(PH_COUNT), qcmp_pho_count);
+
+  for(i=0; i < phkeysN; i++)
+    phkeys[i] = phcou[i].key;
+
   return phkeysN;
 }
 

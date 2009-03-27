@@ -11,11 +11,17 @@
 #include "IMdkit.h"
 #include "Xi18n.h"
 
+
+/* change 3 to 4 if you want to use 4-byte UTF-8 characters, but you must
+   regenerate *.gtab tsin
+*/
+#define CH_SZ (3)
+
+
 typedef enum {
   GCIN_STATE_DISABLED = 0,
   GCIN_STATE_ENG_FULL = 1,
-  GCIN_STATE_CH_ENG_FULL = 2,
-  GCIN_STATE_CHINESE = 4
+  GCIN_STATE_CHINESE = 2
 } GCIN_STATE_E;
 
 
@@ -27,7 +33,6 @@ typedef enum {
 #define zmalloc __gcin_zmalloc
 #endif
 
-#define CH_SZ (3) // gcin only supports up to 3 bytes
 
 #define tmalloc(type,n)  (type*)malloc(sizeof(type) * (n))
 void *zmalloc(int n);
@@ -88,7 +93,8 @@ enum {
 #define PHO_KBM "phokbm"
 
 extern int win_xl, win_yl;
-extern int win_x, win_y;
+extern int win_x, win_y;   // actual win x/y
+extern int  current_in_win_x,  current_in_win_y;  // request x/y
 extern int dpy_xl, dpy_yl;
 
 extern int gcin_font_size;
@@ -108,6 +114,7 @@ int u8cpy(char *t, char *s);
 int utf8_tlen(char *s, int N);
 void utf8_putchar(char *s);
 gboolean utf8_str_eq(char *a, char *b, int len);
+void utf8cpyN(char *t, char *s, int N);
 
 void get_gcin_dir(char *tt);
 Atom get_gcin_atom(Display *dpy);

@@ -6,7 +6,7 @@
 typedef struct {
   u_short key;
   u_char ch[CH_SZ];
-  u_short count;
+  short count;
   int oseq;
 } PHITEM;
 
@@ -15,29 +15,6 @@ int itemsN;
 
 PHO_ITEM pho_items[MAX_CHS];
 int pho_itemsN=0;
-
-static int shiftb[]={9,7,3,0};
-
-int lookup(u_char *s)
-{
-  int i;
-  char tt[CH_SZ+1], *pp;
-
-  if (*s < 128)
-    return *s-'0';
-
-  bchcpy(tt, s);
-  tt[CH_SZ]=0;
-
-  for(i=0;i<3;i++)
-    if ((pp=strstr(pho_chars[i],tt)))
-      break;
-
-  if (i==3)
-    return 0;
-
-  return (((pp-pho_chars[i])/CH_SZ) << shiftb[i]);
-}
 
 
 void p_err(char *fmt,...)
@@ -114,10 +91,7 @@ int main(int argc, char **argv)
     while (*p && *p!=' ') {
       kk |= lookup(p);
 
-      if (*p & 128)
-        p+=CH_SZ;
-      else
-        p++;
+      p += utf8_sz(p);
     }
 
     items[itemsN].key = kk;
@@ -171,6 +145,7 @@ int main(int argc, char **argv)
   char *tp = strstr(fname, ".src");
   if (!tp)
     p_err("file name should be *.tab.src");
+
   *tp=0;
 
   char *fname_out = fname;

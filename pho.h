@@ -15,7 +15,7 @@ extern PHOKBM phkbm;
 
 typedef struct {
   u_char ch[CH_SZ];
-  u_short count;
+  short count;
 } PHO_ITEM;
 
 typedef struct {
@@ -46,7 +46,7 @@ int utf8_pho_keys(char *big5, phokey_t *phkeys);
 void prph(phokey_t kk);
 phokey_t pho2key(char typ_pho[]);
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecount);
-
+int lookup(u_char *s);
 
 #define MAX_PH_BF (90)
 
@@ -54,3 +54,4 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecoun
 
 
 #define TSIN_HASH_SHIFT 6
+

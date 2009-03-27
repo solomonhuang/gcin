@@ -25,7 +25,7 @@ extern char *TableDir;
 INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 INMD *cur_inmd;
-static gboolean last_full, more_pg, wild_mode, m_pg_mode, spc_pressed;
+static gboolean last_full, more_pg, wild_mode, m_pg_mode, spc_pressed, invalid_spc;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
 static short defselN, exa_match;
 static KeySym inch[MAX_TAB_KEY_NUM64];
@@ -178,20 +178,16 @@ static void ClrSelArea()
 
 void disp_gtab(int index, char *gtabchar);
 
+
 static void ClrIn()
 {
   bzero(inch,sizeof(inch));
   bzero(seltab,sizeof(seltab));
   m_pg_mode=pg_idx=more_pg=wild_mode=wild_page=last_idx=defselN=exa_match=
-  spc_pressed=ci=0;
+  spc_pressed=ci=invalid_spc=0;
 
   sel1st_i=MAX_SELKEY-1;
-}
 
-void clear_gtab_in_area();
-
-static void ClrInArea()
-{
   clear_gtab_in_area();
   last_idx = 0;
 }
@@ -504,7 +500,6 @@ static void putstr_inp(u_char *p)
 
       ClrIn();
       ClrSelArea();
-      ClrInArea();
       return;
     }
 
@@ -553,7 +548,6 @@ static void putstr_inp(u_char *p)
 
   ClrIn();
   ClrSelArea();
-  ClrInArea();
 }
 
 
@@ -743,7 +737,7 @@ static void load_phr(int j, char *tt)
 }
 
 void init_gtab_pho_query_win();
-int feedkey_pho(KeySym xkey);
+int feedkey_pho(KeySym xkey, int state);
 
 void set_gtab_target_displayed()
 {
@@ -762,7 +756,6 @@ void reset_gtab_all()
 
   ClrIn();
   ClrSelArea();
-  ClrInArea();
 }
 
 static void disp_selection(gboolean phrase_selected)
@@ -830,6 +823,34 @@ static void proc_wild_disp()
    disp_selection(0);
 }
 
+gboolean full_char_proc(KeySym keysym);
+
+gboolean shift_char_proc(KeySym key, int kbstate)
+{
+    char tt[2];
+
+    if (key >= 127)
+      return FALSE;
+
+    if (kbstate & LockMask) {
+      if (key >= 'a' && key <= 'z')
+        key-=0x20;
+    } else {
+      if (key >= 'A' && key <= 'Z')
+        key+=0x20;
+    }
+
+
+    if (current_CS->b_half_full_char)
+      return full_char_proc(key);
+
+
+    tt[0] = key;
+    tt[1] = 0;
+    send_text(tt);
+    return TRUE;
+}
+
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -850,7 +871,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 
   if (same_pho_query_state == SAME_PHO_QUERY_pho_select)
-    return feedkey_pho(key);
+    return feedkey_pho(key, 0);
 #if 0
   if (current_CS->b_half_full_char) {
      char *s = half_char_to_full_char(key);
@@ -864,23 +885,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   }
 #endif
   if ((kbstate & ShiftMask) && key!='*' && key!='?') {
-    char tt[2];
-
-    if (key >= 127)
-      return 0;
-
-    if (kbstate & LockMask) {
-      if (key >= 'a' && key <= 'z')
-        key-=0x20;
-    } else {
-      if (key >= 'A' && key <= 'Z')
-        key+=0x20;
-    }
-
-    tt[0] = key;
-    tt[1] = 0;
-    send_text(tt);
-    return 1;
+    return shift_char_proc(key, kbstate);
   }
 
   gboolean has_wild = FALSE;
@@ -933,6 +938,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
       return 0;
     case ' ':
+      if (invalid_spc) {
+        ClrIn();
+        return TRUE;
+      }
+
       has_wild = has_wild_card();
 
       if (wild_mode) {
@@ -1123,7 +1133,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (ci==0) {
     ClrSelArea();
-    ClrInArea();
     ClrIn();
     return 1;
   }
@@ -1190,11 +1199,21 @@ YYYY:
     if (pselkey && !defselN)
       return 0;
 
-    if (gtab_dup_select_bell)
-      bell();
+    if (gtab_invalid_key_in) {
+      if (spc_pressed) {
+        bell();
+        invalid_spc = TRUE;
+//        dbg("invalid_spc\n");
+      }
+      else
+        ClrSelArea();
+    } else {
+      if (gtab_dup_select_bell)
+        bell();
 
-    if (ci>0)
-      inch[--ci]=0;
+      if (ci>0)
+        inch[--ci]=0;
+    }
 
     last_idx=0;
     DispInArea();
@@ -1291,6 +1310,11 @@ next_pg:
     if (!defselN) {
       bell();
       spc_pressed=0;
+
+      if (gtab_invalid_key_in) {
+        invalid_spc = TRUE;
+        return TRUE;
+      }
       goto refill;
     } else
     if (!more_pg) {

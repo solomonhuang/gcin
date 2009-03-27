@@ -6,7 +6,7 @@ static gboolean current_gtab_simple_win = FALSE;
 
 static GtkWidget *gwin_gtab;
 static GtkWidget *frame;
-static GtkWidget *label_gtab_sele;
+static GtkWidget *label_full, *label_gtab_sele;
 static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64];
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
@@ -90,7 +90,7 @@ void disp_gtab_sel(char *s)
 #endif
 
   if (win_size_exceed(gwin_gtab))
-    move_win_gtab(win_x, win_y);
+    move_win_gtab(current_in_win_x, current_in_win_y);
 }
 
 
@@ -108,16 +108,8 @@ void move_win_gtab(int x, int y)
 {
 //  dbg("move_win_gtab %d %d\n", x, y);
 
-  if (current_CS && current_CS->fixed_pos) {
-    x = current_CS->fixed_x;
-    y = current_CS->fixed_y;
-  }
 
-#if 1
   get_win_size(gwin_gtab, &win_xl, &win_yl);
-#else
-  gtk_window_get_size(GTK_WINDOW(gwin_gtab), &win_xl, &win_yl);
-#endif
 
   if (x + win_xl > dpy_xl)
     x = dpy_xl - win_xl;
@@ -129,8 +121,8 @@ void move_win_gtab(int x, int y)
   if (y < 0)
     y = 0;
 
-  win_x = x;  win_y = y;
   gtk_window_move(GTK_WINDOW(gwin_gtab), x, y);
+  win_x = x;  win_y = y;
 
   show_win_sym();
 }
@@ -239,6 +231,8 @@ void create_win_gtab_gui_full()
   /* This packs the button into the gwin_gtab (a gtk container). */
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
 
+  label_full = gtk_label_new("全");
+
   GtkWidget *button_input_method_name = gtk_button_new();
   label_input_method_name = gtk_label_new("");
   gtk_container_add (GTK_CONTAINER (button_input_method_name), label_input_method_name);
@@ -314,6 +308,9 @@ void create_win_gtab_gui_simple()
   GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
 
+  label_full = gtk_label_new("全");
+  gtk_box_pack_start (GTK_BOX (hbox), label_full, FALSE, FALSE, 0);
+
   GtkWidget *event_box_input_method_name = gtk_event_box_new();
   gtk_box_pack_start (GTK_BOX (hbox), event_box_input_method_name, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (event_box_input_method_name), 0);
@@ -367,6 +364,7 @@ void create_win_gtab_gui_simple()
   gtk_widget_show_all (gwin_gtab);
 
   set_disp_im_name();
+  gtk_widget_hide(label_full);
 }
 
 
@@ -467,8 +465,6 @@ char *get_full_str()
   switch (current_CS->im_state) {
     case GCIN_STATE_ENG_FULL:
       return eng_full_str;
-    case GCIN_STATE_CH_ENG_FULL:
-      return ch_full_str;
     default:
       return "　";
   }
@@ -476,6 +472,11 @@ char *get_full_str()
 
 void win_gtab_disp_half_full()
 {
+  if (current_CS->im_state == GCIN_STATE_CHINESE && current_CS->b_half_full_char) {
+    gtk_widget_show(label_full);
+  } else
+    gtk_widget_hide(label_full);
+
   gtk_label_set_text(GTK_LABEL(labels_gtab[0]), get_full_str());
   int i;
 

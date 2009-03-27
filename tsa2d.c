@@ -97,33 +97,6 @@ static int qcmp_usecount(const void *a, const void *b)
 }
 
 
-static int shiftb[]={9,7,3,0};
-
-int lookup(u_char *s)
-{
-  int i;
-  char tt[3], *pp;
-
-  if (*s < 128)
-    return *s-'0';
-
-  int len = utf8_sz(s);
-
-  bchcpy(tt, s);
-  tt[len]=0;
-
-
-  for(i=0;i<3;i++)
-    if ((pp=strstr(pho_chars[i],tt)))
-      break;
-
-  if (i==3)
-    return 0;
-
-  return (((pp-pho_chars[i])/CH_SZ) << shiftb[i]);
-}
-
-
 int main(int argc, char **argv)
 {
   FILE *fp,*fw;
@@ -198,10 +171,7 @@ int main(int argc, char **argv)
       while (s[i]!=' ' && i<len) {
         kk |= lookup(&s[i]);
 
-        if (s[i]&128)
-          i += CH_SZ;
-        else
-          i++;
+        i+=utf8_sz(&s[i]);
       }
 
       i++;
