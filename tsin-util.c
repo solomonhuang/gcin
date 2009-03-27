@@ -255,7 +255,7 @@ static int load_ts_gtab(int idx, char *tstr)
 }
 
 // len is in CH_SZ
-int find_match(char *str, int len, char *match_chars)
+int find_match(char *str, int len, char *match_chars, int match_chars_max)
 {
   if (!len)
     return 0;
@@ -304,6 +304,9 @@ int find_match(char *str, int len, char *match_chars)
         if (strncmp(str, tstr, len) || tlen <= len)
           break;
 
+        if (matchN >= match_chars_max)
+          break;
+
         memcpy(&match_chars[matchN * CH_SZ], &tstr[len], CH_SZ);
 //        dbg("zzz %c%c%c\n", match_chars[0], match_chars[1], match_chars[2]);
         matchN++;
@@ -316,6 +319,9 @@ int find_match(char *str, int len, char *match_chars)
         tlen = load_ts_gtab(i, tstr);
 
         if (strncmp(str, tstr, len) || tlen <= len)
+          break;
+
+        if (matchN >= match_chars_max)
           break;
 
         memcpy(&match_chars[matchN * CH_SZ], &tstr[len], CH_SZ);

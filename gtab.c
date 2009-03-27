@@ -472,7 +472,7 @@ void init_gtab(int inmdno, int usenow)
 
 static char match_phrase[MAX_PHRASE_STR_LEN];
 static int part_matched_len;
-gboolean find_match(char *str, int len, char *match_str);
+gboolean find_match(char *str, int len, char *match_str, int match_strs_max);
 void start_gtab_pho_query(char *utf8);
 
 static void clear_phrase_match_buf()
@@ -516,14 +516,14 @@ static void putstr_inp(u_char *p)
 #if DPHR
         dbg("%d   zzz %s\n",part_matched_len, match_phrase);
 #endif
-        if (find_match(match_phrase, part_matched_len + CH_SZ, NULL)) {
+        if (find_match(match_phrase, part_matched_len + CH_SZ, NULL, 0)) {
 #if DPHR
           dbg("cat match_phrase %s\n", match_phrase);
 #endif
           part_matched_len += CH_SZ;
         } else {
           strcpy(match_phrase, p);
-          if (find_match(match_phrase, CH_SZ, NULL)) {
+          if (find_match(match_phrase, CH_SZ, NULL, 0)) {
 #if DPHR
             dbg("single match_phrase %s\n", match_phrase);
 #endif
@@ -551,9 +551,11 @@ static gboolean set_sel1st_i()
   if (!part_matched_len)
     return FALSE;
 
-  char match_arr[512];
+#define MAX_MATCH_STRS 1024
 
-  int N = find_match(match_phrase, part_matched_len, match_arr);
+  char match_arr[CH_SZ * MAX_MATCH_STRS + 1];
+
+  int N = find_match(match_phrase, part_matched_len, match_arr, MAX_MATCH_STRS);
   int i;
 
 #if 0

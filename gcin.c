@@ -130,7 +130,7 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
 //  dbg("gcin_ProtoHandler %x ims\n", ims);
-  int index;
+  int index=0;
 
   if (ims == xim_arr[0].xims)
     index = 0;
