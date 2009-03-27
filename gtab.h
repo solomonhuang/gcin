@@ -43,7 +43,13 @@ struct TableHead2 {
 #define MAX_TAB_KEY_NUM 5
 #define MAX_TAB_KEY_NUM64 10
 
+#define LARGE_GTAB 0
+
+#if LARGE_GTAB
+typedef u_int gtab_idx1_t;
+#else
 typedef u_short gtab_idx1_t;
+#endif
 
 typedef struct {
   ITEM *tbl;

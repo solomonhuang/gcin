@@ -531,8 +531,8 @@ int feedkey_pho(KeySym xkey)
 
       while(i<phkbm.selkeyN  && ii< stop_idx) {
         out_buffer[out_bufferN++] = phkbm.selkey[i];
-        bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
-        out_bufferN+=CH_SZ;
+        int len = u8cpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+        out_bufferN+=len;
         out_buffer[out_bufferN++] = ' ';
 
         ii++;
@@ -660,8 +660,8 @@ proc_state:
   if (ityp3_pho) {
     while(i< phkbm.selkeyN  && ii < stop_idx) {
       out_buffer[out_bufferN++] = phkbm.selkey[i];
-      bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
-      out_bufferN+=CH_SZ;
+      int len = u8cpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+      out_bufferN+=len;
       out_buffer[out_bufferN++] = ' ';
 
       ii++;
@@ -680,8 +680,8 @@ proc_state:
     maxi=i;
   } else {
     while(i<phkbm.selkeyN  && ii < stop_idx) {
-      bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
-      out_bufferN+=CH_SZ;
+      int len = u8cpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+      out_bufferN+=len;
 
       ii++;
       i++;

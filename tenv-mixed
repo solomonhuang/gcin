@@ -1,0 +1,5 @@
+export LC_CTYPE="zh_TW.Big5"
+export LC_MESSAGES="zh_TW.Big5"
+export XMODIFIERS="@im=gcin-test"
+exec ./gcin &
+LC_ALL=zh_TW.UTF-8 gedit

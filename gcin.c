@@ -37,6 +37,15 @@ void start_inmd_window()
 {
 
   switch (default_input_method) {
+    case 3:
+      create_win_pho();
+
+      if (dual_xim)
+        create_win0();
+
+      xim_arr[0].xim_xwin = xwin_pho;
+      xim_arr[1].xim_xwin = xwin0;
+      break;
     case 6:
       create_win0();
 
@@ -413,11 +422,12 @@ int main(int argc, char **argv)
   dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
   char *lc_ctype = getenv("LC_CTYPE");
   char *lc_all = getenv("LC_ALL");
+  char *lang = getenv("LANG");
   if (!lc_ctype)
     lc_ctype = "";
   if (!lc_all)
     lc_all = "";
-  dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s\n", lc_ctype, lc_all);
+  dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s  LANG=%s\n", lc_ctype, lc_all, lang);
 
   xim_arr[0].server_locale = "zh_TW";
   char *xim_server_name = get_gcin_xim_name();
@@ -425,7 +435,8 @@ int main(int argc, char **argv)
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
   strcpy(xim_arr[1].xim_server_name, xim_server_name);
 
-  if ((lc_ctype && !strcmp(lc_ctype, "zh_TW.UTF-8")) || (lc_all && !strcmp(lc_all, "zh_TW.UTF-8"))) {
+  if ((lc_ctype && !strcmp(lc_ctype, "zh_TW.UTF-8")) || (lc_all && !strcmp(lc_all, "zh_TW.UTF-8")) ||
+       (lang && !strcmp(lc_all, "zh_TW.UTF-8"))) {
     xim_arr[0].b_send_utf8_str = TRUE;
     xim_arr[1].b_send_utf8_str = FALSE;
     xim_arr[1].server_locale = "zh_TW.Big5";

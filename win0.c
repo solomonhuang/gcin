@@ -28,6 +28,7 @@ static GtkWidget *button_eng_ph;
 static int max_yl;
 
 
+
 void disp_hide_tsin_status_row()
 {
   if (tsin_disp_status_row)
@@ -278,6 +279,7 @@ void move_win_char_index(GtkWidget *win1, int index)
   gtk_window_move(GTK_WINDOW(win1), x, y);
 }
 
+#define MIN_X_SIZE 16
 
 
 void compact_win0_x()
@@ -288,13 +290,13 @@ void compact_win0_x()
   if (max_yl < win_yl)
     max_yl = win_yl;
 
-  gtk_window_resize(GTK_WINDOW(gwin0), 60, max_yl);
+  gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, max_yl);
 }
 
 void compact_win0()
 {
   max_yl = 0;
-  gtk_window_resize(GTK_WINDOW(gwin0), 60, 16);
+  gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
 }
 
 
@@ -564,6 +566,7 @@ void show_win0()
   show_win_sym();
 }
 
+void hide_selections_win();
 void hide_win0()
 {
   gtk_widget_hide(gwin0);
@@ -601,3 +604,14 @@ void change_tsin_font_size()
   change_win1_font();
 }
 
+
+
+void show_button_pho(gboolean bshow)
+{
+  if (bshow)
+    gtk_widget_show(button_pho);
+  else {
+    gtk_widget_hide(button_pho);
+    compact_win0();
+  }
+}

@@ -27,11 +27,11 @@ INMD inmd[MAX_GTAB_NUM_KEY+1];
 INMD *cur_inmd;
 static gboolean last_full, more_pg, wild_mode, m_pg_mode, spc_pressed;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
-static u_short defselN, exa_match;
+static short defselN, exa_match;
 static KeySym inch[MAX_TAB_KEY_NUM64];
 static int ci;
-static u_short last_idx, pg_idx;
-static u_short wild_page;
+static int last_idx, pg_idx;
+static int wild_page;
 static int sel1st_i = MAX_SELKEY - 1;
 
 #define gtab_full_space_auto_first (gtab_space_auto_first & (GTAB_space_auto_first_any|GTAB_space_auto_first_full))
@@ -334,6 +334,8 @@ void init_gtab(int inmdno, int usenow)
   }
 
   fread(ttt, 1, th.KeyS, fp);
+  dbg("KeyS %d\n", th.KeyS);
+
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
   memcpy(&inp->keyname[61*CH_SZ], "？", CH_SZ);  /* for wild card */
   memcpy(&inp->keyname[62*CH_SZ], "＊", CH_SZ);
@@ -716,13 +718,18 @@ static char *ptr_selkey(KeySym key)
 static void load_phr(int j, char *tt)
 {
   int len;
-  char *ch = tblch(j);
+  u_char *ch = tblch(j);
+  int phrno;
 
-  int phrno=((int)(ch[0])<<8)|ch[1];
+#if LARGE_GTAB
+    phrno=((int)(ch[0])<<16)|((int)ch[1]<<8)|ch[2];
+#else
+    phrno=((int)(ch[0])<<8)|ch[1];
+#endif
 
   int ofs = cur_inmd->phridx[phrno], ofs1 = cur_inmd->phridx[phrno+1];
 
-//  dbg("load_phr   %d  %d %d\n", phrno, ofs, ofs1);
+//  dbg("load_phr   j:%d %d %d %d\n", j, phrno, ofs, ofs1);
   len = ofs1 - ofs;
 
   if (len > 128 || len <= 0) {
@@ -762,7 +769,7 @@ static void disp_selection(gboolean phrase_selected)
 {
   ClrSelArea();
 
-  char tt[MAX_SEL_BUF];
+  char tt[1024];
   tt[0]=0;
 
   int ofs;

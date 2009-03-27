@@ -107,5 +107,6 @@ void sendkey_b5(char *bchar);
 void bell();
 void set_label_font_size(GtkWidget *label, int size);
 void send_gcin_message(Display *dpy, char *s);
+void check_CS();
 
 #define BITON(flag, bit) ((flag) & (bit))

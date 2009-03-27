@@ -26,7 +26,9 @@ void send_text_call_back(char *text)
   send_fake_key_eve();
 }
 
+
 ClientState *current_CS;
+ClientState temp_CS;
 
 gboolean init_in_method(int in_no);
 
@@ -194,7 +196,7 @@ void move_in_win(ClientState *cs, int x, int y)
   if (current_in_win_x == x && current_in_win_y == y)
     return;
 
-  current_in_win_x = x ; current_in_win_y == y;
+  current_in_win_x = x ; current_in_win_y = y;
 
   switch (cs->in_method) {
     case 3:
@@ -259,8 +261,7 @@ void reset_gtab_all();
 void toggle_im_enabled(u_int kev_state)
 {
 //    dbg("toggle_im_enabled\n");
-    if (!current_CS)
-      return;
+    check_CS();
 
     if (current_CS->in_method < 0 || current_CS->in_method > 10)
       return;
@@ -339,12 +340,22 @@ void init_inter_code(int usenow);
 void init_tab_pp(int usenow);
 void init_tab_pho();
 
+void check_CS()
+{
+  if (!current_CS)
+    current_CS = &temp_CS;
+}
+
+
 gboolean init_in_method(int in_no)
 {
   gboolean status = TRUE;
 
   if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
     return FALSE;
+
+  check_CS();
+
 
   if (current_CS->in_method != in_no) {
     hide_in_win(current_CS);
@@ -404,8 +415,7 @@ void tsin_set_eng_ch(int nmod);
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
-  if (!current_CS)
-    return FALSE;
+  check_CS();
 
   if (current_CS->client_win)
     focus_win = current_CS->client_win;
@@ -436,7 +446,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     }
   }
 
-  if (!current_CS || !current_CS->b_im_enabled) {
+  if (!current_CS->b_im_enabled) {
     return FALSE;
   }
 
@@ -483,7 +493,9 @@ int feedkey_pp_release(KeySym xkey, int kbstate);
 // return TRUE if the key press is processed
 gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 {
-  if (!current_CS || !current_CS->b_im_enabled)
+  check_CS();
+
+  if (!current_CS->b_im_enabled)
     return FALSE;
 #if 0
   if (current_CS->client_win)
@@ -542,8 +554,7 @@ int gcin_FocusIn(ClientState *cs)
     }
   }
 
-  if (current_CS != cs && (win == focus_win || !current_CS))
-    current_CS = cs;
+  current_CS = cs;
 
   if (win == focus_win) {
     if (cs->b_im_enabled) {
@@ -587,7 +598,10 @@ int gcin_FocusOut(ClientState *cs)
 #if DEBUG || 0
     dbg("focus out %x %x\n", cs, current_CS);
 #endif
-//    focus_win = 0;
+    focus_win = 0;
+
+    if (cs == current_CS)
+      temp_CS = *current_CS;
 
     return True;
 }

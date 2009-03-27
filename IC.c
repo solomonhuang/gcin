@@ -196,7 +196,7 @@ void load_IC(IC *rec)
    Window win = cs->client_win;
 
 #if 1
-   if (current_CS != cs && (win == focus_win || !current_CS))
+   if (win == focus_win || !current_CS)
      current_CS = cs;
 
    if (win == focus_win) {
@@ -233,6 +233,9 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 	XICAttribute *pre_attr = call_data->preedit_attr;
 	XICAttribute *sts_attr = call_data->status_attr;
 	register int i;
+
+	if (!cs)
+          current_CS = cs;
 #if DEBUG
         dbg(".... StoreIC\n");
 #endif

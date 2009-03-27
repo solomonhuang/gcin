@@ -3,7 +3,7 @@ include ../config.mak
 .SUFFIXES:	.kbmsrc .kbm .cin .gtab
 
 DATA=pho.tab tsin.idx \
-     cj.gtab ar30.gtab dayi3.gtab pinyin.gtab jyutping.gtab \
+     cj.gtab ar30.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
      ibm.kbm tsin hsu.kbm
 DATAKEEP=symbol-table gtab.list phrase.table

@@ -5,7 +5,6 @@ export LANGUAGE=zh_TW.UTF-8
 export LC_ALL=zh_TW.UTF-8
 export GCIN_TABLE_DIR=./data
 echo "GCIN_TABLE_DIR=$GCIN_TABLE_DIR"
-export GCIN_XIM=gcin.utf8
 pkill gcin.test
 export XMODIFIERS=@im=$GCIN_XIM
 locale

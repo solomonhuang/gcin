@@ -96,13 +96,13 @@ int sequ(char *s, char *t)
 typedef struct {
   u_int key;
   u_char ch[CH_SZ];
-  u_short oseq;
+  int oseq;
 } ITEM2;
 
 typedef struct {
   u_int64_t key;
   u_char ch[CH_SZ];
-  u_short oseq;
+  int oseq;
 } ITEM2_64;
 
 
@@ -140,7 +140,7 @@ int qcmp(const void *aa, const void *bb)
 
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
-  return (int)a->oseq - (int)b->oseq;
+  return a->oseq - b->oseq;
 }
 
 
@@ -150,7 +150,7 @@ int qcmp_64(const void *aa, const void *bb)
 
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
-  return (int)a->oseq - (int)b->oseq;
+  return a->oseq - b->oseq;
 }
 
 
@@ -164,7 +164,6 @@ int main(int argc, char **argv)
   char fname[64];
   char fname_cin[64];
   char fname_tab[64];
-  char fname_sel1st[64];
   char tt[512];
   u_char *cmd, *arg;
   struct TableHead th;
@@ -204,8 +203,6 @@ int main(int argc, char **argv)
   strcpy(fname_tab,fname);
   strcat(fname_cin,".cin");
   strcat(fname_tab,".gtab");
-  strcpy(fname_sel1st,fname_tab);
-  strcat(fname_sel1st,".sel1st");
 
   if ((fr=fopen(fname_cin,"r"))==NULL)
           p_err("Cannot open %s\n", fname_cin);
@@ -378,15 +375,36 @@ int main(int argc, char **argv)
         bchcpy(itar[chno].ch, out);
 
 //      printf("uuu %x %c%c\n", kk, out[0], out[1]);
+
+#define MAX_16_PHRASE 32767
+
     } else {
       if (key64) {
-        itar64[chno].ch[0]=phr_cou>>8;
-        itar64[chno].ch[1]=phr_cou&0xff;
+        if (chno < MAX_16_PHRASE)
+#if LARGE_GTAB
+          itar64[chno].ch[0]=phr_cou>>16;
+          itar64[chno].ch[1]=(phr_cou >> 8) & 0xff;
+          itar64[chno].ch[2]=phr_cou&0xff;
+#else
+          itar64[chno].ch[0]=phr_cou>>8;
+          itar64[chno].ch[1]=phr_cou&0xff;
+          itar64[chno].ch[2]=0;
+#endif
       }
       else {
-        itar[chno].ch[0]=phr_cou>>8;
-        itar[chno].ch[1]=phr_cou&0xff;
+#if LARGE_GTAB
+          itar[chno].ch[0]=phr_cou>>16;
+          itar[chno].ch[1]=(phr_cou >> 8) & 0xff;
+          itar[chno].ch[2]=phr_cou&0xff;
+#else
+          itar[chno].ch[0]=phr_cou>>8;
+          itar[chno].ch[1]=phr_cou&0xff;
+          itar[chno].ch[2]=0;
+#endif
       }
+
+      if (len > MAX_CIN_PHR)
+        p_err("phrase too long: %s\n", arg);
 
       phridx = trealloc(phridx, int, phr_cou+1);
       phridx[phr_cou++]=prbf_cou;
@@ -451,7 +469,7 @@ int main(int argc, char **argv)
     int kk = (key>>LAST_K_bitN) & 0x3f;
 
     if (!def1[kk]) {
-      idx1[kk]=(u_short)i;
+      idx1[kk]=(gtab_idx1_t)i;
       def1[kk]=1;
     }
   }

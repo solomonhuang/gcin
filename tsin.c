@@ -40,7 +40,7 @@ static CHPHO chpho[MAX_PH_BF_EXT];
 static u_char psta[MAX_PH_BF_EXT];
 static int c_idx, c_len, ph_sta=-1, ph_sta_last=-1;
 static int sel_pho;
-static int eng_ph=1;
+static gboolean eng_ph=TRUE;
 static int save_frm, save_to;
 static int current_page;
 static int startf;
@@ -810,17 +810,20 @@ gboolean flush_tsin_buffer()
   return 0;
 }
 
+void show_button_pho(gboolean bshow);
 
 void tsin_set_eng_ch(int nmod)
 {
   eng_ph = nmod;
   show_stat();
   drawcursor();
+
+  show_button_pho(eng_ph);
 }
 
 void tsin_toggle_eng_ch()
 {
-  tsin_set_eng_ch(eng_ph ^= 1);
+  tsin_set_eng_ch(!eng_ph);
 }
 
 void tsin_toggle_half_full()
