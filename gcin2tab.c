@@ -46,10 +46,10 @@ void del_nl_spc(char *s)
 void get_line(u_char *tt)
 {
   while (!feof(fr)) {
-    fgets(tt,128,fr);
+    fgets(tt, 512, fr);
     lineno++;
 
-    if (tt[0]=='#')
+    if (tt[0]=='#' || strlen(tt) < 3)
       continue;
     else
       break;
@@ -80,6 +80,10 @@ void cmd_arg(u_char *s, u_char **cmd, u_char **arg)
 
   t=skip_spc(t);
   del_nl_spc(t);
+
+  char *p;
+  if ((p=strchr(t, '\t')))
+    *p = 0;
 
   *arg=t;
 }
@@ -161,7 +165,7 @@ int main(int argc, char **argv)
   char fname_cin[64];
   char fname_tab[64];
   char fname_sel1st[64];
-  char tt[128];
+  char tt[512];
   u_char *cmd, *arg;
   struct TableHead th;
   struct TableHead2 th2;
@@ -334,7 +338,7 @@ int main(int argc, char **argv)
     u_int64_t kk;
     int k;
 
-    cmd_arg(tt,&cmd,&arg);
+    cmd_arg(tt, &cmd, &arg);
     if (!cmd[0] || !arg[0])
       continue;
     if (cmd[0]=='%')
@@ -346,7 +350,7 @@ int main(int argc, char **argv)
       th.MaxPress=len;
 
     if (len > 10)
-      p_err("%d:  only <= 10 keys is allowed", lineno);
+      p_err("%d:  only <= 10 keys is allowed '%s'", lineno, cmd);
 
     kk=0;
     for(i=0;i<len;i++) {

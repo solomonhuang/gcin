@@ -241,6 +241,7 @@ void update_in_win_pos()
 
 IC *findIC();
 gboolean flush_tsin_buffer();
+void reset_gtab_all();
 
 void toggle_im_enabled(u_int kev_state)
 {
@@ -263,6 +264,9 @@ void toggle_im_enabled(u_int kev_state)
 
       if (current_CS->in_method == 6)
         flush_tsin_buffer();
+      else {
+        reset_gtab_all();
+      }
 
       hide_in_win(current_CS);
       current_CS->b_im_enabled = FALSE;
@@ -408,7 +412,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     ) {
       if (current_CS->in_method == 6) {
         tsin_set_eng_ch(1);
-
       }
 
       toggle_im_enabled(kev_state);

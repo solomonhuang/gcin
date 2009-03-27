@@ -724,6 +724,17 @@ gboolean is_gtab_query_mode()
   return same_pho_query_state == SAME_PHO_QUERY_pho_select;
 }
 
+void reset_gtab_all()
+{
+  if (!cur_inmd)
+    return;
+
+  ClrIn();
+  ClrSelArea();
+  ClrInArea();
+}
+
+
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
   int i,j;
@@ -806,9 +817,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     case XK_Escape:
       close_gtab_pho_win();
       if (ci) {
-        ClrIn();
-        ClrSelArea();
-        ClrInArea();
+        reset_gtab_all();
         return 1;
       } else
         return 0;
