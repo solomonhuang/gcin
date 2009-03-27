@@ -55,19 +55,29 @@ void load_ts_phrase()
 
     fread(&usecount,1,1,fp);
     fread(phbuf,sizeof(phokey_t), clen, fp);
-    fread(chbuf, CH_SZ, clen,fp);
+    int tlen = 0;
+
+    for(i=0; i < clen; i++) {
+      int n = fread(&chbuf[tlen], 1, 1, fp);
+      if (n<=0)
+        goto stop;
+      int len=utf8_sz(&chbuf[tlen]);
+      fread(&chbuf[tlen+1], 1, len-1, fp);
+      tlen+=len;
+    }
+
 
     if (clen < 2)
       continue;
 
-    chbuf[clen * CH_SZ]=0;
+    chbuf[tlen]=0;
     phrase = trealloc(phrase, char *, phraseN+1);
-
-    if (strlen(chbuf) < CH_SZ*2)
-      p_err("error %d] %s clen:%d", phraseN, chbuf, clen);
 
     phrase[phraseN++] = strdup(chbuf);
   }
+
+
+stop:
 
   fclose(fp);
 

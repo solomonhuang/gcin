@@ -296,7 +296,7 @@ void get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
 
 // given the pho key & the big5 char, return the idx in ch_pho
 
-int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5)
+int ch_key_to_ch_pho_idx(phokey_t phkey, char *utf8)
 {
   int start_i, stop_i;
 
@@ -304,7 +304,8 @@ int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5)
 
   int i;
   for(i=start_i; i<stop_i; i++) {
-    if (!bchcmp(ch_pho[i].ch, big5)) {
+    int u8len = utf8_sz(ch_pho[i].ch);
+    if (!memcmp(ch_pho[i].ch, utf8, u8len)) {
       return i;
     }
   }

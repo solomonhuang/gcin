@@ -7,8 +7,6 @@ static gboolean current_gtab_simple_win = FALSE;
 static GtkWidget *gwin_gtab;
 static GtkWidget *frame;
 static GtkWidget *label_gtab_sele;
-// static GtkWidget *label_half_full;
-// static GtkWidget *button_gtab;
 static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64];
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
@@ -88,7 +86,6 @@ void disp_gtab_sel(char *s)
 #if 0
   gtk_label_set_text(GTK_LABEL(label_gtab_sele), s);
 #else
-//  dbg("jjj %s\n", s);
   gtk_label_set_markup(GTK_LABEL(label_gtab_sele), s);
 #endif
 }
@@ -153,6 +150,7 @@ void create_win_gtab()
 }
 
 void create_win_sym();
+void exec_gcin_setup();
 
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
@@ -165,10 +163,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
     case 2:
       break;
     case 3:
-#if DEBUG
-      dbg("exec gcin\n");
-#endif
-      system(GCIN_BIN_DIR"/gcin-setup &");
+      exec_gcin_setup();
       break;
   }
 
@@ -210,13 +205,6 @@ static void cb_clicked_fixed_pos()
 
 void toggle_half_full_char();
 
-#if 0
-static void cb_half_bull()
-{
-  toggle_half_full_char();
-}
-#endif
-
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 void create_win_gtab_gui_full()
@@ -251,16 +239,6 @@ void create_win_gtab_gui_full()
   gtk_container_set_border_width (GTK_CONTAINER (button_input_method_name), 0);
   gtk_box_pack_start (GTK_BOX (hbox), button_input_method_name, FALSE, FALSE, 0);
 
-#if 0
-  GtkWidget *button_half_full = gtk_button_new();
-  gtk_container_set_border_width (GTK_CONTAINER (button_half_full), 0);
-  label_half_full = gtk_label_new(NULL);
-  gtk_container_add (GTK_CONTAINER (button_half_full), label_half_full);
-  gtk_box_pack_start (GTK_BOX (hbox), button_half_full, FALSE, FALSE, 0);
-  disp_gtab_half_full(current_CS->b_half_full_char);
-  g_signal_connect (G_OBJECT (button_half_full), "clicked",
-      G_CALLBACK (cb_half_bull), (gpointer) NULL);
-#endif
 
   GtkWidget *button_gtab = gtk_button_new();
   gtk_container_set_border_width (GTK_CONTAINER (button_gtab), 0);
@@ -335,20 +313,6 @@ void create_win_gtab_gui_simple()
   gtk_container_add (GTK_CONTAINER (frame_input_method_name), label_input_method_name);
   g_signal_connect_swapped (GTK_OBJECT (event_box_input_method_name), "button-press-event",
         G_CALLBACK (inmd_switch_popup_handler), NULL);
-
-#if 0
-  GtkWidget *event_box_half_full = gtk_event_box_new();
-  gtk_box_pack_start (GTK_BOX (hbox), event_box_half_full, FALSE, FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (event_box_half_full), 0);
-  GtkWidget *frame_half_full = gtk_frame_new(NULL);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_half_full), 0);
-  gtk_container_add (GTK_CONTAINER (event_box_half_full), frame_half_full);
-  label_half_full = gtk_label_new(NULL);
-  gtk_container_add (GTK_CONTAINER (frame_half_full), label_half_full);
-  disp_gtab_half_full(current_CS->b_half_full_char);
-  g_signal_connect (G_OBJECT (event_box_half_full), "button-press-event",
-      G_CALLBACK (cb_half_bull), (gpointer) NULL);
-#endif
 
 
   GtkWidget *event_box_gtab = gtk_event_box_new();

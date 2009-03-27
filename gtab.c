@@ -141,6 +141,7 @@ void free_gtab()
     free(inp->tbl64); inp->tbl64 = NULL;
     free(inp->phridx); inp->phridx = NULL;
     free(inp->phrbuf); inp->phrbuf = NULL;
+    free(inp->keyname_lookup); inp->keyname_lookup = NULL;
   }
 }
 
@@ -371,6 +372,7 @@ void init_gtab(int inmdno, int usenow)
 
 
   if (all_full_ascii) {
+    free(inp->keyname_lookup);
     inp->keyname_lookup = malloc(sizeof(char) * MAX_GTAB_KEYS);
     memcpy(inp->keyname_lookup, keyname_lookup, MAX_GTAB_KEYS);
   }

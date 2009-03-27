@@ -231,6 +231,11 @@ static gboolean close_appearance_conf_window( GtkWidget *widget,
 
 void create_appearance_conf_window()
 {
+  if (gcin_appearance_conf_window) {
+    gtk_window_present(GTK_WINDOW(gcin_appearance_conf_window));
+    return;
+  }
+
   load_setttings();
 
   gcin_appearance_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -381,6 +386,11 @@ static GtkWidget *create_spc_opts()
 
 void create_gtab_conf_window()
 {
+  if (gcin_gtab_conf_window) {
+    gtk_window_present(GTK_WINDOW(gcin_gtab_conf_window));
+    return;
+  }
+
   load_setttings();
 
     gcin_gtab_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

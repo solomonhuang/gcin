@@ -121,9 +121,9 @@ int main(int argc, char **argv)
 
     p++;
 
-    bchcpy(items[itemsN].ch, p);
+    int u8len = u8cpy(items[itemsN].ch, p);
 
-    p+= CH_SZ + 1; // skip ch & space
+    p+= u8len + 1; // skip ch & space
 
     items[itemsN].count = atoi(p);
     items[itemsN].oseq = itemsN;

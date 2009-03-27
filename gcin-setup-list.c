@@ -155,14 +155,14 @@ static void cb_ok (GtkWidget *button, gpointer data)
   save_gcin_conf_int(GCIN_REMOTE_CLIENT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
 
-  gtk_widget_destroy(gtablist_window);
+  gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 
   send_gcin_message(GDK_DISPLAY(), "reload");
 }
 
 static void cb_cancel (GtkWidget *widget, gpointer data)
 {
-  gtk_widget_destroy(gtablist_window);
+  gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 }
 
 static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer data)
@@ -358,6 +358,11 @@ static GtkWidget *create_im_toggle_keys()
 
 void create_gtablist_window (void)
 {
+  if (gtablist_window) {
+    gtk_window_present(GTK_WINDOW(gtablist_window));
+    return;
+  }
+
   /* create gtab_list_window, etc */
   gtablist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (gtablist_window), "輸入法選擇");
@@ -426,7 +431,7 @@ void create_gtablist_window (void)
                     G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 380, 350);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 450, 350);
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);

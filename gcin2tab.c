@@ -106,7 +106,7 @@ typedef struct {
 } ITEM2_64;
 
 
-#define MAX_K (40000)
+#define MAX_K (500000)
 
 ITEM2 itar[MAX_K], itmp[MAX_K];
 ITEM2_64 itar64[MAX_K], itmp64[MAX_K];
@@ -176,8 +176,8 @@ int main(int argc, char **argv)
   gtab_idx1_t idx1[256];
   char def1[256];
   int quick_def;
-  int phridx[12000], phr_cou=0;
-  char phrbuf[32768];
+  int *phridx=NULL, phr_cou=0;
+  char *phrbuf = NULL;
   int prbf_cou=0;
 
   dbg("-- gcin2tab encoding UTF-8 --\n");
@@ -388,7 +388,9 @@ int main(int argc, char **argv)
         itar[chno].ch[1]=phr_cou&0xff;
       }
 
+      phridx = trealloc(phridx, int, phr_cou+1);
       phridx[phr_cou++]=prbf_cou;
+      phrbuf = realloc(phrbuf, prbf_cou + len + 1);
       strcpy(&phrbuf[prbf_cou],arg);
 //      printf("phrase:%d  len:%d'%s'\n", phr_cou, len, arg);
       prbf_cou+=len;

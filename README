@@ -78,6 +78,7 @@ logout & login
   ㄆ4    —   (破折號)
   ㄒ     ℃   (攝氏 Celsius)
   ㄒ2    ㏄  (毫升)
+  ㄍ		個
   ㄍ‧ ♂   (公)
   ㄇ‧ ♀   (母)
 
@@ -200,10 +201,13 @@ net 上網
 -----------------------------------------------------------
 - 倉頡、行列輸入法中，現在可以直接輸入 linux，就可以跑出 linux，其餘的輸入法可以自己加到 .cin 後重新執行 gcin2tab。還有(gnome kde gaim gcin xmms xine gedit kate kedit adsl hbo tvbs dvd vcd lcd)
 
-新加入的 keys 不要與原有的重複，如果原有的本來就重複，那就沒關係。
+新加入的 keys 最好不要與原有的重複，如果原有的本來就重複，那就沒關係。
 -----------------------------------------------------------
 以下的 嘸蝦米 table 僅供測試用，如果有長期使用，請購買合法版權。
-download http://edt1023.sayya.org/misc/noseeing-2.tar.gz
+download 
+http://edt1023.sayya.org/misc/noseeing-2.tar.gz (正體中文)
+http://edt1023.sayya.org/misc/noseeing-3.tar.gz (正/簡體中文 & 日文 綜合版)
+
 tar xvfz noseeing-2.tar.gz
 cp noseeing.gtab /usr/share/gcin/table
 
@@ -342,7 +346,7 @@ gedit diff.txt
 Answer: 注音輸入的區域的字型必須比編輯區的小個幾點就沒有這個問題。如果你有 install 日文字型，
 且使用 12/23/2004 以前的 fonts.conf，則還是會有縮回去的問題，請下載最新的 fonts.conf。
 --------------------------------------------------
-gcin coredump 如幫忙 debug
+gcin coredump 如果要幫忙 debug
 
 cd gcin-0.x.x
 export  GCIN_DEBUG=1
@@ -429,4 +433,7 @@ rpmbuild -ba gcin.spec
 等 compile 完，就可以在
 ~/rpm/RPMS/i586
 看到你的 .rpm
+----------------------------------------------------------------------------------------------------------
+ 現在可以用注音輸入半/全形 數字 (0..9 及減(-)) 及 用 [] 鍵輸入'()[]{}'，現在也可以加入含有數字的詞，譬如 
+「7月, 5點, 3個」。另外，你也可以用這來儲存電話的號碼，只要用注音輸入電話的前兩碼然後用 shift 選就可以了。
 ----------------------------------------------------------------------------------------------------------

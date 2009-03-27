@@ -129,17 +129,12 @@ void disp_char(int index, u_char *ch)
   create_char(index);
   GtkWidget *label = chars[index].label;
 
-  bchcpy(tt, ch);
+  int u8len = u8cpy(tt, ch);
 
   if (ch[0]==' ' && ch[1]==' ')
       set_label_space(label);
   else {
-    if (*ch < 127) {
-      tt[1] = 0;
-    } else {
-      tt[CH_SZ] = 0;
-    }
-
+    tt[u8len] = 0;
     gtk_label_set_text(GTK_LABEL(label), tt);
   }
 
@@ -349,6 +344,14 @@ void clear_tsin_line()
   }
 }
 
+void exec_gcin_setup()
+{
+#if DEBUG
+      dbg("exec gcin\n");
+#endif
+      system(GCIN_BIN_DIR"/gcin-setup &");
+}
+
 
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
@@ -361,10 +364,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
       inmd_switch_popup_handler(widget, event);
       break;
     case 3:
-#if DEBUG
-      dbg("exec gcin\n");
-#endif
-      system(GCIN_BIN_DIR"/gcin-setup &");
+      exec_gcin_setup();
       break;
   }
 
@@ -589,7 +589,6 @@ void change_tsin_font_size()
   for(i=0; i < 3;i ++) {
     set_label_font_size(labels_pho[i], gcin_font_size_tsin_pho_in);
   }
-
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *label = chars[i].label;

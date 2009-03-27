@@ -88,3 +88,19 @@ int u8cpy(char *t, char *s)
   memcpy(t, s, utf8sz);
   return utf8sz;
 }
+
+
+int utf8_tlen(char *s, int N)
+{
+  int ofs=0;
+  int i;
+  char *p = s;
+
+  for(i=0; i < N; i++) {
+    int len = utf8_sz(p);
+    p+=len;
+  }
+
+  return p - s;
+}
+

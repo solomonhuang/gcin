@@ -144,6 +144,11 @@ void load_setttings();
 
 void create_kbm_window()
 {
+  if (gcin_kbm_window) {
+    gtk_window_present(GTK_WINDOW(gcin_kbm_window));
+    return;
+  }
+
   load_setttings();
 
     gcin_kbm_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

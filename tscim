@@ -5,4 +5,4 @@ export GTK_IM_MODULE=scim
 export XMODIFIERS=@im=SCIM
 scim -d &
 gedit --new-window &
-kedit
+#kedit

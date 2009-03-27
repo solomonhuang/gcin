@@ -47,7 +47,16 @@ static int qcmp(const void *a, const void *b)
     return 1;
   if (lena < lenb)
     return -1;
-  return memcmp(&bf[cha],&bf[chb],lena*CH_SZ);
+
+  int tlena = utf8_tlen(&bf[cha], lena);
+  int tlenb = utf8_tlen(&bf[chb], lenb);
+
+  if (tlena > tlenb)
+    return 1;
+  if (tlena < tlenb)
+    return -1;
+
+  return memcmp(&bf[cha], &bf[chb], tlena);
 }
 
 static int shiftb[]={9,7,3,0};
@@ -81,7 +90,7 @@ int main(int argc, char **argv)
 {
   FILE *fp,*fw;
   u_char s[1024];
-  u_char chbuf[80][CH_SZ];
+  u_char chbuf[MAX_PHRASE_LEN * CH_SZ];
   u_short phbuf[80];
   int i,j,idx,len, ofs;
   u_short kk;
@@ -132,18 +141,20 @@ int main(int argc, char **argv)
 
     i=0;
     int chbufN=0;
+    int charN = 0;
     while (s[i]!=' ' && i<len) {
       int len = utf8_sz(&s[i]);
 
-      memcpy(chbuf[chbufN], &s[i], len);
+      memcpy(&chbuf[chbufN], &s[i], len);
 
       i+=len;
-      chbufN++;
+      chbufN+=len;
+      charN++;
     }
 
     i++;
     int phbufN=0;
-    while (i<len && phbufN < chbufN && s[i]!=' ') {
+    while (i<len && phbufN < charN && s[i]!=' ') {
       kk=0;
 
       while (s[i]!=' ' && i<len) {
@@ -159,7 +170,7 @@ int main(int argc, char **argv)
       phbuf[phbufN++]=kk;
     }
 
-    if (phbufN!=chbufN) {
+    if (phbufN!=charN) {
       fprintf(stderr, "Line %d problem in phbufN!=chbufN %d != %d\n",
         lineCnt, phbufN, chbufN);
       exit(-1);
@@ -182,8 +193,8 @@ int main(int argc, char **argv)
     memcpy(&bf[ofs++],&usecount,1);
     memcpy(&bf[ofs],phbuf, clen * sizeof(phokey_t));
     ofs+=clen * sizeof(phokey_t);
-    memcpy(&bf[ofs], chbuf, (int)clen*CH_SZ);
-    ofs+=clen * CH_SZ;
+    memcpy(&bf[ofs], chbuf, chbufN);
+    ofs+=chbufN;
     if (ofs+100 >= bfsize) {
       bfsize+=65536;
       if (!(bf=(u_char *)realloc(bf,bfsize))) {
@@ -225,7 +236,8 @@ int main(int argc, char **argv)
     idx = phidx[i];
     sidx[j]=ofs;
     len=bf[idx];
-    clen=sizeof(phokey_t)*len + CH_SZ*len + 1 + 1;
+    int tlen = utf8_tlen(&bf[idx + 1 + 1 + sizeof(phokey_t)*len], len);
+    clen=sizeof(phokey_t)*len + tlen + 1 + 1;
 
     if (memcmp(s, &bf[idx], clen)) {
       memcpy(&sf[ofs], &bf[idx], clen);

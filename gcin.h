@@ -96,6 +96,7 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 int utf8_sz(char *s);
 void utf8cpy(char *t, char *s);
 int u8cpy(char *t, char *s);
+int utf8_tlen(char *s, int N);
 
 void get_gcin_dir(char *tt);
 Atom get_gcin_atom(Display *dpy);

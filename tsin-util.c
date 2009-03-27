@@ -110,9 +110,15 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 
   tbuf[0]=len;
   tbuf[1]=0;  // usecount
+  int tlen = utf8_tlen(utf8str, len);
+  dbg("tlen %d  '", tlen);
+  for(i=0; i < tlen; i++)
+    putchar(utf8str[i]);
+  dbg("'\n");
+
 
   memcpy(&tbuf[2], phkeys, sizeof(phokey_t) * len);
-  memcpy(&tbuf[sizeof(phokey_t)*len + 2], utf8str, CH_SZ*len);
+  memcpy(&tbuf[sizeof(phokey_t)*len + 2], utf8str, tlen);
 
   hashno=phkeys[0] >> TSIN_HASH_SHIFT;
   if (hashno >= TSIN_HASH_N)
@@ -130,7 +136,6 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
       break;
   }
 
-  int tlen = sbuf[0]*CH_SZ;
 //  dbg("tlen:%d  ord:%d  %s\n", tlen, ord, utf8str);
   if (!ord && !memcmp(&sbuf[sbuf[0]*sizeof(phokey_t)+1+1], utf8str, tlen)) {
 //    bell();
@@ -152,7 +157,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
     }
   }
 
-  fwrite(tbuf, 1, (sizeof(phokey_t)+CH_SZ)*len+1+1, fph);
+  fwrite(tbuf, 1, sizeof(phokey_t)*len + tlen + 1+1, fph);
   fflush(fph);
 
   if (hashidx[hashno]>mid)
@@ -191,10 +196,20 @@ int read_tsin_phrase(char *str)
     return 0;
   fread(&usecount, 1, 1,fph); // use count
   fread(pho, sizeof(phokey_t), len, fph);
-  fread(str, CH_SZ, len, fph);
-  str[len * CH_SZ] = 0;
 
-  return len * CH_SZ;
+  int i;
+  int tlen = 0;
+
+  for(i=0; i < len; i++) {
+    fread(&str[tlen], 1, 1, fph);
+    int sz = utf8_sz(&str[tlen]);
+    fread(&str[tlen+1], 1, sz-1, fph);
+    tlen+=sz;
+  }
+
+  str[tlen] = 0;
+
+  return tlen;
 }
 
 typedef struct {

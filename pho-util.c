@@ -33,7 +33,7 @@ void pho_load()
     }
   }
 
-  update_table_file(pho_tab, 2);
+  update_table_file(pho_tab, 3);
 
   FILE *fr;
 

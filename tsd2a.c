@@ -7,11 +7,10 @@
 
 int phcount;
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   FILE *fp;
   phokey_t phbuf[MAX_PHRASE_LEN];
-  u_char chbuf[128][CH_SZ];
   int i;
   u_char clen, usecount;
 
@@ -28,14 +27,23 @@ main(int argc, char **argv)
     fread(&clen,1,1,fp);
     fread(&usecount,1,1,fp);
     fread(phbuf,sizeof(phokey_t), clen, fp);
-    fread(chbuf, CH_SZ, clen, fp);
+
+    int tlen = 0;
 
     for(i=0;i<clen;i++) {
-      int len=utf8_sz(&chbuf[i][0]);
+      char ch[CH_SZ];
+
+      int n = fread(ch, 1, 1, fp);
+      if (n<=0)
+        goto stop;
+
+      int len=utf8_sz(ch);
+
+      fread(&ch[1], 1, len-1, fp);
 
       int j;
       for(j=0; j < len; j++)
-        printf("%c", chbuf[i][j]);
+        printf("%c", ch[j]);
     }
 
     printf(" ");
@@ -48,6 +56,7 @@ main(int argc, char **argv)
     printf(" %d\n", usecount);
   }
 
+stop:
   fclose(fp);
   return 0;
 }

@@ -476,6 +476,7 @@ int main(int argc, char **argv)
   gdk_window_add_filter(NULL, my_gdk_filter, NULL);
 
   signal(SIGINT, do_exit);
+  signal(SIGHUP, do_exit);
 
   // disable the io handler abort
   // void *olderr =
