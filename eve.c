@@ -207,10 +207,12 @@ void move_IC_in_win(ClientState *rec);
 
 void update_in_win_pos()
 {
+//  dbg("update_in_win_pos %d\n", current_CS->input_style);
   if (current_CS && current_CS->input_style == InputStyleRoot) {
     Window r_root, r_child;
     int winx, winy, rootx, rooty;
     u_int mask;
+
 
     XQueryPointer(dpy, root, &r_root, &r_child, &rootx, &rooty, &winx, &winy, &mask);
 

@@ -208,26 +208,22 @@ void load_IC(IC *rec)
    }
 #endif
 
-   if (cs->input_style & XIMPreeditCallbacks) {
-     cs->input_style = InputStyleOnSpot;
+   if (cs->input_style & InputStyleOnSpot) {
 #if 0
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
 #endif
    } else
-   if (cs->input_style & XIMPreeditPosition) {
+   if (cs->input_style & InputStyleOverSpot) {
      cs->input_style = InputStyleOverSpot;
-#if 1
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
-#endif
    }
 
-   if (cs->input_style & XIMPreeditNothing) {
-#if 1
+   if (cs->input_style & InputStyleRoot) {
      cs->input_style = InputStyleRoot;
+     update_in_win_pos();
      move_IC_in_win(cs);
-#endif
    }
 }
 
@@ -245,7 +241,17 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 #endif
 	for (i = 0; i < (int)call_data->ic_attr_num; i++, ic_attr++) {
 		if (Is (XNInputStyle, ic_attr)) {
-                    rec->cs.input_style = *(INT32*)ic_attr->value;
+                    INT32 input_style = *(INT32*)ic_attr->value;
+
+                    if (input_style & XIMPreeditCallbacks) {
+                      cs->input_style = InputStyleOnSpot;
+                    } else
+                    if (input_style & XIMPreeditPosition) {
+                      cs->input_style = InputStyleOverSpot;
+                    } else
+                    if (input_style & XIMPreeditNothing) {
+                        cs->input_style = InputStyleRoot;
+                    }
 		}
 
 		else if (Is (XNClientWindow, ic_attr)) {
