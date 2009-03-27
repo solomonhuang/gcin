@@ -1,3 +1,5 @@
+export GCIN_TABLE_DIR=./data
+echo "GCIN_TABLE_DIR=$GCIN_TABLE_DIR"
 export GCIN_XIM=gcin_test
 pkill gcin.test
 export LC_ALL=zh_TW.Big5

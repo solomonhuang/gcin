@@ -2,11 +2,17 @@
 #include <dirent.h>
 #include <X11/Xatom.h>
 
-#if 0
-char *TableDir="./";
-#else
 char *TableDir=GCIN_TABLE_DIR;
-#endif
+
+void init_TableDir()
+{
+  char *dname;
+
+  if (dname=getenv("GCIN_TABLE_DIR")) {
+    TableDir = dname;
+  }
+}
+
 
 void get_gcin_dir(char *tt)
 {

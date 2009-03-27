@@ -10,7 +10,11 @@
 #include "Xi18n.h"
 #include "IC.h"
 
+
 #define CH_SZ (2) // big5 size ( 2 bytes), will be changed to 3 if unicode is used
+
+#define tmalloc(type,n)  (type*)malloc(sizeof(type) * (n))
+#define trealloc(p,type,n)  (type*)realloc(p, sizeof(type) * (n))
 
 extern Display *dpy;
 void p_err(char *fmt,...);
@@ -55,5 +59,6 @@ extern int dpy_xl, dpy_yl;
 
 extern int gcin_font_size;
 
-#define CHANGE_FONT_SIZE "change font size"
-#define GCIN_FONT_SIZE "gcin-font-size"
+#include "gcin-conf.h"
+
+#define MAX_TAB_KEY_NUM 5

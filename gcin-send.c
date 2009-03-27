@@ -1,7 +1,6 @@
 #include "gcin.h"
 #include <X11/Xatom.h>
 
-
 void send_gcin_message(Display *dpy, char *s)
 {
   Atom atom = get_gcin_atom(dpy);

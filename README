@@ -50,8 +50,8 @@ Or
 ㄣˇ  「
 ㄣˋ   」
 ㄌ2   –    (連接號)
-ㄇ3   《
-ㄇ4    》  (書'名'號)
+ㄇ3   《    (書'名'號)
+ㄇ4    》  
 ㄌ     …   (省'略'號)
 ㄆ4    —   (破折號)
 ㄒ     ℃   (攝氏 Celsius)
@@ -92,16 +92,12 @@ input style,
 你可以按輸入視窗中的圖釘來固定或解除固定視窗。
 
 ----------------------------
-
 按 control-u 可以把整個編輯區的內容清除。
-
 -----------------------------------
-
 如何在非 gnome environment(如 KDE) 修改 gcin 顯示的 button 外觀
 
   執行  gnome-theme-manager 可以選擇主題, 修改外觀. 但是必須在 KDE startup 
 script 中執行 gnome-settings-daemon.
-
 -----------------------------------------
 把 gcin 一類的 XIM server kill 掉再重新啟動，容易造成 X window 底下程式運作
 不正常(特別是 mozilla)，最好還是 logout 再 login。
@@ -119,3 +115,20 @@ export XMODIFIERS=@im=gcin_test
 使用者的 gcin 資料毀損，要如何還原成 gcin 原來的設定:
  執行  rm -fr ~/.gcin
 當然了，使用者自己的詞庫也跟著不見。使用者可以 copy 此目錄來複製 gcin 的設定。
+-------------------------------------------
+如何加入新的 .cin 中文輸入
+執行 
+$ gcin2tab file
+# cp *.gtab /usr/share/gcin/table
+
+編輯
+   /usr/share/gcin/table/gtab.list
+
+加入一行
+
+按 control-alt-數字鍵  切換到你在 gtab.list 中定的數字鍵。注音與詞音是固定在 3 & 6 鍵上，
+不能更改的。 執行 gcin-setup 可以設定內定的輸入法。
+--------------------------------------------
+如何修改 Alt-Shift-key 送出的字串。
+    修改 /usr/share/gcin/table/phrase.table
+---------------------------------------------

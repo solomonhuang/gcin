@@ -1,10 +1,34 @@
 #include "gcin.h"
+#include "gtab.h"
+#include <X11/extensions/XTest.h>
+
 
 #define STRBUFLEN 64
 
 extern Display *dpy;
 extern XIMS current_ims;
+extern int default_input_method;
 static IMForwardEventStruct *current_forward_eve;
+
+static char callback_str_buffer[32];
+
+
+
+static void send_fake_key_eve()
+{
+  KeyCode kc_shift_l = XKeysymToKeycode(dpy, XK_Shift_L);
+  XTestFakeKeyEvent(dpy, kc_shift_l, True, CurrentTime);
+  XTestFakeKeyEvent(dpy, kc_shift_l, False, CurrentTime);
+}
+
+void send_text_call_back(char *text)
+{
+  strcpy(callback_str_buffer, text);
+  send_fake_key_eve();
+}
+
+
+GtkWidget *win_syms[10];
 
 InputStyle_E current_input_style;
 IC *current_IC;
@@ -35,11 +59,10 @@ void send_text(char *text)
 
 void sendkey_b5(char *bchar)
 {
-  char tt[3];
+  char tt[CH_SZ+1];
 
-  tt[0]=bchar[0];
-  tt[1]=bchar[1];
-  tt[2]=0;
+  memcpy(tt, bchar, CH_SZ);
+  tt[CH_SZ]=0;
 
   send_text(tt);
 }
@@ -60,7 +83,10 @@ void hide_in_win(IC *ic)
 #endif
     return;
   }
-
+#if 0
+  dbg("hide_in_win %d\n", ic->in_method);
+#endif
+//  dbg("hide_in_win\n");
   switch (ic->in_method) {
     case 3:
       hide_win_pho();
@@ -72,6 +98,8 @@ void hide_in_win(IC *ic)
     case 10:
       hide_win_int();
       break;
+    default:
+      hide_win_gtab();
   }
 }
 
@@ -95,6 +123,8 @@ void show_in_win(IC *ic)
     case 10:
       show_win_int();
       break;
+    default:
+      show_win_gtab();
   }
 }
 
@@ -106,7 +136,9 @@ void move_in_win(IC *ic, int x, int y)
 #endif
     return;
   }
-
+#if 0
+  dbg("move_in_win %d %d\n",x, y);
+#endif
   switch (ic->in_method) {
     case 3:
       move_win_pho(x, y);
@@ -117,6 +149,10 @@ void move_in_win(IC *ic, int x, int y)
     case 10:
       move_win_int(x, y);
       break;
+    default:
+      if (!ic->in_method)
+        return;
+      move_win_gtab(x, y);
   }
 }
 
@@ -156,7 +192,9 @@ void toggle_im_enabled()
       current_IC->b_im_enabled = TRUE;
 
       if (!current_IC->in_method) {
-        init_in_method(6);
+        extern int initial_inmd;
+
+        init_in_method(default_input_method);
       }
 
       update_in_win_pos();
@@ -168,8 +206,14 @@ void toggle_im_enabled()
 void update_active_in_win_geom()
 {
   switch (current_IC->in_method) {
+    case 3:
+      get_win0_geom();
     case 6:
       get_win0_geom();
+    case 10:
+      break;
+    default:
+      get_win_gtab_geom();
       break;
   }
 }
@@ -182,6 +226,9 @@ void toggle_half_full_char()
 
 void init_in_method(int in_no)
 {
+
+  if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
+    return;
 
   if (current_IC->in_method != in_no)
     hide_in_win(current_IC);
@@ -200,6 +247,11 @@ void init_in_method(int in_no)
       current_IC->in_method = 10;
       init_inter_code(True);
       break;
+    default:
+      current_IC->in_method = in_no;
+      show_win_gtab();
+      init_gtab(in_no, True);
+      break;
   }
 
   update_in_win_pos();
@@ -217,11 +269,13 @@ int ProcessKey()
   memset(strbuf, 0, STRBUFLEN);
   XKeyEvent *kev = (XKeyEvent*)&current_forward_eve->event;
   int count = XLookupString(kev, strbuf, STRBUFLEN, &keysym, NULL);
-#if 0
-  if (count > 0) {
-      dbg("count:%d [%s] ", count, strbuf);
+
+
+  if (strlen(callback_str_buffer)) {
+    send_text(callback_str_buffer);
+    callback_str_buffer[0]=0;
   }
-#endif
+
 
   if (keysym == XK_space) {
     if (kev->state & ControlMask) {
@@ -230,7 +284,14 @@ int ProcessKey()
       toggle_im_enabled();
       return;
     }
-    else
+  }
+
+  if (!current_IC->b_im_enabled) {
+    bounce_back_key();
+    return;
+  }
+
+  if (keysym == XK_space) {
     if (kev->state & ShiftMask) {
       if (current_IC->in_method == 6)
         tsin_toggle_half_full();
@@ -241,17 +302,15 @@ int ProcessKey()
     }
   }
 
-  if (!current_IC->b_im_enabled) {
-    bounce_back_key();
-    return;
-  }
-
   int status = 0;
 
   if ((kev->state & ControlMask) && (kev->state&(GDK_MOD1_MASK|GDK_MOD5_MASK))) {
     init_in_method(keysym- XK_0);
     return;
   }
+
+  if ((kev->state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask))
+    return feed_phrase(keysym);
 
   switch(current_IC->in_method) {
     case 3:
@@ -262,6 +321,9 @@ int ProcessKey()
       break;
     case 10:
       status = feedkey_intcode(keysym, kev->state);
+      break;
+    default:
+      status = feedkey_gtab(keysym, kev->state);
       break;
   }
 
@@ -304,7 +366,7 @@ int gcin_FocusOut(IMChangeFocusStruct *call_data)
     IC *ic = FindIC(call_data->icid);
 
     if (ic == current_IC) {
-      hide_win0();
+      hide_in_win(ic);
     }
 #if DEBUG
     dbg("focus out %d\n", call_data->icid);

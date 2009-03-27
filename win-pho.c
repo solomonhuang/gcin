@@ -4,7 +4,7 @@ static GtkWidget *gwin_pho;
 static GtkWidget *label_pho_sele;
 static GtkWidget *button_pho;
 static GtkWidget *labels_pho[4];
-
+static GtkWidget *label_key_codes;
 
 void disp_pho(int index, char *phochar)
 {
@@ -33,6 +33,24 @@ void disp_pho_sel(char *s)
   }
 
   gtk_label_set_text(GTK_LABEL(label_pho_sele), utf8);
+}
+
+
+void set_key_codes_label_pho(char *s)
+{
+  if (!label_key_codes)
+    return;
+
+  GError *err = NULL;
+  int rn, wn;
+  char *utf8 = g_locale_to_utf8 (s, strlen(s), &rn, &wn, &err);
+
+  if (err) {
+    printf("utf8 conver error");
+    return;
+  }
+
+  gtk_label_set_text(GTK_LABEL(label_key_codes), utf8);
 }
 
 
@@ -66,9 +84,14 @@ void move_win_pho(int x, int y)
   gtk_window_move(GTK_WINDOW(gwin_pho), x, y);
 }
 
+void minimize_win_pho()
+{
+  gtk_window_resize(GTK_WINDOW(gwin_pho), 10, 10);
+}
+
 void create_win_pho()
 {
-  dbg("create_win_pho .....\n");
+//  dbg("create_win_pho .....\n");
 
   if (gwin_pho) {
     show_win_pho();
@@ -119,6 +142,8 @@ void create_win_pho()
     set_label_font_size(label, gcin_font_size);
   }
 
+  label_key_codes  = gtk_label_new(NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), label_key_codes, FALSE, FALSE, 2);
 
   gtk_widget_show_all (gwin_pho);
 }

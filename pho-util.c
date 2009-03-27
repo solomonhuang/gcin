@@ -138,3 +138,29 @@ char *phokey_to_str(phokey_t kk)
 
   return phchars;
 }
+
+void str_to_all_phokey_chars(char *b5_str, char *out)
+{
+  int len=strlen(b5_str);
+
+  out[0]=0;
+
+  int h;
+
+  for(h=0; h < strlen(b5_str); h+=CH_SZ) {
+    phokey_t phos[32];
+
+    int n=big5_pho_chars(&b5_str[h], phos);
+
+    int i;
+    for(i=0; i < n; i++) {
+      char *pstr = phokey_to_str(phos[i]);
+      strcat(out, pstr);
+      if (i < n -1)
+        strcat(out, " ");
+    }
+
+    if (h < len - CH_SZ)
+      strcat(out, " | ");
+  }
+}

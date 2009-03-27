@@ -4,11 +4,9 @@
 Display *dpy;
 Window root;
 static Window xim_xwin;
-int initial_inmd = 6;
 int win_xl, win_yl;
 int win_x, win_y;
 int dpy_xl, dpy_yl;
-int gcin_font_size=14;
 
 u_char fullchar[]=
 "¡@¡I¡¨¡­¢C¢H¡®¡¦¡]¡^¡¯¡Ï¡A¡Ð¡D¡þ¢¯¢°¢±¢²¢³¢´¢µ¢¶¢·¢¸¡G¡F¡Õ¡×¡Ö¡H"
@@ -295,10 +293,12 @@ void do_exit()
   free_pho_mem();
   free_tsin();
   free_all_IC();
+  free_gtab();
 
 #if 1
   destory_win0();
   destory_win1();
+  destroy_win_gtab();
 #endif
 
   gtk_main_quit();
@@ -306,12 +306,16 @@ void do_exit()
 
 void start_inmd_window()
 {
-  extern Window xwin0;
+  extern Window xwin0, xwin_gtab;
 
-  switch (initial_inmd) {
+  switch (default_input_method) {
     case 6:
       create_win0();
       xim_xwin = xwin0;
+      break;
+    default:
+      create_win_gtab();
+      xim_xwin = xwin_gtab;
       break;
   }
 }
@@ -322,6 +326,8 @@ main(int argc, char **argv)
   setlocale(LC_ALL, "zh_TW.Big5");
 
   load_setttings();
+  init_TableDir();
+  load_phrase();
 
   gtk_init (&argc, &argv);
   dpy = GDK_DISPLAY();

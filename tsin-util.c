@@ -45,7 +45,7 @@ void load_tsin_db()
   if (phidx)
     free(phidx);
 
-  if ((phidx=(int *)malloc(a_phcount*4))==NULL)
+  if ((phidx=tmalloc(int, a_phcount))==NULL)
     p_err("malloc err pp 1");
 
   fread(phidx,4, phcount, fr);
@@ -60,11 +60,13 @@ void load_tsin_db()
 
 void free_tsin()
 {
-  if (phidx)
-    free(phidx);
+  if (phidx) {
+    free(phidx); phidx = NULL;
+  }
 
-  if (fph)
-    fclose(fph);
+  if (fph) {
+    fclose(fph); fph = NULL;
+  }
 }
 
 
@@ -135,7 +137,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
   phcount++;
   if (phcount>=a_phcount) {
     a_phcount+=256;
-    if (!(phidx=(int *)realloc(phidx, a_phcount*4))) {
+    if (!(phidx=trealloc(phidx, int, a_phcount*4))) {
       p_err("tsin.c:realloc err");
     }
   }

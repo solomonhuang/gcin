@@ -5,7 +5,8 @@ include config.mak
 .SUFFIXES:	.c .o .E
 
 OBJS=gcin.o IC.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
-     win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o
+     win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
+     gtab.o gtab-util.o phrase.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o
@@ -13,7 +14,8 @@ OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o
 OBJS_kbmcv=kbmcv.o pho-sym.o
 OBJS_tsd2a=tsd2a.o pho-sym.o
-OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o
+OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o
+OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o gtablist.o
 CFLAGS= $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\"
@@ -23,14 +25,14 @@ IMdkitLIB = IMdkit/lib/libXimd.a
 .c.E:
 	$(CC) $(CFLAGS) -E -o $@ $<
 
-PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup
+PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup gcin2tab
 PROGS_CV=kbmcv
 
 all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 
 gcin:      $(OBJS) $(IMdkitLIB)
-	$(CC) -o $@ $(OBJS) $(IMdkitLIB) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS) $(IMdkitLIB) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 	ln -sf $@ $@.test
 
@@ -51,6 +53,9 @@ tsa2d:  $(OBJS_tsa2d)
 
 tsd2a:  $(OBJS_tsd2a)
 	cc -o $@ $(OBJS_tsd2a) $(LDFLAGS)
+
+gcin2tab:  $(OBJS_gcin2tab)
+	cc -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
 
 kbmcv:  $(OBJS_kbmcv)
 	$(CC) -o $@ $(OBJS_kbmcv)

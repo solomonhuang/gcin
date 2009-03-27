@@ -69,6 +69,7 @@ static int qcmp_count(const void *aa, const void *bb)
 static void ClrSelArea()
 {
   disp_pho_sel(" ");
+  minimize_win_pho();
 }
 
 
@@ -147,9 +148,14 @@ void inc_pho_count(u_short key, int ch_idx)
 }
 
 
+void lookup_gtab(char *ch, char out[]);
+
 void putkey_pho(u_short key, int idx)
 {
   sendkey_b5(ch_pho[idx].ch);
+  char tt[64];
+  lookup_gtab(ch_pho[idx].ch, tt);
+
   inc_pho_count(key, idx);
 
   clrin_pho();

@@ -1,5 +1,6 @@
 #include "gcin.h"
 #include "pho.h"
+#include "win-sym.h"
 
 GtkWidget *gwin0;
 Window xwin0;
@@ -24,6 +25,7 @@ static GtkWidget *button_pho;
 static GtkWidget *labels_pho[4];
 static GtkWidget *button_eng_ph;
 static GtkWidget *button_fixed_pos;
+static GtkWidget *win_sym_tsin;
 
 void set_label_font_size(GtkWidget *label, int size)
 {
@@ -272,6 +274,12 @@ void clear_tsin_line()
   }
 }
 
+
+void cb_pho_lookup(void *data, char *instr, char *outstr)
+{
+   str_to_all_phokey_chars(instr, outstr);
+}
+
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
   int x=event->x;
@@ -295,9 +303,9 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 }
 
 
-static char file_pin_float[] = GCIN_ICON_DIR"/pin-float16.png";
+char file_pin_float[] = GCIN_ICON_DIR"/pin-float16.png";
 
-void set_currenet_IC_pin_image_pin()
+static void set_currenet_IC_pin_image_pin()
 {
   if (current_IC->fixed_pos)
     gtk_image_set_from_file(GTK_IMAGE(image_pin),GCIN_ICON_DIR"/pin-fixed24.png");
@@ -343,6 +351,8 @@ void create_win0_gui()
 {
   if (frame)
     return;
+
+  bzero(chars, sizeof(chars));
 
   frame = gtk_frame_new(NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
@@ -400,8 +410,11 @@ void create_win0_gui()
   g_signal_connect(G_OBJECT(button_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
 
-  GtkTooltips *button_pho_tips = gtk_tooltips_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button_pho, "左鍵符號，右鍵設定",NULL);
+
+  if (left_right_button_tips) {
+    GtkTooltips *button_pho_tips = gtk_tooltips_new ();
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button_pho, "左鍵符號，右鍵設定",NULL);
+  }
 
 
   int i;
@@ -440,6 +453,9 @@ void create_win0_gui()
 
 void destory_win0()
 {
+  if (!gwin0)
+    return;
+
   gtk_widget_destroy(gwin0);
 }
 
@@ -447,14 +463,10 @@ void get_win0_geom()
 {
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
 
-#if 1
   GtkRequisition sz;
   // the value of gtk_window_get_size is old
   gtk_widget_size_request(gwin0, &sz);
   win_xl = sz.width;  win_yl = sz.height;
-#else
-  gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
-#endif
 }
 
 void show_win0()
@@ -475,7 +487,6 @@ void show_win0()
   show_win_sym();
 }
 
-void hide_win_sym();
 void hide_win0()
 {
   gtk_widget_hide(gwin0);
@@ -485,7 +496,7 @@ void hide_win0()
 
 void bell()
 {
-  XBell(dpy, 70);
+  XBell(dpy, 80);
 }
 
 void change_win1_font();

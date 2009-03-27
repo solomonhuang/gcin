@@ -115,6 +115,8 @@ void disp_arrow_down()
 
 void destory_win1()
 {
+  if (!gwin1)
+    return;
   gtk_widget_destroy(gwin1);
 }
 

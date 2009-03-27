@@ -91,7 +91,7 @@ CARD16 icid;
         if (rec->id == icid) {
 
           if (rec == current_IC) {
-            hide_win0();
+            hide_in_win(rec);
           }
 
           if (last != NULL)

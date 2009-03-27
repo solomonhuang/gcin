@@ -100,6 +100,8 @@ static void drawcursor()
   else {
     set_cursor_tsin(c_idx);
   }
+
+  gdk_flush();
 }
 
 
@@ -220,10 +222,23 @@ void show_stat()
 static void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
                     u_char *ch)
 {
+  if (idx >= phcount) {
+    load_tsin_db(); // probably db changed, reload;
+    *len = 0;
+    return;
+  }
+
   int ph_ofs=phidx[idx];
 
   fseek(fph, ph_ofs, SEEK_SET);
   fread(len, 1, 1, fph);
+
+  if (*len >= MAX_PHRASE_LEN) {
+    load_tsin_db(); // probably db changed, reload;
+    *len = 0;
+    return;
+  }
+
   fread(usecount, 1, 1,fph); // use count
   fread(pho, sizeof(phokey_t), (int)(*len), fph);
   if (ch)
@@ -248,7 +263,9 @@ void prph(phokey_t kk)
   if (k3) printf("%c%c", pho_chars[2][k3], pho_chars[2][k3+1]);
   if (k4) printf("%d", k4>>1);
 }
+#endif
 
+#if 0
 void nputs(u_char *s, u_char len)
 {
   char tt[16];

@@ -1,6 +1,5 @@
 #include "gcin.h"
 
-int gcin_font_size;
 
 static struct {
   char *name;
@@ -333,6 +332,7 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
   exit(0);
 }
 
+
 void create_win0_conf_window()
 {
     gcin_win0_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -380,6 +380,10 @@ static void cb_win0_conf()
 }
 
 
+static void cb_default_input_method()
+{
+  create_gtablist_window();
+}
 
 
 static void create_main_win()
@@ -402,6 +406,10 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox), button_win0_conf, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_win0_conf), "clicked",
                     G_CALLBACK (cb_win0_conf), NULL);
+  GtkWidget *button_default_input_method = gtk_button_new_with_label("內定輸入法");
+  gtk_box_pack_start (GTK_BOX (vbox), button_default_input_method, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_default_input_method), "clicked",
+                    G_CALLBACK (cb_default_input_method), NULL);
 
   GtkWidget *button_tslearn = gtk_button_new_with_label("讓詞音從文章學習詞");
   gtk_box_pack_start (GTK_BOX (vbox), button_tslearn, TRUE, TRUE, 0);
@@ -439,6 +447,9 @@ int main(int argc, char **argv)
   gtk_init(&argc, &argv);
 
   create_main_win();
+
+  // once you invoke gcin-setup, the left-right buton tips is disabled
+  save_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 0);
 
   gtk_main();
 }
