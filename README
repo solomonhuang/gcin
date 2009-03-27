@@ -134,6 +134,7 @@ mozilla gtk2-ft 有什麼優點，用 GTK2 的優點就是與系統的主題(the
 
 Firefox over-the-spot 支援可以看下面的 link download .so
 http://moto.debian.org.tw/viewtopic.php?t=5311
+由於 firefox 現在是 把 libwidget_gtk2.so link 進去，所以沒有辦法取代，還是用 mozilla 吧！
 
 ----------------------------
 在詞音中按 control-u 可以把整個編輯區的內容清除。

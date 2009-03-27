@@ -913,8 +913,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
 
       // for array30
-      if (!ci && cur_inmd->endkey[0] && strchr(cur_inmd->endkey, key))
-        return 0;
+      if (!ci) {
+        if (cur_inmd->endkey[0] && strchr(cur_inmd->endkey, key))
+          return 0;
+      }
 
       pselkey=ptr_selkey(key);
 
@@ -961,6 +963,12 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       inkey=cur_inmd->keymap[key];
       spc_pressed=0;
 
+      dbg("ci: %d\n", ci);
+#if 1
+      // for cj & boshiamy to input digits
+      if (!ci && !inkey)
+          return 0;
+#endif
 
       if (inkey>=1 && ci< cur_inmd->MaxPress) {
         inch[ci++]=inkey;

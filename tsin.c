@@ -110,6 +110,7 @@ static void putbuf(u_char s[][CH_SZ], int len)
 #endif
 
   for(idx=i=0;i<len;i++) {
+    int len = utf8_sz(s[i]);
     if (s[i][0]>=128) {
       int pho_idx = ch_key_to_ch_pho_idx(ph_buf[i], &s[i][0]);
 
@@ -117,10 +118,11 @@ static void putbuf(u_char s[][CH_SZ], int len)
         inc_pho_count(ph_buf[i], pho_idx);
 
       bchcpy(&tt[idx],&s[i][0]);
-      idx+=CH_SZ;
     }
     else
-      tt[idx++]=s[i][0];
+      tt[idx]=s[i][0];
+
+    idx += len;
   }
 
   tt[idx]=0;
@@ -1285,11 +1287,19 @@ change_char:
 
        disp_current_sel_page();
        return 1;
+     case '\'':  // single quote
+       if (phkbm.phokbm[xkey][0].num)
+         goto other_keys;
+       else {
+         phokey_t key = 0;
+         return add_to_tsin_buf("、", &key, 1);
+       }
      case XK_q:
      case XK_Q:
        if (b_hsu_kbm && eng_ph)
          goto change_char;
      default:
+other_keys:
        if ((kbstate & ControlMask)) {
          if (xkey==XK_u) {
            clear_tsin_buffer();
