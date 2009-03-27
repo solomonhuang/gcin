@@ -172,7 +172,12 @@ void move_win_int(int x, int y);
 void move_win0(int x, int y);
 void move_win_pho(int x, int y);
 
-static int current_in_win_x, current_in_win_y;
+static int current_in_win_x = -1, current_in_win_y = -1;
+
+void reset_current_in_win_xy()
+{
+  current_in_win_x = -1; current_in_win_y = -1;
+}
 
 void move_in_win(ClientState *cs, int x, int y)
 {
@@ -278,6 +283,7 @@ void toggle_im_enabled(u_int kev_state)
 
       hide_in_win(current_CS);
       current_CS->b_im_enabled = FALSE;
+      reset_current_in_win_xy();
     } else {
       current_CS->b_im_enabled = TRUE;
       orig_caps_state = kev_state & LockMask;
@@ -342,6 +348,8 @@ gboolean init_in_method(int in_no)
 
   if (current_CS->in_method != in_no)
     hide_in_win(current_CS);
+
+  reset_current_in_win_xy();
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
   current_CS->in_method = in_no;
@@ -476,10 +484,10 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 {
   if (!current_CS || !current_CS->b_im_enabled)
     return FALSE;
-
+#if 0
   if (current_CS->client_win)
     focus_win = current_CS->client_win;
-
+#endif
   switch(current_CS->in_method) {
     case 6:
       return feedkey_pp_release(keysym, kev_state);

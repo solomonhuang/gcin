@@ -59,7 +59,6 @@ struct _GtkGCINInfo
   GtkSettings *settings;
   gulong status_set;
   gulong preedit_set;
-//  GSList *ics;
 
   guint reconnecting :1;
 };
@@ -83,9 +82,6 @@ static void     gtk_im_context_gcin_get_preedit_string (GtkIMContext          *c
 						       gchar                **str,
 						       PangoAttrList        **attrs,
 						       gint                  *cursor_pos);
-
-static void set_ic_client_window (GtkIMContextGCIN *context_xim,
-				  GdkWindow       *client_window);
 
 static GObjectClass *parent_class;
 
@@ -128,19 +124,17 @@ gtk_im_context_xim_register_type (GTypeModule *type_module)
 static void
 reinitialize_all_ics (GtkGCINInfo *info)
 {
-#if 0
-  GSList *tmp_list;
-
-  for (tmp_list = info->ics; tmp_list; tmp_list = tmp_list->next)
-    reinitialize_ic (tmp_list->data);
-#endif
 }
 
 static void gcin_display_closed (GdkDisplay *display,
 			 gboolean    is_error,
-			 GCIN_client_handle *gcin_ch)
+                         GtkIMContextGCIN *context_xim)
 {
-  gcin_im_client_close(gcin_ch);
+  if (!context_xim->gcin_ch)
+    return;
+
+  gcin_im_client_close(context_xim->gcin_ch);
+  context_xim->gcin_ch = NULL;
 }
 
 
@@ -169,7 +163,7 @@ get_im (GtkIMContextGCIN *context_xim)
       perror("cannot open gcin_ch");
 
     g_signal_connect (display, "closed",
-                      G_CALLBACK (gcin_display_closed), context_xim->gcin_ch);
+                      G_CALLBACK (gcin_display_closed), context_xim);
   }
 
   return info;
@@ -208,13 +202,10 @@ gtk_im_context_gcin_finalize (GObject *obj)
 //  printf("gtk_im_context_gcin_finalize\n");
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (obj);
 
-//  context_xim->finalizing = TRUE;
-
   if (context_xim->gcin_ch) {
     gcin_im_client_close(context_xim->gcin_ch);
     context_xim->gcin_ch = NULL;
   }
-//  set_ic_client_window (context_xim, NULL);
 }
 
 /* Finds the GtkWidget that owns the window, or if none, the
@@ -360,11 +351,6 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 
   XKeyPressedEvent xevent;
 
-#if 0
-  if (event->type == GDK_KEY_RELEASE && !context_xim->filter_key_release)
-    return FALSE;
-#endif
-
   xevent.type = (event->type == GDK_KEY_PRESS) ? KeyPress : KeyRelease;
   xevent.serial = 0;		/* hope it doesn't matter */
   xevent.send_event = event->send_event;
@@ -387,7 +373,6 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
       keysym, xevent.state, &rstr);
 
 //    dbg("yyyyyyyyy %d %d num_bytes:%d %x\n", rstr, result, num_bytes, buffer[0]);
-
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f) {
 //      dbg("buffer %c\n", buffer[0]);
       rstr = (char *)malloc(num_bytes + 1);
@@ -559,7 +544,6 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
   if (cursor_pos)
     *cursor_pos = context_xim->preedit_cursor;
 }
-
 
 
 /**

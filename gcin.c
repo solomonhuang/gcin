@@ -440,7 +440,7 @@ int main(int argc, char **argv)
   }
 
 
-  if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version"))) {
+  if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {
     p_err(" version %s\n", GCIN_VERSION);
   }
 

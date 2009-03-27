@@ -17,7 +17,7 @@ OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o gtablist.o \
-locale.o gcin-setup-pho.o
+locale.o gcin-setup-pho.o about.o
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \

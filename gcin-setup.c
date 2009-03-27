@@ -490,10 +490,12 @@ static void cb_default_input_method()
   create_gtablist_window();
 }
 
+GtkWidget *main_window;
+void create_about_window();
 
 static void create_main_win()
 {
-  GtkWidget *main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
   g_signal_connect (G_OBJECT (main_window), "delete_event",
                      G_CALLBACK (close_application),
@@ -542,6 +544,12 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox), button_ts_edit, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_ts_edit), "clicked",
                     G_CALLBACK (cb_ts_edit), NULL);
+
+  GtkWidget *button_about = gtk_button_new_with_label("關於 gcin");
+  gtk_box_pack_start (GTK_BOX (vbox), button_about, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_about), "clicked",
+                    G_CALLBACK (create_about_window),  NULL);
+
 
   GtkWidget *button_help = gtk_button_new_from_stock (GTK_STOCK_HELP);
   gtk_box_pack_start (GTK_BOX (vbox), button_help, TRUE, TRUE, 0);
