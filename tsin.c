@@ -49,17 +49,6 @@ static struct {
 } pre_sel[10];
 int pre_selN;
 
-static gboolean use_caps_lock=1;
-
-void load_tsin_conf()
-{
-  char swkey[16];
-  get_gcin_conf_str(TSIN_CHINESE_ENGLISH_SWITCH, swkey, "CapsLock");
-  if (!strcmp(swkey, "Tab"))
-    use_caps_lock = 0;
-  else
-    use_caps_lock = 1;
-}
 
 
 void disp_char(int index, u_char *ch);
@@ -87,10 +76,10 @@ static void drawcursor()
 
   if (c_idx == c_len) {
     if (tsin_half_full || eng_ph) {
-      disp_char(c_idx,"　");
+      disp_char(c_idx,"  ");
       set_cursor_tsin(c_idx);
     } else {
-      disp_char(c_idx, "  ");
+      disp_char(c_idx, " ");
       set_cursor_tsin(c_idx);
     }
   }
@@ -101,7 +90,7 @@ static void drawcursor()
   gdk_flush();
 }
 
-void inc_pho_count(u_short key, int ch_idx);
+void inc_pho_count(phokey_t key, int ch_idx);
 int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5);
 
 static void putbuf(u_char s[][CH_SZ], int len)
@@ -313,7 +302,6 @@ disp_prom:
   }
 
   load_tsin_db();
-  load_tsin_conf();
 
   clr_ch_buf();
   show_win0();
@@ -1002,6 +990,7 @@ static gboolean pre_punctuation(KeySym xkey)
 
 phokey_t pho2key(char typ_pho[]);
 gboolean inph_typ_pho(char newkey);
+void clr_in_area_pho_tsin();
 
 int feedkey_pp(KeySym xkey, int kbstate)
 {
@@ -1072,14 +1061,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
         }
         return 0;
      case XK_Caps_Lock:
-        if (use_caps_lock) {
+        if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
           close_selection_win();
           tsin_toggle_eng_ch();
           return 1;
         } else
           return 0;
      case XK_Tab:
-        if (!use_caps_lock) {
+        if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab) {
           close_selection_win();
           tsin_toggle_eng_ch();
           return 1;
@@ -1090,21 +1079,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
           }
           return 0;
         }
-#if 0
-     case XK_KP_Multiply:
-        close_selection_win();
-        if (save_mode) {
-          save_to=c_idx;
-          save_phrase();
-          save_mode=0;
-          bell();
-        } else {
-          save_frm=c_idx;
-          save_mode=1;
-          bell();
-        }
-        return 1;
-#endif
+     case XK_Shift_L:
+     case XK_Shift_R:
+        if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) {
+          close_selection_win();
+          tsin_toggle_eng_ch();
+          return 1;
+        } else
+          return 0;
      case XK_Delete:
         if (c_idx == c_len)
           return 0;
@@ -1360,7 +1342,7 @@ asc_char:
             if (!(kbstate&LockMask) && isupper(xkey))
               xkey+=0x20;
         } else {
-          if (!eng_ph && use_caps_lock) {
+          if (!eng_ph && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
             if (shift_m) {
               if (islower(xkey))
                 xkey-=0x20;

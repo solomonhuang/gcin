@@ -52,7 +52,8 @@ if [ $prefix = /usr ]; then
   OPTFLAGS="-O"
 fi
 
-echo "MAKE=$MAKE" > config.mak
+echo "CC=gcc" > config.mak
+echo "MAKE=$MAKE" >> config.mak
 echo "GTKINC=$GTKINC" >> config.mak
 echo "prefix=$prefix" >> config.mak
 echo "bindir=$bindir" >> config.mak

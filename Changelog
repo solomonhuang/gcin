@@ -1,3 +1,17 @@
+0.5.6:
+- 許式鍵盤 ( 7 吃) 無法輸入的問題。
+- 倚天 26 (ULㄩ ㄥ  XTㄨ ㄤ  EP ㄧ ㄡ) 無法輸入的問題。
+
+0.5.5:
+- gcin-setup 裡 gtab 的設定視窗按 ok 後不會關起來的問題。
+- gtab 行列有時按預選列中的字無法選擇的問題。
+- 許式鍵盤無法輸入 '詞' 等字的問題。
+- 現在可以單獨設定詞音裏的注音輸入的區域的字型大小。有時候必須設定到比編輯區的小一些，畫面才不會跳動。
+- gcin locale 現在也會看 LC_ALL，如果有設定，會優先於 LC_CTYPE 的內容，這是為了解決目前 C library 'LC_ALL' 設定以後，LC_CTYPE 不會同時被更改的問題。
+- 現在會自動修改 Mandrake 10.1 的 /etc/sysconfig/i18n  & /usr/X11R6/bin/crxvt，把原來的給 SCIM 用的設定換成 gcin。
+- phod2a 現在真正會 dump 使用者的注音資料。
+
+
 0.5.4:
 - 在 KDE environment (konsole...)， gcin 視窗位置的問題應該會改善不少。
 - 詞音 Backspace 的問題。

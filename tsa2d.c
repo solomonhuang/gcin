@@ -25,7 +25,7 @@ static int qcmp(const void *a, const void *b)
   int idxb=*((int *)b);
   u_char lena,lenb, len;
   int cha, chb;
-  int res,i;
+  int i;
   u_short ka,kb;
 
   lena=bf[idxa]; idxa+=2;
@@ -67,7 +67,7 @@ int lookup(u_char *s)
 
 
   for(i=0;i<3;i++)
-    if (pp=strstr(pho_chars[i],tt))
+    if ((pp=strstr(pho_chars[i],tt)))
       break;
 
   if (i==3)
@@ -77,17 +77,16 @@ int lookup(u_char *s)
 }
 
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   FILE *fp,*fw;
   u_char s[1024];
   u_char chbuf[80][CH_SZ];
   u_short phbuf[80];
-  int i,j,k1,k2,k3,k4,num,idx,len, ofs, dupcou;
+  int i,j,idx,len, ofs;
   u_short kk;
-  u_char phlen;
   int hashidx[TSIN_HASH_N];
-  u_char clen, llen;
+  u_char clen;
   gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
   if (reload)

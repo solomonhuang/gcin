@@ -91,6 +91,28 @@ if  [ -d $xinitdir ]; then
 else
   echo "Directory $xinitdir does not exist"
 fi
+cd /etc/sysconfig
+## below is for Mandrake 10.1
+grep -i scim i18n >& /dev/null
+if [ $? = 0 ]; then
+  if [ ! -f i18n.orig.gcin ]; then
+    mv i18n i18n.orig.gcin
+  fi
+
+  sed -e "s/im=SCIM/im=xcin/" < i18n.orig.gcin |
+  sed -e "s/scim -d/gcin/" | \
+  sed -e "s/MODULE=scim/MODULE=xim/" > i18n
+fi
+cd /usr/X11R6/bin
+grep -i scim crxvt >& /dev/null
+if [ $? = 0 ]; then
+  if [ ! -f crxvt.orig.cin ]; then
+    mv crxvt crxvt.orig.cin
+  fi
+
+  sed -e "s/XIM=SCIM/#XIM=xim/" < crxvt.orig.cin > crxvt
+  chmod 755 crxvt
+fi
 %update_menus
 
 %postun

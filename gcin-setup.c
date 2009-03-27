@@ -26,9 +26,15 @@ static GtkWidget *check_button_phrase_pre_select, *check_button_gtab_dup_select_
 
 static GtkWidget *opt_spc_opts;
 
-static char *tsin_eng_ch_sw[]={
-  "CapsLock",
-  "Tab"
+static struct {
+  char *name;
+  int key;
+} tsin_eng_ch_sw[]={
+  {"CapsLock", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock},
+  {"Tab", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
+#if 0
+  {"Shift", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
+#endif
 };
 int tsin_eng_ch_swN = sizeof(tsin_eng_ch_sw) / sizeof(tsin_eng_ch_sw[0]);
 
@@ -47,16 +53,14 @@ static gboolean close_application( GtkWidget *widget,
   exit(0);
 }
 
-void save_gcin_conf_str(char *name, char *str);
-void save_gcin_conf_int(char *name, int val);
-void send_gcin_message(Display *dpy, char *s);
 
 static gboolean cb_ok( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
   save_gcin_conf_str(PHONETIC_KEYBOARD, kbm_sel[new_select_idx].kbm);
-  save_gcin_conf_str(TSIN_CHINESE_ENGLISH_SWITCH, tsin_eng_ch_sw[new_select_idx_tsin_sw]);
+  save_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
+                     tsin_eng_ch_sw[new_select_idx_tsin_sw].key);
   save_gcin_conf_int(TSIN_PHRASE_PRE_SELECT,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phrase_pre_select)));
 
@@ -100,11 +104,10 @@ static int get_current_kbm_idx()
 static int get_currnet_eng_ch_sw_idx()
 {
   char swkey[32];
-  get_gcin_conf_str(TSIN_CHINESE_ENGLISH_SWITCH, swkey, "CapsLock");
 
   int i;
-  for(i=0; i < kbm_selN; i++)
-    if (!strcmp(tsin_eng_ch_sw[i], swkey))
+  for(i=0; i < tsin_eng_ch_swN; i++)
+    if (tsin_eng_ch_sw[i].key == tsin_chinese_english_toggle_key)
       return i;
 
   p_err("tsin-chinese-english-switch->%s is not valid", swkey);
@@ -176,7 +179,7 @@ void create_kbm_window()
     new_select_idx_tsin_sw = current_idx;
 
     for(i=0; i< tsin_eng_ch_swN; i++) {
-      GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_sw, tsin_eng_ch_sw[i]);
+      GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_sw, tsin_eng_ch_sw[i].name);
       gtk_box_pack_start (GTK_BOX (box_tsin_sw), button, TRUE, TRUE, 0);
 
       group_tsin_sw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
@@ -365,7 +368,7 @@ struct {
   { NULL, 0},
 };
 
-static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol;
+static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol, *spinner_tsin_pho_in;
 
 static gboolean cb_appearance_conf_ok( GtkWidget *widget,
                                    GdkEvent  *event,
@@ -380,6 +383,9 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   int font_size_symbol = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_symbol));
   save_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, font_size_symbol);
+
+  int font_size_tsin_pho_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_pho_in));
+  save_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, font_size_tsin_pho_in);
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
   gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
@@ -420,6 +426,14 @@ void create_appearance_conf_window()
   spinner = gtk_spin_button_new (adj, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_font_size), spinner);
 
+  GtkWidget *frame_font_size_symbol = gtk_frame_new("符號選擇視窗字型大小");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_symbol, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_symbol), 3);
+  GtkAdjustment *adj_symbol =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 24.0, 1.0, 1.0, 0.0);
+  spinner_symbol = gtk_spin_button_new (adj_symbol, 0, 0);
+  gtk_container_add (GTK_CONTAINER (frame_font_size_symbol), spinner_symbol);
+
 
   GtkWidget *frame_font_size_tsin_presel = gtk_frame_new("詞音預選詞視窗字型大小");
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_tsin_presel, FALSE, FALSE, 0);
@@ -430,13 +444,13 @@ void create_appearance_conf_window()
   gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_presel), spinner_tsin_presel);
 
 
-  GtkWidget *frame_font_size_symbol = gtk_frame_new("符號選擇視窗字型大小");
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_symbol, FALSE, FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_symbol), 3);
-  GtkAdjustment *adj_symbol =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 24.0, 1.0, 1.0, 0.0);
-  spinner_symbol = gtk_spin_button_new (adj_symbol, 0, 0);
-  gtk_container_add (GTK_CONTAINER (frame_font_size_symbol), spinner_symbol);
+  GtkWidget *frame_font_size_tsin_pho_in = gtk_frame_new("詞音注音輸入區字型大小");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_tsin_pho_in, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_tsin_pho_in), 3);
+  GtkAdjustment *adj_tsin_pho_in =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_pho_in, 8.0, 24.0, 1.0, 1.0, 0.0);
+  spinner_tsin_pho_in = gtk_spin_button_new (adj_tsin_pho_in, 0, 0);
+  gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_pho_in), spinner_tsin_pho_in);
 
 
   GtkWidget *button_close = gtk_button_new_with_label ("OK");
@@ -480,7 +494,7 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
-  gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
+  gtk_widget_destroy(gcin_gtab_conf_window); gcin_gtab_conf_window = NULL;
 
   return TRUE;
 }
@@ -523,7 +537,6 @@ static GtkWidget *create_spc_opts()
   return hbox;
 }
 
-static GtkWidget *gcin_gtab_conf_window;
 
 void create_gtab_conf_window()
 {

@@ -12,6 +12,9 @@ Mandrake
 /etc/X11/xinit/XIM/XIM.orig.gcin
 在 'rpm -e' uninstall 解除安裝時不會自動還原.
 
+在 Mandrake 10.1 中，會自動修改 /etc/sysconfig/i18n & /usr/X11R6/bin/crxvt 把原來給 SCIM 用的設定改成
+給 gcin 用。
+
 其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X 
 中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin 
 -------------------
@@ -78,9 +81,9 @@ Mandrake
 把這項功能關掉.
 
 ---------------------------------
-如何加入新詞:
-把 cursor 游標移至要存的詞句的開頭,按下 shift-Enter, 則會自 cursor 所在位置存
-到編輯區的結尾,cursor 也會自動跳到結尾, 方便繼續輸入.
+如何加入新詞：
+把 cursor 游標移至要存的詞句的開頭，按下 shift-Enter, 則會自 cursor 所在位置存
+到編輯區的結尾，cursor 也會自動跳到結尾, 方便繼續輸入。
 ---------------------------------
 標點符號與特殊符號可不可以存成詞？
 
@@ -253,4 +256,25 @@ gcin 就用 這個來當 XIM name， /usr/X11R6/bin/crxvt 這個 shell script 會設定
 KDE 中 gcin 的 window 為什麼不會跟著 cursor 移動？
 你可以用 qtconfig 把 XIM input style 設定成 over-the-spot 就可以了。
 ------------------------------------------------
+gcin 的詞庫不夠多，想貢獻給 gcin 作者自己的詞庫。
+cd .gcin
+tsd2a tsin > your
+diff your gcin-0.x.x/data/tsin.src > diff.txt
+gedit diff.txt
 
+這樣就可以看到 兩個 file 的差異，注意看你的詞庫是否有那些
+現代人用不到的詞，這些沒用的詞只會增加詞音錯誤的機率，
+刪除以後再寄給我  (cp76@csie.nctu.edu.tw)。
+-------------------------------------------------
+在 Mandrake 10.1 中出現
+  輸入區出現方框的亂碼，注音的 '一' 變成 '|' 一直線。
+請去
+   http://www.csie.nctu.edu.tw/~cp76/linux/fontconfig
+下載暫時修正，這是 Mandrake 的問題。
+
+1. chmod 755 libpango-1.0.so.0.400.1; cp libpango-1.0.so.0.400.1  /usr/lib
+2. cp fonts.conf /etc/fonts
+--------------------------------------------------
+詞音輸入的視窗在打滿注音後會縮回去，看起來有點討厭。
+Answer: 注音輸入的區域的字型必須比編輯區的小個幾點就沒有這個問題。
+--------------------------------------------------

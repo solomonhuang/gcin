@@ -1,0 +1,12 @@
+make
+export GCIN_XIM=gcin_test
+pkill gcin.test
+../gcin.test &
+
+export LC_ALL=zh_TW.Big5
+export XMODIFIERS=@im=$GCIN_XIM
+export LD_PRELOAD=../im-client/gcin-im-client.so;./gtk-im.so
+gedit
+
+unset LD_PRELOAD
+pkill gcin.test

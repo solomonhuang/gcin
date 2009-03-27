@@ -92,10 +92,9 @@ static XIMEncoding chEncodings[] = {
 };
 static XIMEncodings encodings;
 
-int gcin_ForwardEventHandler(IMForwardEventStruct *call_data);
+int xim_ForwardEventHandler(IMForwardEventStruct *call_data);
 
 XIMS current_ims;
-IMProtocol *current_call_data;
 extern void toggle_im_enabled();
 
 
@@ -124,8 +123,8 @@ void CreateIC(IMChangeICStruct *call_data);
 void DeleteIC(CARD16 icid);
 void SetIC(IMChangeICStruct * call_data);
 void GetIC(IMChangeICStruct *call_data);
-int gcin_FocusIn(IMChangeFocusStruct *call_data);
-int gcin_FocusOut(IMChangeFocusStruct *call_data);
+int xim_gcin_FocusIn(IMChangeFocusStruct *call_data);
+int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
 
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
@@ -146,7 +145,6 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 //  dbg("index:%d\n", index);
 
   current_ims = ims;
-  current_call_data = call_data;
 
   switch (call_data->major_code) {
   case XIM_OPEN:
@@ -196,17 +194,17 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 #if DEBUG
      dbg("XIM_FORWARD_EVENT\n");
 #endif
-     return gcin_ForwardEventHandler((IMForwardEventStruct *)call_data);
+     return xim_ForwardEventHandler((IMForwardEventStruct *)call_data);
   case XIM_SET_IC_FOCUS:
 #if DEBUG
      dbg("XIM_SET_IC_FOCUS\n");
 #endif
-     return gcin_FocusIn((IMChangeFocusStruct *)call_data);
+     return xim_gcin_FocusIn((IMChangeFocusStruct *)call_data);
   case XIM_UNSET_IC_FOCUS:
 #if DEBUG
      dbg("XIM_UNSET_IC_FOCUS\n");
 #endif
-     return gcin_FocusOut((IMChangeFocusStruct *)call_data);
+     return xim_gcin_FocusOut((IMChangeFocusStruct *)call_data);
   case XIM_RESET_IC:
 #if DEBUG
      dbg("XIM_UNSET_IC_FOCUS\n");
@@ -285,7 +283,6 @@ void load_tsin_conf(), load_setttings(), load_tab_pho_file();
 static void reload_data()
 {
   dbg("reload_data\n");
-  load_tsin_conf();
   load_tsin_db();
   load_tab_pho_file();
   load_setttings();
@@ -293,6 +290,7 @@ static void reload_data()
 
 void change_tsin_font_size();
 void change_gtab_font_size();
+void change_win_sym_font_size();
 
 
 static void change_font_size()
@@ -300,6 +298,7 @@ static void change_font_size()
   load_setttings();
   change_tsin_font_size();
   change_gtab_font_size();
+  change_win_sym_font_size();
 }
 
 static int xerror_handler(Display *d, XErrorEvent *eve)
@@ -399,32 +398,35 @@ static void exec_setup_scripts()
 }
 
 
-static char *gcin_db_locale="zh_TW.Big5";
 char *get_gcin_xim_name();
 void load_phrase(), init_TableDir(),  load_gtab_list();
+void init_im_serv();
 
 int main(int argc, char **argv)
 {
   dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
+  char *lc_ctype = getenv("LC_CTYPE");
+  char *lc_all = getenv("LC_ALL");
+  dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s\n", lc_ctype, lc_all);
 
-  char *locale_str;
   xim_arr[0].server_locale = "zh_TW";
   char *xim_server_name = get_gcin_xim_name();
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
   strcpy(xim_arr[1].xim_server_name, xim_server_name);
-  if ((locale_str=getenv("LC_CTYPE")) && !strcmp(locale_str, "zh_TW.UTF-8")) {
-    dbg("LC_CTYPE=%s, gcin will use UTF-8\n", locale_str);
 
+  if ((lc_ctype && !strcmp(lc_ctype, "zh_TW.UTF-8")) || (lc_all && !strcmp(lc_all, "zh_TW.UTF-8"))) {
     xim_arr[0].b_send_utf8_str = TRUE;
     xim_arr[1].b_send_utf8_str = FALSE;
     xim_arr[1].server_locale = "zh_TW.Big5";
     strcat(xim_arr[1].xim_server_name, ".Big5");
+    dbg("gcin will use UTF-8 as default encoding\n");
   } else {
     xim_arr[0].b_send_utf8_str = FALSE;
     xim_arr[1].b_send_utf8_str = TRUE;
     xim_arr[1].server_locale = "zh_TW.UTF-8";
     strcat(xim_arr[1].xim_server_name, ".UTF-8");
+    dbg("gcin will use Big5 as default encoding\n");
   }
 
 
@@ -432,8 +434,10 @@ int main(int argc, char **argv)
     p_err(" version %s\n", GCIN_VERSION);
   }
 
-  setlocale(LC_ALL, gcin_db_locale);
-  setenv("LC_ALL", gcin_db_locale, TRUE);
+  // temporaray solution
+  static char tmplocale[]="zh_TW.Big5";
+  setlocale(LC_ALL, tmplocale);
+  setenv("LC_ALL", tmplocale, TRUE);
 
   exec_setup_scripts();
 
@@ -461,6 +465,10 @@ int main(int argc, char **argv)
   // disable the io handler abort
   // void *olderr =
     XSetErrorHandler((XErrorHandler)xerror_handler);
+
+#if 1
+  init_gcin_im_serv();
+#endif
 
   gtk_main();
 

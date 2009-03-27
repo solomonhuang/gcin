@@ -29,7 +29,7 @@ int lookup(u_char *s)
   tt[CH_SZ]=0;
 
   for(i=0;i<3;i++)
-    if (pp=strstr(pho_chars[i],tt))
+    if ((pp=strstr(pho_chars[i],tt)))
       break;
 
   if (i==3)
@@ -68,14 +68,16 @@ int qcmp_key(const void *aa, const void *bb)
   PHITEM *b=(PHITEM *)bb;
 
   int d;
-  if (d=a->key - b->key)
+  if ((d=a->key - b->key))
     return a->key - b->key;
 
   return b->count - a->count;
 }
 
 
-main(int argc, char **argv)
+void send_gcin_message(Display *dpy, char *s);
+
+int main(int argc, char **argv)
 {
   char *fname = "pho.tab.src";
   FILE *fp;
@@ -99,7 +101,6 @@ main(int argc, char **argv)
     if (len==0)
       continue;
 
-    int i;
     u_short kk=0;
     u_char *p = s;
 

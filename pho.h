@@ -43,6 +43,7 @@ void pho_load();
 extern char *pho_chars[];
 char *phokey_to_str(phokey_t kk);
 int big5_pho_chars(char *big5, phokey_t *phkeys);
+void prph(phokey_t kk);
 
 #define MAX_PH_BF (90)
 

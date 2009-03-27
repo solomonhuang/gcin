@@ -12,13 +12,15 @@ static GtkWidget *label_key_codes;
 static GtkWidget *image_pin;
 
 Window xwin_gtab;
+void set_label_space(GtkWidget *label);
 
 void disp_gtab(int index, char *gtabchar)
 {
   char utf8[512];
 
-  if (gtabchar[0]==' ')
-    strcpy(utf8,"　");
+  if (gtabchar[0]==' ') {
+    set_label_space(labels_gtab[index]);
+  }
   else {
     if (gtabchar[0] & 128)
       utf8cpy(utf8, gtabchar);
@@ -26,9 +28,10 @@ void disp_gtab(int index, char *gtabchar)
       memcpy(utf8, gtabchar, 2);
       utf8[2]=0;
     }
+
+    gtk_label_set_text(GTK_LABEL(labels_gtab[index]), utf8);
   }
 
-  gtk_label_set_text(GTK_LABEL(labels_gtab[index]), utf8);
 }
 
 char *str_half_full[]={"半","全"};
@@ -79,9 +82,9 @@ void set_key_codes_label(char *s)
 
 void move_win_gtab(int x, int y)
 {
-  if (current_IC && current_IC->fixed_pos) {
-    x = current_IC->fixed_x;
-    y = current_IC->fixed_y;
+  if (current_CS && current_CS->fixed_pos) {
+    x = current_CS->fixed_x;
+    y = current_CS->fixed_y;
   }
 
   gtk_window_get_size(GTK_WINDOW(gwin_gtab), &win_xl, &win_yl);
@@ -147,7 +150,7 @@ extern char file_pin_float[];
 
 static void set_currenet_IC_pin_image_pin()
 {
-  if (current_IC->fixed_pos)
+  if (current_CS->fixed_pos)
     gtk_image_set_from_file(GTK_IMAGE(image_pin), GCIN_ICON_DIR"/pin-fixed24.png");
   else
     gtk_image_set_from_file(GTK_IMAGE(image_pin), file_pin_float);
@@ -158,16 +161,16 @@ void get_win_gtab_geom();
 static void cb_clicked_fixed_pos()
 {
 
-  if (!current_IC)
+  if (!current_CS)
     return;
 
-  current_IC->fixed_pos^=1;
+  current_CS->fixed_pos^=1;
 
-//  dbg("cb_clicked_fixed_pos %d\n", current_IC->fixed_pos);
+//  dbg("cb_clicked_fixed_pos %d\n", current_CS->fixed_pos);
 
-  if (current_IC->fixed_pos) {
+  if (current_CS->fixed_pos) {
     get_win_gtab_geom();
-    current_IC->fixed_x = win_x;  current_IC->fixed_y = win_y;
+    current_CS->fixed_x = win_x;  current_CS->fixed_y = win_y;
   }
 
   set_currenet_IC_pin_image_pin();
@@ -217,7 +220,7 @@ void create_win_gtab_gui()
   label_half_full = gtk_label_new(NULL);
   gtk_container_add (GTK_CONTAINER (button_half_full), label_half_full);
   gtk_box_pack_start (GTK_BOX (hbox), button_half_full, FALSE, FALSE, 0);
-  disp_gtab_half_full(current_IC->b_half_full_char);
+  disp_gtab_half_full(current_CS->b_half_full_char);
   g_signal_connect (G_OBJECT (button_half_full), "clicked",
       G_CALLBACK (cb_half_bull), (gpointer) NULL);
 
@@ -265,18 +268,18 @@ void init_gtab(int inmdno, int usenow);
 
 void show_win_gtab()
 {
-//  dbg("show_win_gtab %d ..\n", current_IC->in_method);
+//  dbg("show_win_gtab %d ..\n", current_CS->in_method);
   create_win_gtab();
   create_win_gtab_gui();
   set_currenet_IC_pin_image_pin();
 
-  if (current_IC) {
-    if (current_IC->fixed_pos)
+  if (current_CS) {
+    if (current_CS->fixed_pos)
       move_win_gtab(0,0);
   }
 
 
-  init_gtab(current_IC->in_method, True);
+  init_gtab(current_CS->in_method, True);
   gtk_widget_show(gwin_gtab);
   show_win_sym();
 }

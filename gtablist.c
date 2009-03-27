@@ -1,4 +1,5 @@
 #include "gcin.h"
+#include "gcin-conf.h"
 
 struct {
   char *keystr;
@@ -130,6 +131,7 @@ create_model (void)
 
 #define DEFAULT_INPUT_METHOD "default-input-method"
 
+
 static void cb_ok (GtkWidget *button, gpointer data)
 {
   GtkTreeSelection *treeselection=gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
@@ -144,7 +146,6 @@ static void cb_ok (GtkWidget *button, gpointer data)
     i = gtk_tree_path_get_indices (path)[0];
     gtk_tree_path_free(path);
 
-    gchar *name=g_array_index (articles, Item, i).name;
     gchar *key=g_array_index (articles, Item, i).key;
 
     save_gcin_conf_str(DEFAULT_INPUT_METHOD, key);
@@ -167,7 +168,6 @@ static void
 add_columns (GtkTreeView *treeview)
 {
   GtkCellRenderer *renderer;
-  GtkTreeModel *model = gtk_tree_view_get_model (treeview);
 
   /* name column */
 
@@ -204,15 +204,13 @@ add_columns (GtkTreeView *treeview)
 }
 
 
-static callback_win_delete()
+static void callback_win_delete()
 {
   gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 }
 
 void set_selection_by_key(int key)
 {
-  int i;
-
   if (!treeview)
     return;
 
@@ -225,7 +223,6 @@ void set_selection_by_key(int key)
     return;
 
   do {
-    gchar *tname;
     char *tkey;
 
     gtk_tree_model_get(model,&iter, COLUMN_KEY, &tkey,-1);
@@ -270,7 +267,7 @@ static GtkWidget *create_im_toggle_keys()
 }
 
 
-void *create_gtablist_window (void)
+void create_gtablist_window (void)
 {
   /* create gtab_list_window, etc */
   gtablist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

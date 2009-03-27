@@ -39,7 +39,7 @@ void mask_key_typ_pho(phokey_t *key)
 
 
 
-gboolean inph_typ_pho(char newkey)
+gboolean inph_typ_pho(int newkey)
 {
   int i;
   int insert = -1;
@@ -62,10 +62,16 @@ gboolean inph_typ_pho(char newkey)
     }
   }
 
+
+  int max_in_idx;
+
+  for(max_in_idx=3; max_in_idx>=0 && !typ_pho[max_in_idx]; max_in_idx--);
+
+
   if (insert < 0)
   for(i=0; i < 3; i++) {
     char num = phkbm.phokbm[(int)newkey][i].num;
-    char typ = phkbm.phokbm[(int)newkey][i].typ;
+    int typ = phkbm.phokbm[(int)newkey][i].typ;
 #define TKBM 0
     if (typ==3 && (typ_pho[0]||typ_pho[1]||typ_pho[2])) {
       inph[typ] = newkey;
@@ -82,9 +88,9 @@ gboolean inph_typ_pho(char newkey)
   if (insert < 0)
   for(i=0; i < 3; i++) {
     char num = phkbm.phokbm[(int)newkey][i].num;
-    char typ = phkbm.phokbm[(int)newkey][i].typ;
+    int typ = phkbm.phokbm[(int)newkey][i].typ;
 
-    if (num && !inph[typ]) {
+    if (num && !inph[typ] && typ>max_in_idx) {
       inph[typ] = newkey;
       typ_pho[typ] = num;
 #if TKBM
@@ -99,7 +105,7 @@ gboolean inph_typ_pho(char newkey)
     // then overwrite mode
     for(i=0; i < 3; i++) {
       char num = phkbm.phokbm[newkey][i].num;
-      char typ = phkbm.phokbm[newkey][i].typ;
+      int typ = phkbm.phokbm[newkey][i].typ;
 
       if (num) {
         inph[typ] = newkey;
@@ -116,12 +122,12 @@ gboolean inph_typ_pho(char newkey)
 
   // forced to type 2
   if (inph[0] && (newkey == ' '|| typ_pho[3]) &&
-      !typ_pho[1] && !typ_pho[2]) {
-    int midx = phkbm.phokbm[inph[0]][2].typ==2 ? 2:1;
-    int mnum = phkbm.phokbm[inph[0]][midx].num;
+      !typ_pho[1] && !typ_pho[2] && (!b_hsu_kbm || inph[0]!='a')) {
+    int midx = phkbm.phokbm[(int)inph[0]][2].typ==2 ? 2:1;
+    int mnum = phkbm.phokbm[(int)inph[0]][midx].num;
 
     if (mnum) {
-      int mtyp = phkbm.phokbm[inph[0]][midx].typ;
+      int mtyp = phkbm.phokbm[(int)inph[0]][midx].typ;
 #if TKBM
        dbg("ooooooooooo %d %d %d\n", midx, mnum, mtyp);
 #endif
@@ -139,13 +145,19 @@ gboolean inph_typ_pho(char newkey)
     typ_pho[0] = phkbm.phokbm['c'][1].num;
   }
 
+  // v 吃
+  if (b_hsu_kbm && inph[3] && inph[0]=='v' && !typ_pho[1] && !typ_pho[2] &&
+      phkbm.phokbm['v'][1].num) {
+    typ_pho[0] = phkbm.phokbm['v'][1].num;
+  }
+
 
   int idx = insert == 1 ? 0 : insert;
 
   {
     for(i=0; i < 3; i++) {
-      char num = phkbm.phokbm[inph[idx]][i].num;
-      char typ = phkbm.phokbm[inph[idx]][i].typ;
+      char num = phkbm.phokbm[(int)inph[idx]][i].num;
+      char typ = phkbm.phokbm[(int)inph[idx]][i].typ;
 
       if (!num)
         break;
@@ -155,7 +167,7 @@ gboolean inph_typ_pho(char newkey)
 
 //      dbg("idx:%d i:%d\n", idx, i);
 
-      typ_pho[typ] = num;
+      typ_pho[(int)typ] = num;
 
       int vv=hash_pho[typ_pho[0]];
       phokey_t ttt=0xffff;
@@ -195,8 +207,7 @@ void clrin_pho()
   cpg=0;
 }
 
-#define InAreaX (0)
-
+void disp_pho(int index, char *phochar);
 static void clr_in_area_pho()
 {
   int i;
@@ -221,6 +232,9 @@ static int qcmp_count(const void *aa, const void *bb)
 
   return b->count - a->count;
 }
+
+void disp_pho_sel(char *s);
+void minimize_win_pho();
 
 static void ClrSelArea()
 {
@@ -268,7 +282,7 @@ int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5)
 }
 
 
-void inc_pho_count(u_short key, int ch_idx)
+void inc_pho_count(phokey_t key, int ch_idx)
 {
   int start_i, stop_i;
 
@@ -287,8 +301,16 @@ void inc_pho_count(u_short key, int ch_idx)
   }
 
   ch_pho[ch_idx].count++;
+//  dbg("count %d\n", ch_pho[ch_idx].count);
 
   qsort(&ch_pho[start_i], stop_i - start_i, sizeof(PHO_ITEM), qcmp_count);
+#if 0
+  int i;
+  for(i=start_i; i < stop_i; i++) {
+    dbg("uuuu %c%c%c %d\n", ch_pho[i].ch[0], ch_pho[i].ch[1],
+      ch_pho[i].ch[2], ch_pho[i].count);
+  }
+#endif
 
   FILE *fw;
 

@@ -28,10 +28,8 @@ void send_text_call_back(char *text)
 }
 
 
-GtkWidget *win_syms[MAX_GTAB_NUM_KEY+1];
-
 InputStyle_E current_input_style;
-IC *current_IC;
+ClientState *current_CS;
 
 void init_in_method(int in_no);
 
@@ -40,29 +38,23 @@ void set_current_input_style(InputStyle_E style)
   current_input_style = style;
 }
 
+char *output_buffer;
+int  output_bufferN, output_bufferN_a;
+
 
 void send_text(char *text)
 {
-  XTextProperty tp;
-  char outbuf[512];
+  int len = strlen(text);
+  int requiredN = len + 1 + output_bufferN;
 
-  if (pxim_arr->b_send_utf8_str) {
-    Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
-  } else {
-    utf8_big5(text, outbuf);
-    text = outbuf;
-    XmbTextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
+  if (requiredN >= output_bufferN_a) {
+    output_bufferN_a = requiredN;
+    output_buffer = realloc(output_buffer, output_bufferN_a);
+    output_buffer[output_bufferN] = 0;
   }
 
-#if DEBUG
-  dbg("sendkey_b5: %s\n", text);
-#endif
-
-  ((IMCommitStruct*)current_forward_eve)->flag |= XimLookupChars;
-  ((IMCommitStruct*)current_forward_eve)->commit_string = tp.value;
-  IMCommitString(current_ims, (XPointer)current_forward_eve);
-
-  XFree(tp.value);
+  strcat(output_buffer, text);
+  output_bufferN += len;
 }
 
 
@@ -76,6 +68,41 @@ void sendkey_b5(char *bchar)
   send_text(tt);
 }
 
+
+void export_text_xim()
+{
+  char *text = output_buffer;
+
+  if (!output_bufferN)
+    return 0;
+
+
+  XTextProperty tp;
+  char outbuf[512];
+
+  if (pxim_arr->b_send_utf8_str) {
+    Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
+  } else {
+    utf8_big5(output_buffer, outbuf);
+    text = outbuf;
+    XmbTextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
+  }
+
+#if DEBUG
+  dbg("sendkey_b5: %s\n", text);
+#endif
+
+  ((IMCommitStruct*)current_forward_eve)->flag |= XimLookupChars;
+  ((IMCommitStruct*)current_forward_eve)->commit_string = tp.value;
+  IMCommitString(current_ims, (XPointer)current_forward_eve);
+
+  output_bufferN = 0; output_buffer[0] = 0;
+
+  XFree(tp.value);
+}
+
+
+
 static void bounce_back_key()
 {
     IMForwardEventStruct forward_ev = *(current_forward_eve);
@@ -87,9 +114,9 @@ void hide_win_gtab();
 void hide_win_int();
 void hide_win_pho();
 
-void hide_in_win(IC *ic)
+void hide_in_win(ClientState *cs)
 {
-  if (!ic) {
+  if (!cs) {
 #if DEBUG
     dbg("hide_in_win: ic is null");
 #endif
@@ -99,7 +126,7 @@ void hide_in_win(IC *ic)
   dbg("hide_in_win %d\n", ic->in_method);
 #endif
 //  dbg("hide_in_win\n");
-  switch (ic->in_method) {
+  switch (cs->in_method) {
     case 3:
       hide_win_pho();
       break;
@@ -120,16 +147,16 @@ void show_win0();
 void show_win_int();
 void show_win_gtab();
 
-void show_in_win(IC *ic)
+void show_in_win(ClientState *cs)
 {
-  if (!ic) {
+  if (!cs) {
 #if DEBUG
     dbg("show_in_win: ic is null");
 #endif
     return;
   }
 
-  switch (ic->in_method) {
+  switch (cs->in_method) {
     case 3:
       show_win_pho();
       break;
@@ -149,11 +176,11 @@ void move_win_int(int x, int y);
 void move_win0(int x, int y);
 void move_win_pho(int x, int y);
 
-void move_in_win(IC *ic, int x, int y)
+void move_in_win(ClientState *cs, int x, int y)
 {
-  if (!ic) {
+  if (!cs) {
 #if DEBUG
-    dbg("move_in_win: ic is null");
+    dbg("move_in_win: cs is null");
 #endif
     return;
   }
@@ -161,7 +188,7 @@ void move_in_win(IC *ic, int x, int y)
 #if DEBUG
   dbg("move_in_win %d %d\n",x, y);
 #endif
-  switch (ic->in_method) {
+  switch (cs->in_method) {
     case 3:
       move_win_pho(x, y);
       break;
@@ -172,14 +199,14 @@ void move_in_win(IC *ic, int x, int y)
       move_win_int(x, y);
       break;
     default:
-      if (!ic->in_method)
+      if (!cs->in_method)
         return;
       move_win_gtab(x, y);
   }
 }
 
-void move_IC_win0(IC *rec);
-void move_IC_in_win(IC *rec);
+void move_IC_win0(ClientState *rec);
+void move_IC_in_win(ClientState *rec);
 
 void update_in_win_pos()
 {
@@ -192,8 +219,8 @@ void update_in_win_pos()
 
     winx++; winy++;
 
-    if (current_IC) {
-      Window inpwin = get_ic_win(current_IC);
+    if (current_CS) {
+      Window inpwin = current_CS->client_win;
 #if DEBUG
       dbg("update_in_win_pos\n");
 #endif
@@ -204,19 +231,18 @@ void update_in_win_pos()
 
         XTranslateCoordinates(dpy, root, inpwin, winx, winy, &tx, &ty, &ow);
 
-        current_IC->pre_attr.spot_location.x = tx;
-        current_IC->pre_attr.spot_location.y = ty;
+        current_CS->spot_location.x = tx;
+        current_CS->spot_location.y = ty;
       }
     }
 
-    move_in_win(current_IC, winx, winy);
+    move_in_win(current_CS, winx, winy);
   } else {
-    if (current_IC)
-      move_IC_in_win(current_IC);
+    if (current_CS)
+      move_IC_in_win(current_CS);
   }
 }
 
-extern IMProtocol *current_call_data;
 IC *findIC();
 gboolean flush_tsin_buffer();
 
@@ -224,23 +250,23 @@ void toggle_im_enabled()
 {
 //    dbg("toggle_im_enabled\n");
 
-    if (current_IC->b_im_enabled) {
+    if (current_CS->b_im_enabled) {
 
-      if (current_IC->in_method)
+      if (current_CS->in_method)
         flush_tsin_buffer();
 
-      hide_in_win(current_IC);
-      current_IC->b_im_enabled = FALSE;
+      hide_in_win(current_CS);
+      current_CS->b_im_enabled = FALSE;
     } else {
-      current_IC->b_im_enabled = TRUE;
+      current_CS->b_im_enabled = TRUE;
 
-      if (!current_IC->in_method) {
+      if (!current_CS->in_method) {
         init_in_method(default_input_method);
       }
 
       update_in_win_pos();
 
-      show_in_win(current_IC);
+      show_in_win(current_CS);
     }
 }
 
@@ -249,7 +275,7 @@ void get_win0_geom();
 
 void update_active_in_win_geom()
 {
-  switch (current_IC->in_method) {
+  switch (current_CS->in_method) {
     case 3:
       get_win0_geom();
     case 6:
@@ -268,11 +294,11 @@ void tsin_toggle_half_full();
 void toggle_half_full_char()
 {
 
-  if (current_IC->in_method == 6)
+  if (current_CS->in_method == 6)
     tsin_toggle_half_full();
   else {
-    current_IC->b_half_full_char ^= 1;
-    disp_gtab_half_full(current_IC->b_half_full_char);
+    current_CS->b_half_full_char ^= 1;
+    disp_gtab_half_full(current_CS->b_half_full_char);
   }
 //  dbg("half full toggle\n");
 }
@@ -288,11 +314,11 @@ void init_in_method(int in_no)
   if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
     return;
 
-  if (current_IC->in_method != in_no)
-    hide_in_win(current_IC);
+  if (current_CS->in_method != in_no)
+    hide_in_win(current_CS);
 
-//  dbg("switch init_in_method %d\n", in_no);
-  current_IC->in_method = in_no;
+//  dbg("switch init_in_method %x %d\n", current_CS, in_no);
+  current_CS->in_method = in_no;
 
   switch (in_no) {
     case 3:
@@ -321,16 +347,10 @@ int feed_phrase(KeySym ksym);
 int feedkey_intcode(KeySym key);
 void tsin_set_eng_ch(int nmod);
 
-void ProcessKey()
+// return TRUE if the key press is processed
+gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
-  char strbuf[STRBUFLEN];
-  KeySym keysym;
-
-  focus_win = current_IC->client_win;
-
-  memset(strbuf, 0, STRBUFLEN);
-  XKeyEvent *kev = (XKeyEvent*)&current_forward_eve->event;
-  XLookupString(kev, strbuf, STRBUFLEN, &keysym, NULL);
+  focus_win = current_CS->client_win;
 
   if (strlen(callback_str_buffer)) {
     send_text(callback_str_buffer);
@@ -343,63 +363,57 @@ void ProcessKey()
     dbg("%x\n", Mod4Mask);
 #endif
     if (
-      ((kev->state & ControlMask) && gcin_im_toggle_keys==Control_Space) ||
-      ((kev->state & Mod1Mask) && gcin_im_toggle_keys==Alt_Space) ||
-      ((kev->state & ShiftMask) && gcin_im_toggle_keys==Shift_Space) ||
-      ((kev->state & Mod4Mask) && gcin_im_toggle_keys==Windows_Space)
+      ((kev_state & ControlMask) && gcin_im_toggle_keys==Control_Space) ||
+      ((kev_state & Mod1Mask) && gcin_im_toggle_keys==Alt_Space) ||
+      ((kev_state & ShiftMask) && gcin_im_toggle_keys==Shift_Space) ||
+      ((kev_state & Mod4Mask) && gcin_im_toggle_keys==Windows_Space)
     ) {
-      if (current_IC->in_method == 6)
+      if (current_CS->in_method == 6)
         tsin_set_eng_ch(1);
 
       toggle_im_enabled();
-      return;
+      return TRUE;
     }
   }
 
-  if (!current_IC || !current_IC->b_im_enabled) {
-    bounce_back_key();
-    return;
+  if (!current_CS || !current_CS->b_im_enabled) {
+    return FALSE;
   }
 
-  if (keysym == XK_space && (kev->state & ShiftMask)) {
+  if (keysym == XK_space && (kev_state & ShiftMask)) {
     toggle_half_full_char();
-    return;
+    return TRUE;
   }
 
-  int status = 0;
+  gboolean status = FALSE;
 
-  if ((kev->state & ControlMask) && (kev->state&(GDK_MOD1_MASK|GDK_MOD5_MASK))) {
+  if ((kev_state & ControlMask) && (kev_state&(GDK_MOD1_MASK|GDK_MOD5_MASK))) {
     init_in_method(keysym- XK_0);
-    return;
+    return TRUE;
   }
 
-  if ((kev->state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
-    status = feed_phrase(keysym);
-    return;
+  if ((kev_state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
+    return feed_phrase(keysym);
   }
 
 
-  switch(current_IC->in_method) {
+  switch(current_CS->in_method) {
     case 3:
-      status = feedkey_pho(keysym);
-      break;
+      return feedkey_pho(keysym);
     case 6:
-      status = feedkey_pp(keysym, kev->state);
-      break;
+      return feedkey_pp(keysym, kev_state);
     case 0:
-      status = feedkey_intcode(keysym);
-      break;
+      return feedkey_intcode(keysym);
     default:
-      status = feedkey_gtab(keysym, kev->state);
-      break;
+      return feedkey_gtab(keysym, kev_state);
   }
 
-  if (!status)
-    bounce_back_key();
+
+  return FALSE;
 }
 
 
-int gcin_ForwardEventHandler(IMForwardEventStruct *call_data)
+int xim_ForwardEventHandler(IMForwardEventStruct *call_data)
 {
     current_forward_eve = call_data;
 
@@ -407,10 +421,21 @@ int gcin_ForwardEventHandler(IMForwardEventStruct *call_data)
 #if DEBUG
         dbg("bogus event type, ignored\n");
 #endif
-    	return True;
+        return True;
     }
 
-    ProcessKey();
+    char strbuf[STRBUFLEN];
+    KeySym keysym;
+
+    bzero(strbuf, STRBUFLEN);
+    XKeyEvent *kev = (XKeyEvent*)&current_forward_eve->event;
+    XLookupString(kev, strbuf, STRBUFLEN, &keysym, NULL);
+
+
+    if (!ProcessKeyPress(keysym, kev->state))
+      bounce_back_key();
+
+    export_text_xim();
 
     return False;
 }
@@ -418,17 +443,32 @@ int gcin_ForwardEventHandler(IMForwardEventStruct *call_data)
 IC *FindIC(CARD16 icid);
 void load_IC(IC *rec);
 
-int gcin_FocusIn(IMChangeFocusStruct *call_data)
+int gcin_FocusIn(ClientState *cs)
 {
-    IC *ic = FindIC(call_data->icid);
-
-    if (ic) {
-      Window win = get_ic_win(ic);
+    if (cs) {
+      Window win = cs->client_win;
 
       if (focus_win != win) {
-        hide_in_win(current_IC);
+        hide_in_win(current_CS);
         focus_win = win;
       }
+    }
+
+#if DEBUG
+    dbg("focus in %d\n", call_data->icid);
+#endif
+    return True;
+}
+
+
+
+int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
+{
+    IC *ic = FindIC(call_data->icid);
+    ClientState *cs = &ic->cs;
+
+    if (ic) {
+      gcin_FocusIn(cs);
 
       load_IC(ic);
     }
@@ -439,17 +479,25 @@ int gcin_FocusIn(IMChangeFocusStruct *call_data)
     return True;
 }
 
-int gcin_FocusOut(IMChangeFocusStruct *call_data)
+int gcin_FocusOut(ClientState *cs)
 {
-    IC *ic = FindIC(call_data->icid);
-
-    if (ic == current_IC) {
-      hide_in_win(ic);
+    if (cs == current_CS) {
+      hide_in_win(cs);
     }
 #if DEBUG
     dbg("focus out %d\n", call_data->icid);
 #endif
 //    focus_win = 0;
+
+    return True;
+}
+
+int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
+{
+    IC *ic = FindIC(call_data->icid);
+    ClientState *cs = &ic->cs;
+
+    gcin_FocusOut(cs);
 
     return True;
 }

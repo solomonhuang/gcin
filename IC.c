@@ -78,7 +78,9 @@ static IC
     } else {
 	rec = (IC *)malloc(sizeof(IC));
     }
-    memset(rec, 0, sizeof(IC));
+
+    bzero(rec, sizeof(IC));
+
     rec->id = ++icid;
 
     rec->next = ic_list;
@@ -99,7 +101,7 @@ IC *FindIC(CARD16 icid)
     return NULL;
 }
 
-void hide_in_win(IC *ic);
+void hide_in_win(ClientState *ic);
 
 void DeleteIC(CARD16 icid)
 {
@@ -109,8 +111,8 @@ void DeleteIC(CARD16 icid)
     for (rec = ic_list; rec != NULL; last = rec, rec = rec->next) {
         if (rec->id == icid) {
 
-          if (rec == current_IC) {
-            hide_in_win(rec);
+          if (&rec->cs == current_CS) {
+            hide_in_win(&rec->cs);
           }
 
           if (last != NULL)
@@ -149,27 +151,19 @@ static void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
   XSetErrorHandler(olderr);
 }
 
-Window get_ic_win(IC *rec)
-{
-   Window inpwin = rec->focus_win;
-   if (!inpwin)
-      inpwin = rec->client_win;
-
-   return inpwin;
-}
 
 
-void move_in_win(IC *ic, int x, int y);
-void show_in_win(IC *ic);
+void move_in_win(ClientState *cs, int x, int y);
+void show_in_win(ClientState *cs);
 void set_current_input_style(InputStyle_E style);
 extern Window focus_win;
 
-void move_IC_in_win(IC *rec)
+void move_IC_in_win(ClientState *cs)
 {
 #if DEBUG
    dbg("move_IC_in_win\n");
 #endif
-   Window inpwin = get_ic_win(rec);
+   Window inpwin = cs->client_win;
 
    if (!inpwin)
       return;
@@ -177,8 +171,8 @@ void move_IC_in_win(IC *rec)
    if (inpwin != focus_win)
       return;
 #endif
-   int inpx = rec->pre_attr.spot_location.x;
-   int inpy = rec->pre_attr.spot_location.y;
+   int inpx = cs->spot_location.x;
+   int inpy = cs->spot_location.y;
    XWindowAttributes att;
 
    XGetWindowAttributes(dpy, inpwin, &att);
@@ -194,46 +188,48 @@ void move_IC_in_win(IC *rec)
    dbg("move_IC_in_win %d %d   txy:%d %d\n", inpx, inpy, tx, ty);
 #endif
 
-   move_in_win(rec, tx, ty+1);
+   move_in_win(cs, tx, ty+1);
 }
 
 void load_IC(IC *rec)
 {
-   Window win = get_ic_win(rec);
+   ClientState *cs = &rec->cs;
+   Window win = cs->client_win;
 
-   if (current_IC != rec && (win == focus_win || !current_IC))
-     current_IC = rec;
+   if (current_CS != cs && (win == focus_win || !current_CS))
+     current_CS = cs;
 
    if (win == focus_win) {
-     if (!rec->b_im_enabled)
-       hide_in_win(rec);
+     if (!cs->b_im_enabled)
+       hide_in_win(cs);
      else
-     if (rec->b_im_enabled)
-       show_in_win(rec);
+     if (cs->b_im_enabled)
+       show_in_win(cs);
    }
 
-   if (rec->input_style & XIMPreeditCallbacks) {
+   if (cs->input_style & XIMPreeditCallbacks) {
 #if DEBUG
      dbg("rec->input_style onspot\n", rec->input_style);
 #endif
      set_current_input_style(InputStyleOnSpot);
-     if (rec->b_im_enabled)
-       move_IC_in_win(rec);
+     if (cs->b_im_enabled)
+       move_IC_in_win(cs);
    } else
-   if (rec->input_style & XIMPreeditPosition) {
+   if (cs->input_style & XIMPreeditPosition) {
 #if DEBUG
      dbg("rec->input_style overspot\n", rec->input_style);
 #endif
      set_current_input_style(InputStyleOverSpot);
-     if (rec->b_im_enabled)
-       move_IC_in_win(rec);
+     if (cs->b_im_enabled)
+       move_IC_in_win(cs);
    }
-   if (rec->input_style & XIMPreeditNothing) {
+
+   if (cs->input_style & XIMPreeditNothing) {
 #if DEBUG
      dbg("rec->input_style root\n", rec->input_style);
 #endif
      set_current_input_style(InputStyleRoot);
-     move_IC_in_win(rec);
+     move_IC_in_win(cs);
    }
 }
 
@@ -241,6 +237,7 @@ void load_IC(IC *rec)
 static void
 StoreIC(IC *rec, IMChangeICStruct *call_data)
 {
+        ClientState *cs = &rec->cs;
 	XICAttribute *ic_attr = call_data->ic_attr;
 	XICAttribute *pre_attr = call_data->preedit_attr;
 	XICAttribute *sts_attr = call_data->status_attr;
@@ -250,11 +247,11 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 #endif
 	for (i = 0; i < (int)call_data->ic_attr_num; i++, ic_attr++) {
 		if (Is (XNInputStyle, ic_attr)) {
-                    rec->input_style = *(INT32*)ic_attr->value;
+                    rec->cs.input_style = *(INT32*)ic_attr->value;
 		}
 
 		else if (Is (XNClientWindow, ic_attr)) {
-                    rec->client_win = *(Window*)ic_attr->value;
+                    rec->cs.client_win = *(Window*)ic_attr->value;
 #if DEBUG
 		    dbg("rec->client_win %x\n", rec->client_win);
 #endif
@@ -280,8 +277,8 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 		    rec->pre_attr.area_needed = *(XRectangle*)pre_attr->value;
 
 		else if (Is (XNSpotLocation, pre_attr)) {
-                    rec->pre_attr.spot_location = *(XPoint*)pre_attr->value;
-                    move_IC_in_win(rec);
+                    cs->spot_location = *(XPoint*)pre_attr->value;
+                    move_IC_in_win(cs);
                 }
 		else if (Is (XNColormap, pre_attr))
 		    rec->pre_attr.cmap = *(Colormap*)pre_attr->value;
@@ -419,6 +416,9 @@ void GetIC(IMChangeICStruct *call_data)
 
     if (rec == NULL)
       return;
+
+    ClientState *cs = &rec->cs;
+
     for (i = 0; i < (int)call_data->ic_attr_num; i++, ic_attr++) {
 	if (Is (XNFilterEvents, ic_attr)) {
 	    ic_attr->value = (void *)malloc(sizeof(CARD32));
@@ -444,7 +444,7 @@ void GetIC(IMChangeICStruct *call_data)
 
 	} else if (Is (XNSpotLocation, pre_attr)) {
 	    pre_attr->value = (void *)malloc(sizeof(XPoint));
-            *(XPoint*)pre_attr->value = rec->pre_attr.spot_location;
+            *(XPoint*)pre_attr->value = cs->spot_location;
 	    pre_attr->value_length = sizeof(XPoint);
 #if DEBUG
             dbg("over splot %d %d\n", rec->pre_attr.spot_location.x,  rec->pre_attr.spot_location.y);

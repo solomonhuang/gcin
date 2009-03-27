@@ -16,7 +16,7 @@ static int symsN;
 static time_t file_modify_time;
 
 extern char *TableDir;
-
+static GtkWidget *win_syms[MAX_GTAB_NUM_KEY+1];
 
 static gboolean read_syms()
 {
@@ -52,7 +52,8 @@ static gboolean read_syms()
   for(i=0; i < symsN; i++) {
     int j;
     for(j=0; j < syms[i].symN; j++)
-      free(syms[i].sym[j]);
+      if (syms[i].sym[j])
+        free(syms[i].sym[j]);
   }
   free(syms); syms=NULL;
   symsN=0;
@@ -105,7 +106,6 @@ void send_text_call_back(char *text);
 
 static void cb_button_sym(GtkButton *button, char *str)
 {
-//  dbg("select %s\n", str);
   phokey_t pho[256];
   int len = strlen(str);
 
@@ -114,7 +114,7 @@ static void cb_button_sym(GtkButton *button, char *str)
   for(i=0; i < len; i+=CH_SZ)
     big5_pho_chars(str+i, &pho[i/CH_SZ]);
 
-  if (current_IC->in_method == 6)
+  if (current_CS->in_method == 6)
     add_to_tsin_buf(str, pho, strlen(str) / CH_SZ);
   else
     send_text_call_back(str);
@@ -124,9 +124,9 @@ void update_active_in_win_geom();
 
 void move_win_sym()
 {
-  gwin_sym = win_syms[current_IC->in_method];
+  gwin_sym = win_syms[current_CS->in_method];
 #if 0
-  dbg("move %d gwin_sym:%x\n", current_IC->in_method, gwin_sym);
+  dbg("move %d gwin_sym:%x\n", current_CS->in_method, gwin_sym);
 #endif
   if (!gwin_sym)
     return;
@@ -154,11 +154,11 @@ void move_win_sym()
   gtk_window_move(GTK_WINDOW(gwin_sym), wx, wy);
 }
 
-static gboolean win_sym_enabled=1;
+static gboolean win_sym_enabled=0;
 
 void hide_win_sym()
 {
-  gwin_sym = win_syms[current_IC->in_method];
+  gwin_sym = win_syms[current_CS->in_method];
 
   if (!gwin_sym)
     return;
@@ -171,10 +171,10 @@ void hide_win_sym()
 
 void show_win_sym()
 {
-  if (!current_IC)
+  if (!current_CS)
     return;
 
-  gwin_sym = win_syms[current_IC->in_method];
+  gwin_sym = win_syms[current_CS->in_method];
 
   if (!gwin_sym || !win_sym_enabled)
     return;
@@ -191,7 +191,7 @@ void str_to_all_phokey_chars(char *b5_str, char *out);
 
 static void sym_lookup_key(char *instr, char *outstr)
 {
-  if (current_IC->in_method == 3 || current_IC->in_method == 6) {
+  if (current_CS->in_method == 3 || current_CS->in_method == 6) {
     str_to_all_phokey_chars(instr, outstr);
   } else {
 
@@ -213,28 +213,26 @@ extern INMD *cur_inmd;
 
 void create_win_sym()
 {
-#if 0
-  dbg("create_win_sym ..\n", create_win_sym);
-#endif
-  if (current_IC)
-    gwin_sym = win_syms[current_IC->in_method];
+  if (current_CS)
+    gwin_sym = win_syms[current_CS->in_method];
 
-  if (current_IC->in_method != 3 && current_IC->in_method != 6 && !cur_inmd) {
+  if (current_CS->in_method != 3 && current_CS->in_method != 6 && !cur_inmd)
     return;
-  }
+
 
   if (read_syms()) {
     if (gwin_sym)
       gtk_widget_destroy(gwin_sym);
-    win_syms[current_IC->in_method] = gwin_sym = NULL;
+    win_syms[current_CS->in_method] = gwin_sym = NULL;
   } else {
     if (!syms)
       return;
   }
 
-  if (gwin_sym) {
-    win_sym_enabled^=1;
 
+  win_sym_enabled^=1;
+
+  if (gwin_sym) {
     if (win_sym_enabled) {
 //      move_win_sym(gwin_sym);
       show_win_sym(gwin_sym);
@@ -252,7 +250,6 @@ void create_win_sym()
 
   gtk_container_set_border_width (GTK_CONTAINER (vbox_top), 0);
 
-
   int i;
   for(i=0; i < symsN; i++) {
     SYM_ROW *psym = &syms[i];
@@ -269,6 +266,7 @@ void create_win_sym()
 
       GtkWidget *button = gtk_button_new();
       GtkWidget *label = gtk_label_new(str);
+
       gtk_container_add(GTK_CONTAINER(button), label);
       set_label_font_size(label, gcin_font_size_symbol);
 
@@ -297,13 +295,20 @@ void create_win_sym()
   GdkWindow *gdkwin_sym = gwin_sym->window;
   gdk_window_set_override_redirect(gdkwin_sym, TRUE);
 
-  if (current_IC)
-    win_syms[current_IC->in_method] = gwin_sym;
+  if (current_CS)
+    win_syms[current_CS->in_method] = gwin_sym;
 
-  gtk_widget_show_all(gwin_sym);
+  if (win_sym_enabled)
+    gtk_widget_show_all(gwin_sym);
+
   move_win_sym(gwin_sym);
 #if 1
-  dbg("in_method:%d\n", current_IC->in_method);
+  dbg("in_method:%d\n", current_CS->in_method);
 #endif
   return;
+}
+
+
+void change_win_sym_font_size()
+{
 }

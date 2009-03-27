@@ -11,10 +11,8 @@ main(int argc, char **argv)
 {
   FILE *fp;
   phokey_t phbuf[MAX_PHRASE_LEN];
-  u_char s[128];
   u_char chbuf[128][CH_SZ];
-  int i, len;
-  u_char tt[CH_SZ+1], phlen;
+  int i;
   u_char clen, usecount;
 
   if (argc <= 1) {

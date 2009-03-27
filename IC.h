@@ -29,7 +29,6 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 typedef struct {
     XRectangle	area;		/* area */
     XRectangle	area_needed;	/* area needed */
-    XPoint	spot_location;	/* spot location */
     Colormap	cmap;		/* colormap */
     CARD32	foreground;	/* foreground */
     CARD32	background;	/* background */
@@ -51,25 +50,33 @@ typedef struct {
     Cursor	cursor;		/* cursor */
 } StatusAttributes;
 
+typedef struct {
+    Window	client_win;	/* client window */
+    INT32	input_style;	/* input style */
+    gboolean    b_im_enabled;
+    gboolean    b_half_full_char;
+    gboolean    fixed_pos;
+    gboolean    b_gcin_protocol; // TRUE : gcin    FALSE: XIM
+    int         fixed_x, fixed_y;
+    int         in_method;
+    XPoint	spot_location;	/* spot location */
+} ClientState;
+
+
 typedef struct _IC {
     CARD16	id;		/* ic id */
-    INT32	input_style;	/* input style */
-    Window	client_win;	/* client window */
     Window	focus_win;	/* focus window */
     char	*resource_name;	/* resource name */
     char	*resource_class; /* resource class */
     PreeditAttributes pre_attr; /* preedit attributes */
     StatusAttributes sts_attr; /* status attributes */
-    gboolean    b_im_enabled;
-    gboolean    b_half_full_char;
-    gboolean    fixed_pos;
-    int         fixed_x, fixed_y;
-    int         in_method;
+
+    ClientState cs;
     struct _IC	*next;
 } IC;
 
 
-typedef struct DUAL_XIM_ENTRY {
+typedef struct {
   gboolean b_send_utf8_str;
   char *server_locale;
   char xim_server_name[32];

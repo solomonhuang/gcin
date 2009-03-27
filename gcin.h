@@ -16,6 +16,8 @@
 #define CH_SZ (3) // big5 size ( 2 bytes), will be changed to 3 if unicode is used
 
 #define tmalloc(type,n)  (type*)malloc(sizeof(type) * (n))
+void *zmalloc(int n);
+#define tzmalloc(type,n)  (type*)zmalloc(sizeof(type) * (n))
 #define trealloc(p,type,n)  (type*)realloc(p, sizeof(type) * (n+1))
 
 extern Display *dpy;
@@ -28,7 +30,7 @@ extern Window xwin0;
 extern Window root;
 void loadIC();
 IC *FindIC(CARD16 icid);
-extern IC *current_IC;
+extern ClientState *current_CS;
 
 #define MROW 2
 #define MCOL 39
@@ -40,12 +42,21 @@ typedef enum {
 } InputStyle_E;
 
 
-typedef enum {
+enum {
   Control_Space=0,
   Shift_Space=1,
   Alt_Space=2,
   Windows_Space=3,
 } IM_TOGGLE_KEYS;
+
+
+enum {
+  TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock=1,
+  TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab=2,
+  TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift=4,
+} TSIN_CHINESE_ENGLISH_TOGGLE_KEY;
+
+
 
 #define ROW_ROW_SPACING (2)
 
@@ -82,3 +93,4 @@ void send_text(char *text);
 void sendkey_b5(char *bchar);
 void bell();
 void set_label_font_size(GtkWidget *label, int size);
+void send_gcin_message(Display *dpy, char *s);

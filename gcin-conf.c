@@ -8,7 +8,7 @@ void init_TableDir()
 {
   char *dname;
 
-  if (dname=getenv("GCIN_TABLE_DIR")) {
+  if ((dname=getenv("GCIN_TABLE_DIR"))) {
     TableDir = dname;
   }
 }
@@ -98,10 +98,10 @@ char *get_gcin_xim_name()
 {
   char *xim_name;
 
-  if (xim_name=getenv("GCIN_XIM"))
+  if ((xim_name=getenv("GCIN_XIM")))
     return xim_name;
 
-  if (xim_name=getenv("XMODIFIERS")) {
+  if ((xim_name=getenv("XMODIFIERS"))) {
     static char find[] = "@im=";
     static char sstr[32];
     char *p = strstr(xim_name, find);
@@ -110,7 +110,7 @@ char *get_gcin_xim_name()
     strncpy(sstr, p, sizeof(sstr));
     sstr[sizeof(sstr) - 1]=0;
 
-    if (p=strchr(sstr, '.'))
+    if ((p=strchr(sstr, '.')))
       *p=0;
 
     dbg("Try to use name from XMODIFIERS=@im=%s\n", sstr);

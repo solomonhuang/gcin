@@ -10,7 +10,7 @@ OBJS=gcin.o IC.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
-             gcin-settings.o
+             gcin-settings.o util.o
 OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
@@ -24,6 +24,7 @@ CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\"
 
 IMdkitLIB = IMdkit/lib/libXimd.a
+im-srv = im-srv/im-srv.a
 
 .c.E:
 	$(CC) $(CFLAGS) -E -o $@ $<
@@ -34,8 +35,8 @@ PROGS_CV=kbmcv
 all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 
-gcin:      $(OBJS) $(IMdkitLIB)
-	$(CC) -o $@ $(OBJS) $(IMdkitLIB) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
+gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
+	$(CC) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 	ln -sf $@ $@.test
 
@@ -66,6 +67,9 @@ kbmcv:  $(OBJS_kbmcv)
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
 
+$(im-srv):
+	$(MAKE) -C im-srv
+
 install:
 	install -d $(datadir)/icons
 	install gcin.png $(datadir)/icons
@@ -77,6 +81,7 @@ install:
 	$(MAKE) -C scripts install
 	$(MAKE) -C data install
 	if [ $(prefix) = /usr/local ]; then \
+	   install -m 644 gcin.png /usr/share/icons; \
 	   install -m 644 menu/* /usr/lib/menu; \
 	   which update-menus >& /dev/null && update-menus; \
 	   sh modify-XIM; \
@@ -91,8 +96,10 @@ clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean
 	$(MAKE) -C scripts clean
+	$(MAKE) -C im-srv clean
+	$(MAKE) -C im-client clean
+	$(MAKE) -C gtk-im clean
 	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
-#	cd ..; tar cvfj gcin.tbz gcin
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

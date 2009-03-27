@@ -17,16 +17,14 @@ u_long CONVT(char *s);
 INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 INMD *cur_inmd;
-static int spc_pressed=0;
+static gboolean last_full, more_pg, wild_mode, m_pg_mode, spc_pressed;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
-static int defselN=0;
+static u_short defselN, exa_match;
 static KeySym inch[MAX_TAB_KEY_NUM];
 static int ci;
-static int last_full, last_idx;
-static int more_pg, pg_idx, m_pg_mode;
+static u_short last_idx, pg_idx;
+static u_short wild_page;
 static int sel1st_i = MAX_SELKEY - 1;
-static int wild_mode;
-static int wild_page;
 
 #define gtab_full_space_auto_first (gtab_space_auto_first & (GTAB_space_auto_first_any|GTAB_space_auto_first_full))
 
@@ -175,7 +173,7 @@ static void ClrIn()
 {
   bzero(inch,sizeof(inch));
   bzero(seltab,sizeof(seltab));
-  m_pg_mode=pg_idx=more_pg=wild_mode=wild_page=last_idx=defselN=
+  m_pg_mode=pg_idx=more_pg=wild_mode=wild_page=last_idx=defselN=exa_match=
   spc_pressed=ci=0;
 
   sel1st_i=MAX_SELKEY-1;
@@ -566,7 +564,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   int i,j;
   static int s1,e1;
   int inkey;
-  int exa_match;
   char *pselkey= NULL;
   gboolean phrase_selected = FALSE;
 
@@ -577,7 +574,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       return 0;
   }
 
-  if (current_IC->b_half_full_char) {
+  if (current_CS->b_half_full_char) {
      char *s = half_char_to_full_char(key);
      if (!s)
        return 0;
@@ -667,7 +664,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       } else {
 //        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);
         if (gtab_space_auto_first == GTAB_space_auto_first_any && seltab[0][0] &&
-            sel1st_i==MAX_SELKEY-1 && defselN<=cur_inmd->M_DUP_SEL) {
+            sel1st_i==MAX_SELKEY-1 && exa_match<=cur_inmd->M_DUP_SEL) {
           sel1st_i = 0;
         }
 
@@ -737,6 +734,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         putstr_inp(seltab[sel1st_i]);  /* select 1st */
       }
 
+
       if (wild_mode)
         goto XXXX;
 
@@ -745,6 +743,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
       inkey=cur_inmd->keymap[key];
       spc_pressed=0;
+
 
       if (inkey>=1 && ci< cur_inmd->MaxPress) {
         inch[ci++]=inkey;
@@ -764,6 +763,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         return 1;
       }
 
+
       if (inkey) {
         for(i=0;i<5;i++)
           if (inch[i]>60) {
@@ -777,15 +777,14 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
             return 1;
           }
       }
-#if 0
-      if (pselkey && current_IC->in_method==8 && inch[0]==23 && ci==3)
-        goto YYYY;
-#endif
+
       if (!inkey && pselkey && defselN)
         goto YYYY;
+
       if (!inkey && !pselkey)
         return 0;
   } /* switch */
+
 
   if (ci==0) {
     ClrSelArea();
@@ -820,11 +819,16 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   dbg("s1:%d e1:%d key:%x ci:%d vmask[ci]:%x ch:%c%c and:%x\n", s1, e1, CONVT(cur_inmd->tbl[s1].key),
      ci, vmask[ci], cur_inmd->tbl[s1].ch[0], cur_inmd->tbl[s1].ch[1],
      (CONVT(cur_inmd->tbl[s1].key)&vmask[ci]));
+
+  dbg("pselkey:%x  %d  defselN:%d\n", pselkey,
+       (CONVT(cur_inmd->tbl[s1].key) & vmask[ci])!=val,
+       defselN);
 #endif
+
 
 XXXX:
   if ((CONVT(cur_inmd->tbl[s1].key) & vmask[ci])!=val || (wild_mode && defselN) ||
-                  ((ci==cur_inmd->MaxPress||spc_pressed) && defselN && pselkey)) {
+                  ((ci==cur_inmd->MaxPress||spc_pressed) && defselN && pselkey) ) {
 YYYY:
     if ((pselkey || wild_mode) && defselN) {
       int vv=pselkey - cur_inmd->selkey;
@@ -860,18 +864,20 @@ refill:
   if (ci < cur_inmd->MaxPress && !spc_pressed ) {
     int shiftb=(4-ci) * KeyBits;
 
-    defselN=0;
+    exa_match=0;
     bzero(seltab, sizeof(seltab));
-    while (CONVT(cur_inmd->tbl[j].key)==val && defselN <= cur_inmd->M_DUP_SEL) {
+    while (CONVT(cur_inmd->tbl[j].key)==val && exa_match <= cur_inmd->M_DUP_SEL) {
       if (cur_inmd->tbl[j].ch[0] >= 0x80)
-        bchcpy(seltab[defselN++],cur_inmd->tbl[j].ch);
+        bchcpy(seltab[exa_match++],cur_inmd->tbl[j].ch);
 
       j++;
     }
 
-//    dbg("rrr %d\n", defselN);
 
-    exa_match=defselN-1;
+    defselN=exa_match;
+
+    if (defselN > cur_inmd->M_DUP_SEL)
+      defselN--;
 
     if (gtab_disp_partial_match)
     while((CONVT(cur_inmd->tbl[j].key)&vmask[ci])==val && j<e1) {
@@ -881,7 +887,7 @@ refill:
            (bchcmp(seltab[fff],cur_inmd->tbl[j].ch)>0 && fff > exa_match)) {
         if (cur_inmd->tbl[j].ch[0] >= 0x80) {
           bchcpy(seltab[fff], cur_inmd->tbl[j].ch);
-//          defselN++;
+          defselN++;
         }
       }
 
@@ -954,8 +960,14 @@ Disp_opt:
       } else {
         strcat(strcat(tt, seltab[i]), " ");
       }
-    } else
-      strcat(tt, " 　 ");
+    } else {
+      extern gboolean b_use_full_space;
+
+      if (b_use_full_space)
+         strcat(tt, " 　 ");
+      else
+         strcat(tt, "   ");
+    }
   }
 
   if (gtab_pre_select || spc_pressed || last_full)

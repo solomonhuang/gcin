@@ -5,35 +5,18 @@
 
 #include "gcin.h"
 #include "pho.h"
+#include "gcin-conf.h"
 
-void p_err(char *fmt,...)
+
+int main(int argc, char **argv)
 {
-  va_list args;
+  int i;
 
-  va_start(args, fmt);
-  fprintf(stderr,"gcin:");
-  vfprintf(stderr, fmt, args);
-  va_end(args);
-  fprintf(stderr,"\n");
-  exit(-1);
-}
+  load_setttings();
 
-void dbg(char *fmt,...)
-{
-  va_list args;
-
-  va_start(args, fmt);
-  vprintf(fmt, args);
-  fflush(stdout);
-  va_end(args);
-}
-
-
-int main()
-{
-  FILE *fr;
-  int i,cou;
-  unsigned int ttt;
+  if (argc > 1) {
+    p_err("Currently only support ~/.gcin/pho.tab");
+  }
 
   pho_load();
 
@@ -50,4 +33,6 @@ int main()
         ch_pho[j].count);
     }
   }
+
+  return 0;
 }

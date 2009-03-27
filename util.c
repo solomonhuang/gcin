@@ -22,6 +22,9 @@ void dbg(char *fmt,...)
 	va_end(args);
 }
 
-void tsin_db_file_name(char *tsfname)
+void *zmalloc(int n)
 {
+  void *p =  malloc(n);
+  bzero(p, n);
+  return p;
 }
