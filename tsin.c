@@ -5,6 +5,7 @@
 #include "gcin.h"
 #include "pho.h"
 #include "tsin.h"
+#include "gcin-conf.h"
 
 extern gboolean b_hsu_kbm;
 
@@ -49,20 +50,15 @@ static struct {
 int pre_selN;
 
 static gboolean use_caps_lock=1;
-static gboolean phrase_pre_select=1;
 
 void load_tsin_conf()
 {
   char swkey[16];
-  get_gcin_conf_str("tsin-chinese-english-switch", swkey, "CapsLock");
+  get_gcin_conf_str(TSIN_CHINESE_ENGLISH_SWITCH, swkey, "CapsLock");
   if (!strcmp(swkey, "Tab"))
     use_caps_lock = 0;
   else
     use_caps_lock = 1;
-
-  char phr_pre[16];
-  get_gcin_conf_str("tsin-phrase-pre-select", phr_pre, "1");
-  phrase_pre_select = atoi(phr_pre);
 }
 
 
@@ -168,14 +164,6 @@ static void prbuf()
 
 static int orig_disp_in_area_x = -1;
 void disp_tsin_pho(int index, char *pho);
-
-static void clr_in_area_pho_tsin()
-{
-  int i;
-
-  for(i=0; i < 4; i++)
-   disp_tsin_pho(i, "　");
-}
 
 static void disp_in_area_pho_tsin()
 {
@@ -537,7 +525,7 @@ static void disp_current_sel_page()
 
   clear_sele();
 
-  for(i=0; i < SELKEY; i++) {
+  for(i=0; i < phkbm.selkeyN; i++) {
     int idx = current_page + i;
 
     if (idx < phrase_count) {
@@ -550,7 +538,7 @@ static void disp_current_sel_page()
       break;
   }
 
-  if (current_page + SELKEY < phrase_count + pho_count) {
+  if (current_page + phkbm.selkeyN < phrase_count + pho_count) {
     disp_arrow_down();
   }
 
@@ -705,7 +693,7 @@ static void disp_pre_sel_page()
 
   int i;
 
-  if (!phrase_pre_select) {
+  if (!tsin_phrase_pre_select) {
     return;
   }
 
@@ -714,7 +702,7 @@ static void disp_pre_sel_page()
 
   clear_sele();
 
-  for(i=0; i < Min(SELKEY, pre_selN); i++) {
+  for(i=0; i < Min(phkbm.selkeyN, pre_selN); i++) {
     set_sele_text(i, pre_sel[i].str, pre_sel[i].len*CH_SZ);
   }
 
@@ -948,7 +936,7 @@ static gboolean pre_sel_handler(KeySym xkey)
   static char noshi_sele[]="1234567890asdfghjkl;";
   char *p;
 
-  if (!pre_selN || !phrase_pre_select)
+  if (!pre_selN || !tsin_phrase_pre_select)
     return 0;
 
   if (isupper(xkey))
@@ -1232,7 +1220,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
        if (!sel_pho)
          return 0;
 
-       current_page = current_page - SELKEY;
+       current_page = current_page - phkbm.selkeyN;
        if (current_page < 0)
          current_page = 0;
 
@@ -1270,7 +1258,7 @@ change_char:
          sel_pho=1;
          current_page = 0;
        } else {
-         current_page = current_page + SELKEY;
+         current_page = current_page + phkbm.selkeyN;
          if (current_page >= phrase_count + pho_count)
            current_page = 0;
        }

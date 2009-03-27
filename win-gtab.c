@@ -18,7 +18,7 @@ void disp_gtab(int index, char *gtabchar)
   char utf8[512];
 
   if (gtabchar[0]==' ')
-    strcpy(utf8,"  ");
+    strcpy(utf8,"　");
   else {
     if (gtabchar[0] & 128)
       utf8cpy(utf8, gtabchar);
@@ -39,6 +39,19 @@ void disp_gtab_half_full(gboolean hf)
     return;
 
   gtk_label_set_text(GTK_LABEL(label_half_full), str_half_full[hf]);
+}
+
+void change_gtab_font_size()
+{
+  if (!label_gtab_sele)
+    return;
+
+  set_label_font_size(label_gtab_sele, gcin_font_size);
+
+  int i;
+  for(i=0; i < MAX_TAB_KEY_NUM; i++) {
+    set_label_font_size(labels_gtab[i], gcin_font_size);
+  }
 }
 
 
@@ -188,8 +201,6 @@ void create_win_gtab_gui()
 
   label_gtab_sele = gtk_label_new(NULL);
   gtk_container_add (GTK_CONTAINER (align), label_gtab_sele);
-  set_label_font_size(label_gtab_sele, gcin_font_size);
-
 
   GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
   /* This packs the button into the gwin_gtab (a gtk container). */
@@ -231,7 +242,6 @@ void create_win_gtab_gui()
     GtkWidget *label = gtk_label_new(NULL);
     labels_gtab[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_gtab), label, FALSE, FALSE, 0);
-    set_label_font_size(label, gcin_font_size);
   }
 
   image_pin = gtk_image_new_from_file(file_pin_float);
@@ -243,6 +253,8 @@ void create_win_gtab_gui()
 
   label_key_codes  = gtk_label_new(NULL);
   gtk_box_pack_start (GTK_BOX (hbox), label_key_codes, FALSE, FALSE, 2);
+
+  change_gtab_font_size();
 
   gtk_widget_show_all (gwin_gtab);
 }

@@ -11,7 +11,10 @@ int gtab_space_auto_first;
 int gtab_auto_select_by_phrase;
 int gtab_press_full_auto_send;
 int gtab_pre_select;
+int gtab_disp_partial_match;
 
+int tsin_phrase_pre_select;
+int phonetic_char_dynamic_sequence;
 
 int get_gcin_conf_int(char *name, int default_value);
 
@@ -29,4 +32,8 @@ void load_setttings()
   gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, 1);
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
+  gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
+
+  tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
+  phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
 }

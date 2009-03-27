@@ -98,6 +98,7 @@ void hide_char(int index)
   gtk_widget_hide_all(chars[index].vbox);
 }
 
+
 void clear_chars_all()
 {
   int i;
@@ -150,11 +151,20 @@ void disp_tsin_pho(int index, char *pho)
   char s[CH_SZ+1];
 
   if (pho[0]==' ')
-    strcpy(s, "  ");
+    strcpy(s, "　");
   else
     utf8cpy(s, pho);
 
   gtk_label_set_text(GTK_LABEL(labels_pho[index]), s);
+}
+
+
+void clr_in_area_pho_tsin()
+{
+  int i;
+
+  for(i=0; i < 4; i++)
+   disp_tsin_pho(i, "　");
 }
 
 void hide_pho(int index)
@@ -414,7 +424,7 @@ void create_win0_gui()
 
   int i;
   for(i=0; i < 3;i ++) {
-    GtkWidget *label = gtk_label_new(" ");
+    GtkWidget *label = gtk_label_new("");
     labels_pho[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_pho), label, FALSE, FALSE, 0);
     set_label_font_size(label, gcin_font_size - 4);
@@ -440,6 +450,8 @@ void create_win0_gui()
   gtk_box_pack_start (GTK_BOX (hbox_row2), event_box_pin, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (event_box_pin), "button_press_event",
       G_CALLBACK (cb_clicked_fixed_pos), (gpointer) NULL);
+
+  clr_in_area_pho_tsin();
 
   gtk_widget_show_all (gwin0);
   gdk_flush();

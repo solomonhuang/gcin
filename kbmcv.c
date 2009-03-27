@@ -76,6 +76,7 @@ int main(int argc, char **argv)
   len=strlen(s);
   s[len-1]=0;
   strcpy(phkb.selkey, s);
+  phkb.selkeyN = strlen(s);
 
   while (!feof(fp)) {
     fgets(s,sizeof(s),fp);
@@ -110,6 +111,8 @@ int main(int argc, char **argv)
     }
   }
   fclose(fp);
+
+
 #if 0
   if (phkb.phokbm['c'][0].num && phkb.phokbm['c'][1].num) {
     swap_char(&phkb.phokbm['c'][0].num, &phkb.phokbm['c'][1].num);

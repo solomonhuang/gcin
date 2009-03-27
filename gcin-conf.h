@@ -11,6 +11,14 @@
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define GTAB_PRE_SELECT "gtab-pre-select"
 #define GTAB_PRESS_FULL_AUTO_SEND "gtab-press-full-auto-send"
+#define GTAB_DISP_PARTIAL_MATCH "gtab-disp-partial-match"
+
+#define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
+
+#define TSIN_CHINESE_ENGLISH_SWITCH "tsin-chinese-english-switch"
+#define PHONETIC_KEYBOARD "phonetic-keyboard"
+
+#define PHONETIC_CHAR_DYNAMIC_SEQUENCE "phonetic-char-dynamic-sequence"
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
 extern int default_input_method;
@@ -21,6 +29,11 @@ extern int gtab_auto_select_by_phrase;
 extern int gcin_im_toggle_keys;
 extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
+extern int gtab_disp_partial_match;
+
+extern int tsin_phrase_pre_select;
+extern int phonetic_char_dynamic_sequence;
+
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char rstr[], char *default_str);

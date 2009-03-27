@@ -296,6 +296,8 @@ int main(int argc, char **argv)
 {
   gtk_init (&argc, &argv);
 
+  load_setttings();
+
   pho_load();
   load_tsin_db();
   dpy = GDK_DISPLAY();

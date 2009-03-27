@@ -54,18 +54,18 @@ gboolean inph_typ_pho(char newkey)
   if (b_hsu_kbm) {
     if (typ_pho[1] && !typ_pho[2]) {
       for(i=0; i < 3; i++)
-        if (phkbm.phokbm[newkey][i].typ==2) {
+        if (phkbm.phokbm[(int)newkey][i].typ==2) {
           insert = 2;
           inph[2] = newkey;
-          typ_pho[2] = phkbm.phokbm[newkey][i].num;
+          typ_pho[2] = phkbm.phokbm[(int)newkey][i].num;
         }
     }
   }
 
   if (insert < 0)
   for(i=0; i < 3; i++) {
-    char num = phkbm.phokbm[newkey][i].num;
-    char typ = phkbm.phokbm[newkey][i].typ;
+    char num = phkbm.phokbm[(int)newkey][i].num;
+    char typ = phkbm.phokbm[(int)newkey][i].typ;
 #define TKBM 0
     if (typ==3 && (typ_pho[0]||typ_pho[1]||typ_pho[2])) {
       inph[typ] = newkey;
@@ -81,8 +81,8 @@ gboolean inph_typ_pho(char newkey)
   // try insert mode first
   if (insert < 0)
   for(i=0; i < 3; i++) {
-    char num = phkbm.phokbm[newkey][i].num;
-    char typ = phkbm.phokbm[newkey][i].typ;
+    char num = phkbm.phokbm[(int)newkey][i].num;
+    char typ = phkbm.phokbm[(int)newkey][i].typ;
 
     if (num && !inph[typ]) {
       inph[typ] = newkey;
@@ -272,6 +272,9 @@ void inc_pho_count(u_short key, int ch_idx)
 {
   int start_i, stop_i;
 
+  if (!phonetic_char_dynamic_sequence)
+    return;
+
   get_start_stop_idx(key, &start_i, &stop_i);
 
 //  dbg("start_i %d %d    %d %d\n", start_i, stop_i, start_idx, stop_idx);
@@ -346,7 +349,7 @@ void load_tab_pho_file()
   FILE *fr;
   char phokbm_name[MAX_GCIN_STR];
 
-  get_gcin_conf_str("phonetic-keyboard", phokbm_name, "zo");
+  get_gcin_conf_str(PHONETIC_KEYBOARD, phokbm_name, "zo");
   if (strcmp(phokbm_name, "hsu"))
     b_hsu_kbm = FALSE;
   else
@@ -430,8 +433,8 @@ int feedkey_pho(KeySym xkey)
     case '<':
        if (!ityp3_pho)
          return 0;
-       if (cpg>=SELKEY)
-         cpg-=SELKEY;
+       if (cpg >= phkbm.selkeyN)
+         cpg -= phkbm.selkeyN;
        goto proc_state;
     case ' ':
       if (!typ_pho[0] && !typ_pho[1] && !typ_pho[2])
@@ -443,10 +446,10 @@ int feedkey_pho(KeySym xkey)
          goto llll1;
       }
 
-      ii = start_idx+ cpg + SELKEY;
+      ii = start_idx+ cpg + phkbm.selkeyN;
 
       if (ii < stop_idx) {
-        cpg += SELKEY;
+        cpg += phkbm.selkeyN;
       }
       else {
           if (cpg) {
@@ -463,7 +466,7 @@ int feedkey_pho(KeySym xkey)
 
       out_bufferN=0;
 
-      while(i<SELKEY  && ii< stop_idx) {
+      while(i<phkbm.selkeyN  && ii< stop_idx) {
         out_buffer[out_bufferN++] = phkbm.selkey[i];
         bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
         out_bufferN+=CH_SZ;
@@ -592,7 +595,7 @@ proc_state:
   out_bufferN=0;
 
   if (ityp3_pho) {
-    while(i<SELKEY  && ii < stop_idx) {
+    while(i< phkbm.selkeyN  && ii < stop_idx) {
       out_buffer[out_bufferN++] = phkbm.selkey[i];
       bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
       out_bufferN+=CH_SZ;
@@ -613,7 +616,7 @@ proc_state:
 
     maxi=i;
   } else {
-    while(i<SELKEY  && ii < stop_idx) {
+    while(i<phkbm.selkeyN  && ii < stop_idx) {
       bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
       out_bufferN+=CH_SZ;
 

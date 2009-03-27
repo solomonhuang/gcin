@@ -155,7 +155,7 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
       IMOpenStruct *pimopen=(IMOpenStruct *)call_data;
       if(pimopen->connect_id > MAX_CONNECT - 1)
         return True;
-#if 1
+#if DEBUG
     dbg("open lang %s  connectid:%d\n", pimopen->lang.name, pimopen->connect_id);
 #endif
       return True;
@@ -292,12 +292,14 @@ static void reload_data()
 }
 
 void change_tsin_font_size();
+void change_gtab_font_size();
 
 
 static void change_font_size()
 {
   load_setttings();
   change_tsin_font_size();
+  change_gtab_font_size();
 }
 
 static int xerror_handler(Display *d, XErrorEvent *eve)

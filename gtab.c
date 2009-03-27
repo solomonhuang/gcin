@@ -162,10 +162,10 @@ static void ClrInArea()
 {
   int i;
 
-  disp_gtab(0, "  ");
+  disp_gtab(0, " ");
 
   for(i=1; i < cur_inmd->MaxPress; i++) {
-    disp_gtab(i, "");
+    disp_gtab(i, " ");
   }
 
   last_idx=0;
@@ -657,10 +657,19 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       if (more_pg) {
         j=pg_idx;
         goto next_pg;
+      } else
+      if (ci==0) {
+        if (last_full) {
+          last_full=0;
+          return 1;
+        }
+        return 0;
       } else {
-        if (gtab_space_auto_first == GTAB_space_auto_first_any && seltab[0] &&
-            sel1st_i==MAX_SELKEY-1)
+//        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);
+        if (gtab_space_auto_first == GTAB_space_auto_first_any && seltab[0][0] &&
+            sel1st_i==MAX_SELKEY-1 && defselN<=cur_inmd->M_DUP_SEL) {
           sel1st_i = 0;
+        }
 
         if (seltab[sel1st_i][0]) {
 //          dbg("last_full %d %d\n", last_full,spc_pressed);
@@ -669,14 +678,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
             return 1;
           }
         }
-      }
-
-      if (ci==0) {
-        if (last_full) {
-          last_full=0;
-          return 1;
-        }
-        return 0;
       }
 
       last_full=0;
@@ -795,7 +796,9 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   DispInArea();
 
-  u_long val=0;
+  static u_long val; // needs static
+  val=0;
+
   for(i=0; i < MAX_TAB_KEY_NUM; i++)
     val|= inch[i] << (KeyBits * (MAX_TAB_KEY_NUM - 1 - i));
 
@@ -849,11 +852,6 @@ YYYY:
     return 1;
   }
 
-#if 0
-  if (current_IC->in_method==8 && CONVT(cur_inmd->tbl[s1].key)==val && pselkey) {
-    spc_pressed=1;
-  }
-#endif
 
 refill:
 
@@ -864,23 +862,26 @@ refill:
 
     defselN=0;
     bzero(seltab, sizeof(seltab));
-    while (CONVT(cur_inmd->tbl[j].key)==val && defselN<10) {
+    while (CONVT(cur_inmd->tbl[j].key)==val && defselN <= cur_inmd->M_DUP_SEL) {
       if (cur_inmd->tbl[j].ch[0] >= 0x80)
         bchcpy(seltab[defselN++],cur_inmd->tbl[j].ch);
 
       j++;
     }
 
+//    dbg("rrr %d\n", defselN);
+
     exa_match=defselN-1;
 
+    if (gtab_disp_partial_match)
     while((CONVT(cur_inmd->tbl[j].key)&vmask[ci])==val && j<e1) {
-      int fff=cur_inmd->keycol[(CONVT(cur_inmd->tbl[j].key)>>shiftb) & (u_long)0x3f];
+      int fff=cur_inmd->keycol[(CONVT(cur_inmd->tbl[j].key)>>shiftb) & 0x3f];
 
       if (!(seltab[fff][0]) ||
            (bchcmp(seltab[fff],cur_inmd->tbl[j].ch)>0 && fff > exa_match)) {
         if (cur_inmd->tbl[j].ch[0] >= 0x80) {
           bchcpy(seltab[fff], cur_inmd->tbl[j].ch);
-          defselN++;
+//          defselN++;
         }
       }
 
@@ -954,7 +955,7 @@ Disp_opt:
         strcat(strcat(tt, seltab[i]), " ");
       }
     } else
-      strcat(tt, "   ");
+      strcat(tt, " 　 ");
   }
 
   if (gtab_pre_select || spc_pressed || last_full)

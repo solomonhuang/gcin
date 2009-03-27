@@ -4,7 +4,7 @@
 static GtkWidget *gwin1, *frame;
 Window xwin1;
 
-#define SELEN (9)
+#define SELEN (12)
 
 static GtkWidget *labels_sele[SELEN];
 static GtkWidget *arrow_up, *arrow_down;

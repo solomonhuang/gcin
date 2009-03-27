@@ -19,8 +19,6 @@ static char tsfname[64]="";
 void load_tsin_db()
 {
   if (!tsfname[0]) {
-    char tt[128];
-
     if (!getenv("GCIN_TABLE_DIR"))
       get_gcin_user_fname("tsin", tsfname);
     else
@@ -103,7 +101,7 @@ static int phseq(u_char *a, u_char *b)
 
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 {
-  int ofs, top,bottom, mid, ord, ph_ofs, hashno, hashno_end, i;
+  int mid, ord, ph_ofs, hashno, hashno_end, i;
   FILE *fw;
   u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2],
          sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2];
@@ -118,7 +116,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
     return FALSE;
 
   for(mid=hashidx[hashno]; mid<hashidx[hashno+1]; mid++) {
-    u_char usecount;
+//    u_char usecount;
 
     ph_ofs=phidx[mid];
     fseek(fph, ph_ofs, SEEK_SET);

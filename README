@@ -1,3 +1,4 @@
+# big5 encoding
  
 Mandrake
   urpmi gcin-0.X.X-liu_mdk.i586.rpm
@@ -91,6 +92,11 @@ input style,
 程式不會回報游標所在位置。 像用 GTK2/Gnome2 開發的程式都有這個問題. 目前 gcin 
 的視窗是擺在滑鼠指標所在的位置. 這樣好像比目前 xcin 的方式容易使用。
 你可以按輸入視窗中的圖釘來固定或解除固定視窗。
+
+現在你可以 download
+http://www.csie.nctu.edu.tw/~cp76/linux/gtk-xim/im-xim.so
+cp im-xim.so  /usr/lib/gtk-2.0/2.2.0/immodules
+就可以在 Gnome 2.X 上使用 over-the-spot ，不過 gnome-terminal 仍然不能使用。
 
 ----------------------------
 在詞音中按 control-u 可以把整個編輯區的內容清除。
@@ -235,3 +241,11 @@ gtab(倉頡、行列) 輸入法中要如何加入新詞？
 ----------------------------------------------
 如果使用許氏鍵盤，'q' 是用來選字詞，空白鍵則改為送出編輯區的字串。
 ----------------------------------------------
+為什麼 crxvt 內 不能用 gcin，這是因為你在某個地方有設定 XMODIFIERS=@im=gcin，
+gcin 就用 這個來當 XIM name， /usr/X11R6/bin/crxvt 這個 shell script 會設定
+ XMODIFIERS=@im=xcin， 所以 crxvt 連不到。
+
+解決方式有兩種：
+  1. 設定 XMODIFIERS=@im=xcin
+  2. 修改 /usr/X11R6/bin/crxvt， 把 XIM=xcin 拿掉。
+  

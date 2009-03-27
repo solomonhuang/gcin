@@ -68,6 +68,7 @@ int utf8_sz(char *s)
     return 4;
 
   p_err("bad utf8 char %x", *s);
+  return -1;
 }
 
 

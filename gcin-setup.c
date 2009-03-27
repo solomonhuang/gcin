@@ -17,9 +17,12 @@ static struct {
 };
 
 static GtkWidget *check_button_phrase_pre_select, *check_button_gtab_dup_select_bell,
+                 *check_button_phrase_pre_select,
+                 *check_button_phonetic_char_dynamic_sequence,
                  *check_button_gtab_auto_select_by_phrase,
                  *check_button_gtab_press_full_auto_send,
-                 *check_button_gtab_pre_select;
+                 *check_button_gtab_pre_select,
+                 *check_button_gtab_disp_partial_match;
 
 static GtkWidget *opt_spc_opts;
 
@@ -52,10 +55,13 @@ static gboolean cb_ok( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
-  save_gcin_conf_str("phonetic-keyboard", kbm_sel[new_select_idx].kbm);
-  save_gcin_conf_str("tsin-chinese-english-switch", tsin_eng_ch_sw[new_select_idx_tsin_sw]);
-  save_gcin_conf_int("tsin-phrase-pre-select",
+  save_gcin_conf_str(PHONETIC_KEYBOARD, kbm_sel[new_select_idx].kbm);
+  save_gcin_conf_str(TSIN_CHINESE_ENGLISH_SWITCH, tsin_eng_ch_sw[new_select_idx_tsin_sw]);
+  save_gcin_conf_int(TSIN_PHRASE_PRE_SELECT,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phrase_pre_select)));
+
+  save_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence)));
 
   send_gcin_message(GDK_DISPLAY(), "reload kbm");
 
@@ -76,7 +82,6 @@ static void callback_button_clicked_tsin_sw( GtkWidget *widget, gpointer data)
   new_select_idx_tsin_sw = (int) data;
 }
 
-void get_gcin_conf_str(char *name, char rstr[], char *default_str);
 
 static int get_current_kbm_idx()
 {
@@ -95,7 +100,7 @@ static int get_current_kbm_idx()
 static int get_currnet_eng_ch_sw_idx()
 {
   char swkey[32];
-  get_gcin_conf_str("tsin-chinese-english-switch", swkey, "CapsLock");
+  get_gcin_conf_str(TSIN_CHINESE_ENGLISH_SWITCH, swkey, "CapsLock");
 
   int i;
   for(i=0; i < kbm_selN; i++)
@@ -104,14 +109,6 @@ static int get_currnet_eng_ch_sw_idx()
 
   p_err("tsin-chinese-english-switch->%s is not valid", swkey);
   return -1;
-}
-
-static gboolean get_current_tsin_phrase_pre_select()
-{
-  char phr_pre[16];
-
-  get_gcin_conf_str("tsin-phrase-pre-select", phr_pre, "1");
-  return atoi(phr_pre);
 }
 
 static gboolean close_kbm_window( GtkWidget *widget,
@@ -194,12 +191,23 @@ void create_kbm_window()
 
     GtkWidget *frame_tsin_phrase_pre_select = gtk_frame_new("詞音輸入預選詞視窗");
     gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_phrase_pre_select , TRUE, TRUE, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_sw), 3);
+    gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_phrase_pre_select), 3);
     check_button_phrase_pre_select = gtk_check_button_new ();
     gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_pre_select),
         check_button_phrase_pre_select);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_phrase_pre_select),
-       get_current_tsin_phrase_pre_select());
+       tsin_phrase_pre_select);
+
+
+    GtkWidget *frame_phonetic_char_dynamic_sequence = gtk_frame_new("注音依使用頻率調整順序");
+    gtk_box_pack_start (GTK_BOX (vbox_top), frame_phonetic_char_dynamic_sequence , TRUE, TRUE, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (frame_phonetic_char_dynamic_sequence), 3);
+    check_button_phonetic_char_dynamic_sequence = gtk_check_button_new ();
+    gtk_container_add (GTK_CONTAINER (frame_phonetic_char_dynamic_sequence),
+        check_button_phonetic_char_dynamic_sequence);
+    gtk_toggle_button_set_active(
+       GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence),
+       phonetic_char_dynamic_sequence);
 
 
     GtkWidget *button_close = gtk_button_new_with_label ("OK");
@@ -385,6 +393,10 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_press_full_auto_send)));
 
+  save_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_partial_match)));
+
+
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
@@ -519,7 +531,6 @@ void create_win0_conf_window()
        gtab_pre_select);
 
 
-
     GtkWidget *hbox_gtab_press_full_auto_send = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_press_full_auto_send, FALSE, FALSE, 0);
     GtkWidget *label_gtab_gtab_press_full_auto_send = gtk_label_new("按滿自動送字");
@@ -529,6 +540,18 @@ void create_win0_conf_window()
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_press_full_auto_send),
        gtab_press_full_auto_send);
+
+
+    GtkWidget *hbox_gtab_disp_partial_match = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_disp_partial_match, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_gtab_disp_partial_match = gtk_label_new("預選列中顯示部份符合的字");
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_disp_partial_match), label_gtab_gtab_disp_partial_match,  FALSE, FALSE, 0);
+    check_button_gtab_disp_partial_match = gtk_check_button_new ();
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_disp_partial_match), check_button_gtab_disp_partial_match,  FALSE, FALSE, 0);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_partial_match),
+       gtab_disp_partial_match);
+
 
 
     GtkWidget *button_close = gtk_button_new_with_label ("OK");

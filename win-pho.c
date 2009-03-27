@@ -12,7 +12,7 @@ void disp_pho(int index, char *phochar)
   char tt[CH_SZ+1];
 
   if (phochar[0]==' ')
-    strcpy(tt, "  ");
+    strcpy(tt, "　");
   else
     utf8cpy(tt, phochar);
 
