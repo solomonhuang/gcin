@@ -76,11 +76,12 @@ echo "GCIN_ICON_DIR=\$(datadir_r)/icons/gcin" >> config.mak
 echo "GCIN_ICON_DIR_i=\$(datadir)/icons/gcin" >> config.mak
 echo "GCIN_BIN_DIR=\$(bindir_r)" >> config.mak
 
+
 cd menu
 for i in *.in
 do
   outf=`echo $i | sed -e "s/\.in//"`
-  echo $outf
+#  echo $outf
   if [ $bindir = /usr/bin ]; then
     sed -e "s~/usr/local/bin~/usr/bin~" < $i > $outf
   else

@@ -9,7 +9,7 @@
 #define LEFT_RIGHT_BUTTON_TIPS "left-right-button-tips"
 #define GCIN_CHARS_BIG5_ONLY "gcin-chars-big5-only"
 #define GCIN_FLAGS_IM_ENABLED "gcin-flags-im-enabled"
-
+#define GCIN_REMOTE_CLIENT "gcin-remote-client"
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
 #define GTAB_SPACE_AUTO_FIRST "gtab-space-auto-first"
@@ -31,7 +31,7 @@
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_chars_big5_only,
-           gcin_flags_im_enabled;
+           gcin_flags_im_enabled, gcin_remote_client;
 
 extern int default_input_method;
 extern int left_right_button_tips;

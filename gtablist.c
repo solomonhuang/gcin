@@ -18,7 +18,7 @@ static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
 static GtkWidget *button;
-static GtkWidget *opt_im_toggle_keys;
+static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client;
 
 typedef struct
 {
@@ -161,6 +161,8 @@ static void cb_ok (GtkWidget *button, gpointer data)
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, imkeys[idx].keynum);
   save_gcin_conf_int(GCIN_FLAGS_IM_ENABLED, gcin_flags_im_enabled);
+  save_gcin_conf_int(GCIN_REMOTE_CLIENT,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
 
   gtk_widget_destroy(gtablist_window);
 
@@ -360,6 +362,16 @@ void create_gtablist_window (void)
   gtk_container_add (GTK_CONTAINER (sw), treeview);
 
   gtk_box_pack_start (GTK_BOX (vbox), create_im_toggle_keys(), FALSE, FALSE, 0);
+
+  GtkWidget *hbox_gcin_remote_client = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_remote_client, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_remote_client = gtk_label_new("遠端 client 程式支援 (port 9999-)");
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client), label_gcin_remote_client,  FALSE, FALSE, 0);
+  check_button_gcin_remote_client = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client),check_button_gcin_remote_client,  FALSE, FALSE, 0);
+
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client),
+     gcin_remote_client);
 
   /* some buttons */
   hbox = gtk_hbox_new (TRUE, 4);

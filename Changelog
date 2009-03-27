@@ -1,3 +1,12 @@
+0.6.6:
+- 把 README 改成 UTF-8 編碼。
+- 由於嘸蝦米字的拆法特多，造成顯示拆法區的字串一大串，看起來怪怪的，現在嘸蝦米改成用半型字字母顯示，情形改善不少。
+
+0.6.5:
+- 新增關掉 gcin remote client 支援的選項 ，如果你是 su 成另外一個 user，這個選項仍然必須打開，否則無法輸入中文。
+- install scripts 為了 Fedora/SUSE 有些修正。 Thanks to swyear@bbs.openfind.com.tw, starjou.bbs@bbs.sayya.org and candyz.bbs@bbs.sayya.org。
+- 改字以後不會連成詞的問題。例如，我們要輸入 '要方便'，到第二個字時變成 '藥方'，這時候按空白鍵選 '方' 改回 '要方'，接下來輸入'便'時會跑出 '變'，沒有組成 '方便'。
+
 0.6.4:
 - GTK_IM_CLIENT=gcin 用 GTK 的 mouse 右鍵來使用切換輸入法 menu ，容易造成當掉的問題。
 - 大易輸入法 圖(7oo)，無法輸入的問題。感謝 kiwi03.bbs@ptt.cc 回報問題。 

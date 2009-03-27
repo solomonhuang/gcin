@@ -23,6 +23,7 @@ struct TableHead {
 
 u_long CONVT(char *s);
 #define KeyBits (6)
+#define MAX_GTAB_KEYS (1<<KeyBits)
 
 #define MAX_GTAB_NUM_KEY 10
 #define MAX_GTAB_ITEM_KEY_LEN (sizeof(((ITEM*)0)->key) * 8 / KeyBits)
@@ -40,9 +41,10 @@ typedef struct {
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:4  changjei:5 */
   int DefChars;           /* defined chars */
-  u_char keyname[64 * CH_SZ];
+  u_char keyname[MAX_GTAB_KEYS * CH_SZ];
+  u_char *keyname_lookup; // used by boshiamy only
   gtab_idx1_t idx1[51];
-  u_char keymap[64 * CH_SZ];
+  u_char keymap[MAX_GTAB_KEYS * CH_SZ];
   char selkey[MAX_SELKEY];
   u_char *sel1st;
   int M_DUP_SEL;

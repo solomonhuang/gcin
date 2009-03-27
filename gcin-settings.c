@@ -2,6 +2,7 @@
 #include "gtab.h"
 
 int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
+int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
 int gcin_im_toggle_keys;
@@ -32,6 +33,7 @@ void load_setttings()
   gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
   gcin_chars_big5_only = get_gcin_conf_int(GCIN_CHARS_BIG5_ONLY,0);
   gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);
+  gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 1);
 
   default_input_method = get_gcin_conf_int(DEFAULT_INPUT_METHOD, 6);
   left_right_button_tips = get_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 1);

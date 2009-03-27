@@ -39,11 +39,11 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 
 //  dbg("gcin_im_client_reopen\n");
 
-#if 1
   if (!dpy) {
     dbg("null disp\n");
     goto next;
   }
+
 
   Atom gcin_addr_atom = get_gcin_addr_atom(dpy);
   Window gcin_win = None;
@@ -78,33 +78,9 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
     }
   }
 
-  if (loop == MAX_TRY || gcin_win == None)
-    goto next;
-
-
-  Atom actual_type;
-  int actual_format;
-  u_long nitems,bytes_after;
-  char *message = NULL;
-
-  if (!gcin_addr_atom || XGetWindowProperty(dpy, gcin_win, gcin_addr_atom, 0, 64,
-     False, AnyPropertyType, &actual_type, &actual_format,
-     &nitems,&bytes_after,(u_char **)&message) != Success) {
-#if DBG
-    dbg("XGetWindowProperty: old version of gcin or gcin is not running ??\n");
-#endif
+  if (loop == MAX_TRY || gcin_win == None) {
     goto next;
   }
-
-  if (message) {
-    memcpy(&srv_ip_port, message, sizeof(srv_ip_port));
-    XFree(message);
-  } else
-    goto next;
-
-//  dbg("im server tcp port %d\n", ntohs(srv_ip_port.port));
-#endif
-
 
   struct sockaddr_un serv_addr;
   bzero((char *) &serv_addr,sizeof(serv_addr));
@@ -132,8 +108,30 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   goto next;
 
   struct sockaddr_in in_serv_addr;
+  Atom actual_type;
+  int actual_format;
+  u_long nitems,bytes_after;
+  char *message = NULL;
 
 tcp:
+  if (!gcin_addr_atom || XGetWindowProperty(dpy, gcin_win, gcin_addr_atom, 0, 64,
+     False, AnyPropertyType, &actual_type, &actual_format,
+     &nitems,&bytes_after,(u_char **)&message) != Success) {
+#if DBG || 1
+    dbg("XGetWindowProperty: old version of gcin or gcin is not running ??\n");
+#endif
+    goto next;
+  }
+
+
+  if (message) {
+    memcpy(&srv_ip_port, message, sizeof(srv_ip_port));
+    XFree(message);
+  } else
+    goto next;
+
+//  dbg("im server tcp port %d\n", ntohs(srv_ip_port.port));
+
   bzero((char *) &in_serv_addr, sizeof(in_serv_addr));
 
   in_serv_addr.sin_family = AF_INET;
@@ -187,7 +185,7 @@ next:
     }
   }
 
-  if (BITON(handle->flag, FLAG_GCIN_client_handle_has_focus))
+  if (handle->fd && BITON(handle->flag, FLAG_GCIN_client_handle_has_focus))
     gcin_im_client_focus_in(handle);
 
   return handle;
@@ -357,7 +355,7 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
   *rstr = NULL;
 
   if (!handle->fd) {
-    dbg("gcin_im_client_forward_key_event fd is 0\n");
+//    dbg("gcin_im_client_forward_key_event fd is 0\n");
     return 0;
   }
 

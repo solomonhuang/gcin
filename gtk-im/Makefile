@@ -22,8 +22,6 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 		install -d $(IMMODULES_LOCAL); \
 		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
-		cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib; \
-		cp gtk.immodules.lib gtk.immodules; \
 	else \
 		install -d $(IMMODULES); \
 		install -m 755 im-gcin.so $(IMMODULES); \

@@ -80,5 +80,25 @@ __END
 fi
 
 # install gtk IM module
-cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib
-cp gtk.immodules.lib gtk.immodules
+
+# SUSE
+PATH=$PATH:/opt/gnome/bin
+
+for i in gtk-query-immodules-2.0 gtk-query-immodules-2.0-32 gtk-query-immodules-2.0-64
+do
+  which $i >& /dev/null
+  if [ $? = 0 ]; then
+    GTK_QUERY_IM=$i
+    break
+  fi
+done
+
+if [ $GTK_QUERY_IM ]; then
+  GTK_ETC=/etc/gtk-2.0
+  if [ ! -d $GTK_ETC ]; then
+    GTK_ETC=/etc/opt/gnome/gtk-2.0
+  fi
+  cd $GTK_ETC
+  $GTK_QUERY_IM > gtk.immodules.lib
+  cp gtk.immodules.lib gtk.immodules
+fi

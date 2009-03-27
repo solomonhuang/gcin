@@ -150,7 +150,7 @@ static void cb_help()
 {
   char cmd[512];
 
-  sprintf(cmd, "gedit --encoding big5 %s/README &", DOC_DIR);
+  sprintf(cmd, "gedit %s/README &", DOC_DIR);
   system(cmd);
 }
 
@@ -248,9 +248,18 @@ void create_appearance_conf_window()
   gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_pho_in), spinner_tsin_pho_in);
 
 
+  GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
+
+  GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
+  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, FALSE, FALSE, 0);
+
+  g_signal_connect (G_OBJECT (button_cancel), "clicked",
+                            G_CALLBACK (close_appearance_conf_window),
+                            G_OBJECT (gcin_appearance_conf_window));
 
   GtkWidget *button_close = gtk_button_new_from_stock (GTK_STOCK_OK);
-  gtk_box_pack_start (GTK_BOX (vbox_top), button_close, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
 
   g_signal_connect_swapped (G_OBJECT (button_close), "clicked",
                             G_CALLBACK (cb_appearance_conf_ok),

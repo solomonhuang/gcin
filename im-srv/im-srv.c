@@ -27,7 +27,7 @@ static void cb_read_gcin_client_data(gpointer data, int source, GdkInputConditio
 
 Atom get_gcin_addr_atom(Display *dpy);
 
-void gen_passwd_idx()
+static void gen_passwd_idx()
 {
   srv_ip_port.passwd.seed = (rand() >> 1) % __GCIN_PASSWD_N_;
 
@@ -82,7 +82,7 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
   gcin_clients[newsockfd].type = type;
 }
 
-int get_ip_address(u_int *ip)
+static int get_ip_address(u_int *ip)
 {
   char hostname[64];
 
@@ -126,7 +126,7 @@ void init_gcin_im_serv(Window win)
   if (!stat(serv_addr.sun_path, &st)) {
     if (unlink(serv_addr.sun_path) < 0) {
       char tt[512];
-      snprintf(tt, "unlink error %s", serv_addr.sun_path);
+      snprintf(tt, sizeof(tt), "unlink error %s", serv_addr.sun_path);
       perror(tt);
     }
   }
@@ -149,9 +149,16 @@ void init_gcin_im_serv(Window win)
   gdk_input_add(im_sockfd, GDK_INPUT_READ, cb_new_gcin_client,
                 GINT_TO_POINTER(Connection_type_unix));
 
+  addr_atom = get_gcin_addr_atom(GDK_DISPLAY());
+  XSetSelectionOwner(dpy, addr_atom, win, CurrentTime);
+
+  if (!gcin_remote_client) {
+    dbg("connection via TCP is disabled\n");
+    return;
+  }
+
 #if 1
   // tcp socket
-
 
   if (get_ip_address(&srv_ip_port.ip) < 0)
     return;
@@ -192,10 +199,6 @@ void init_gcin_im_serv(Window win)
   if (listen(im_tcp_sockfd, 5) < 0) {
     perror("cannot listen: ");
   }
-
-  addr_atom = get_gcin_addr_atom(GDK_DISPLAY());
-
-  XSetSelectionOwner(dpy, addr_atom, win, CurrentTime);
 
   gen_passwd_idx();
 

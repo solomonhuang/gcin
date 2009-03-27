@@ -1316,7 +1316,13 @@ change_char:
          if (len) {
            prbuf();
            current_page=sel_pho=ityp3_pho=0;
-           ph_sta=-1;
+           if (len == CH_SZ) {
+             ph_sta = -1;
+             goto restart;
+           }
+           else
+             ph_sta=-1;
+
            hide_selections_win();
          }
          return 1;
@@ -1490,13 +1496,8 @@ restart:
 
 //     dbg("ph_sta < 0, scanphr c_idx:%d match_len:%d\n", c_idx, match_len);
      psta[c_idx-1]=c_idx-1;
-#if 0
-     disp_pre_sel_page();
-#else
      pre_selN=0;
-#endif
      disp_ph_sta();
-
      return 1;
    } else {
      int mdist = c_idx - ph_sta;

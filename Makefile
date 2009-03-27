@@ -79,7 +79,6 @@ install:
 	install -d $(GCIN_ICON_DIR_i)
 	install -m 644 icons/* $(GCIN_ICON_DIR_i)
 	install -d $(bindir)
-	$(MAKE) -C scripts install
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
@@ -92,6 +91,7 @@ install:
 	else \
 	   install -s $(PROGS) $(bindir); \
 	fi
+	$(MAKE) -C scripts install
 clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean

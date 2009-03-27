@@ -1,0 +1,25 @@
+cd
+cat > .rpmrc << END1
+buildarchtranslate: i386: i586
+buildarchtranslate: i486: i586
+buildarchtranslate: i586: i586
+buildarchtranslate: i686: i586
+END1
+
+sed -e "s~YOUR_HOME_DIR~$HOME~" > .rpmmacros << END2
+%_topdir                YOUR_HOME_DIR/rpm
+%_tmppath               YOUR_HOME_DIR/rpm/tmp
+%_signature             gpg
+%_gpg_name              Mandrakelinux
+%_gpg_path              ~/.gnupg
+%distribution           Mandrakelinux
+%vendor                 Mandrakesoft
+END2
+
+mkdir rpm
+cd rpm
+
+for i in BUILD RPMS RPMS/i586 RPMS/noarch SOURCES SPECS SRPMS tmp
+do
+  mkdir -p $i
+done

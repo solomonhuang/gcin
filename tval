@@ -6,6 +6,6 @@ export XMODIFIERS=@im=$GCIN_XIM
 #valgrind --tool memcheck --leak-check=yes ./gcin.test &
 valgrind --tool=memcheck ./gcin.test &
 gcinpid=$!
-sleep 1
+sleep 10
 gedit
 pkill gcin.test

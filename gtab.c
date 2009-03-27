@@ -86,10 +86,18 @@ void lookup_gtab(char *ch, char out[])
 
       if (!k)
         break;
+      int len;
+      char *keyname;
 
-      int len = (cur_inmd->keyname[k * CH_SZ] & 0x80) ? CH_SZ : 2;
+      if (cur_inmd->keyname_lookup) {
+        len = 1;
+        keyname = &cur_inmd->keyname_lookup[k];
+      } else {
+        keyname = &cur_inmd->keyname[k * CH_SZ];
+        len = (*keyname & 0x80) ? CH_SZ : 2;
+      }
 //      dbg("uuuuuuuuuuuu %d %x len:%d\n", k, cur_inmd->keyname[k], len);
-      memcpy(&t[tlen], &cur_inmd->keyname[k * CH_SZ], len);
+      memcpy(&t[tlen], keyname, len);
       tlen+=len;
     }
 
@@ -298,6 +306,45 @@ void init_gtab(int inmdno, int usenow)
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
   memcpy(&inp->keyname[61*CH_SZ], "？", CH_SZ);  /* for wild card */
   memcpy(&inp->keyname[62*CH_SZ], "＊", CH_SZ);
+
+  // for boshiamy
+  extern u_char *fullchar[];
+  gboolean all_full_ascii = TRUE;
+  char keyname_lookup[MAX_GTAB_KEYS];
+
+  bzero(keyname_lookup, sizeof(keyname_lookup));
+  for(i=1; i < th.KeyS; i++) {
+    char *keyname = &inp->keyname[i*CH_SZ];
+    int len = utf8_sz(keyname);
+    int j;
+
+    if (len==1 && utf8_sz(keyname + 1)) { // array30
+      all_full_ascii = FALSE;
+      break;
+    }
+
+#define FULLN (127 - ' ')
+
+    for(j=0; j < FULLN; j++)
+      if (!memcmp(fullchar[j], keyname, len)) {
+        break;
+      }
+
+    if (j==FULLN) {
+      dbg("all_full_ascii %d\n", j);
+      all_full_ascii = FALSE;
+      break;
+    }
+
+    keyname_lookup[i] = ' ' + j;
+  }
+
+
+  if (all_full_ascii) {
+    inp->keyname_lookup = malloc(sizeof(char) * MAX_GTAB_KEYS);
+    memcpy(inp->keyname_lookup, keyname_lookup, MAX_GTAB_KEYS);
+  }
+
   inp->KeyS=th.KeyS;
   inp->MaxPress=th.MaxPress;
   inp->DefChars=th.DefC;
