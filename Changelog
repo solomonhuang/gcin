@@ -1,3 +1,17 @@
+0.7.3:
+- Thanks to swyear for the install script for SUSE 9.1 and 9.2.
+- 注音第幾聲會多送字母的問題。
+
+0.7.2:
+- Fedora 等沒有 /usr/bin/update-menus 的 distribution 出現 install 的 error
+- gcin-setup 設定第一次內定的輸入法有些改進。
+
+0.7.1:
+- gtab 現在可以定義超過 5 個鍵的輸入法，最多可以到 10 鍵(64-bit)。
+- 新增拼音輸入。
+- For Mandrake 9.2 & 10.0： modify-XIM 會修改 /usr/X11R6/bin/crxvt 'xcin-zh_TW' -> '#xcin'，這樣就不會執行兩份 gcin，或無法叫出 gcin。
+- 現在按 Shift-1 會跑出全形的 '！' ，Thanks to yuanchao (at) gmail com。不過還是建議輸入 'ㄊ' + space 會更簡單，因為手不用移那麼遠去按。
+
 0.7.0:
 - 嘸蝦米 使用 '* ?' wildcard 替代鍵查詢後，選字錯誤的問題，Thanks to LGJ for reporting this bug.
 - 改用 regular expression 去 match '* ?'，現在應該比以前更正確了。

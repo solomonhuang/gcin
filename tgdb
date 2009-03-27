@@ -1,8 +1,10 @@
+export GCIN_IM_CLEINT_NO_AUTO_EXEC=
 export GCIN_TABLE_DIR=./data
 export GCIN_XIM=gcin_test
 pkill gcin.test
 export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=$GCIN_XIM
-sleep 3; gedit &
+export LD_PRELOAD=./im-client/libgcin-im-client.so
+sleep 1; gedit &
 gdb ./gcin.test
 pkill gedit

@@ -7,7 +7,6 @@
 
 extern Display *dpy;
 extern XIMS current_ims;
-extern int default_input_method;
 static IMForwardEventStruct *current_forward_eve;
 
 static char callback_str_buffer[32];
@@ -54,9 +53,10 @@ void send_text(char *text)
 void sendkey_b5(char *bchar)
 {
   char tt[CH_SZ+1];
+  int len = utf8_sz(bchar);
 
-  memcpy(tt, bchar, CH_SZ);
-  tt[CH_SZ]=0;
+  memcpy(tt, bchar, len);
+  tt[len]=0;
 
   send_text(tt);
 }

@@ -46,7 +46,7 @@ logout & login
 
 詞音標點符號輸入:
 (取發音的第一個注音符號 + 輕聲(‧) or 1/2/3/輕 聲)
-(如果要輸入注音符號, 就按向下鍵去選)
+(如果要輸入注音符號, 就按向下鍵或空白鍵去選)
 
   
   ㄐ    。  (句點)
@@ -190,6 +190,14 @@ talk 聊天
 net 上網
 
 那可不可以與單字重覆定義按鍵呢？可以的，在按空白鍵後就可以選字 or 詞。
+-----------------------------------------------------------
+以下的 嘸蝦米 table 僅供測試用，如果有長期使用，請購買合法版權。
+download http://edt1023.sayya.org/misc/noseeing-2.tar.gz
+tar xvfz noseeing-2.tar.gz
+cp noseeing.gtab /usr/share/gcin/table
+
+logout & login 按 ctrl-alt-9 就可以開始用。
+可以用 gcin-setup 把嘸蝦米設定成內定的輸入法。
 ----------------------------------------------
 如何修改 Alt-Shift-key 送出的字串。
     修改 /usr/share/gcin/table/phrase.table
@@ -271,6 +279,8 @@ gedit
    1昌 2昍   5曝 6暻 7暘   0暍
 這是引導初學者按鍵的功能，5曝代表'曝'是在5這個行(TGB廿土月)上。 34 是空白，表示沒有任何字。
 如果不喜歡，有選項可以關掉。
+
+如果是嘸蝦米，則顯示的號碼必須加一。
 ----------------------------------------------
 - gcin 的內部資料庫，已經全部轉成 UTF-8 encoding，所以現在注音/詞音可以輸入(方方土)等的 utf-8，如果要編輯 gcin 的 file，必需使用支援 utf8 encoding 的 editor 如 'gedit'，儲存的時候要確定是存成 UTF-8 encoding。
 - install 0.4.0 前請先把 詞音的資料庫匯出，並且用 iconv 轉成 utf-8 encoding：

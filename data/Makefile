@@ -3,7 +3,7 @@ include ../config.mak
 .SUFFIXES:	.kbmsrc .kbm .cin .gtab
 
 DATA=pho.tab tsin.idx \
-     cj.gtab ar30.gtab dayi3.gtab \
+     cj.gtab ar30.gtab dayi3.gtab  pinyin.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
      ibm.kbm tsin hsu.kbm
 DATAKEEP=symbol-table gtab.list phrase.table
@@ -19,7 +19,7 @@ tsin.idx:	tsin.src
 pho.tab:	 pho.tab.src
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d
 
-.cin.gtab:
+.cin.gtab:      ../gcin2tab
 	../gcin2tab $<
 
 .kbmsrc.kbm:	../kbmcv

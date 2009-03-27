@@ -993,8 +993,8 @@ static gboolean pre_sel_handler(KeySym xkey)
 
 static gboolean pre_punctuation(KeySym xkey)
 {
-  static char shift_punc[]="<>?:\"{}";
-  static char chars[]="，。？：；『』";
+  static char shift_punc[]="<>?:\"{}!";
+  static char chars[]="，。？：；『』！";
 
   char *p;
 
@@ -1231,6 +1231,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
            phokey_t pk = ph_buf[idx];
 
            if (pk) {
+             void create_win_pho_near(phokey_t pho);
              create_win_pho_near(pk);
            }
 

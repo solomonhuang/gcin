@@ -16,20 +16,18 @@ if  [ -d $xinitdir ]; then
     sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < xinput.orig.gcin > \
       xinput
     chmod 755 xinput
-  #SuSE 9.1 This is a testing, contributed by swyear@bbs.openfind.com.tw
+  #SuSE 9.1 9.2 This is a testing, contributed by swyear@bbs.openfind.com.tw
   elif [ -f ../xim ]; then
     cd ..
     if [ ! -f xim.orig.gcin ]; then
       mv xim xim.orig.gcin
     fi
-    declare -i TWline=`grep -n 'zh_TW\*)' xim.orig.gcin | cut -b 1-2`
-    declare -i CNline=`grep -n 'zh_CN\*)' xim.orig.gcin | cut -b 1-2`
-    declare -i dellineb=$TWline+1
-    declare -i dellinee=$CNline-2
-    sed ''$dellineb','$dellinee' d' < xim.orig.gcin > xim10
-    sed ''$TWline' a \ export XMODIFIERS="@im=gcin"' < xim10 > xim11
-    sed ''$dellineb' a \ gcin &' < xim11 >xim
-    rm -f xim1*
+    echo "export `locale | grep LC_CTYPE`" > xim
+    echo 'export XMODIFIERS="@im=gcin"' >> xim
+    echo "export GTK_IM_MODULE=gcin" >> xim
+    echo "export QT_IM_SWITCHER=imsw-multi" >> xim
+    echo "export QT_IM_MODULE=xim" >> xim
+    echo "gcin &" >> xim
     chmod 755 xim
   # others
   else
@@ -66,6 +64,16 @@ if [ $? = 0 ]; then
   sed -e "s/XIM=SCIM/#XIM=xim/" < crxvt.orig.cin > crxvt
   chmod 755 crxvt
 fi
+
+# Mandrake 10.0 & 9.2 have this problem.
+grep xcin-zh_TW crxvt >& /dev/null
+if [ $? = 0 ]; then
+  [ -f crxvt.orig.cin ] || mv crxvt crxvt.orig.cin
+
+  sed -e "s/XIM=xcin-zh_TW/#XIM=xim/" < crxvt.orig.cin > crxvt
+  chmod 755 crxvt
+fi
+
 
 # below is for Fedora Core 3
 cd /etc/alternatives

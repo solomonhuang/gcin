@@ -21,8 +21,6 @@ static GtkWidget *check_button_phrase_pre_select,
                  *check_button_phonetic_char_dynamic_sequence,
                  *check_button_tsin_disp_status_row;
 
-static GtkWidget *opt_spc_opts;
-
 static struct {
   char *name;
   int key;
@@ -46,17 +44,9 @@ int tsin_space_optionsN = sizeof(tsin_space_options) / sizeof(tsin_space_options
 
 static int kbm_selN = sizeof(kbm_sel) / sizeof(kbm_sel[0]);
 
-static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
+static GtkWidget *gcin_kbm_window = NULL;
 
 static int new_select_idx, new_select_idx_tsin_sw, new_select_idx_tsin_space_opt;
-
-
-static gboolean close_application( GtkWidget *widget,
-                                   GdkEvent  *event,
-                                   gpointer   data )
-{
-  exit(0);
-}
 
 
 static gboolean cb_ok( GtkWidget *widget,

@@ -8,7 +8,7 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 	   install -d /usr/lib/menu; \
 	   install -m 644 $(MENUS) /usr/lib/menu; \
-	   which update-menus >& /dev/null && update-menus; \
+	   which update-menus >& /dev/null && update-menus || exit 0; \
 	else \
 	   install -d $(libdir)/menu; \
 	   install -m 644 $(MENUS) $(libdir)/menu; \

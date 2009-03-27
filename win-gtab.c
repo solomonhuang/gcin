@@ -1,4 +1,5 @@
 #include "gcin.h"
+#include "gtab.h"
 #include <X11/extensions/XTest.h>
 
 static GtkWidget *gwin_gtab;
@@ -6,7 +7,7 @@ static GtkWidget *frame;
 static GtkWidget *label_gtab_sele;
 static GtkWidget *label_half_full;
 static GtkWidget *button_gtab;
-static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM];
+static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64];
 static GtkWidget *button_input_method_name;
 static GtkWidget *label_key_codes;
 static GtkWidget *image_pin;
@@ -30,9 +31,31 @@ void disp_gtab(int index, char *gtabchar)
     }
 
     gtk_label_set_text(GTK_LABEL(labels_gtab[index]), utf8);
+    gtk_widget_show(labels_gtab[index]);
   }
 
 }
+
+void clear_gtab_in_area()
+{
+  int i;
+  int maxpress = cur_inmd ? cur_inmd->MaxPress : 1;
+
+  if (maxpress > 5)
+    maxpress = 5;
+  if (!maxpress)
+    maxpress = 1;
+
+
+  for(i=0; i < maxpress; i++) {
+    disp_gtab(i, " ");
+  }
+
+  for(i=maxpress; i < 10; i++) {
+    gtk_widget_hide(labels_gtab[i]);
+  }
+}
+
 
 char *str_half_full[]={"半","全"};
 
@@ -52,7 +75,7 @@ void change_gtab_font_size()
   set_label_font_size(label_gtab_sele, gcin_font_size);
 
   int i;
-  for(i=0; i < MAX_TAB_KEY_NUM; i++) {
+  for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
     set_label_font_size(labels_gtab[i], gcin_font_size);
   }
 }
@@ -246,7 +269,7 @@ void create_win_gtab_gui()
   gtk_container_add (GTK_CONTAINER (button_gtab), hbox_gtab);
 
   int i;
-  for(i=0; i < MAX_TAB_KEY_NUM; i++) {
+  for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
     GtkWidget *label = gtk_label_new(NULL);
     labels_gtab[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_gtab), label, FALSE, FALSE, 0);
@@ -285,6 +308,7 @@ void show_win_gtab()
   init_gtab(current_CS->in_method, True);
   gtk_widget_show(gwin_gtab);
   show_win_sym();
+  clear_gtab_in_area();
 }
 
 

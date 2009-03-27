@@ -82,7 +82,6 @@ install:
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
-	$(MAKE) -C menu install
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
 	   install -d $(DOC_DIR); \
@@ -92,6 +91,7 @@ install:
 	   install -s $(PROGS) $(bindir); \
 	fi
 	$(MAKE) -C scripts install
+	$(MAKE) -C menu install
 clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean

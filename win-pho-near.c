@@ -138,7 +138,7 @@ void create_win_pho_near(phokey_t pho)
         near_entries[near_entriesN].label = label_pho;
         near_entries[near_entriesN].pk = pk;
         g_signal_connect (G_OBJECT (button), "clicked",
-                    G_CALLBACK (cb_sel), near_entriesN);
+                    G_CALLBACK (cb_sel), GINT_TO_POINTER(near_entriesN));
         near_entriesN++;
       }
     }

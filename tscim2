@@ -1,0 +1,5 @@
+export XMODIFIERS="@im=SCIM"
+export GTK_IM_MODULE="scim"
+export LC_ALL=en_US.UTF-8
+scim -d &
+gedit

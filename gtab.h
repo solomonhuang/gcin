@@ -26,13 +26,22 @@ struct TableHead {
   QUICK_KEYS qkeys;
 };
 
+struct TableHead2 {
+  char endkey[16];
+
+  union {
+    char dummy[64];  // for future use
+  };
+};
 
 #define KeyBits (6)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
 #define MAX_GTAB_NUM_KEY 10
-#define MAX_GTAB_ITEM_KEY_LEN (sizeof(((ITEM64 *)0)->key) * 8 / KeyBits)
 #define MAX_SELKEY 16
+
+#define MAX_TAB_KEY_NUM 5
+#define MAX_TAB_KEY_NUM64 10
 
 typedef u_short gtab_idx1_t;
 
@@ -61,6 +70,7 @@ typedef struct {
   time_t file_modify_time;
   gboolean key64;        // db is 64 bit-long key
   int max_keyN;
+  char endkey[16];       // only pinin use it
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
@@ -72,5 +82,8 @@ typedef enum {
 } GTAB_space_pressed_E;
 
 
-u_int CONVT(char *s);
 u_int64_t CONVT2(INMD *inmd, int i);
+extern char gtab64_header[];
+extern INMD *cur_inmd;
+
+#define LAST_K_bitN (cur_inmd->key64 ? 54:24)

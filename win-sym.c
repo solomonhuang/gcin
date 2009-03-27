@@ -208,7 +208,6 @@ static void sym_lookup_key(char *instr, char *outstr)
   }
 }
 
-extern INMD *cur_inmd;
 
 void create_win_sym()
 {

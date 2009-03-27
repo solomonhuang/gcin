@@ -28,7 +28,7 @@ INMD *cur_inmd;
 static gboolean last_full, more_pg, wild_mode, m_pg_mode, spc_pressed;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
 static u_short defselN, exa_match;
-static KeySym inch[MAX_TAB_KEY_NUM];
+static KeySym inch[MAX_TAB_KEY_NUM64];
 static int ci;
 static u_short last_idx, pg_idx;
 static u_short wild_page;
@@ -59,6 +59,8 @@ static int qcmp_strlen(const void *aa, const void *bb)
   return strlen(a) - strlen(b);
 }
 
+#define tblch(i) (cur_inmd->key64 ? cur_inmd->tbl64[i].ch:cur_inmd->tbl[i].ch)
+#define Max_tab_key_num (cur_inmd->key64 ? MAX_TAB_KEY_NUM64 : MAX_TAB_KEY_NUM)
 
 void lookup_gtab(char *ch, char out[])
 {
@@ -69,19 +71,18 @@ void lookup_gtab(char *ch, char out[])
     return;
 
   int i;
-
   for(i=0; i < cur_inmd->DefChars; i++) {
-    if (bchcmp(cur_inmd->tbl[i].ch, ch))
+    if (bchcmp(tblch(i), ch))
       continue;
+
     u_int64_t key = CONVT2(cur_inmd, i);
 
     int j;
 
     int tlen=0;
-    char t[CH_SZ * MAX_GTAB_ITEM_KEY_LEN + 1];
-    int key_num = cur_inmd->key64 ? MAX_TAB_KEY_NUM64 : MAX_TAB_KEY_NUM;
+    char t[CH_SZ * MAX_TAB_KEY_NUM64 + 1];
 
-    for(j=key_num-1; j>=0; j--) {
+    for(j=Max_tab_key_num - 1; j>=0; j--) {
 
       int sh = j * KeyBits;
       int k = (key >> sh) & 0x3f;
@@ -137,6 +138,7 @@ void free_gtab()
   for(i=0; i < 10; i++) {
     INMD *inp = &inmd[i];
     free(inp->tbl); inp->tbl = NULL;
+    free(inp->tbl64); inp->tbl64 = NULL;
     free(inp->phridx); inp->phridx = NULL;
     free(inp->phrbuf); inp->phrbuf = NULL;
   }
@@ -174,18 +176,6 @@ static void ClrSelArea()
 
 
 void disp_gtab(int index, char *gtabchar);
-static void ClrInArea()
-{
-  int i;
-
-  disp_gtab(0, " ");
-
-  for(i=1; i < cur_inmd->MaxPress; i++) {
-    disp_gtab(i, " ");
-  }
-
-  last_idx=0;
-}
 
 static void ClrIn()
 {
@@ -195,6 +185,14 @@ static void ClrIn()
   spc_pressed=ci=0;
 
   sel1st_i=MAX_SELKEY-1;
+}
+
+void clear_gtab_in_area();
+
+static void ClrInArea()
+{
+  clear_gtab_in_area();
+  last_idx = 0;
 }
 
 
@@ -270,6 +268,7 @@ void init_gtab(int inmdno, int usenow)
   int i;
   INMD *inp=&inmd[inmdno];
   struct TableHead th;
+  struct TableHead2 th2;
 
 
   if (!inmd[inmdno].filename[0] || !strcmp(inmd[inmdno].filename,"-"))
@@ -301,10 +300,28 @@ void init_gtab(int inmdno, int usenow)
 
   dbg("gtab file %s\n", ttt);
 
+  fread(ttt, 1, strlen(gtab64_header)+1, fp);
+
+  if (strcmp(ttt, gtab64_header)) {
+    inp->max_keyN = 5;
+    fseek(fp, 0, SEEK_SET);
+  }
+  else {
+    inp->max_keyN = 10;
+    inp->key64 = TRUE;
+    dbg("it's a 64-bit .gtab\n");
+  }
+
+
   strcpy(uuu,ttt);
 
   fread(&th,1,sizeof(th),fp);
-  fread(ttt,1,th.KeyS,fp);
+  if (inp->key64) {
+    fread(&th2,1,sizeof(th2),fp);
+    memcpy(inp->endkey, th2.endkey, sizeof(th2.endkey));
+  }
+
+  fread(ttt, 1, th.KeyS, fp);
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
   memcpy(&inp->keyname[61*CH_SZ], "？", CH_SZ);  /* for wild card */
   memcpy(&inp->keyname[62*CH_SZ], "＊", CH_SZ);
@@ -368,16 +385,31 @@ void init_gtab(int inmdno, int usenow)
   /* printf("chars: %d\n",th.DefC); */
   dbg("inmdno: %d th.KeyS:%d\n", inmdno, th.KeyS);
 
-  if (inp->tbl) {
-    dbg("free %x\n", inp->tbl);
-    free(inp->tbl);
+  if (inp->key64) {
+    if (inp->tbl64) {
+      dbg("free %x\n", inp->tbl64);
+      free(inp->tbl64);
+    }
+
+    if ((inp->tbl64=tmalloc(ITEM64, th.DefC))==NULL) {
+      p_err("malloc err");
+    }
+
+    fread(inp->tbl64, sizeof(ITEM64), th.DefC, fp);
+  } else {
+    if (inp->tbl) {
+      dbg("free %x\n", inp->tbl);
+      free(inp->tbl);
+    }
+
+    if ((inp->tbl=tmalloc(ITEM, th.DefC))==NULL) {
+      p_err("malloc err");
+    }
+
+    fread(inp->tbl,sizeof(ITEM),th.DefC, fp);
   }
 
-  if ((inp->tbl=tmalloc(ITEM, th.DefC))==NULL) {
-    p_err("malloc err");
-  }
-
-  fread(inp->tbl,sizeof(ITEM),th.DefC, fp);
+  dbg("chars %d\n", th.DefC);
 
   memcpy(&inp->qkeys, &th.qkeys, sizeof(th.qkeys));
   inp->use_quick= th.qkeys.quick1[1][0][0] > 0;  // only array 30 use this
@@ -413,6 +445,17 @@ void init_gtab(int inmdno, int usenow)
     set_gtab_input_method_name(inp->cname);
     DispInArea();
   }
+
+#if 0
+  for(i='A'; i < 127; i++)
+    printf("%d] %c %d\n", i, i, inp->keymap[i]);
+#endif
+#if 0
+  for(i=0; i < 100; i++) {
+    u_char *ch = tblch(i);
+    dbg("%d] %c%c%c\n", i, ch[0], ch[1], ch[2]);
+  }
+#endif
 }
 
 static char match_phrase[MAX_PHRASE_STR_LEN];
@@ -553,14 +596,12 @@ static u_int64_t vmask64[]=
   (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18)|(KKK<<12)|(KKK<<6)|KKK
 };
 
-#define LAST_K_bitN (cur_inmd->key64 ? 54:24)
 #define KEY_N (cur_inmd->max_keyN)
 
-// for strict match, use stack
 void wildcard()
 {
   int i,t,match, wild_ofs=0;
-  u_int64_t  kk,vv;
+  u_int64_t  kk;
   int found=0;
   regex_t reg;
 
@@ -604,8 +645,6 @@ void wildcard()
   tt[0]=0;
 
   for(t=0; t< cur_inmd->DefChars && defselN < strlen(cur_inmd->selkey); t++) {
-    ITEM it = cur_inmd->tbl[t];
-
     kk=CONVT2(cur_inmd, t);
     match=1;
     char ts[32];
@@ -626,8 +665,8 @@ void wildcard()
     if (!regexec(&reg, ts, 0, 0, 0)) {
       if (wild_ofs >= wild_page) {
         b1_cat(tt, cur_inmd->selkey[defselN]);
-        bch_cat(tt, it.ch);
-        bchcpy(seltab[defselN++],it.ch);
+        bch_cat(tt, tblch(t));
+        bchcpy(seltab[defselN++], tblch(t));
         b1_cat(tt, ' ');
       } else
         wild_ofs++;
@@ -653,9 +692,9 @@ static char *ptr_selkey(KeySym key)
 static void load_phr(int j, char *tt)
 {
   int len;
+  char *ch = tblch(j);
 
-  int phrno=((int)(cur_inmd->tbl[j].ch[0])<<8)|
-                  cur_inmd->tbl[j].ch[1];
+  int phrno=((int)(ch[0])<<8)|ch[1];
 
   int ofs = cur_inmd->phridx[phrno], ofs1 = cur_inmd->phridx[phrno+1];
 
@@ -930,7 +969,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 
       if (inkey) {
-        for(i=0;i<5;i++)
+        for(i=0; i < MAX_TAB_KEY_NUM64; i++)
           if (inch[i]>60) {
             DispInArea();
             if (ci==cur_inmd->MaxPress) {
@@ -963,9 +1002,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   static u_int64_t val; // needs static
   val=0;
 
-  for(i=0; i < MAX_TAB_KEY_NUM; i++)
-    val|= inch[i] << (KeyBits * (MAX_TAB_KEY_NUM - 1 - i));
+  for(i=0; i < Max_tab_key_num; i++)
+    val|= (u_int64_t)inch[i] << (KeyBits * (Max_tab_key_num - 1 - i));
 
+//  dbg("--------- %d val %llx\n", Max_tab_key_num, val);
 #if 1
   if (last_idx)
     s1=last_idx;
@@ -974,32 +1014,36 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     s1=cur_inmd->idx1[inch[0]];
 
   e1=cur_inmd->idx1[inch[0]+1];
-  while ((CONVT2(cur_inmd, s1) & vmask[ci]) != val &&
+  u_int64_t vmaskci = cur_inmd->key64 ? vmask64[ci]:vmask[ci];
+
+  while ((CONVT2(cur_inmd, s1) & vmaskci) != val &&
           CONVT2(cur_inmd, s1) < val &&  s1<e1)
     s1++;
 
   last_idx=s1;
 #if 0
   dbg("inch %d %d   val:%x\n", inch[0], inch[1], val);
-  dbg("s1:%d e1:%d key:%x ci:%d vmask[ci]:%x ch:%c%c and:%x\n", s1, e1, CONVT2(cur_inmd, s1),
-     ci, vmask[ci], cur_inmd->tbl[s1].ch[0], cur_inmd->tbl[s1].ch[1],
-     (CONVT2(cur_inmd, s1)&vmask[ci]));
+  u_char *tbl_ch = tblch(s1);
+  dbg("s1:%d e1:%d key:%llx ci:%d vmask[ci]:%llx ch:%c%c%c and:%x\n", s1, e1, CONVT2(cur_inmd, s1),
+     ci, vmaskci, tbl_ch[0], tbl_ch[1], tbl_ch[2], CONVT2(cur_inmd, s1) & vmask[ci]);
 
   dbg("pselkey:%x  %d  defselN:%d\n", pselkey,
        (CONVT2(cur_inmd, s1) & vmask[ci])!=val,
        defselN);
 #endif
 
-
 XXXX:
-  if ((CONVT2(cur_inmd, s1) & vmask[ci])!=val || (wild_mode && defselN) ||
-                  ((ci==cur_inmd->MaxPress||spc_pressed) && defselN && pselkey) ) {
-#if 1
+  vmaskci = cur_inmd->key64 ? vmask64[ci]:vmask[ci];
+
+  if ((CONVT2(cur_inmd, s1) & vmaskci)!=val || (wild_mode && defselN) ||
+                  ((ci==cur_inmd->MaxPress||spc_pressed) && defselN &&
+      (pselkey && (!strchr(cur_inmd->endkey, key) || spc_pressed)) ) ) {
 YYYY:
     if ((pselkey || wild_mode) && defselN) {
       int vv = pselkey - cur_inmd->selkey;
 
-      if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
+      if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode &&
+          (!cur_inmd->use_quick || ci!=2))
         vv++;
 
       if (vv<0)
@@ -1010,7 +1054,6 @@ YYYY:
         return 1;
       }
     }
-#endif
 
     if (pselkey && !defselN)
       return 0;
@@ -1031,14 +1074,16 @@ refill:
 
   j=s1;
 
-  if (ci < cur_inmd->MaxPress && !spc_pressed ) {
-    int shiftb=(4-ci) * KeyBits;
+  if (ci < cur_inmd->MaxPress && !spc_pressed && !strchr(cur_inmd->endkey, key)) {
+    int shiftb=(KEY_N - 1 -ci) * KeyBits;
 
     exa_match=0;
     bzero(seltab, sizeof(seltab));
     while (CONVT2(cur_inmd, j)==val && exa_match <= cur_inmd->M_DUP_SEL) {
-      if (cur_inmd->tbl[j].ch[0] >= 0x80)
-        bchcpy(seltab[exa_match++], cur_inmd->tbl[j].ch);
+      u_char *tbl_ch = tblch(j);
+
+      if (tbl_ch[0] >= 0x80)
+        bchcpy(seltab[exa_match++], tbl_ch);
 
       j++;
     }
@@ -1052,11 +1097,12 @@ refill:
     if (gtab_disp_partial_match)
     while((CONVT2(cur_inmd, j) & vmask[ci])==val && j<e1) {
       int fff=cur_inmd->keycol[(CONVT2(cur_inmd, j)>>shiftb) & 0x3f];
+      u_char *tbl_ch = tblch(j);
 
       if (!(seltab[fff][0]) ||
-           (bchcmp(seltab[fff],cur_inmd->tbl[j].ch)>0 && fff > exa_match)) {
-        if (cur_inmd->tbl[j].ch[0] >= 0x80) {
-          bchcpy(seltab[fff], cur_inmd->tbl[j].ch);
+           (bchcmp(seltab[fff], tbl_ch)>0 && fff > exa_match)) {
+        if (tbl_ch[0] >= 0x80) {
+          bchcpy(seltab[fff], tbl_ch);
           defselN++;
         }
       }
@@ -1067,12 +1113,19 @@ refill:
 next_pg:
     defselN=more_pg=0;
     bzero(seltab,sizeof(seltab));
+    if (strchr(cur_inmd->endkey, key))
+      spc_pressed = 1;
 
     while(CONVT2(cur_inmd, j)==val && defselN<cur_inmd->M_DUP_SEL && j<e1) {
-      if (cur_inmd->tbl[j].ch[0]<0x80)
-        load_phr(j++, seltab[defselN++]);
-      else
-        bchcpy(&seltab[defselN++], cur_inmd->tbl[j++].ch);
+      u_char *tbl_ch = tblch(j);
+
+      if (tbl_ch[0] < 0x80)
+        load_phr(j, seltab[defselN]);
+      else {
+        bchcpy(seltab[defselN], tbl_ch);
+      }
+
+      j++; defselN++;
 
       if (ci == cur_inmd->MaxPress || spc_pressed) {
 //        dbg("sel1st_i %d %d %d\n", ci, cur_inmd->MaxPress, spc_pressed);

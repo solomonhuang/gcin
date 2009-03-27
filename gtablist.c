@@ -26,6 +26,7 @@ typedef struct
   gchar *key;
   gchar *file;
   gboolean used;
+  gboolean default_inmd;
   gboolean editable;
 } Item;
 
@@ -35,6 +36,7 @@ enum
   COLUMN_KEY,
   COLUMN_FILE,
   COLUMN_USE,
+  COLUMN_DEFAULT_INMD,
   COLUMN_EDITABLE,
   NUM_COLUMNS
 };
@@ -90,6 +92,7 @@ add_items (void)
     int in_no = atoi(foo.key);
     foo.file = g_strdup(file);
     foo.used = (gcin_flags_im_enabled & (1 << in_no)) != 0;
+    foo.default_inmd = in_no == default_input_method;
     foo.editable = FALSE;
     g_array_append_vals (articles, &foo, 1);
   }
@@ -113,7 +116,8 @@ create_model (void)
 
   /* create list store */
   model = gtk_list_store_new (NUM_COLUMNS,G_TYPE_STRING, G_TYPE_STRING,
-                              G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
+                              G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN,
+                              G_TYPE_BOOLEAN);
 
   /* add items */
   for (i = 0; i < articles->len; i++) {
@@ -127,10 +131,12 @@ create_model (void)
 			  COLUMN_FILE,
 			  g_array_index (articles, Item, i).file,
 			  COLUMN_USE,
-			  g_array_index (articles, Item, i).used,
-			  COLUMN_EDITABLE,
-			  g_array_index (articles, Item, i).editable,
-			  -1);
+                          g_array_index (articles, Item, i).used,
+			  COLUMN_DEFAULT_INMD,
+                          g_array_index (articles, Item, i).default_inmd,
+                          COLUMN_EDITABLE,
+                          g_array_index (articles, Item, i).editable,
+                          -1);
   }
 
   return GTK_TREE_MODEL (model);
@@ -141,22 +147,7 @@ create_model (void)
 
 static void cb_ok (GtkWidget *button, gpointer data)
 {
-  GtkTreeSelection *treeselection=gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
-  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(treeview));
-  GtkTreeIter iter;
-
-  if (gtk_tree_selection_get_selected (treeselection, NULL, &iter)) {
-    gint i;
-    GtkTreePath *path;
-
-    path = gtk_tree_model_get_path (model, &iter);
-    i = gtk_tree_path_get_indices (path)[0];
-    gtk_tree_path_free(path);
-
-    gchar *key=g_array_index (articles, Item, i).key;
-
-    save_gcin_conf_str(DEFAULT_INPUT_METHOD, key);
-  }
+  save_gcin_conf_int(DEFAULT_INPUT_METHOD, default_input_method);
 
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, imkeys[idx].keynum);
@@ -193,6 +184,43 @@ static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpoint
   value ^= 1;
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_USE, value, -1);
+  gtk_tree_path_free (path);
+
+  return TRUE;
+}
+
+static void clear_all(GtkTreeModel *model)
+{
+  GtkTreeIter iter;
+
+  if (!gtk_tree_model_get_iter_first(model, &iter))
+    return;
+
+  do {
+    char *tkey;
+
+    gtk_tree_model_get(model,&iter, COLUMN_KEY, &tkey, -1);
+
+    gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_DEFAULT_INMD, 0, -1);
+
+  } while (gtk_tree_model_iter_next(model, &iter));
+}
+
+
+static gboolean toggled_default_inmd(GtkCellRendererToggle *cell, gchar *path_string, gpointer data)
+{
+  GtkTreeModel *model = GTK_TREE_MODEL (data);
+  clear_all(model);
+  GtkTreeIter iter;
+  GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
+
+//  dbg("toggled_default_inmd\n");
+  gtk_tree_model_get_iter (model, &iter, path);
+  int i = gtk_tree_path_get_indices (path)[0];
+  char *key=g_array_index (articles, Item, i).key;
+  default_input_method = atoi(key);
+
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_DEFAULT_INMD, TRUE, -1);
   gtk_tree_path_free (path);
 
   return TRUE;
@@ -237,20 +265,31 @@ add_columns (GtkTreeView *treeview)
                                                "text", COLUMN_FILE,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
-#if 1
   // use column
   renderer = gtk_cell_renderer_toggle_new ();
   g_signal_connect (G_OBJECT (renderer), "toggled",
-		    G_CALLBACK (toggled), model);
+                    G_CALLBACK (toggled), model);
 
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-					       -1, "使用",
-					       renderer,
-					       "active", COLUMN_USE,
-					       NULL);
-#endif
+                                               -1, "使用",
+                                               renderer,
+                                               "active", COLUMN_USE,
+                                               NULL);
+
+  // default_inmd column
+  renderer = gtk_cell_renderer_toggle_new ();
+  g_signal_connect (G_OBJECT (renderer), "toggled",
+                    G_CALLBACK (toggled_default_inmd), model);
+
+  g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
+
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
+                                               -1, "第一次內定",
+                                               renderer,
+                                               "active", COLUMN_DEFAULT_INMD,
+                                               NULL);
 }
 
 
@@ -387,14 +426,13 @@ void create_gtablist_window (void)
                     G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 360, 350);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 380, 350);
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);
 
   gtk_widget_show_all (gtablist_window);
 
-  extern int default_input_method;
   set_selection_by_key(default_input_method);
 
 #if 0
