@@ -1,3 +1,13 @@
+0.8.7:
+- 詞音 alt-shift-key 現在會送字到編輯區，而不是直接到程式。
+- gcin-setup 新增符號表編輯 & alt-shift 編輯。
+- alt-shift 的 file 改成在 ~/.gcin/phrase.table，如果 user 改了 file，就會自動 reload。
+- 詞庫編輯現在會自動從 gedit, kedit or kate 中找一個來當 utf8 editor
+- gtab 中如果顯示部份符合的字是關閉的，則現在不會把 window 長大。
+- 把拆字顯示關閉以後，如果使用 wild card，顯示出來的拆字不會清除的問題。
+- 倉頡 yhmbc 無法選第二個字的問題。
+- 似乎 fixed 了一個 64 bit 的問題。
+
 0.8.6:
 - 新增 gtab 是否要顯示拆字結果的選項，但如果使用 wild card 仍然會顯示。
 - 把 Changelog 加到 .rpm 內。
@@ -14,7 +24,7 @@
 0.8.3:
 - 行列輸入法按全形逗號 '，' 候容易當掉的問題。 .gtab file 必須重 build。
 - 「關於gcin」的相關問題。
-- 倉頡、行列輸入法中，現在可以直接輸入 linux，就可以跑出 linux，其餘的輸入法可以自己加到 .cin 後重新執行 gcin2tab。還有(gnome kde gaim gcin xmms xine gedit kate kedit adsl hbo tvbs dvd vcd lcd)    新加入的 keys 不要與原有的重複，如果原有的本來就重複，那就沒關係。
+- 倉頡、行列輸入法中，現在可以直接輸入 linux，就可以跑出 Linux，其餘的輸入法可以自己加到 .cin 後重新執行 gcin2tab。還有(gnome kde gaim gcin xmms xine gedit kate kedit adsl hbo tvbs dvd vcd lcd)    新加入的 keys 不要與原有的重複，如果原有的本來就重複，那就沒關係。
 
 
 0.8.2:

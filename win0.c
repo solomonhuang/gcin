@@ -165,7 +165,7 @@ void clear_chars_all()
 {
   int i;
 
-  for(i=0; i < MAX_PH_BF; i++) {
+  for(i=0; i < MAX_PH_BF_EXT; i++) {
     hide_char(i);
   }
 
@@ -341,7 +341,7 @@ void clear_tsin_line()
 {
   int i;
 
-  for(i=0; i < MAX_PH_BF; i++) {
+  for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *line = chars[i].line;
     if (!line)
       continue;
@@ -591,7 +591,7 @@ void change_tsin_font_size()
   }
 
 
-  for(i=0; i < MAX_PH_BF; i++) {
+  for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *label = chars[i].label;
 
     set_label_font_size(label, gcin_font_size);

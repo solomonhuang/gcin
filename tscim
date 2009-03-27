@@ -3,5 +3,6 @@
 export LC_ALL=zh_TW.Big5
 export GTK_IM_MODULE=scim
 export XMODIFIERS=@im=SCIM
-gnome-terminal --new-window &
+scim -d &
 gedit --new-window &
+kedit

@@ -18,7 +18,7 @@ touch .gcin/gcin-UTF-8-format
 
 cd $1 || echo "$1 is not a gcin table dir"
 
-for i in pho.tab tsin* symbol-table
+for i in pho.tab tsin* symbol-table phrase.table
 do
   if [ ! -f ~/.gcin/$i ]; then
      cp $i ~/.gcin

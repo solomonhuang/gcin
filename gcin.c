@@ -460,7 +460,6 @@ int main(int argc, char **argv)
   init_TableDir();
   load_setttings();
   load_gtab_list();
-  load_phrase();
 
   gtk_init (&argc, &argv);
   dpy = GDK_DISPLAY();

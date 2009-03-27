@@ -1,0 +1,17 @@
+#!/bin/bash
+
+PATH=$PATH:/opt/gnome/bin:/usr/local/bin
+
+for i in gedit kedit kate
+do
+  which $i >& /dev/null
+  if [ $? = 0 ]; then
+    UTF8ED=$i
+    break
+  fi
+done
+
+export LC_CTYPE=zh_TW.UTF-8
+export LC_ALL=zh_TW.UTF-8
+
+$UTF8ED $1

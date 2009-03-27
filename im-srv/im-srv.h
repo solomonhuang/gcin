@@ -6,7 +6,7 @@ typedef enum {
 typedef struct {
   ClientState *cs;
   int tag;
-  unsigned long seed;
+  u_int seed;
   Connection_type type;
 } GCIN_ENT;
 

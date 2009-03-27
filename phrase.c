@@ -41,20 +41,17 @@ struct keystruc {
 int tranN=sizeof(tran)/sizeof(tran[0]);
 extern char *TableDir;
 
+FILE *watch_fopen(char *filename, time_t *pfile_modify_time);
+
 void load_phrase()
 {
   FILE *fp;
   char kname[32];
   char ttt[512];
+  static time_t file_modify_time;
 
-#if 1
-  strcat(strcpy(ttt,TableDir),"/phrase.table");
-#else
-  strcpy(ttt, "phrase.table");
-#endif
-
-  if ((fp=fopen(ttt, "r"))==NULL)
-    p_err("cannot fopen %s\n", ttt);
+  if ((fp=watch_fopen("phrase.table", &file_modify_time)) == NULL)
+    return;
 
   while (!feof(fp)) {
     int i,j;
@@ -83,8 +80,10 @@ void load_phrase()
       if (!strcmp(kname, tran[i].kname))
             break;
 
-    if (i==tranN)
-      p_err("unknown key: %s\n", kname);
+    if (i==tranN) {
+      dbg("unknown key: %s\n", kname);
+      continue;
+    }
 
     tran[i].str = strdup(str);
   }
@@ -99,12 +98,14 @@ void free_phrase()
     free(tran[i].str);
 }
 
+void add_to_tsin_buf_str(char *str);
 
 gboolean feed_phrase(KeySym ksym)
 {
   int i;
 
 //  dbg("ksym:%x\n", ksym);
+  load_phrase();
 
   if (ksym>='A' && ksym <= 'Z')
     ksym += 0x20;
@@ -114,10 +115,14 @@ gboolean feed_phrase(KeySym ksym)
       continue;
 
     if (tran[i].str) {
-      send_text(tran[i].str);
-      return TRUE;
-    } else
-      return FALSE;
+      if (current_CS->in_method == 6) {
+        add_to_tsin_buf_str(tran[i].str);
+      }
+      else
+        send_text(tran[i].str);
+    }
+
+    return TRUE;
   }
 
   return FALSE;

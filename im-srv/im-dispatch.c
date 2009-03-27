@@ -39,7 +39,7 @@ int write_enc(int fd, void *p, int n)
   return r;
 }
 
-static void shutdown_client(int fd, int rn)
+static void shutdown_client(int fd)
 {
 //  dbg("client shutdown rn %d\n", rn);
   gdk_input_remove(gcin_clients[fd].tag);
@@ -64,7 +64,7 @@ void process_client_req(int fd)
   int rn = read(fd, &req, sizeof(req));
 
   if (rn <= 0) {
-    shutdown_client(fd, rn);
+    shutdown_client(fd);
     return;
   }
 
@@ -84,8 +84,7 @@ void process_client_req(int fd)
 
   if (current_CS && req.client_win == current_CS->client_win) {
     cs = current_CS;
-  }
-  else {
+  } else {
     cs = gcin_clients[fd].cs;
 
     if (!cs) {
@@ -168,7 +167,7 @@ void process_client_req(int fd)
         perror("getpeername\n");
       }
 
-      shutdown_client(fd, 0);
+      shutdown_client(fd);
       break;
   }
 }

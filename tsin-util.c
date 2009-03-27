@@ -99,6 +99,8 @@ static int phseq(u_char *a, u_char *b)
 }
 
 
+
+
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 {
   int mid, ord = 0, ph_ofs, hashno, i;
@@ -108,6 +110,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 
   tbuf[0]=len;
   tbuf[1]=0;  // usecount
+
   memcpy(&tbuf[2], phkeys, sizeof(phokey_t) * len);
   memcpy(&tbuf[sizeof(phokey_t)*len + 2], utf8str, CH_SZ*len);
 
@@ -172,6 +175,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 
   return TRUE;
 }
+
 
 int *ts_gtab;
 int ts_gtabN;

@@ -1,6 +1,7 @@
 /*
 	Copyright (C) 2004	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
+#include <string.h>
 
 #include "gcin.h"
 #include "pho.h"
@@ -24,12 +25,13 @@ extern PHOKBM phkbm;
 extern char tsidxfname[64];
 extern int hashidx[TSIN_HASH_N];
 
-#define IN_AREA_LEN (8)
-#define IN_AREA_LEN_SPC (IN_AREA_LEN + 2)
+typedef struct {
+  phokey_t pho;
+  char ch[CH_SZ];
+  char och[CH_SZ];
+} CHPHO;
 
-static u_char ch_buf[MAX_PH_BF_EXT][CH_SZ];
-static u_char ch_obuf[MAX_PH_BF_EXT][CH_SZ];
-static phokey_t ph_buf[MAX_PH_BF_EXT];
+static CHPHO chpho[MAX_PH_BF_EXT];
 static u_char psta[MAX_PH_BF_EXT];
 static int c_idx, c_len, ph_sta=-1, ph_sta_last=-1;
 static int sel_pho;
@@ -48,13 +50,13 @@ static struct {
 } pre_sel[10];
 int pre_selN;
 
-
+gboolean save_phrase_to_db2(CHPHO *chph, int len);
 
 void disp_char(int index, u_char *ch);
 
 static void disp_char_chbuf(int idx)
 {
-  disp_char(idx, ch_buf[idx]);
+  disp_char(idx, chpho[idx].ch);
 }
 
 
@@ -86,13 +88,13 @@ static void drawcursor()
     set_cursor_tsin(c_idx);
   }
 
-  gdk_flush();
+//  gdk_flush();
 }
 
 void inc_pho_count(phokey_t key, int ch_idx);
 int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5);
 
-static void putbuf(u_char s[][CH_SZ], int len)
+static void putbuf(CHPHO *chph, int len)
 {
   u_char tt[CH_SZ * (MAX_PH_BF_EXT+1) + 1];
   int i,idx;
@@ -110,18 +112,15 @@ static void putbuf(u_char s[][CH_SZ], int len)
 #endif
 
   for(idx=i=0;i<len;i++) {
-    int len = utf8_sz(s[i]);
-    if (s[i][0]>=128) {
-      int pho_idx = ch_key_to_ch_pho_idx(ph_buf[i], &s[i][0]);
+    int len = utf8_sz(chph[i].ch);
 
+    if (len > 2) {
+      int pho_idx = ch_key_to_ch_pho_idx(chpho[i].pho, chph[i].ch);
       if (pho_idx >= 0)
-        inc_pho_count(ph_buf[i], pho_idx);
-
-      bchcpy(&tt[idx],&s[i][0]);
+        inc_pho_count(chpho[i].pho, pho_idx);
     }
-    else
-      tt[idx]=s[i][0];
 
+    memcpy(&tt[idx], chph[i].ch, len);
     idx += len;
   }
 
@@ -192,8 +191,8 @@ static void clr_ch_buf()
 {
   int i;
   for(i=0; i < MAX_PH_BF_EXT; i++) {
-    ch_buf[i][0]=' ';
-    ch_buf[i][1]=0;
+    chpho[i].ch[0]=' ';
+    chpho[i].ch[1]=0;
     psta[i]=0xff;
   }
 
@@ -312,6 +311,7 @@ disp_prom:
 }
 
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len);
+gboolean save_phrase_to_db2(CHPHO *chph, int len);
 
 static void save_phrase()
 {
@@ -335,10 +335,10 @@ static void save_phrase()
     return;
 
   for(i=save_frm;i<=save_to;i++)
-    if (!ph_buf[i])
+    if (!chpho[i].pho)
       return;
 
-  if (!save_phrase_to_db(&ph_buf[save_frm], (char *)&ch_buf[save_frm], len)) {
+  if (!save_phrase_to_db2(&chpho[save_frm], len)) {
     bell();
   }
 
@@ -363,23 +363,12 @@ static void shift_ins()
    if (c_len >= PH_SHIFT_N) {
      int ofs;
 
-     if (!(ch_buf[0][0] & 0x80) && (ch_buf[1][0]&0x80)) {
-       putbuf(ch_buf,2);
-       ofs=2;
-     }
-     else
-     if (!(ch_buf[0][0]&0x80) && !(ch_buf[1][0]&0x80)) {
-       putbuf(ch_buf,2);
-       ofs=2;
-     } else {
-       putbuf(ch_buf,1);
-       ofs=1;
-     }
+     ofs = 1;
+     putbuf(chpho, ofs);
+
      ph_sta-=ofs;
-     for(j=0;j<PH_SHIFT_N-ofs;j++) {
-       bchcpy(ch_buf[j], ch_buf[j+ofs]);
-       bchcpy(ch_obuf[j], ch_obuf[j+ofs]);
-       ph_buf[j]=ph_buf[j+ofs];
+     for(j=0; j < c_len - ofs; j++) {
+       chpho[j] = chpho[j+ofs];
        psta[j]=psta[j+ofs]-ofs;
      }
      c_idx-=ofs;
@@ -390,12 +379,11 @@ static void shift_ins()
    c_len++;
    if (c_idx < c_len-1) {
      for(j=c_len; j>=c_idx; j--) {
-       bchcpy(ch_buf[j+1], ch_buf[j]);
-       bchcpy(ch_obuf[j+1], ch_obuf[j]);
-       ph_buf[j+1]=ph_buf[j];
+       chpho[j+1] = chpho[j];
        psta[j+1]=psta[j]+1;
      }
-      ch_buf[c_len][0]=' ';
+
+     chpho[c_len].ch[0]=' ';
     /*    prbuf(); */
    }
 
@@ -407,12 +395,12 @@ void put_b5_char(char *b5ch, phokey_t key)
 {
    shift_ins();
 
-   bchcpy(ch_buf[c_idx], b5ch);
-   bchcpy(ch_obuf[c_idx], b5ch);
+   bchcpy(chpho[c_idx].ch, b5ch);
+   bchcpy(chpho[c_idx].och, b5ch);
 
    disp_char_chbuf(c_idx);
 
-   ph_buf[c_idx]=key;
+   chpho[c_idx].pho=key;
    c_idx++;
 
    if (c_idx < c_len) {
@@ -429,10 +417,22 @@ static int selidx[MAX_PHRASE_SEL_N];
 static u_short phrase_count;
 static u_short pho_count;
 
+static gboolean chpho_eq_pho(int idx, phokey_t *phos, int len)
+{
+  int i;
+
+  for(i=0; i < len; i++)
+    if (chpho[idx+i].pho != phos[i])
+       return FALSE;
+
+  return TRUE;
+}
+
+
 static void get_sel_phrase()
 {
   int sti,edi,j;
-  phokey_t key, stk[10];
+  phokey_t key, stk[MAX_PHRASE_LEN];
   u_char len, mlen, stch[MAX_PHRASE_LEN * CH_SZ + 1];
 
   mlen=c_len-c_idx;
@@ -440,7 +440,7 @@ static void get_sel_phrase()
   if (mlen > MAX_PHRASE_LEN)
     mlen=MAX_PHRASE_LEN;
 
-  key=ph_buf[c_idx];
+  key=chpho[c_idx].pho;
   j= key >> TSIN_HASH_SHIFT;
 
   if (j >= TSIN_HASH_N)
@@ -459,7 +459,8 @@ static void get_sel_phrase()
       continue;
     }
 
-    if (!memcmp(&ph_buf[c_idx], stk, sizeof(phokey_t)*len)) {
+
+    if (chpho_eq_pho(c_idx, stk, len)) {
       sellen[phrase_count]=len;
       selidx[phrase_count]=sti;
       memcpy(selstr[phrase_count++], stch, CH_SZ*len);
@@ -476,9 +477,9 @@ static void get_sel_pho()
   phokey_t key;
 
   if (c_idx==c_len)
-    key=ph_buf[c_idx-1];
+    key=chpho[c_idx-1].pho;
   else
-    key=ph_buf[c_idx];
+    key=chpho[c_idx].pho;
 
   if (!key)
     return;
@@ -543,14 +544,14 @@ static int fetch_user_selection(int val, char **seltext)
   int len = 0;
 
   if (idx < phrase_count) {
-    len = CH_SZ*sellen[idx];
+    len = sellen[idx];
 
     *seltext = selstr[idx];
   } else
   if (idx < phrase_count + pho_count) {
     int v = idx - phrase_count + startf;
 
-    len = CH_SZ;
+    len = 1;
     *seltext = ch_pho[v].ch;
   }
 
@@ -571,16 +572,29 @@ static int phokey_t_seq(phokey_t *a, phokey_t *b, int len)
   return 0;
 }
 
-
-
-static u_char scanphr(phokey_t *pp, int plen)
+static void extract_pho(int chpho_idx, int plen, phokey_t *pho)
 {
+  int i;
+
+  for(i=0; i < plen; i++) {
+    pho[i] = chpho[chpho_idx + i].pho;
+  }
+}
+
+
+static u_char scanphr(int chpho_idx, int plen)
+{
+  if (plen >= MAX_PHRASE_LEN)
+    return 0;
 #if 0
   int t;
   for(t=0; t < plen; t++)
     prph(pp[t]);
   puts("");
 #endif
+  phokey_t pp[MAX_PHRASE_LEN];
+  extract_pho(chpho_idx, plen, pp);
+
   int mid, cmp;
   phokey_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
   u_char len, mlen, usecount, stch[MAX_PHRASE_LEN * CH_SZ];
@@ -778,7 +792,7 @@ gboolean flush_tsin_buffer()
   tsin_reset_in_pho();
 
   if (c_len) {
-    putbuf(ch_buf,c_len);
+    putbuf(chpho, c_len);
     compact_win0_x();
     clear_ch_buf_sel_area();
     clear_tsin_buffer();
@@ -845,35 +859,73 @@ static void disp_ph_sta()
 }
 
 
+
+void ch_pho_cpy(CHPHO *pchpho, char *utf8, phokey_t *phos, int len)
+{
+  int i;
+
+  for(i=0; i < len; i++) {
+    int len = u8cpy(pchpho[i].ch, utf8);
+    utf8+=len;
+    pchpho[i].pho = phos[i];
+  }
+}
+
+
+void set_chpho_ch(CHPHO *pchpho, char *utf8, int len)
+{
+  int i;
+
+  for(i=0; i < len; i++) {
+    int u8len = u8cpy(pchpho[i].ch, utf8);
+    utf8+=u8len;
+  }
+}
+
+
+void set_chpho_ch2(CHPHO *pchpho, char *utf8, int len)
+{
+  int i;
+
+  for(i=0; i < len; i++) {
+    int u8len = u8cpy(pchpho[i].ch, utf8);
+    u8cpy(pchpho[i].och, utf8);
+    utf8+=u8len;
+  }
+}
+
+
 gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
 {
     int idx = c_idx;
     int i;
 
-    if (idx < 0 || c_len + len >= MAX_PH_BF)
+    if (idx < 0 || c_len + len >= MAX_PH_BF_EXT)
       return 0;
 
+    char *pp = str;
     for(i=0; i < len; i++) {
       if (pho[i])
         continue;
 
       phokey_t tpho[32];
-      utf8_pho_keys(&str[i*CH_SZ], tpho);
+      tpho[0]=0;
+      int u8len = utf8_sz(pp);
+
+      utf8_pho_keys(pp, tpho);
       pho[i] = tpho[0];
+      pp += u8len;
     }
 
 
-#if 1
     if (idx < c_len) {
       for(i=c_len-1; i >= idx; i--) {
-        memcpy(ch_buf[i+len], ch_buf[i], CH_SZ);
-        memcpy(ch_obuf[i+len], ch_obuf[i], CH_SZ);
-        ph_buf[i+len] = ph_buf[i];
+        chpho[i+len] = chpho[i];
+//        bchcpy(ch_obuf[i+len], ch_obuf[i]);
       }
     }
 
-    memcpy(&ch_buf[idx], str, len*CH_SZ);
-    memcpy(&ph_buf[idx], pho, len*sizeof(phokey_t));
+    ch_pho_cpy(&chpho[idx], str, pho, len);
 
     if (c_idx == c_len)
       c_idx +=len;
@@ -887,15 +939,6 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     for(i=0;i < len; i++) {
       psta[idx+i]=idx;
     }
-#else
-    int i;
-
-    for(i=0; i < len; i++) {
-      put_b5_char(&str[i*CH_SZ], pho[i]);
-    }
-
-    prbuf();
-#endif
 
     drawcursor();
     disp_ph_sta();
@@ -916,11 +959,11 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     if (idx < 0)
       return 0;
 
-    if (idx >= MAX_PH_BF)
+    if (idx + len >= MAX_PH_BF_EXT)
       flush_tsin_buffer();
 
-    memcpy(&ch_buf[idx], str, len*CH_SZ);
-    memcpy(&ph_buf[idx], pho, len*sizeof(phokey_t));
+    ch_pho_cpy(&chpho[idx], str, pho, len);
+
     c_len=c_idx=idx + len;
 
     clrin_pho();
@@ -939,6 +982,30 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     ph_sta=-1;
     return 1;
 }
+
+
+void add_to_tsin_buf_str(char *str)
+{
+  char *pp = str;
+  char *endp = pp+strlen(pp);
+  int N = 0;
+
+
+  while (*pp) {
+    int u8sz = utf8_sz(pp);
+    N++;
+    pp += u8sz;
+
+    if (pp >= endp) // bad utf8 string
+      break;
+  }
+
+
+  phokey_t pho[MAX_PHRASE_LEN];
+  bzero(pho, sizeof(pho));
+  add_to_tsin_buf(str, pho, N);
+}
+
 
 static gboolean pre_sel_handler(KeySym xkey)
 {
@@ -1133,9 +1200,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
         pst=k=psta[c_idx];
 
         for(k=c_idx;k<c_len;k++) {
-          memcpy(ch_buf[k], ch_buf[k+1], CH_SZ);
-          memcpy(ch_obuf[k], ch_obuf[k+1], CH_SZ);
-          ph_buf[k]=ph_buf[k+1];
+          chpho[k] = chpho[k+1];
+//          memcpy(ch_obuf[k], ch_obuf[k+1], CH_SZ);
           psta[k]=psta[k+1]-1;
         }
 
@@ -1158,7 +1224,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
             k++;
 
           match_len= c_idx - k;
-          if (!(match_len=scanphr(&ph_buf[k], match_len)))
+          if (!(match_len=scanphr(k, match_len)))
             ph_sta=-1;
           else
             ph_sta=k;
@@ -1191,9 +1257,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
         pst=k=psta[c_idx];
 
         for(k=c_idx;k<c_len;k++) {
-          memcpy(ch_buf[k], ch_buf[k+1], CH_SZ);
-          memcpy(ch_obuf[k], ch_obuf[k+1], CH_SZ);
-          ph_buf[k]=ph_buf[k+1];
+          chpho[k]=chpho[k+1];
+//          memcpy(ch_obuf[k], ch_obuf[k+1], CH_SZ);
           psta[k]=psta[k+1]-1;
         }
 
@@ -1215,7 +1280,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
             k++;
 
           match_len= c_idx - k;
-          if (!(match_len=scanphr(&ph_buf[k], match_len)))
+          if (!(match_len=scanphr(k, match_len)))
             ph_sta=-1;
           else
             ph_sta=k;
@@ -1230,7 +1295,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
        if (!sel_pho) {
          if (c_len && c_idx == c_len) {
            int idx = c_len-1;
-           phokey_t pk = ph_buf[idx];
+           phokey_t pk = chpho[idx].pho;
 
            if (pk) {
              void create_win_pho_near(phokey_t pho);
@@ -1271,7 +1336,7 @@ change_char:
          return 0;
 
        idx = c_idx==c_len ? c_idx - 1 : c_idx;
-       if (!ph_buf[idx])
+       if (!chpho[idx].pho)
          return 1;
 
        if (!sel_pho) {
@@ -1319,26 +1384,25 @@ other_keys:
          char *sel_text;
          int len = fetch_user_selection(c, &sel_text);
 
-         if (len > CH_SZ) {
-           memcpy(ch_buf[c_idx], sel_text, len);
-           memcpy(ch_obuf[c_idx], sel_text, len);
+         if (len > 1) {
+//           memcpy(ch_buf[c_idx], sel_text, len);
+           set_chpho_ch2(&chpho[c_idx], sel_text, len);
+//           memcpy(chpho[c_idx], sel_text, len * CH_SZ);
            raise_phr(c);
          } else
-         if (len == CH_SZ) { // single chinese char
+         if (len == 1) { // single chinese char
            i= c_idx==c_len?c_idx-1:c_idx;
-           key=ph_buf[i];
-           memcpy(ch_buf[i], sel_text, CH_SZ);
-#if 1
-           memcpy(ch_obuf[i], sel_text, CH_SZ);
-#endif
+           key=chpho[i].pho;
+           set_chpho_ch2(&chpho[i], sel_text, 1);
+//           memcpy(ch_obuf[i], sel_text, CH_SZ);
            if (i && psta[i]<i)
-             memcpy(ch_buf[i-1],ch_obuf[i-1], CH_SZ);
+             set_chpho_ch(&chpho[i-1], chpho[i-1].och, 1);
          }
 
          if (len) {
            prbuf();
            current_page=sel_pho=ityp3_pho=0;
-           if (len == CH_SZ) {
+           if (len == 1) {
              hide_selections_win();
              ph_sta = -1;
              goto restart;
@@ -1418,18 +1482,18 @@ asc_char:
         shift_ins();
 
         if (tsin_half_full) {
-          bchcpy(ch_buf[c_idx], half_char_to_full_char(xkey));
+          bchcpy(chpho[c_idx].ch, half_char_to_full_char(xkey));
         } else {
 //          dbg("%c\n", tt);
-          ch_buf[c_idx][0]=tt;
+          chpho[c_idx].ch[0]=tt;
         }
 
         phokey_t tphokeys[32];
         tphokeys[0]=0;
-        utf8_pho_keys(ch_buf[c_idx], tphokeys);
+        utf8_pho_keys(chpho[c_idx].ch, tphokeys);
 
         disp_char_chbuf(c_idx);
-        ph_buf[c_idx]=tphokeys[0];
+        chpho[c_idx].pho=tphokeys[0];
         c_idx++;
         if (c_idx < c_len)
           prbuf();
@@ -1514,7 +1578,7 @@ llll2:
 
    if (ph_sta < 0) {
 restart:
-     if ((match_len=scanphr(&ph_buf[c_idx-1],1)))
+     if ((match_len=scanphr(c_idx-1,1)))
        ph_sta=c_idx-1;
 
 //     dbg("ph_sta < 0, scanphr c_idx:%d match_len:%d\n", c_idx, match_len);
@@ -1530,7 +1594,7 @@ restart:
 
      while (ph_sta < c_idx) {
 //       dbg("ph_sta:%d\n", ph_sta);
-       if ((max_match_phrase_len = scanphr(&ph_buf[ph_sta], c_idx - ph_sta))) {
+       if ((max_match_phrase_len = scanphr(ph_sta, c_idx - ph_sta))) {
 //         dbg("max_match_phrase_len: %d\n", max_match_phrase_len);
          break;
        } else
@@ -1574,9 +1638,11 @@ restart:
      for(i=0; i < pre_selN; i++) {
        if (pre_sel[i].len != mdist)
          continue;
-
+#if 0
        memcpy(&ch_buf[ph_sta], pre_sel[i].str, mdist*CH_SZ);
        memcpy(&ph_buf[ph_sta], pre_sel[i].phokey, mdist*sizeof(phokey_t));
+#endif
+       ch_pho_cpy(&chpho[ph_sta], pre_sel[i].str, pre_sel[i].phokey, mdist);
 
        int j;
        for(j=0;j < mdist; j++) {
@@ -1625,4 +1691,18 @@ void tsin_remove_last()
     return;
   c_len--;
   c_idx--;
+}
+
+gboolean save_phrase_to_db2(CHPHO *chph, int len)
+{
+   phokey_t pho[MAX_PHRASE_LEN];
+   char ch[MAX_PHRASE_LEN * CH_SZ];
+   int i;
+
+   for(i=0; i < len; i++) {
+      pho[i] = chph[i].pho;
+      bchcpy(&ch[i*CH_SZ], chph[i].ch);
+   }
+
+   return save_phrase_to_db(pho, ch, len);
 }

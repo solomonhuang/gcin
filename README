@@ -344,7 +344,7 @@ Answer: 注音輸入的區域的字型必須比編輯區的小個幾點就沒有
 --------------------------------------------------
 gcin coredump 如幫忙 debug
 
-cd gcin-0.5.x
+cd gcin-0.x.x
 export  GCIN_DEBUG=1
 make clean
 ./configure
@@ -423,7 +423,7 @@ cp gcin-x.x.x.tar.bz2 ~/rpm/SOURCES
 
 在 gcin-x.x.x
 ./configure 完後，會有一個 gcin.spec
-(這是給 Mandrake 用的可能要稍微修改一下。)
+(這是給 Mandrake 用的，其它的 distribution 可能要稍微修改一下。)
 
 rpmbuild -ba gcin.spec
 等 compile 完，就可以在

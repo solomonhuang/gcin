@@ -61,6 +61,7 @@ static int qcmp_strlen(const void *aa, const void *bb)
 
 #define tblch(i) (cur_inmd->key64 ? cur_inmd->tbl64[i].ch:cur_inmd->tbl[i].ch)
 #define Max_tab_key_num (cur_inmd->key64 ? MAX_TAB_KEY_NUM64 : MAX_TAB_KEY_NUM)
+void set_key_codes_label(char *s);
 
 void lookup_gtab(char *ch, char out[])
 {
@@ -125,7 +126,6 @@ void lookup_gtab(char *ch, char out[])
     free(tbuf[i]);
   }
 
-  void set_key_codes_label(char *s);
   set_key_codes_label(out);
   void set_key_codes_label_pho(char *s);
   set_key_codes_label_pho(out);
@@ -486,6 +486,8 @@ static void clear_phrase_match_buf()
 
 static void putstr_inp(u_char *p)
 {
+  set_key_codes_label("");
+
   if (strlen(p) > CH_SZ || p[0] < 128) {
     send_text(p);
   }
@@ -786,10 +788,12 @@ static void disp_selection(gboolean phrase_selected)
     } else {
       extern gboolean b_use_full_space;
 
-      if (b_use_full_space)
-         strcat(tt, " 　 ");
-      else
-         strcat(tt, "   ");
+      if (gtab_disp_partial_match) {
+         if (b_use_full_space)
+            strcat(tt, " 　 ");
+         else
+            strcat(tt, "   ");
+      }
     }
   }
 
@@ -1012,8 +1016,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       pselkey=ptr_selkey(key);
 
 
-      if ((key < 32 || key > 0x7e) && (gtab_full_space_auto_first||spc_pressed)) {
-//        dbg("sel1st_i:%d  '%c'\n", sel1st_i, seltab[sel1st_i][0]);
+      if (!pselkey && (key < 32 || key > 0x7e) && (gtab_full_space_auto_first || spc_pressed)) {
+//        dbg("%x %x sel1st_i:%d  '%c'\n", pselkey, key, sel1st_i, seltab[sel1st_i][0]);
         if (seltab[sel1st_i][0])
           putstr_inp(seltab[sel1st_i]);  /* select 1st */
 
@@ -1023,8 +1027,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
       inkey=cur_inmd->keymap[key];
 
+//      dbg("spc_pressed %d %d %d\n", spc_pressed, last_full, cur_inmd->MaxPress);
+
 #if 1 // for dayi, testcase :  6 space keypad6
-      if ((spc_pressed||(wild_mode && (!inkey ||pendkey))) && pselkey) {
+      if (( (spc_pressed||last_full) ||(wild_mode && (!inkey ||pendkey))) && pselkey) {
         int vv = pselkey - cur_inmd->selkey;
 
         if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
@@ -1042,7 +1048,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 //      dbg("iii %x\n", pselkey);
       if (seltab[sel1st_i][0] && !wild_mode &&
-           (gtab_full_space_auto_first||spc_pressed)) {
+           (gtab_full_space_auto_first||spc_pressed||last_full) ) {
         putstr_inp(seltab[sel1st_i]);  /* select 1st */
       }
 
@@ -1150,7 +1156,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
        defselN);
 #endif
 
-XXXX:
   vmaskci = cur_inmd->key64 ? vmask64[ci]:vmask[ci];
 
   if ((CONVT2(cur_inmd, s1) & vmaskci)!=val || (wild_mode && defselN) ||
@@ -1254,6 +1259,8 @@ next_pg:
       }
     }
 
+    exa_match = defselN;
+
     if (j<e1 && CONVT2(cur_inmd, j)==val && defselN==cur_inmd->M_DUP_SEL) {
       pg_idx=j;
       more_pg=1;
@@ -1263,11 +1270,11 @@ next_pg:
       more_pg=1;
     }
 
-    if (defselN==1 && !more_pg) {
-      if (ci==cur_inmd->MaxPress)
-        last_full=1;
+    if (ci==cur_inmd->MaxPress)
+      last_full=1;
 
-      if (spc_pressed || gtab_press_full_auto_send) {
+    if (defselN==1 && !more_pg) {
+      if (spc_pressed || (gtab_press_full_auto_send && last_full)) {
         putstr_inp(seltab[0]);
         return 1;
       }
@@ -1278,7 +1285,7 @@ next_pg:
       goto refill;
     } else
     if (!more_pg) {
-      if (gtab_dup_select_bell && (gtab_full_space_auto_first || spc_pressed))
+      if (gtab_dup_select_bell && (gtab_full_space_auto_first || spc_pressed || last_full))
         bell();
     }
   }

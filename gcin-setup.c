@@ -141,40 +141,48 @@ static void cb_ts_import()
    gtk_widget_show(file_selector);
 }
 
+static char utf8_edit[]=GCIN_SCRIPT_DIR"/utf8-edit";
 
 static void cb_ts_edit()
 {
-  system("( cd ~/.gcin && tsd2a tsin > tmpfile && gedit tmpfile && tsa2d tmpfile ) &");
+  char tt[512];
+
+  sprintf(tt, "( cd ~/.gcin && tsd2a tsin > tmpfile && %s tmpfile && tsa2d tmpfile ) &", utf8_edit);
+  system(tt);
+}
+
+
+static void cb_alt_shift()
+{
+  char tt[512];
+
+  sprintf(tt, "( cd ~/.gcin && %s phrase.table ) &", utf8_edit);
+  system(tt);
+}
+
+
+static void cb_symbol_table()
+{
+  char tt[512];
+
+  sprintf(tt, "( cd ~/.gcin && %s symbol-table ) &", utf8_edit);
+  system(tt);
+}
+
+
+int utf8_editor(char *fname)
+{
+  char tt[256];
+
+  sprintf(tt, "%s %s", utf8_edit, fname);
+  dbg("%s\n", tt);
+  return system(tt);
 }
 
 
 static void cb_help()
 {
-  char *editors[] = { "gedit", "kedit", "kate", NULL };
-  char cmd[512];
-  char **p;
-
-  for (p= editors; *p; p++) {
-    char tt[64];
-
-    sprintf(tt, "/usr/bin/%s", *p);
-    if (access(tt, X_OK))
-      break;
-
-    sprintf(tt, "/usr/local/bin/%s", *p);
-    if (access(tt, X_OK))
-      break;
-  }
-
-  if (! *p) {
-    dbg("cannot invoke any editors %s", getenv("PATH"));
-    abort();
-  }
-
-
-  sprintf(cmd, "export LC_CTYPE=zh_TW.UTF-8; %s %s/README &", *p, DOC_DIR);
-  dbg("cmd %s\n", cmd);
-  system(cmd);
+  utf8_editor(DOC_DIR"/README");
 }
 
 struct {
@@ -577,6 +585,18 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox), button_ts_edit, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_ts_edit), "clicked",
                     G_CALLBACK (cb_ts_edit), NULL);
+
+
+  GtkWidget *button_alt_shift = gtk_button_new_with_label("alt-shift 片語編輯");
+  gtk_box_pack_start (GTK_BOX (vbox), button_alt_shift, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_alt_shift), "clicked",
+                    G_CALLBACK (cb_alt_shift), NULL);
+
+  GtkWidget *button_symbol_table = gtk_button_new_with_label("符號表編輯");
+  gtk_box_pack_start (GTK_BOX (vbox), button_symbol_table, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_symbol_table), "clicked",
+                    G_CALLBACK (cb_symbol_table), NULL);
+
 
   GtkWidget *button_about = gtk_button_new_with_label("關於 gcin");
   gtk_box_pack_start (GTK_BOX (vbox), button_about, TRUE, TRUE, 0);

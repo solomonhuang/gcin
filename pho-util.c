@@ -88,6 +88,8 @@ int utf8_pho_keys(char *big5, phokey_t *phkeys)
   int ofs=0;
   int phkeysN=0;
 
+  phkeys[0];
+
   do {
     for(; ofs < ch_phoN; ofs++)
       if (!bchcmp(big5, ch_pho[ofs].ch))

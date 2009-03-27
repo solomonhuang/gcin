@@ -13,40 +13,49 @@ typedef struct {
 
 static SYM_ROW *syms;
 static int symsN;
-static time_t file_modify_time;
 
 extern char *TableDir;
 static GtkWidget *win_syms[MAX_GTAB_NUM_KEY+1];
+
+FILE *watch_fopen(char *filename, time_t *pfile_modify_time)
+{
+  FILE *fp;
+  char fname[256];
+
+  if (!getenv("GCIN_TABLE_DIR"))
+    get_gcin_user_fname(filename, fname);
+  else
+    get_sys_table_file_name(filename, fname);
+
+  if ((fp=fopen(fname, "r"))==NULL) {
+    strcat(strcat(strcpy(fname, TableDir), "/"), filename);
+
+    if ((fp=fopen(fname, "r"))==NULL)
+     return NULL;
+  }
+
+  struct stat st;
+  fstat(fileno(fp), &st);
+
+  if (st.st_mtime == *pfile_modify_time) {
+    fclose(fp);
+    return NULL;
+  }
+
+  *pfile_modify_time = st.st_mtime;
+  return fp;
+}
+
 
 static gboolean read_syms()
 {
   FILE *fp;
   char fname[256];
   static char symbol_table[] = "symbol-table";
+  static time_t file_modify_time;
 
-  if (!getenv("GCIN_TABLE_DIR"))
-    get_gcin_user_fname(symbol_table, fname);
-  else
-    get_sys_table_file_name(symbol_table, fname);
-
-  if ((fp=fopen(fname, "r"))==NULL) {
-    strcat(strcat(strcpy(fname, TableDir), "/"), symbol_table);
-
-    if ((fp=fopen(fname, "r"))==NULL)
-     return FALSE;
-  }
-
-  struct stat st;
-  fstat(fileno(fp), &st);
-
-  if (file_modify_time) {
-    if (st.st_mtime == file_modify_time) {
-      fclose(fp);
-      return FALSE;
-    }
-  }
-
-  file_modify_time = st.st_mtime;
+  if ((fp=watch_fopen(symbol_table, &file_modify_time))==NULL)
+    return FALSE;
 
   int i;
   for(i=0; i < symsN; i++) {
@@ -110,9 +119,6 @@ static void cb_button_sym(GtkButton *button, char *str)
   int len = strlen(str);
 
   bzero(pho, sizeof(pho));
-  int i;
-  for(i=0; i < len; i+=CH_SZ)
-    utf8_pho_keys(str+i, &pho[i/CH_SZ]);
 
   if (current_CS->in_method == 6)
     add_to_tsin_buf(str, pho, strlen(str) / CH_SZ);
