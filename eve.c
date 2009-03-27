@@ -172,6 +172,8 @@ void move_win_int(int x, int y);
 void move_win0(int x, int y);
 void move_win_pho(int x, int y);
 
+static int current_in_win_x, current_in_win_y;
+
 void move_in_win(ClientState *cs, int x, int y)
 {
   if (!cs) {
@@ -184,6 +186,10 @@ void move_in_win(ClientState *cs, int x, int y)
 #if DEBUG || 0
   dbg("move_in_win %d %d\n",x, y);
 #endif
+  if (current_in_win_x == x && current_in_win_y == y)
+    return;
+
+  current_in_win_x = x ; current_in_win_y == y;
 
   switch (cs->in_method) {
     case 3:

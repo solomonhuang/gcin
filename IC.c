@@ -218,11 +218,10 @@ void load_IC(IC *rec)
      cs->input_style = InputStyleOverSpot;
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
-   }
-
+   } else
    if (cs->input_style & InputStyleRoot) {
      cs->input_style = InputStyleRoot;
-     update_in_win_pos();
+//     update_in_win_pos();
      move_IC_in_win(cs);
    }
 }

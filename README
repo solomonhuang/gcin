@@ -1,5 +1,5 @@
 # UTF-8 encoding, please use editors that can support UTF-8 encoding like gedit.
- 
+
 Mandrake
   urpmi gcin-0.X.X-liu_mdk.i586.rpm
   or
@@ -7,21 +7,20 @@ Mandrake
 
 
 如果是用 Mandrake,  rpm install 完成之後會自動修改
-   /etc/X11/xinit/XIM 
- 在 login 時會執行 gcin 而不是 xcin。 原來的 /etc/X11/xinit/XIM rename 成 
+   /etc/X11/xinit/XIM
+ 在 login 時會執行 gcin 而不是 xcin。 原來的 /etc/X11/xinit/XIM rename 成
 /etc/X11/xinit/XIM/XIM.orig.gcin
 在 'rpm -e' uninstall 解除安裝時不會自動還原.
 
 在 Mandrake 10.1 中，會自動修改 /etc/sysconfig/i18n & /usr/X11R6/bin/crxvt 把原來給 SCIM 用的設定改成
 給 gcin 用。
 
-其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X 
-中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin 
+其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X
+中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin
 
 ---------------------
 Fedora rpms
 
-http://linux.nchc.org.tw/fedora/apt/fedora/linux/3/i386/RPMS.drbl-extra/
 ftp://cle.linux.org.tw/apt/heidelberg/Fedora/RPMS.cle/
 
 -------------------
@@ -41,7 +40,7 @@ su as root
 logout & login
 
 由 .tar.bz2 需要 install libgtk+2.0_0-devel 這個 .rpm，不過各家的名字可能不太一樣，可能要找一下。另外，你還需要 install pkg-config 這個 .rpm 。
- 
+
 -----------------
 
 設定 gcin:
@@ -55,7 +54,7 @@ logout & login
 (取發音的第一個注音符號 + 輕聲(‧) or 1/2/3/輕 聲)
 (如果要輸入注音符號, 就按向下鍵或空白鍵去選)
 
-  
+
   ㄐ    。  (句點)
   ㄉ    ，  (逗號)
   ㄇ    ：  (冒號)
@@ -74,14 +73,14 @@ logout & login
   ㄣˋ   」
   ㄌ2   –    (連接號)
   ㄇ3   《    (書'名'號)
-  ㄇ4    》  
+  ㄇ4    》
   ㄌ     …   (省'略'號)
   ㄆ4    —   (破折號)
   ㄒ     ℃   (攝氏 Celsius)
   ㄒ2    ㏄  (毫升)
   ㄍ‧ ♂   (公)
-  ㄇ‧ ♀   (母) 
- 
+  ㄇ‧ ♀   (母)
+
 
 酷音輸入 的 shift + ",./;'" 也可以用
 現在滑鼠的指標移到符號視窗的按鈕，約一秒鐘會顯示對應的注音按鍵提示，方便學習。
@@ -94,7 +93,7 @@ logout & login
   cd ~/.gcin
   phod2a pho.tab > pho.tab.src  (轉成文字檔)
   gedit pho.tab.src
-  phoa2d pho.tab.src            (轉成 gcin 的 pho.tab)  
+  phoa2d pho.tab.src            (轉成 gcin 的 pho.tab)
 -------------------------
 由於 '一' 與 '不' 同音字詞過多,  輸入此兩字的注音應該以口語發音為主.
 譬如,輸入 '不會', '不'應該輸入第2聲.
@@ -115,9 +114,9 @@ logout & login
 只要字有在注音表內就可以存成詞，請參考前面的說明，但目前不支援半型字。
 
 ----------------------
-為什麼有時候gcin的輸入視窗不會跟著程式的游標 ? 這是因為有些程式只支援 root 
-input style, 
-程式不會回報游標所在位置。 像用 GTK2/Gnome2 開發的程式都有這個問題. 目前 gcin 
+為什麼有時候gcin的輸入視窗不會跟著程式的游標 ? 這是因為有些程式只支援 root
+input style,
+程式不會回報游標所在位置。 像用 GTK2/Gnome2 開發的程式都有這個問題. 目前 gcin
 的視窗是擺在滑鼠指標所在的位置. 這樣好像比目前 xcin 的方式容易使用。
 你可以按輸入視窗中的圖釘來固定或解除固定視窗。
 
@@ -141,7 +140,7 @@ http://moto.debian.org.tw/viewtopic.php?t=5311
 -----------------------------------
 如何在非 gnome environment(如 KDE) 修改 gcin 顯示的 button 外觀
 
-  執行  gnome-theme-manager 可以選擇主題, 修改外觀. 但是必須在 KDE startup 
+  執行  gnome-theme-manager 可以選擇主題, 修改外觀. 但是必須在 KDE startup
 script 中執行 gnome-settings-daemon.
 -----------------------------------------
 把 gcin 一類的 XIM server kill 掉再重新啟動，容易造成 X window 底下程式運作
@@ -168,7 +167,7 @@ export XMODIFIERS=@im=gcin_test
 mv file.cin file.cin.big5
 iconv -f big5 -t utf-8 file.cin.big5 > file.cin
 
-執行 
+執行
 $ gcin2tab file
 # cp *.gtab /usr/share/gcin/table
 
@@ -234,7 +233,7 @@ gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
       export XMODIFIERS=@im=$GCIN_XIM.UTF-8
       gedit
 
-  這樣 gcin 會自動多一個 zh_TW.UTF-8 的 XIM server，在上面一個例子中， crxvt 是用 zh-TW.Big5，  
+  這樣 gcin 會自動多一個 zh_TW.UTF-8 的 XIM server，在上面一個例子中， crxvt 是用 zh-TW.Big5，
   gedit 是用 zh_TW.UTF-8，export XMODIFIERS=@im=xcin.UTF-8，這個 gedit 就可以以注音輸入(方方土)，
   如果你想要把 這個功能關掉，可以用，
       export GCIN_DUAL_XIM_OFF=
@@ -251,7 +250,7 @@ gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
       export LC_ALL=zh_TW.Big5
       export XMODIFIERS=@im=$GCIN_XIM.Big5
       gedit
- 
+
 ------------------------------------------------
 如何使用 utf8 encoding  : 使用單一 XIM
 export GCIN_DUAL_XIM_OFF=
@@ -297,7 +296,7 @@ gedit
     install gcin 0.4.0， 接著匯入詞庫，file name 是 tsin.src.utf-8
 - 如果已經執行 0.4.0 想還原成原來的資料(在 ~/.gcin.big5)，請重新 install 0.3.x 並執行以下動作
     rm -fr .gcin
-    mv .gcin.big5 .gcin      
+    mv .gcin.big5 .gcin
     接下來就可以做上述的 匯出詞庫 & encoding 轉換動作。
 ----------------------------------------------
 gtab(倉頡、行列) 輸入法中要如何加入新詞？
@@ -374,7 +373,7 @@ r 指令會開始執行 gcin， 掛了之後，
 #5  0x404212e7 in g_main_loop_get_context () from /usr/lib/libglib-2.0.so.0
 ------------------------------------------------------------------------------------------------------
 GTK_IM_MODULE 使用 gcin 自己的 .so，和XIM相比，有何好處？
-  1. gcin 掛掉重新執行時比較不會有程式跟著一起掛掉的情形，現在可以直接在 gnome-terminal 下 
+  1. gcin 掛掉重新執行時比較不會有程式跟著一起掛掉的情形，現在可以直接在 gnome-terminal 下
       'pkill gcin'，不用擔心 gnome-terminal 會停在那邊不動 (mozilla-gtk2 除外)。
   2. GTK2 的程式 locale 即使設定成 zh_TW.Big5 也還是可以輸入所有的 UTF-8 字。
   3. 詞音由於現在有了 key release event，現在也可以用 Shift 來切換中/英。
@@ -392,12 +391,12 @@ gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000�
 雖然目前是用很簡單的 encoding，如果 gcin 搭配 ssh X11 forwarding 應該是非常安全的。
 而且 data 不像 SSL 會變大，更適合在 low bandwidth 使用。
 
-目前只支援 GTK2，但是 gcin 有提供非常容易使用的 API 介面供其他 terminal & QT_IM_MODULE 
+目前只支援 GTK2，但是 gcin 有提供非常容易使用的 API 介面供其他 terminal & QT_IM_MODULE
 使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
 
 gcin 如果使用到自己的 IM_MODULE 時，且用 export GCIN_CONNECT_MSG_ON=
 tty (console) 會出現以下 message
-a. connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin   
+a. connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin
 或是
 b.  gcin client connected to server 172.x.x.x:9999
 
@@ -413,9 +412,9 @@ http://www.csie.nctu.edu.tw/~cp76/linux/rxvt-gcin.tbz 是一個使用 gcin IM cl
 如何 build 自己的 gcin rpm？
 
 首先 create build dir/file
- 
+
 你可執行 .tar.bz2 內的 gcin-0.x.x/setup-rpm，這個 shell script 會幫你把 environment 設定好。
- 
+
 cp gcin-x.x.x.tar.bz2 ~/rpm/SOURCES
 
 在 gcin-x.x.x
