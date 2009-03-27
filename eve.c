@@ -27,16 +27,9 @@ void send_text_call_back(char *text)
   send_fake_key_eve();
 }
 
-
-InputStyle_E current_input_style;
 ClientState *current_CS;
 
 gboolean init_in_method(int in_no);
-
-void set_current_input_style(InputStyle_E style)
-{
-  current_input_style = style;
-}
 
 char *output_buffer;
 int  output_bufferN, output_bufferN_a;
@@ -214,7 +207,7 @@ void move_IC_in_win(ClientState *rec);
 
 void update_in_win_pos()
 {
-  if (current_input_style == InputStyleRoot) {
+  if (current_CS && current_CS->input_style == InputStyleRoot) {
     Window r_root, r_child;
     int winx, winy, rootx, rooty;
     u_int mask;
@@ -228,7 +221,6 @@ void update_in_win_pos()
 #if DEBUG
       dbg("update_in_win_pos\n");
 #endif
-
       if (inpwin) {
         int tx, ty;
         Window ow;
@@ -262,7 +254,6 @@ void toggle_im_enabled(u_int kev_state)
     static u_int orig_caps_state;
 
     if (current_CS->b_im_enabled) {
-
       if (current_CS->in_method== 6 && (kev_state & LockMask) != orig_caps_state &&
           tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
         KeyCode caps = XKeysymToKeycode(dpy, XK_Caps_Lock);
@@ -430,10 +421,10 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     return TRUE;
   }
 
-  if ((keysym == XK_Control_L || keysym == XK_Control_R)
-                   && (kev_state & ShiftMask) ||
-      (keysym == XK_Shift_L || keysym == XK_Shift_R)
-                   && (kev_state & ControlMask)) {
+  if (((keysym == XK_Control_L || keysym == XK_Control_R)
+                   && (kev_state & ShiftMask)) ||
+      ((keysym == XK_Shift_L || keysym == XK_Shift_R)
+                   && (kev_state & ControlMask))) {
      cycle_next_in_method();
      return TRUE;
   }
@@ -463,7 +454,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   return FALSE;
 }
 
-
+int feedkey_pp_release(KeySym xkey, int kbstate);
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)

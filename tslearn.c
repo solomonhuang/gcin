@@ -253,9 +253,9 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
 
   char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
   strcpy(current_str, utf8);
-  g_free(utf8);
 
   int current_strN = strlen(utf8);
+  g_free(utf8);
 
   bigphoN = 0;
   int i;

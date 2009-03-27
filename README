@@ -109,6 +109,9 @@ http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
 mozilla gtk2-ft 有什麼優點，用 GTK2 的優點就是與系統的主題(theme) 完全整合，比較漂亮，
 而且 GTK1 完全不用了之後，比較節省 memory。
 
+Firefox over-the-spot 支援可以看下面的 link download .so
+http://moto.debian.org.tw/viewtopic.php?t=5311
+
 ----------------------------
 在詞音中按 control-u 可以把整個編輯區的內容清除。
 -----------------------------------
@@ -203,7 +206,7 @@ gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
   如果你想要把 這個功能關掉，可以用，
       export GCIN_DUAL_XIM_OFF=
 
-  上面的例子是 Big5 為主，底下的範例是 UTF-8 為主，主要差別就在 xport XMODIFIERS=@im= 部份。
+  上面的例子是 Big5 為主，底下的範例是 UTF-8 為主，主要差別就在 export XMODIFIERS=@im= 部份。
 
       export GCIN_XIM=xcin
       export LC_ALL=zh_TW.UTF-8
@@ -354,11 +357,14 @@ gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000。
 目前只支援 GTK2，但是 gcin 有提供非常容易使用的 API 介面供其他 terminal & QT_IM_MODULE 
 使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
 
-
 gcin 如果使用到自己的 IM_MODULE 時，tty (console) 會出現以下 message
 a. connect to unix socket addr /tmp/gcin-????/socket-:0.0-xcin   
 或是
 b.  gcin client connected to server 172.x.x.x:9999
 
 只需要一個 gcin 執行就可以，不需要為了同時支援 GTK_IM_MODULE & XIM 而執行兩個 gcin process。
+
+目前 OpenOffice GTK2 的版本好像仍然是使用 XIM。
+
+http://www.csie.nctu.edu.tw/~cp76/linux/mrxvt.tbz 是一個使用 gcin IM client 的 mrxvt。
 ------------------------------------------------------------------------------------------------------

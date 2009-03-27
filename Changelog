@@ -1,3 +1,13 @@
+0.6.1:
+- 詞音如果編輯區內有文字時，向上鍵現在不會移動到應用程式的游標位置。感謝  garychang.bbs@bbs.ee.ttu.edu.tw, PCMan.bbs@bbs.sayya.org 提供的 patch 。
+- GTK_IM_MODULE connection 沒有 closed 的問題。
+- 設定 GTK_IM_MODULE=gcin 有時會跑到 ROOT input style 的問題，gcin 視窗不會跟著 cursor 移動。
+- gcin-setup 中加上 gedit --encoding big5 README 以避免在 UTF-8 環境下， gedit 顯示出亂碼。
+- tslearn 有時候按 Add 會有問題。
+- 選擇 .tar.bz2 install 者，由於 少了 
+     cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib 
+  這一個步驟，GTK_IM_MODULE=gcin 會有問題。
+
 0.6.0:
 - gcin-setup OK button 改成 gnome 的 icon。
 - 注音 "性問" 的問題，感謝 PCMan.bbs@bbs.sayya.org 回報問題，這是詞庫資料的問題，'免'這個字的注音有問題。

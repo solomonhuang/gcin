@@ -90,11 +90,13 @@ void process_client_req(int fd)
   else {
     cs = gcin_clients[fd].cs;
 
-    if (!cs)
+    if (!cs) {
       cs = gcin_clients[fd].cs = tzmalloc(ClientState, 1);
+    }
 
     cs->client_win = req.client_win;
     cs->b_gcin_protocol = TRUE;
+    cs->input_style = InputStyleOverSpot;
   }
 
   if (!cs)

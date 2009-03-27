@@ -155,7 +155,6 @@ static void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
 
 void move_in_win(ClientState *cs, int x, int y);
 void show_in_win(ClientState *cs);
-void set_current_input_style(InputStyle_E style);
 extern Window focus_win;
 
 void move_IC_in_win(ClientState *cs)
@@ -210,14 +209,14 @@ void load_IC(IC *rec)
 #endif
 
    if (cs->input_style & XIMPreeditCallbacks) {
-     set_current_input_style(InputStyleOnSpot);
+     cs->input_style = InputStyleOnSpot;
 #if 0
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
 #endif
    } else
    if (cs->input_style & XIMPreeditPosition) {
-     set_current_input_style(InputStyleOverSpot);
+     cs->input_style = InputStyleOverSpot;
 #if 1
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
@@ -226,7 +225,7 @@ void load_IC(IC *rec)
 
    if (cs->input_style & XIMPreeditNothing) {
 #if 1
-     set_current_input_style(InputStyleRoot);
+     cs->input_style = InputStyleRoot;
      move_IC_in_win(cs);
 #endif
    }

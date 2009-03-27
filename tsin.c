@@ -1222,8 +1222,11 @@ int feedkey_pp(KeySym xkey, int kbstate)
         disp_ph_sta();
         return 1;
      case XK_Up:
-       if (!sel_pho)
+       if (!sel_pho) {
+         if (c_len)
+           return 1;
          return 0;
+       }
 
        current_page = current_page - phkbm.selkeyN;
        if (current_page < 0)

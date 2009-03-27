@@ -1,6 +1,6 @@
 include ../config.mak
 
-SCRIPTS=gcin-user-setup gcin-utf8-setup
+SCRIPTS=gcin-user-setup gcin-utf8-setup modify-XIM
 
 all:	$(SCRIPTS)
 

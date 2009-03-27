@@ -365,14 +365,14 @@ void create_gtablist_window (void)
   hbox = gtk_hbox_new (TRUE, 4);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_OK);
-  g_signal_connect (G_OBJECT (button), "clicked",
-                    G_CALLBACK (cb_ok), model);
-  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
-
   button = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_cancel), treeview);
+  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+
+  button = gtk_button_new_from_stock (GTK_STOCK_OK);
+  g_signal_connect (G_OBJECT (button), "clicked",
+                    G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 360, 350);

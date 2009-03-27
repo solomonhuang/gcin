@@ -138,6 +138,13 @@ reinitialize_all_ics (GtkGCINInfo *info)
     reinitialize_ic (tmp_list->data);
 }
 
+static void gcin_display_closed (GdkDisplay *display,
+			 gboolean    is_error,
+			 GCIN_client_handle *gcin_ch)
+{
+  gcin_im_client_close(gcin_ch);
+}
+
 
 static GtkGCINInfo *
 get_im (GtkIMContextGCIN *context_xim)
@@ -146,6 +153,7 @@ get_im (GtkIMContextGCIN *context_xim)
   GSList *tmp_list;
   GtkGCINInfo *info;
   GdkScreen *screen = gdk_drawable_get_screen (client_window);
+  GdkDisplay *display = gdk_screen_get_display (screen);
 
   info = g_new (GtkGCINInfo, 1);
   open_ims = g_slist_prepend (open_ims, info);
@@ -161,6 +169,9 @@ get_im (GtkIMContextGCIN *context_xim)
   if (!context_xim->gcin_ch) {
     if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
       perror("cannot open gcin_ch");
+
+    g_signal_connect (display, "closed",
+                      G_CALLBACK (gcin_display_closed), context_xim->gcin_ch);
   }
 
   return info;
@@ -204,7 +215,11 @@ gtk_im_context_gcin_finalize (GObject *obj)
 
   context_xim->finalizing = TRUE;
 
-  set_ic_client_window (context_xim, NULL);
+  if (context_xim->gcin_ch) {
+    gcin_im_client_close(context_xim->gcin_ch);
+    context_xim->gcin_ch = NULL;
+  }
+//  set_ic_client_window (context_xim, NULL);
 }
 
 static void

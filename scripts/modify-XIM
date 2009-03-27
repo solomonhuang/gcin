@@ -72,3 +72,6 @@ if [ $? = 0 ]; then
   chmod 755 crxvt
 fi
 
+# install gtk IM module
+cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib
+cp gtk.immodules.lib gtk.immodules
