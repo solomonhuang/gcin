@@ -30,6 +30,7 @@ char *half_char_to_full_char(KeySym xkey)
 
 
 void create_win0();
+void create_win1(), create_win_gtab(),create_win_pho();
 extern Window xwin0, xwin1, xwin_gtab, xwin_pho;
 void start_inmd_window()
 {
@@ -98,16 +99,16 @@ IMProtocol *current_call_data;
 extern void toggle_im_enabled();
 
 
-MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
+int MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
 {
 //    dbg("MyTriggerNotifyHandler %d %x\n", call_data->key_index, call_data->event_mask);
 
     if (call_data->flag == 0) { /* on key */
-//        dbg("trigger %d\n", call_data->key_index);
-        if (call_data->key_index == 0 && gcin_im_toggle_keys==Control_Space ||
-            call_data->key_index == 3 && gcin_im_toggle_keys==Shift_Space ||
-            call_data->key_index == 6 && gcin_im_toggle_keys==Alt_Space ||
-            call_data->key_index == 9 && gcin_im_toggle_keys==Windows_Space
+//        db(g("trigger %d\n", call_data->key_index);
+        if ((call_data->key_index == 0 && gcin_im_toggle_keys==Control_Space) ||
+            (call_data->key_index == 3 && gcin_im_toggle_keys==Shift_Space) ||
+            (call_data->key_index == 6 && gcin_im_toggle_keys==Alt_Space) ||
+            (call_data->key_index == 9 && gcin_im_toggle_keys==Windows_Space)
             ) {
             toggle_im_enabled();
         }
@@ -118,6 +119,11 @@ MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
     }
 }
 
+void switch_IC_index(int index);
+void CreateIC(IMChangeICStruct *call_data);
+void DeleteIC(CARD16 icid);
+void SetIC(IMChangeICStruct * call_data);
+void GetIC(IMChangeICStruct *call_data);
 
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {

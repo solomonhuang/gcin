@@ -99,9 +99,7 @@ IC *FindIC(CARD16 icid)
     return NULL;
 }
 
-void
-DeleteIC(icid)
-CARD16 icid;
+void DeleteIC(CARD16 icid)
 {
     IC *rec, *last;
 
@@ -351,9 +349,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 #endif
 }
 
-void
-CreateIC(call_data)
-IMChangeICStruct *call_data;
+void CreateIC(IMChangeICStruct *call_data)
 {
     IC *rec;
 
@@ -394,9 +390,7 @@ void SetIC(IMChangeICStruct * call_data)
     return;
 }
 
-void
-GetIC(call_data)
-IMChangeICStruct *call_data;
+void GetIC(IMChangeICStruct *call_data)
 {
     XICAttribute *ic_attr = call_data->ic_attr;
     XICAttribute *pre_attr = call_data->preedit_attr;

@@ -28,6 +28,8 @@ static int sel1st_i = MAX_SELKEY - 1;
 static int wild_mode;
 static int wild_page;
 
+#define gtab_full_space_auto_first (gtab_space_auto_first & (GTAB_space_auto_first_any|GTAB_space_auto_first_full))
+
 /* for array30-like quick code */
 static char keyrow[]=
 	      "qwertyuiop"
@@ -175,6 +177,7 @@ static void ClrIn()
   bzero(seltab,sizeof(seltab));
   m_pg_mode=pg_idx=more_pg=wild_mode=wild_page=last_idx=defselN=
   spc_pressed=ci=0;
+
   sel1st_i=MAX_SELKEY-1;
 }
 
@@ -633,7 +636,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         ClrInArea();
         ClrIn();
         return 1;
-      } else return 0;
+      } else
+        return 0;
     case '<':
       if (wild_mode) {
         if (wild_page>=10) wild_page-=10;
@@ -653,12 +657,17 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       if (more_pg) {
         j=pg_idx;
         goto next_pg;
-      } else
-      if (seltab[sel1st_i][0]) {
-//        dbg("last_full %d %d\n", last_full,spc_pressed);
-        if ((gtab_full_space_auto_first || spc_pressed)) {
-          putstr_inp((u_char *)&seltab[sel1st_i]);  /* select 1st */
-          return 1;
+      } else {
+        if (gtab_space_auto_first == GTAB_space_auto_first_any && seltab[0] &&
+            sel1st_i==MAX_SELKEY-1)
+          sel1st_i = 0;
+
+        if (seltab[sel1st_i][0]) {
+//          dbg("last_full %d %d\n", last_full,spc_pressed);
+          if (gtab_full_space_auto_first || spc_pressed) {
+            putstr_inp((u_char *)&seltab[sel1st_i]);  /* select 1st */
+            return 1;
+          }
         }
       }
 

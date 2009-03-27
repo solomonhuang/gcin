@@ -1,4 +1,5 @@
 #include "gcin.h"
+#include "gtab.h"
 
 
 static struct {
@@ -16,9 +17,10 @@ static struct {
 };
 
 static GtkWidget *check_button_phrase_pre_select, *check_button_gtab_dup_select_bell,
-                 *check_button_gtab_full_space_auto_first,
                  *check_button_gtab_auto_select_by_phrase,
                  *check_button_gtab_pre_select;
+
+static GtkWidget *opt_spc_opts;
 
 static char *tsin_eng_ch_sw[]={
   "CapsLock",
@@ -42,14 +44,13 @@ static gboolean close_application( GtkWidget *widget,
 }
 
 void save_gcin_conf_str(char *name, char *str);
+void save_gcin_conf_int(char *name, int val);
+void send_gcin_message(Display *dpy, char *s);
 
 static gboolean cb_ok( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
-  FILE *fp;
-  char fname[256];
-
   save_gcin_conf_str("phonetic-keyboard", kbm_sel[new_select_idx].kbm);
   save_gcin_conf_str("tsin-chinese-english-switch", tsin_eng_ch_sw[new_select_idx_tsin_sw]);
   save_gcin_conf_int("tsin-phrase-pre-select",
@@ -58,6 +59,8 @@ static gboolean cb_ok( GtkWidget *widget,
   send_gcin_message(GDK_DISPLAY(), "reload kbm");
 
   gtk_widget_destroy(gcin_kbm_window); gcin_kbm_window = NULL;
+
+  return TRUE;
 }
 
 
@@ -72,6 +75,7 @@ static void callback_button_clicked_tsin_sw( GtkWidget *widget, gpointer data)
   new_select_idx_tsin_sw = (int) data;
 }
 
+void get_gcin_conf_str(char *name, char rstr[], char *default_str);
 
 static int get_current_kbm_idx()
 {
@@ -84,7 +88,7 @@ static int get_current_kbm_idx()
       return i;
 
   p_err("phonetic-keyboard->%s is not valid", kbm_str);
-
+  return -1;
 }
 
 static int get_currnet_eng_ch_sw_idx()
@@ -98,6 +102,7 @@ static int get_currnet_eng_ch_sw_idx()
       return i;
 
   p_err("tsin-chinese-english-switch->%s is not valid", swkey);
+  return -1;
 }
 
 static gboolean get_current_tsin_phrase_pre_select()
@@ -113,8 +118,10 @@ static gboolean close_kbm_window( GtkWidget *widget,
                                    gpointer   data )
 {
   gtk_widget_destroy(gcin_kbm_window); gcin_kbm_window = NULL;
+  return TRUE;
 }
 
+void load_setttings();
 
 void create_kbm_window()
 {
@@ -242,7 +249,7 @@ static void create_result_win(int res)
 
 
 
-static cb_file_ts_export(GtkWidget *widget, gpointer user_data)
+static void cb_file_ts_export(GtkWidget *widget, gpointer user_data)
 {
    GtkWidget *file_selector = (GtkWidget *)user_data;
    const gchar *selected_filename;
@@ -284,7 +291,7 @@ static void cb_ts_export()
    gtk_widget_show(file_selector);
 }
 
-static cb_file_ts_import(GtkWidget *widget, gpointer user_data)
+static void cb_file_ts_import(GtkWidget *widget, gpointer user_data)
 {
    GtkWidget *file_selector = (GtkWidget *)user_data;
    const gchar *selected_filename;
@@ -339,6 +346,15 @@ static void cb_help()
   system(cmd);
 }
 
+struct {
+  char *str;
+  int num;
+} spc_opts[] = {
+  {"按空白立即送出第一字(嘸蝦米)", GTAB_space_auto_first_any},
+  {"按滿按空白送出第一字(內定)", GTAB_space_auto_first_full},
+  {"按滿按空白不送出第一字(Windows 行列)", GTAB_space_auto_first_nofull},
+  { NULL, 0},
+};
 
 static GtkWidget *spinner;
 
@@ -354,17 +370,19 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_DUP_SELECT_BELL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_dup_select_bell)));
 
-  save_gcin_conf_int(GTAB_FULL_SPACE_AUTO_FIRST,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_full_space_auto_first)));
-
   save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_auto_select_by_phrase)));
 
   save_gcin_conf_int(GTAB_PRE_SELECT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_pre_select)));
 
+  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
+  save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
+
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
   gtk_widget_destroy(gcin_win0_conf_window); gcin_win0_conf_window = NULL;
+
+  return TRUE;
 }
 
 static gboolean close_win0_conf_window( GtkWidget *widget,
@@ -372,6 +390,38 @@ static gboolean close_win0_conf_window( GtkWidget *widget,
                                    gpointer   data )
 {
   gtk_widget_destroy(gcin_win0_conf_window); gcin_win0_conf_window = NULL;
+  return TRUE;
+}
+
+
+
+
+static GtkWidget *create_spc_opts()
+{
+
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+  GtkWidget *label = gtk_label_new("空白鍵選項");
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+
+  opt_spc_opts = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_spc_opts, FALSE, FALSE, 0);
+  GtkWidget *menu_spc_opts = gtk_menu_new ();
+
+  int i, current_idx=0;
+
+  for(i=0; spc_opts[i].str; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (spc_opts[i].str);
+
+    if (spc_opts[i].num == gtab_space_auto_first)
+      current_idx = i;
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_spc_opts), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_spc_opts), menu_spc_opts);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_spc_opts), current_idx);
+
+  return hbox;
 }
 
 
@@ -421,17 +471,7 @@ void create_win0_conf_window()
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_dup_select_bell),
        gtab_dup_select_bell);
 
-
-    GtkWidget *hbox_gtab_full_space_auto_first = gtk_hbox_new (FALSE, 10);
-    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_full_space_auto_first, FALSE, FALSE, 0);
-    GtkWidget *label_gtab_full_space = gtk_label_new("按滿空白自動選擇第一個");
-    gtk_box_pack_start (GTK_BOX (hbox_gtab_full_space_auto_first), label_gtab_full_space,  FALSE, FALSE, 0);
-    check_button_gtab_full_space_auto_first = gtk_check_button_new ();
-    gtk_box_pack_start (GTK_BOX (hbox_gtab_full_space_auto_first),check_button_gtab_full_space_auto_first,  FALSE, FALSE, 0);
-
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_full_space_auto_first),
-       gtab_full_space_auto_first);
-
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), create_spc_opts(), FALSE, FALSE, 0);
 
     GtkWidget *hbox_gtab_auto_select_by_phrase = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_auto_select_by_phrase, FALSE, FALSE, 0);
@@ -476,6 +516,7 @@ static void cb_win0_conf()
 }
 
 
+void create_gtablist_window();
 static void cb_default_input_method()
 {
   create_gtablist_window();
@@ -536,6 +577,8 @@ static void create_main_win()
 }
 
 
+void init_TableDir();
+
 int main(int argc, char **argv)
 {
   init_TableDir();
@@ -550,4 +593,6 @@ int main(int argc, char **argv)
   save_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 0);
 
   gtk_main();
+
+  return 0;
 }

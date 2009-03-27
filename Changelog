@@ -1,7 +1,10 @@
-0.4.9
+0.5.0:
+- 新增嘸蝦米空白按鍵的選項，但是用了以後就不會自動由詞來選字。
+
+0.4.9:
+- gtab(倉頡、行列、嘸蝦米等) 有時候會 coredump 的問題。感謝 Chung-Yen Chang 的協助。
 - Apply gtab X modifier patch from diadia.bbs@bbs.sayya.org
-- Bug in kbmcv.
-- gtab(倉頡、行列…等) 有時候會 coredump 的問題。
+- Bug in kbmcv，在 gcc 3.4 上不能 build。 Thanks to (GPC發行的FFC)
 
 0.4.8:
 - 新增(注音/詞音) 許式鍵盤、倚天26鍵及倚天26鍵-asdf 的支援
