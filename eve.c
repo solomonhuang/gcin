@@ -28,7 +28,7 @@ void send_text_call_back(char *text)
 }
 
 
-GtkWidget *win_syms[10];
+GtkWidget *win_syms[MAX_GTAB_NUM_KEY+1];
 
 InputStyle_E current_input_style;
 IC *current_IC;
@@ -44,10 +44,21 @@ void set_current_input_style(InputStyle_E style)
 void send_text(char *text)
 {
   XTextProperty tp;
+  extern gboolean b_send_utf8_str;
+  char outbuf[512];
+
+
+  if (pxim_arr->b_send_utf8_str) {
+    Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
+  } else {
+    utf8_big5(text, outbuf);
+    text = outbuf;
+    XmbTextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
+  }
+
 #if DEBUG
   dbg("sendkey_b5: %s\n", text);
 #endif
-  XmbTextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
 
   ((IMCommitStruct*)current_forward_eve)->flag |= XimLookupChars;
   ((IMCommitStruct*)current_forward_eve)->commit_string = tp.value;
@@ -95,7 +106,7 @@ void hide_in_win(IC *ic)
 //      flush_tsin_buffer();
       hide_win0();
       break;
-    case 10:
+    case 0:
       hide_win_int();
       break;
     default:
@@ -120,7 +131,7 @@ void show_in_win(IC *ic)
     case 6:
       show_win0();
       break;
-    case 10:
+    case 0:
       show_win_int();
       break;
     default:
@@ -146,7 +157,7 @@ void move_in_win(IC *ic, int x, int y)
     case 6:
       move_win0(x, y);
       break;
-    case 10:
+    case 0:
       move_win_int(x, y);
       break;
     default:
@@ -167,7 +178,28 @@ void update_in_win_pos()
 
     XQueryPointer(dpy, root, &r_root, &r_child, &rootx, &rooty, &winx, &winy, &mask);
 
-    move_in_win(current_IC, winx+1, winy+1);
+    winx++; winy++;
+
+    if (current_IC) {
+      Window inpwin = current_IC->focus_win;
+#if DEBUG
+      dbg("update_in_win_pos\n");
+#endif
+      if (!inpwin)
+         inpwin = current_IC->client_win;
+
+      if (inpwin) {
+        int tx, ty;
+        Window ow;
+
+        XTranslateCoordinates(dpy, root, inpwin, winx, winy, &tx, &ty, &ow);
+
+        current_IC->pre_attr.spot_location.x = tx;
+        current_IC->pre_attr.spot_location.y = ty;
+      }
+    }
+
+    move_in_win(current_IC, winx, winy);
   } else {
     if (current_IC)
       move_IC_in_win(current_IC);
@@ -210,7 +242,7 @@ void update_active_in_win_geom()
       get_win0_geom();
     case 6:
       get_win0_geom();
-    case 10:
+    case 0:
       break;
     default:
       get_win_gtab_geom();
@@ -220,7 +252,13 @@ void update_active_in_win_geom()
 
 void toggle_half_full_char()
 {
-  current_IC->b_half_full_char ^= 1;
+
+  if (current_IC->in_method == 6)
+    tsin_toggle_half_full();
+  else {
+    current_IC->b_half_full_char ^= 1;
+    disp_gtab_half_full(current_IC->b_half_full_char);
+  }
 //  dbg("half full toggle\n");
 }
 
@@ -234,21 +272,19 @@ void init_in_method(int in_no)
     hide_in_win(current_IC);
 
 //  dbg("switch init_in_method %d\n", in_no);
+  current_IC->in_method = in_no;
+
   switch (in_no) {
     case 3:
-      current_IC->in_method = 3;
       init_tab_pho(True);
       break;
     case 6:
-      current_IC->in_method = 6;
       init_tab_pp(True);
       break;
     case 0:
-      current_IC->in_method = 10;
       init_inter_code(True);
       break;
     default:
-      current_IC->in_method = in_no;
       show_win_gtab();
       init_gtab(in_no, True);
       break;
@@ -261,7 +297,7 @@ void init_in_method(int in_no)
 gboolean feedkey_pho(KeySym xkey);
 gboolean feedkey_pp(KeySym xkey, int state);
 
-int ProcessKey()
+void ProcessKey()
 {
   char strbuf[STRBUFLEN];
   KeySym keysym;
@@ -278,28 +314,31 @@ int ProcessKey()
 
 
   if (keysym == XK_space) {
-    if (kev->state & ControlMask) {
+#if 0
+    dbg("state %x\n", kev->state);
+    dbg("%x\n", Mod4Mask);
+#endif
+    if (
+      ((kev->state & ControlMask) && gcin_im_toggle_keys==Control_Space) ||
+      ((kev->state & Mod1Mask) && gcin_im_toggle_keys==Alt_Space) ||
+      ((kev->state & ShiftMask) && gcin_im_toggle_keys==Shift_Space) ||
+      ((kev->state & Mod4Mask) && gcin_im_toggle_keys==Windows_Space)
+    ) {
       if (current_IC->in_method == 6)
-        tsin_toggle_eng_ch(1);
+        tsin_set_eng_ch(1);
       toggle_im_enabled();
       return;
     }
   }
 
-  if (!current_IC->b_im_enabled) {
+  if (!current_IC || !current_IC->b_im_enabled) {
     bounce_back_key();
     return;
   }
 
-  if (keysym == XK_space) {
-    if (kev->state & ShiftMask) {
-      if (current_IC->in_method == 6)
-        tsin_toggle_half_full();
-      else
-        toggle_half_full_char();
-
-      return;
-    }
+  if (keysym == XK_space && (kev->state & ShiftMask)) {
+    toggle_half_full_char();
+    return;
   }
 
   int status = 0;
@@ -309,8 +348,10 @@ int ProcessKey()
     return;
   }
 
-  if ((kev->state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask))
-    return feed_phrase(keysym);
+  if ((kev->state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
+    status = feed_phrase(keysym);
+    return;
+  }
 
   switch(current_IC->in_method) {
     case 3:
@@ -319,14 +360,14 @@ int ProcessKey()
     case 6:
       status = feedkey_pp(keysym, kev->state);
       break;
-    case 10:
+    case 0:
       status = feedkey_intcode(keysym, kev->state);
       break;
     default:
       status = feedkey_gtab(keysym, kev->state);
       break;
   }
-
+ret:
   if (!status)
     bounce_back_key();
 }

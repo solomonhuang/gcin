@@ -4,12 +4,14 @@
 typedef u_short phokey_t;
 
 typedef struct {
-	u_char selkey[12];
-	u_char phokbm[128][3][2];
+  u_char selkey[12];
+  struct {
+    char num, typ;
+  } phokbm[128][3];  // for 26 keys pho, it may have up-to 3 pho char for a key
 } PHOKBM;
 
 typedef struct {
-  u_char ch[2];
+  u_char ch[CH_SZ];
   u_short count;
 } PHO_ITEM;
 
@@ -21,6 +23,7 @@ typedef struct {
 extern int start_idx, stop_idx;
 
 #define MAX_PHRASE_LEN (16)
+#define MAX_PHRASE_STR_LEN (MAX_PHRASE_LEN * CH_SZ + 1)
 #define SELKEY (9)
 
 #define Min(a,b) ((a) < (b) ? (a):(b))

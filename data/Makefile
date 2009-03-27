@@ -2,7 +2,7 @@ include ../config.mak
 
 .SUFFIXES:	.kbm .cin .gtab
 
-DATA=pho.tab et.kbm zo.kbm tsin tsin.idx cj.gtab ar30.gtab
+DATA=pho.tab et.kbm zo.kbm ibm.kbm tsin tsin.idx cj.gtab ar30.gtab
 DATAKEEP=symbol-table gtab.list phrase.table
 
 all:	$(DATA)
@@ -22,10 +22,14 @@ et.kbm:
 zo.kbm:
 	../kbmcv   zo
 
+ibm.kbm:
+	../kbmcv   ibm
+
 .cin.gtab:
 	../gcin2tab $<
 
 install:
+	install -d $(GCIN_TABLE_DIR)
 	install -m 644 $(DATA) $(DATAKEEP) $(GCIN_TABLE_DIR)
 clean:
-	rm -f *~ tags core.* $(DATA) *.gtab.*
+	rm -f *~ tags core.* $(DATA) *.gtab

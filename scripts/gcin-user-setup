@@ -1,0 +1,24 @@
+if [ -z "$1" ]; then
+  echo "please specify gcin table dir"
+fi
+
+cd
+
+if [ ! -d .gcin ]; then
+  mkdir .gcin
+fi
+
+if [ ! -d .gcin/config ]; then
+  mkdir .gcin/config
+fi
+
+touch .gcin/gcin-UTF-8-format
+
+cd $1 || echo "$1 is not a gcin table dir"
+
+for i in pho.tab tsin* symbol-table
+do
+  if [ ! -f ~/.gcin/$i ]; then
+     cp $i ~/.gcin
+  fi
+done

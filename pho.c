@@ -8,8 +8,6 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
-static char out_buffer[45];
-int out_bufferN;
 
 extern PHO_ITEM *ch_pho;
 
@@ -35,6 +33,7 @@ void clrin_pho()
   bzero(typ_pho,sizeof(typ_pho));
   bzero(inph,sizeof(inph));
   maxi=ityp3_pho=0;
+  cpg=0;
 }
 
 #define InAreaX (0)
@@ -51,10 +50,9 @@ static void clr_in_area_pho()
 static void disp_in_area_pho()
 {
   int i;
-  extern int cursor_x;
 
   for(i=0;i<4;i++) {
-    disp_pho(i, &pho_chars[i][typ_pho[i]*2]);
+    disp_pho(i, &pho_chars[i][typ_pho[i]*CH_SZ]);
   }
 }
 
@@ -101,7 +99,7 @@ int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5)
 
   int i;
   for(i=start_i; i<stop_i; i++) {
-    if (!memcmp(ch_pho[i].ch, big5, 2)) {
+    if (!bchcmp(ch_pho[i].ch, big5)) {
       return i;
     }
   }
@@ -153,7 +151,7 @@ void lookup_gtab(char *ch, char out[]);
 void putkey_pho(u_short key, int idx)
 {
   sendkey_b5(ch_pho[idx].ch);
-  char tt[64];
+  char tt[512];
   lookup_gtab(ch_pho[idx].ch, tt);
 
   inc_pho_count(key, idx);
@@ -202,9 +200,10 @@ void load_tab_pho_file()
   fclose (fr);
 
 #if     0
+  dbg("ooo\n");
   for(i=0;i<128;i++)
-  if (phkbm.phokbm[i][0][0])
-          printf("%c %d %d\n", i, phkbm.phokbm[i][0][0], phkbm.phokbm[i][0][1]);
+  if (phkbm.phokbm[i][0].num)
+    dbg("kbm %c %d %d\n", i, phkbm.phokbm[i][0].num, phkbm.phokbm[i][1].typ);
 #endif
 }
 
@@ -217,7 +216,7 @@ void init_tab_pho(int usenow)
     load_tab_pho_file();
   }
 
-  create_win_pho();
+  show_win_pho();
   clr_in_area_pho();
   clrin_pho();
 }
@@ -232,6 +231,8 @@ int feedkey_pho(KeySym xkey)
   u_char *pp=NULL;
   char kno;
   int i,j,jj=0,kk=0;
+  char out_buffer[(CH_SZ+2) * 10 + 4];
+  int out_bufferN;
 
   if (xkey >= 'A' && xkey <='Z')
     xkey+=0x20;
@@ -268,18 +269,22 @@ int feedkey_pho(KeySym xkey)
         return 0;
       if (!ityp3_pho && xkey==' ') {
          ctyp=3;  kno=0; jj=0;
+
          if (typ_pho[0] && !typ_pho[1] && !typ_pho[2] && !typ_pho[3]) {
            char tch=inph[0];
-           if(phkbm.phokbm[tch][1][1]==2) {
+           if(phkbm.phokbm[tch][1].typ==2) {
              typ_pho[0]=0;
-             typ_pho[2]=phkbm.phokbm[tch][1][0];
+             typ_pho[2]=phkbm.phokbm[tch][1].num;
            }
          }
          goto llll1;
-       }
-      ii=start_idx+cpg+SELKEY;
-      if (ii < stop_idx)
-        cpg+=SELKEY;
+      }
+
+      ii = start_idx+ cpg + SELKEY;
+
+      if (ii < stop_idx) {
+        cpg += SELKEY;
+      }
       else {
           if (cpg) {
             cpg=0;
@@ -298,8 +303,8 @@ int feedkey_pho(KeySym xkey)
       while(i<SELKEY  && ii< stop_idx) {
 //        xprintf("%c%c%c ", phkbm.selkey[i], ch_pho[ii].ch[0],ch_pho[ii].ch[1]);
         out_buffer[out_bufferN++] = phkbm.selkey[i];
-        memcpy(&out_buffer[out_bufferN], ch_pho[ii].ch, 2);
-        out_bufferN+=2;
+        bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+        out_bufferN+=CH_SZ;
         out_buffer[out_bufferN++] = ' ';
 
         ii++;
@@ -324,8 +329,9 @@ int feedkey_pho(KeySym xkey)
 
       if ((pp=strchr(phkbm.selkey,xkey)) && maxi && ityp3_pho) {
         int c=pp-phkbm.selkey;
+
         if (c<maxi) {
-          putkey_pho(key, start_idx+cpg+c);
+          putkey_pho(key, start_idx + cpg + c);
         }
         return 1;
       }
@@ -334,20 +340,20 @@ int feedkey_pho(KeySym xkey)
         putkey_pho(key, start_idx);
       }
 
-      cpg=0;
+//      cpg=0;
   }
 
   for(i=2;i>=0;i--)
     if (typ_pho[i])
       break;
 
-  kno=phkbm.phokbm[xkey][0][0];
-  ctyp=phkbm.phokbm[xkey][0][1];
+  kno=phkbm.phokbm[xkey][0].num;
+  ctyp=phkbm.phokbm[xkey][0].typ;
 
   for(j=0;j<3;j++)
-  if (phkbm.phokbm[xkey][j][1] > i) {
-       kno=phkbm.phokbm[xkey][j][0];
-       ctyp=phkbm.phokbm[xkey][j][1];
+  if (phkbm.phokbm[xkey][j].typ > i) {
+       kno=phkbm.phokbm[xkey][j].num;
+       ctyp=phkbm.phokbm[xkey][j].typ;
        break;
   }
 #if    0
@@ -392,13 +398,13 @@ llll3:
   if (ttt > key || (ityp3_pho && idx_pho[vv].key != key) ) {
     while (jj<4) {
       while(kk<3)
-        if (phkbm.phokbm[inph[jj]][kk][0] ) {
+        if (phkbm.phokbm[inph[jj]][kk].num ) {
           if (kk) {
-            ctyp=phkbm.phokbm[inph[jj]][kk-1][1];
+            ctyp=phkbm.phokbm[inph[jj]][kk-1].typ;
             typ_pho[ctyp]=0;
           }
-          kno=phkbm.phokbm[inph[jj]][kk][0];
-          ctyp=phkbm.phokbm[inph[jj]][kk][1];
+          kno=phkbm.phokbm[inph[jj]][kk].num;
+          ctyp=phkbm.phokbm[inph[jj]][kk].typ;
           typ_pho[ctyp]=kno;
           kk++;
           goto llll2;
@@ -440,40 +446,28 @@ proc_state:
   if (ityp3_pho) {
     while(i<SELKEY  && ii < stop_idx) {
       out_buffer[out_bufferN++] = phkbm.selkey[i];
-      memcpy(&out_buffer[out_bufferN], ch_pho[ii].ch, 2);
-      out_bufferN+=2;
+      bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+      out_bufferN+=CH_SZ;
       out_buffer[out_bufferN++] = ' ';
 
       ii++;
       i=i+1;
     }
 
-#if 0
-    if (cpg)
-      xprintf("<");
-    else
-      xprintf(" ");
-#endif
     out_buffer[out_bufferN++] = cpg ? '<' : ' ';
 
     if (ii < stop_idx) {
-/*
-      if (cpg)
-        xprintf("\\");
-      else xprintf(" ");
-        xprintf(">");
-*/
       out_buffer[out_bufferN++] = cpg ? '\\' : ' ';
       out_buffer[out_bufferN++] = '>';
-    } else
+    } else {
       cpg=0;
+    }
 
     maxi=i;
   } else {
     while(i<SELKEY  && ii < stop_idx) {
-//      xprintf("%c%c ", ch_pho[ii].ch[0],ch_pho[ii].ch[1]);
-      memcpy(&out_buffer[out_bufferN], ch_pho[ii].ch, 2);
-      out_bufferN+=2;
+      bchcpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+      out_bufferN+=CH_SZ;
 
       ii++;
       i++;

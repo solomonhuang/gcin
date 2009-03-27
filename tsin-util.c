@@ -4,30 +4,31 @@
 
 #include "gcin.h"
 #include "pho.h"
+#include "tsin.h"
 
-#define b2cpy(a,b) memcpy(a,b,2)
 
 int hashidx[TSIN_HASH_N];
 int *phidx;
 FILE *fph;
-int phcount, a_phcount;
-char tsfname[64]="";
+int phcount;
 char tsidxfname[64]="";
+
+static int a_phcount;
+static char tsfname[64]="";
 
 void load_tsin_db()
 {
   if (!tsfname[0]) {
     char tt[128];
 
-#ifndef  NO_PRIVATE_TSIN
-    get_gcin_conf_fname("tsin", tsfname);
-#else
-    get_sys_table_file_name("tsin", tsfname);
-#endif
+    if (!getenv("GCIN_TABLE_DIR"))
+      get_gcin_user_fname("tsin", tsfname);
+    else
+      get_sys_table_file_name("tsin", tsfname);
   }
 
-  strcpy(tsidxfname,tsfname);
-  strcat(tsidxfname,".idx");
+  strcpy(tsidxfname, tsfname);
+  strcat(tsidxfname, ".idx");
 
   FILE *fr;
 
@@ -58,6 +59,7 @@ void load_tsin_db()
     p_err("Cannot open %s", tsfname);
 }
 
+
 void free_tsin()
 {
   if (phidx) {
@@ -74,7 +76,7 @@ static int phseq(u_char *a, u_char *b)
 {
   u_char lena, lenb, mlen;
   int i;
-  u_short ka,kb;
+  phokey_t ka,kb;
 
   lena=*(a++); lenb=*(b++);
   a++; b++;   // skip usecount
@@ -82,11 +84,12 @@ static int phseq(u_char *a, u_char *b)
   mlen=Min(lena,lenb);
 
   for(i=0;i<mlen; i++) {
-    memcpy(&ka,a,2);
-    memcpy(&kb,b,2);
+    memcpy(&ka, a, sizeof(phokey_t));
+    memcpy(&kb,b, sizeof(phokey_t));
     if (ka > kb) return 1;
     if (ka < kb) return -1;
-    a+=2; b+=2;
+    a+=sizeof(phokey_t);
+    b+=sizeof(phokey_t);
   }
 
   if (lena > lenb) return 1;
@@ -95,16 +98,17 @@ static int phseq(u_char *a, u_char *b)
 }
 
 
-gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
+gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 {
-  int tt, ofs, top,bottom, mid, ord, ph_ofs, hashno, hashno_end, i;
+  int ofs, top,bottom, mid, ord, ph_ofs, hashno, hashno_end, i;
   FILE *fw;
-  u_char tbuf[MAX_PHRASE_LEN*4+2], sbuf[MAX_PHRASE_LEN*4+2], ch[MAX_PHRASE_LEN*2+1];
+  u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2],
+         sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2];
 
   tbuf[0]=len;
   tbuf[1]=0;  // usecount
-  memcpy(&tbuf[2], phkeys, sizeof(phokey_t)* len);
-  memcpy(&tbuf[sizeof(phokey_t)*len + 2], big5str, 2*len);
+  memcpy(&tbuf[2], phkeys, sizeof(phokey_t) * len);
+  memcpy(&tbuf[sizeof(phokey_t)*len + 2], utf8str, CH_SZ*len);
 
   hashno=phkeys[0] >> TSIN_HASH_SHIFT;
   if (hashno >= TSIN_HASH_N)
@@ -117,14 +121,16 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
     fseek(fph, ph_ofs, SEEK_SET);
     fread(sbuf,1,1,fph);
     fread(&sbuf[1], 1, 1,fph); // use count
-    fread(&sbuf[2], 1, (sizeof(phokey_t) + 2) * sbuf[0] + 2, fph);
+    fread(&sbuf[2], 1, (sizeof(phokey_t) + CH_SZ) * sbuf[0] + 2, fph);
     if ((ord=phseq(sbuf,tbuf)) >=0)
       break;
   }
 
-  tt=sbuf[0]*2;
-  if (!ord && !memcmp(&sbuf[tt+1+1], big5str, tt)) {
+  int tlen = sbuf[0]*CH_SZ;
+//  dbg("tlen:%d  ord:%d  %s\n", tlen, ord, utf8str);
+  if (!ord && !memcmp(&sbuf[sbuf[0]*sizeof(phokey_t)+1+1], utf8str, tlen)) {
 //    bell();
+    dbg("Phrase already exists\n");
     return FALSE;
   }
 
@@ -142,12 +148,16 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
     }
   }
 
-  fwrite(tbuf,1,4*len+1+1,fph);
+  fwrite(tbuf, 1, (sizeof(phokey_t)+CH_SZ)*len+1+1, fph);
   fflush(fph);
 
-  if (hashidx[hashno]>mid) hashidx[hashno]=mid;
+  if (hashidx[hashno]>mid)
+    hashidx[hashno]=mid;
+
   hashno++;
-  for(;hashno<256;hashno++) hashidx[hashno]++;
+
+  for(;hashno<256;hashno++)
+    hashidx[hashno]++;
 
   if ((fw=fopen(tsidxfname,"w"))==NULL) {
     dbg("%s create err", tsidxfname);
@@ -160,4 +170,152 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
   fclose(fw);
 
   return TRUE;
+}
+
+int *ts_gtab;
+int ts_gtabN;
+
+int read_tsin_phrase(char *str)
+{
+  u_char len, usecount;
+  u_char pho[sizeof(phokey_t) * MAX_PHRASE_LEN];
+
+  fread(&len, 1, 1, fph);
+  if (len > MAX_PHRASE_LEN || len <=0)
+    return 0;
+  fread(&usecount, 1, 1,fph); // use count
+  fread(pho, sizeof(phokey_t), len, fph);
+  fread(str, CH_SZ, len, fph);
+  str[len * CH_SZ] = 0;
+
+  return len * CH_SZ;
+}
+
+
+static int qcmp_ts_gtab(const void *aa, const void *bb)
+{
+  int aofs = *((int *)aa), bofs = *((int *)bb);
+  u_char a[MAX_PHRASE_STR_LEN], b[MAX_PHRASE_STR_LEN];
+
+  fseek(fph, aofs, SEEK_SET);
+  read_tsin_phrase(a);
+  fseek(fph, bofs, SEEK_SET);
+  read_tsin_phrase(b);
+
+  return strcmp(a, b);
+}
+
+void build_ts_gtab()
+{
+  load_tsin_db();
+
+  fseek(fph,0,SEEK_SET);
+
+  if (ts_gtab) {
+    free(ts_gtab);
+    ts_gtab = NULL;
+  }
+
+  ts_gtabN = 0;
+
+  while (!feof(fph)) {
+    int ofs = ftell(fph);
+    u_char a[MAX_PHRASE_STR_LEN];
+
+    read_tsin_phrase(a);
+
+    if (!(ts_gtab=trealloc(ts_gtab, int, ts_gtabN + 1)))
+      p_err("tsin.c:realloc err");
+
+    ts_gtab[ts_gtabN] = ftell(fph);
+    ts_gtabN++;
+  }
+
+  qsort(ts_gtab, ts_gtabN, sizeof(int), qcmp_ts_gtab);
+}
+
+
+static int load_ts_gtab(int idx, char *tstr)
+{
+  int ofs = ts_gtab[idx];
+
+  fseek(fph, ofs, SEEK_SET);
+  return read_tsin_phrase(tstr);
+}
+
+// len is in CH_SZ
+int find_match(char *str, int len, char *match_chars)
+{
+  if (!len)
+    return;
+
+  if (!ts_gtabN)
+    build_ts_gtab();
+
+  int bottom = 0;
+  int top = ts_gtabN - 1;
+  int mid, tlen;
+  char tstr[MAX_PHRASE_STR_LEN];
+  int matchN=0;
+
+  do {
+    mid = (bottom + top) /2;
+
+//    dbg("tstr:%s  %d %d %d\n", tstr, bottom, mid, top);
+    tlen = load_ts_gtab(mid, tstr);
+
+    if (!tlen) {  // error in db
+      dbg("error in db\n");
+      build_ts_gtab();
+      return 0;
+    }
+
+    int r = strncmp(str, tstr, len);
+
+    if (r < 0) {
+      top = mid - 1;
+    }
+    else
+    if (r > 0 || strlen(tstr)==len) {
+      bottom = mid + 1;
+    } else {
+      strcpy(str, tstr);
+
+      if (!match_chars)
+        return 1;
+
+      bottom = mid;
+      int i;
+
+      for(i=mid; i>=0; i--) {
+        tlen = load_ts_gtab(i, tstr);
+
+        if (strncmp(str, tstr, len) || tlen <= len)
+          break;
+
+        memcpy(&match_chars[matchN * CH_SZ], &tstr[len], CH_SZ);
+//        dbg("zzz %c%c%c\n", match_chars[0], match_chars[1], match_chars[2]);
+        matchN++;
+        match_chars[matchN * CH_SZ] = 0;
+
+//        dbg("iiiiii '%s' %d %d %s\n", tstr, tlen, len, match_chars);
+      }
+
+      for(i=mid+1; i< ts_gtabN; i++) {
+        tlen = load_ts_gtab(i, tstr);
+
+        if (strncmp(str, tstr, len) || tlen <= len)
+          break;
+
+        memcpy(&match_chars[matchN * CH_SZ], &tstr[len], CH_SZ);
+        matchN++;
+      }
+
+      return matchN;
+    }
+
+  } while (bottom <= top);
+
+//  dbg("%d %d\n", bottom, top);
+  return 0;
 }

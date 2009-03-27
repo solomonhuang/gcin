@@ -1,3 +1,99 @@
+0.4.5:
+- gcin 在 root input style (gedit, gnome-terminal ...) 的 window， focus-in/focus-out 時 window
+  跑來跑去的情形改善了不少。
+- gtab(倉頡、行列…等) 輸入法現在支援詞庫自動選字。
+- 內定輸入法如果選擇 詞音以外的輸入法，在設定視窗改變設定以後設定無法馬上作用的問題。
+- 詞音/注音 中[ ] 鍵定義為以下標點符號，按空白鍵或向下鍵去選，有如一般同音字一樣。
+  【 「
+  【 【
+  【 『
+  【 《
+   】 」
+   】 】
+   】 』
+   】 》
+- Thanks to diadia.bbs@bbs.sayya.org. for the new 行列輸入 ar30.cin
+- 現在可以設定 gcin 輸入視窗的開啟/關閉鍵。
+
+
+0.4.4:
+- tslearn 加入新詞後會 coredump 或 詞音資料庫錯亂的問題。
+
+0.4.3:
+- .cin 一行有空白結尾的問題。
+
+0.4.2:
+- 按向下鍵選詞會出現錯誤的詞的問題。
+
+0.4.1:
+- 注音輸入按空白選下一頁後選字會錯誤的問題。
+- 行列新增 (方方土 hhr)(酉每 apoz)(吉吉 r;r;)(火宣 ,naa)
+- gcin 現在會自行抓 XMODIFIERS=@im=?? 的內容來決定內定的 XIM name。
+
+0.4.0:
+- gcin 的內部資料庫，已經全部轉成 UTF-8 encoding，所以現在注音/詞音可以輸入(方方土)等的 utf-8，如果要編輯 gcin 的 file，必需使用支援 utf8 encoding 的 editor 如 'gedit'，儲存的時候要確定是存成 UTF-8 encoding。
+- install 0.4.0 前請先把 詞音的資料庫匯出，並且用 iconv 轉成 utf-8 encoding：
+       執行 gcin-setup  做匯出詞庫的動作，存成 tsin.src.big5
+       執行 iconv -f big5 -t utf-8 tsin.src.big5 > tsin.src.utf-8
+       install gcin 0.4.0， 接著匯入詞庫，file name 是 tsin.src.utf-8
+- 如果已經執行 0.4.0 想還原成原來的資料(在 ~/.gcin.big5)，請重新 install 0.3.x 並執行以下動作
+        rm -fr .gcin
+        mv .gcin.big5 .gcin      
+        接下來就可以做上述的 匯出詞庫 & encoding 轉換動作。
+- gcin 現在內定可以執行一個 process 卻可以同時支援雙 Big5 & UTF-8，以下是一個範例，
+      export GCIN_XIM=xcin
+      export LC_ALL=zh_TW.Big5
+      export XMODIFIERS=@im=$GCIN_XIM
+      ./gcin.test &
+      sleep 1
+      rxvt.bin &
+
+      export LC_ALL=zh_TW.UTF-8
+      export XMODIFIERS=@im=$GCIN_XIM.UTF-8
+      gedit
+
+  gcin 會自動多一個 zh_TW.UTF-8 的 XIM server，在上面一個例子中， crxvt 是用 zh-TW.Big5，
+  gedit 是用 zh_TW.UTF-8，如果你想要把 這個功能關掉，可以用，
+      export GCIN_DUAL_XIM_OFF=
+
+
+0.3.1:
+- gtab 按滿 (行列4鍵、倉頡5鍵)後必須選字時，再按空白鍵時，現在新增選項可以選擇是要設定成自動選第一個字或是維持在選字狀態。
+- gtab 輸入法中如果有重複定義且有定義詞會導致 coredump 的問題。
+- Apply 行列輸入 .cin patch from diadia.bbs@bbs.sayya.org
+- Alt-Shift-? 可以送出 '？'
+- 新增 IBM 注音鍵盤。
+
+0.3.0:
+- 倉頡行列輸入法重複字選擇鈴聲現在可以選擇關掉，鈴聲也比以前短很多。
+- Alt-Shift 片語多送字母的問題。
+- gcin 輸入視窗向下移一點以避免與輸入行重疊。
+
+0.2.9:
+- 詞音在編輯區輸入很長的字串後會當掉的問題。
+- 無蝦米中 yobo 嘉喜順序會變的問題。 感謝 Bloody.bbs@wretch.twbbs.org 回報問題。
+- 詞音選擇預選詞後某些詞會找不到的問題。
+
+0.2.8:
+- 把gcin 的 內部 locale 設為 zh_TW.Big5
+- 現在按詞音的'注'的按鈕也可以切換中英輸入。
+- 支援假的 UTF-8, 把 LC_ALL=zh_TW.UTF-8 就會使用 UTF-8, 不過 gcin 內部 DB 仍然是 big5，所以仍然不能輸入(方方土) 的 utf8 字。
+- 行列30 新增 g.; 啟 to ar30.cin  (Thanks to 呆呆 at SayYA)
+- fixed 一些 memory leak
+
+0.2.7:
+- 內定重覆字選擇鍵改為10鍵。
+- 現在按視窗左下角輸入法名稱的按鈕可以切換輸入法，像在 gnome-terminal 內不能用 ctrl-Alt- 切換輸入法時就可以用。
+- 倉頡與行列輸入法現在可以輸入全形字了。
+
+0.2.6:
+- 行列還原成 ar30.cin
+- 詞音的 shift-space 全半形切換變成只能在英文輸入狀態切換，中文狀態按 shift-space 就變成把編輯區的內容送出。
+
+0.2.5:
+- 無蝦米無法使用的問題。
+- 倉頡 & 行列 改成用 xcin 的。
+
 0.2.4:
 - 行列無法輸入'一'的問題。
 - 行列/倉頡 新增 shift 輸入英文字母。

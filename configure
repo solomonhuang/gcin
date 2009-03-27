@@ -61,6 +61,7 @@ echo "libdir=$libdir" >> config.mak
 echo "LDFLAGS=$GTKLDFLAGS" >> config.mak
 echo "GCIN_VERSION=$GCIN_VERSION" >> config.mak
 echo "GCIN_TABLE_DIR=\$(datadir)/gcin/table" >> config.mak
+echo "GCIN_SCRIPT_DIR=\$(datadir)/gcin/script" >> config.mak
 echo "OPTFLAGS=$OPTFLAGS" >> config.mak
 echo "DOC_DIR=$datadir/doc/gcin-$GCIN_VERSION" >> config.mak
 echo "GCIN_ICON_DIR=\$(datadir)/icons/gcin" >> config.mak

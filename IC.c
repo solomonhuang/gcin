@@ -31,6 +31,25 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static IC *ic_list = (IC *)NULL;
 static IC *free_list = (IC *)NULL;
 
+static IC *ic_lists[2];
+static IC *free_lists[2];
+static int current_IC_index;
+
+// dirty solution
+void switch_IC_index(int index)
+{
+    if (index != current_IC_index) {
+        ic_lists[current_IC_index] = ic_list;
+        free_lists[current_IC_index] = free_list;
+
+        ic_list = ic_lists[current_IC_index];
+        free_list = free_lists[current_IC_index];
+
+        current_IC_index = index;
+    }
+}
+
+
 static void free_IC_list(IC *list)
 {
     while (list) {
@@ -145,17 +164,24 @@ void move_IC_in_win(IC *rec)
    if (!inpwin)
       return;
 
+   int inpx = rec->pre_attr.spot_location.x;
+   int inpy = rec->pre_attr.spot_location.y;
+   XWindowAttributes att;
+
+   XGetWindowAttributes(dpy, inpwin, &att);
+
+   if (inpx >= att.width)
+     inpx = att.width - 1;
+   if (inpy >= att.height)
+     inpy = att.height - 1;
+
    int tx, ty;
-   getRootXY(inpwin,
-      rec->pre_attr.spot_location.x, rec->pre_attr.spot_location.y,
-      &tx, &ty);
+   getRootXY(inpwin, inpx, inpy, &tx, &ty);
 #if DEBUG
-   dbg("StoreIC spot location %d %d   txy:%d %d\n",
-     rec->pre_attr.spot_location.x, rec->pre_attr.spot_location.y,
-     tx, ty);
+   dbg("move_IC_in_win %d %d   txy:%d %d\n", inpx, inpy, tx, ty);
 #endif
 
-   move_in_win(rec, tx, ty);
+   move_in_win(rec, tx, ty+1);
 }
 
 void load_IC(IC *rec)
@@ -169,6 +195,14 @@ void load_IC(IC *rec)
    if (rec->b_im_enabled)
      show_in_win(rec);
 
+   if (rec->input_style & XIMPreeditCallbacks) {
+#if DEBUG
+     dbg("rec->input_style onspot\n", rec->input_style);
+#endif
+     set_current_input_style(InputStyleOnSpot);
+     if (rec->b_im_enabled)
+       move_IC_in_win(rec);
+   } else
    if (rec->input_style & XIMPreeditPosition) {
 #if DEBUG
      dbg("rec->input_style overspot\n", rec->input_style);
@@ -230,7 +264,6 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 
 		else if (Is (XNSpotLocation, pre_attr)) {
                     rec->pre_attr.spot_location = *(XPoint*)pre_attr->value;
-
                     move_IC_in_win(rec);
                 }
 		else if (Is (XNColormap, pre_attr))
@@ -268,6 +301,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 		else
 		    fprintf(stderr, "Unknown attr: %s b\n", pre_attr->name);
 	}
+
 
 	for (i = 0; i < (int)call_data->status_attr_num; i++, sts_attr++) {
                 if (Is (XNArea, sts_attr)) {
@@ -310,6 +344,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 		else
 		    fprintf(stderr, "Unknown attr: %s c\n", ic_attr->name);
 	}
+
 	load_IC(rec);
 #if DEBUG
         dbg("exit StoreIC\n");

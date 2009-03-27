@@ -2,12 +2,12 @@
 #include <X11/extensions/XTest.h>
 
 
-static GtkWidget *gwin_gtab;
+static GtkWidget *gwin_gtab, *frame;
 static GtkWidget *label_gtab_sele;
+static GtkWidget *label_half_full;
 static GtkWidget *button_gtab;
 static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM];
 static GtkWidget *button_input_method_name;
-static GtkWidget *frame;
 static GtkWidget *label_key_codes;
 static int max_tab_keyN=5;
 static GtkWidget *image_pin;
@@ -18,29 +18,43 @@ void disp_gtab(int index, char *gtabchar)
 {
   GError *err = NULL;
   int rn, wn;
-  char *utf8 = g_locale_to_utf8 (gtabchar, 2, &rn, &wn, &err);
+  char utf8[512];
 
-  if (err) {
-    printf("utf8 conver error");
-    return;
+  if (gtabchar[0]==' ')
+    strcpy(utf8,"  ");
+  else {
+    if (gtabchar[0] & 128)
+      utf8cpy(utf8, gtabchar);
+    else {
+      memcpy(utf8, gtabchar, 2);
+      utf8[2]=0;
+    }
   }
 
   gtk_label_set_text(GTK_LABEL(labels_gtab[index]), utf8);
-  g_free(utf8);
 }
+
+char *str_half_full[]={"半","全"};
+
+void disp_gtab_half_full(gboolean hf)
+{
+  if (!label_half_full)
+    return;
+
+  gtk_label_set_text(GTK_LABEL(label_half_full), str_half_full[hf]);
+}
+
 
 void disp_gtab_sel(char *s)
 {
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (s, strlen(s), &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
+  if (!label_gtab_sele)
     return;
-  }
-
-  gtk_label_set_text(GTK_LABEL(label_gtab_sele), utf8);
+#if 0
+  gtk_label_set_text(GTK_LABEL(label_gtab_sele), s);
+#else
+//  dbg("jjj %s\n", s);
+  gtk_label_set_markup(GTK_LABEL(label_gtab_sele), s);
+#endif
 }
 
 
@@ -49,16 +63,7 @@ void set_key_codes_label(char *s)
   if (!label_key_codes)
     return;
 
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (s, strlen(s), &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
-
-  gtk_label_set_text(GTK_LABEL(label_key_codes), utf8);
+  gtk_label_set_text(GTK_LABEL(label_key_codes), s);
 }
 
 
@@ -88,17 +93,7 @@ void move_win_gtab(int x, int y)
 void set_gtab_input_method_name(char *s)
 {
 //  dbg("set_gtab_input_method_name '%s'\n", s);
-
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (s, strlen(s), &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
-
-  gtk_button_set_label(GTK_BUTTON(button_input_method_name), utf8);
+  gtk_button_set_label(GTK_BUTTON(button_input_method_name), s);
 }
 
 
@@ -171,6 +166,12 @@ static void cb_clicked_fixed_pos()
 }
 
 
+static cb_half_bull()
+{
+  toggle_half_full_char();
+}
+
+gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 void create_win_gtab_gui()
 {
@@ -197,8 +198,21 @@ void create_win_gtab_gui()
   /* This packs the button into the gwin_gtab (a gtk container). */
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
 
-  button_input_method_name = gtk_button_new_with_label(" ");
+  button_input_method_name = gtk_button_new_with_label("");
+  g_signal_connect_swapped (GTK_OBJECT (button_input_method_name), "button_press_event",
+        G_CALLBACK (inmd_switch_popup_handler), NULL);
+  gtk_container_set_border_width (GTK_CONTAINER (button_input_method_name), 0);
   gtk_box_pack_start (GTK_BOX (hbox), button_input_method_name, FALSE, FALSE, 0);
+
+  GtkWidget *button_half_full = gtk_button_new();
+  gtk_container_set_border_width (GTK_CONTAINER (button_half_full), 0);
+  label_half_full = gtk_label_new(NULL);
+  gtk_container_add (GTK_CONTAINER (button_half_full), label_half_full);
+  gtk_box_pack_start (GTK_BOX (hbox), button_half_full, FALSE, FALSE, 0);
+  disp_gtab_half_full(current_IC->b_half_full_char);
+  g_signal_connect (G_OBJECT (button_half_full), "clicked",
+      G_CALLBACK (cb_half_bull), (gpointer) NULL);
+
 
   button_gtab = gtk_button_new();
   gtk_container_set_border_width (GTK_CONTAINER (button_gtab), 0);

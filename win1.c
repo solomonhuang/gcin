@@ -1,22 +1,32 @@
 #include "gcin.h"
 
-static GtkWidget *gwin1;
+static GtkWidget *gwin1, *frame;
+Window xwin1;
 
 #define SELEN (9)
 
 static GtkWidget *labels_sele[SELEN];
 static GtkWidget *arrow_up, *arrow_down;
 
-
 void create_win1()
 {
-  gwin1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  if (gwin1)
+    return;
 
+  gwin1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_realize (gwin1);
   GdkWindow *gdkwin1 = gwin1->window;
+  xwin1 = GDK_WINDOW_XWINDOW(gdkwin1);
   gdk_window_set_override_redirect(gdkwin1, TRUE);
+}
 
-  GtkWidget *frame = gtk_frame_new(NULL);
+
+void create_win1_gui()
+{
+  if (frame)
+    return;
+
+  frame = gtk_frame_new(NULL);
   gtk_container_add (GTK_CONTAINER(gwin1), frame);
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
@@ -63,28 +73,18 @@ void clear_sele()
   gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
 }
 
+
 void set_sele_text(int i, char *text, int len)
 {
   char tt[128];
+  char utf8[128];
 
-#if 0
-  memcpy(tt, text, len);
-  tt[len] = 0;
-  dbg("set_sele_text: %s\n", text);
-#endif
-  int rn, wn;
-  GError *err = NULL;
-  char *utf8 = g_locale_to_utf8 (text, len, &rn, &wn, &err);
-
-  if (err) {
-    dbg("conver err %s %s\n", text, err->message);
-    g_error_free(err);
-  }
+  memcpy(utf8, text, len);
+  utf8[len]=0;
 
   snprintf(tt, sizeof(tt), "%d %s", i+1, utf8);
 
   gtk_label_set_text(GTK_LABEL(labels_sele[i]), tt);
-  g_free(utf8);
   gtk_widget_show(labels_sele[i]);
 }
 
@@ -100,6 +100,7 @@ void hide_selections_win()
 {
   if (!gwin1)
     return;
+
   gtk_widget_hide(gwin1);
 }
 

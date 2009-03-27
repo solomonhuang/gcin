@@ -1,0 +1,4 @@
+xcin -x xcin.test &
+export XMODIFIERS=@im=xcin.test
+gedit
+pkill xcin

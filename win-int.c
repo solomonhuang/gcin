@@ -7,19 +7,10 @@ static GtkWidget *labels_int[4];
 
 void disp_int(int index, char *intcode)
 {
-  GError *err = NULL;
-  int rn, wn;
-
-//  dbg("disp_int %d %c%c\n", index, intcode[0], intcode[1]);
-  char *utf8 = g_locale_to_utf8 (intcode, 2, &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
+  char utf8[512];
+  big5_utf8_n(intcode, CH_SZ, utf8);
 
   gtk_label_set_text(GTK_LABEL(labels_int[index]), utf8);
-  g_free(utf8);
 }
 
 void clear_int_code(int index)
@@ -37,16 +28,23 @@ void clear_int_code_all()
 
 void hide_win_int()
 {
+  if (!gwin_int)
+    return;
   gtk_widget_hide(gwin_int);
 }
 
 void show_win_int()
 {
+  if (!gwin_int)
+    return;
   gtk_widget_show(gwin_int);
 }
 
 void move_win_int(int x, int y)
 {
+  if (!gwin_int)
+    return;
+
   gtk_window_get_size(GTK_WINDOW(gwin_int), &win_xl, &win_yl);
 
   if (x + win_xl > dpy_xl)
@@ -76,7 +74,6 @@ void create_win_intcode()
   GdkWindow *gdkwin = gwin_int->window;
 
   gdk_window_set_override_redirect(gdkwin, TRUE);
-  gtk_window_set_title(GTK_WINDOW(gwin_int), "test");
 
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
@@ -88,6 +85,8 @@ void create_win_intcode()
   gtk_container_add (GTK_CONTAINER (frame), hbox_top);
 
   GtkWidget *button_intcode = gtk_button_new_with_label("內碼");
+  g_signal_connect_swapped (GTK_OBJECT (button_intcode), "button_press_event",
+        G_CALLBACK (inmd_switch_popup_handler), NULL);
   gtk_box_pack_start (GTK_BOX (hbox_top), button_intcode, FALSE, FALSE, 0);
 
   int i;

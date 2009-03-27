@@ -26,6 +26,7 @@ static GtkWidget *labels_pho[4];
 static GtkWidget *button_eng_ph;
 static GtkWidget *button_fixed_pos;
 static GtkWidget *win_sym_tsin;
+static GtkWidget *inmd_menu;
 
 void set_label_font_size(GtkWidget *label, int size)
 {
@@ -64,31 +65,22 @@ static void create_char(int index)
 
 void disp_char(int index, u_char *ch)
 {
-  char tt[3];
+  char tt[CH_SZ+1];
 
 //  dbg("disp_char %d %c%c\n", index, ch[0], ch[1]);
   create_char(index);
 
-  memcpy(tt, ch, CH_SZ);
+  bchcpy(tt, ch);
 
   if (*ch < 127) {
     tt[1] = 0;
   } else {
-    tt[2] = 0;
-  }
-
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (tt, strlen(tt), &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
-    return;
+    tt[CH_SZ] = 0;
   }
 
   GtkWidget *label = chars[index].label;
 
-  gtk_label_set_text(GTK_LABEL(label), utf8);
+  gtk_label_set_text(GTK_LABEL(label), tt);
   gtk_widget_show(label);
   gtk_widget_show(chars[index].vbox);
 
@@ -96,8 +88,6 @@ void disp_char(int index, u_char *ch)
 
   if (win_x + win_xl >= dpy_xl)
     move_win0(dpy_xl - win_xl, win_y);
-
-  g_free(utf8);
 }
 
 void hide_char(int index)
@@ -157,17 +147,14 @@ void disp_tsin_pho(int index, char *pho)
   if (index>=3)
     return;
 
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (pho, 2, &rn, &wn, &err);
+  char s[CH_SZ+1];
 
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
+  if (pho[0]==' ')
+    strcpy(s, "  ");
+  else
+    utf8cpy(s, pho);
 
-  gtk_label_set_text(GTK_LABEL(labels_pho[index]), utf8);
-  g_free(utf8);
+  gtk_label_set_text(GTK_LABEL(labels_pho[index]), s);
 }
 
 void hide_pho(int index)
@@ -331,6 +318,12 @@ static void cb_clicked_fixed_pos()
   set_currenet_IC_pin_image_pin();
 }
 
+static void cb_clicked_eng_ph()
+{
+  tsin_toggle_eng_ch();
+}
+
+
 void create_win0()
 {
   if (gwin0)
@@ -346,6 +339,8 @@ void create_win0()
   g_signal_connect(G_OBJECT(gwin0),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
 }
+
+gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 void create_win0_gui()
 {
@@ -429,14 +424,15 @@ void create_win0_gui()
 //  gtk_container_set_border_width (GTK_CONTAINER (hbox_row2), 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_row2, FALSE, FALSE, 0);
   GtkWidget *button_tsin = gtk_button_new_with_label("詞音");
-#if 0
-  g_signal_connect (G_OBJECT (button_tsin), "clicked",
-      G_CALLBACK (cb_clicked_tsin), (gpointer) NULL);
-#endif
-
+  g_signal_connect_swapped (GTK_OBJECT (button_tsin), "button_press_event",
+        G_CALLBACK (inmd_switch_popup_handler), NULL);
   gtk_box_pack_start (GTK_BOX (hbox_row2), button_tsin, FALSE, FALSE, 0);
+
+
   button_eng_ph = gtk_button_new_with_label("注");
   gtk_box_pack_start (GTK_BOX (hbox_row2), button_eng_ph, FALSE, FALSE, 0);
+  g_signal_connect (G_OBJECT (button_eng_ph), "clicked",
+      G_CALLBACK (cb_clicked_eng_ph), (gpointer) NULL);
 
   image_pin = gtk_image_new_from_file(file_pin_float);
   GtkWidget *event_box_pin = gtk_event_box_new();
@@ -447,7 +443,9 @@ void create_win0_gui()
 
   gtk_widget_show_all (gwin0);
   gdk_flush();
+
   create_win1();
+  create_win1_gui();
 }
 
 
@@ -496,7 +494,8 @@ void hide_win0()
 
 void bell()
 {
-  XBell(dpy, 80);
+  XBell(dpy, -97);
+//  abort();
 }
 
 void change_win1_font();

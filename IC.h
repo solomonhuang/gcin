@@ -67,3 +67,14 @@ typedef struct _IC {
     int         in_method;
     struct _IC	*next;
 } IC;
+
+
+typedef struct DUAL_XIM_ENTRY {
+  gboolean b_send_utf8_str;
+  char *server_locale;
+  char xim_server_name[32];
+  Window xim_xwin;
+  XIMS xims;
+} DUAL_XIM_ENTRY;
+
+extern DUAL_XIM_ENTRY *pxim_arr;

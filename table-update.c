@@ -9,8 +9,8 @@ void update_table_file(char *name, int version)
   char version_name[256];
 
   strcat(strcpy(version_name, name), ".version");
-  get_gcin_conf_fname(version_name, fname_version);
-  get_gcin_conf_fname(name, fname_user);
+  get_gcin_user_fname(version_name, fname_version);
+  get_gcin_user_fname(name, fname_user);
   get_sys_table_file_name(name, fname_sys);
 
   FILE *fp;

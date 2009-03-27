@@ -1,11 +1,23 @@
 #include "gcin.h"
 
+struct {
+  char *keystr;
+  int keynum;
+} imkeys[] = {
+  {"Control-Space", Control_Space},
+  {"Shift-Space", Shift_Space},
+  {"Alt-Space", Alt_Space},
+  {"Windows-Space", Windows_Space},
+  { NULL, 0},
+};
+
 static GtkWidget *gtablist_window = NULL;
 static GtkWidget *vbox;
 static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
 static GtkWidget *button;
+static GtkWidget *opt_im_toggle_keys;
 
 typedef struct
 {
@@ -45,7 +57,10 @@ add_items (void)
   char ttt[128];
   FILE *fp;
 
-  strcat(strcpy(ttt,TableDir),"/gtab.list");
+  strcat(strcpy(ttt, TableDir),"/gtab.list");
+
+  dbg("TableDir %s\n", TableDir);
+
   if ((fp=fopen(ttt, "r"))==NULL)
     exit(-1);
 
@@ -63,21 +78,14 @@ add_items (void)
     if (strlen(name) < 1)
       break;
 
-    GError *err = NULL;
-    int rn, wn;
-    char *utf8 = g_locale_to_utf8 (name, strlen(name), &rn, &wn, &err);
+    if (name[0]=='#')
+      continue;
 
-    if (err) {
-      printf("utf8 conver error");
-      return;
-    }
-
-    foo.name = g_strdup(utf8);
+    foo.name = g_strdup(name);
     foo.key = g_strdup(key);
     foo.file = g_strdup(file);
     foo.editable = FALSE;
     g_array_append_vals (articles, &foo, 1);
-    g_free(utf8);
   }
 
 
@@ -142,7 +150,12 @@ static void cb_ok (GtkWidget *button, gpointer data)
     save_gcin_conf_str(DEFAULT_INPUT_METHOD, key);
   }
 
+  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
+  save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, imkeys[idx].keynum);
+
   gtk_widget_destroy(gtablist_window);
+
+  send_gcin_message(GDK_DISPLAY(), "reload");
 }
 
 static void cb_cancel (GtkWidget *widget, gpointer data)
@@ -193,7 +206,7 @@ add_columns (GtkTreeView *treeview)
 
 static callback_win_delete()
 {
-  gtk_main_quit();
+  gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 }
 
 void set_selection_by_key(int key)
@@ -227,11 +240,33 @@ void set_selection_by_key(int key)
     gtk_tree_selection_select_iter(selection,&iter);
 }
 
-/* Obligatory basic callback */
-static void print_hello( GtkWidget *w,
-                         gpointer   data )
+
+static GtkWidget *create_im_toggle_keys()
 {
-  g_message ("Hello, World!\n");
+
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+  GtkWidget *label = gtk_label_new("輸入視窗(開啟/關閉)切換");
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+
+  opt_im_toggle_keys = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_im_toggle_keys, FALSE, FALSE, 0);
+  GtkWidget *menu_im_toggle_keys = gtk_menu_new ();
+
+  int i, current_idx=0;
+
+  for(i=0; imkeys[i].keystr; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (imkeys[i].keystr);
+
+    if (imkeys[i].keynum == gcin_im_toggle_keys)
+      current_idx = i;
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_im_toggle_keys), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_im_toggle_keys), menu_im_toggle_keys);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_im_toggle_keys), current_idx);
+
+  return hbox;
 }
 
 
@@ -279,6 +314,8 @@ void *create_gtablist_window (void)
 
   gtk_container_add (GTK_CONTAINER (sw), treeview);
 
+  gtk_box_pack_start (GTK_BOX (vbox), create_im_toggle_keys(), FALSE, FALSE, 0);
+
   /* some buttons */
   hbox = gtk_hbox_new (TRUE, 4);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
@@ -293,7 +330,7 @@ void *create_gtablist_window (void)
                     G_CALLBACK (cb_cancel), treeview);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 250, 200);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 300, 250);
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);

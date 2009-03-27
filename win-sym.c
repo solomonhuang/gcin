@@ -1,6 +1,7 @@
 #include <sys/stat.h>
 #include "gcin.h"
 #include "pho.h"
+#include "gtab.h"
 #include "win-sym.h"
 
 static GtkWidget *gwin_sym = NULL;
@@ -23,7 +24,10 @@ static gboolean read_syms()
   char fname[256];
   static char symbol_table[] = "symbol-table";
 
-  get_gcin_conf_fname(symbol_table, fname);
+  if (!getenv("GCIN_TABLE_DIR"))
+    get_gcin_user_fname(symbol_table, fname);
+  else
+    get_sys_table_file_name(symbol_table, fname);
 
   if ((fp=fopen(fname, "r"))==NULL) {
     strcat(strcat(strcpy(fname, TableDir), "/"), symbol_table);
@@ -106,8 +110,8 @@ static void cb_button_sym(GtkButton *button, char *str)
 
   bzero(pho, sizeof(pho));
   int i;
-  for(i=0; i < len; i+=2)
-    big5_pho_chars(str+i, &pho[i>>1]);
+  for(i=0; i < len; i+=CH_SZ)
+    big5_pho_chars(str+i, &pho[i/CH_SZ]);
 
   if (current_IC->in_method == 6)
     add_to_tsin_buf(str, pho, strlen(str) / CH_SZ);
@@ -166,7 +170,12 @@ void hide_win_sym()
 
 void show_win_sym()
 {
+  if (!current_IC)
+    return;
+
   gwin_sym = win_syms[current_IC->in_method];
+
+
 
   if (!gwin_sym || !win_sym_enabled)
     return;
@@ -189,14 +198,17 @@ static void sym_lookup_key(char *instr, char *outstr)
 
     int i;
     for(i=0; i < strlen(instr); i+= CH_SZ) {
-      char tt[64];
+      char tt[512];
 
       lookup_gtab(instr, tt);
       strcat(outstr, tt);
+      if (i < strlen(instr) - CH_SZ)
+        strcat(outstr, " | ");
     }
   }
 }
 
+extern INMD *cur_inmd;
 
 void create_win_sym()
 {
@@ -205,6 +217,10 @@ void create_win_sym()
 #endif
   if (current_IC)
     gwin_sym = win_syms[current_IC->in_method];
+
+  if (current_IC->in_method != 3 && current_IC->in_method != 6 && !cur_inmd) {
+    return;
+  }
 
   if (read_syms()) {
     if (gwin_sym)
@@ -247,32 +263,25 @@ void create_win_sym()
     for(j=0; j < psym->symN; j++) {
       GError *err = NULL;
       char *str = psym->sym[j];
-      int rn, wn;
 
-      char *utf8 = g_locale_to_utf8 (str, strlen(str), &rn, &wn, &err);
-
-      if (!utf8)
+      if (!str[0])
          continue;
 
-      GtkWidget *button = gtk_button_new_with_label(utf8);
-      g_free(utf8);
+      GtkWidget *button = gtk_button_new_with_label(str);
 
       gtk_container_set_border_width (GTK_CONTAINER (button), 0);
       gtk_box_pack_start (GTK_BOX (hbox_row), button, FALSE, FALSE, 0);
 
       if (strlen(str) >= CH_SZ) {
-        char *pho_utf8 = NULL;
-        char phos[32];
+        char phos[512];
 
         sym_lookup_key(str, phos);
 
         int phos_len = strlen(phos);
 
         if (phos_len) {
-          pho_utf8 = g_locale_to_utf8 (phos, phos_len, &rn, &wn, &err);
           GtkTooltips *button_pho_tips = gtk_tooltips_new ();
-          gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button, pho_utf8, NULL);
-          g_free(pho_utf8);
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button, phos, NULL);
         }
       }
 
@@ -290,7 +299,7 @@ void create_win_sym()
 
   gtk_widget_show_all(gwin_sym);
   move_win_sym(gwin_sym);
-#if 0
+#if 1
   dbg("in_method:%d\n", current_IC->in_method);
 #endif
   return;

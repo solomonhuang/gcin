@@ -27,7 +27,6 @@ void disp_int(int index, char *intcode);
 int feedkey_intcode(KeySym key)
 {
   int i;
-  extern int cursor_x;
 
   key=toupper(key);
   if (key==XK_BackSpace||key==XK_Delete) {
@@ -61,11 +60,14 @@ dispIn:
   }
 
   if (cin==4) {
-    u_char ttt[3];
+    u_char ttt[3], utf8[CH_SZ+1];
+
     ttt[3]=0;
     ttt[0]=(h2i(inch[0])<<4)+h2i(inch[1]);
     ttt[1]=(h2i(inch[2])<<4)+h2i(inch[3]);
-    sendkey_b5(ttt);
+    big5_utf8(ttt, utf8);
+
+    sendkey_b5(utf8);
     cin=0;
 
     clear_int_code_all();

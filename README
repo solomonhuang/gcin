@@ -1,11 +1,7 @@
  
 Mandrake
   urpmi gcin-0.X.X-liu_mdk.i586.rpm
-  如果已經裝了舊版的 gcin rpm，一定要先執行 
-     urpme gcin 
-  否則 /etc/X11/xinit/XIM 會被還原成原來的，gcin 就不會被執行。  
-
-Or
+  or
   rpm -i gcin-0.X.X-liu_mdk.i586.rpm
 
 
@@ -13,12 +9,14 @@ Or
    /etc/X11/xinit/XIM 
  在 login 時會執行 gcin 而不是 xcin。 原來的 /etc/X11/xinit/XIM rename 成 
 /etc/X11/xinit/XIM/XIM.orig.gcin
-在 'rpm -e' uninstall 解除安裝時會 rename 自動還原.
+在 'rpm -e' uninstall 解除安裝時不會自動還原.
 
 其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X 
 中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin 
+-------------------
 
-
+如果使用 .tar.bz2 安裝者， table path 是 /usr/local/share/gcin/table，而不是 /usr/share/gcin/table
+ 
 -----------------
 
 設定 gcin:
@@ -33,29 +31,29 @@ Or
 (如果要輸入注音符號, 就按向下鍵去選)
 
   
-ㄐ    。  (句點)
-ㄉ    ，  (逗號)
-ㄇ    ：  (冒號)
-ㄨ‧  ？  (問號)
-ㄈ    ；  (分號)
-ㄊ    ！  (驚嘆號)
-ㄉˋ  、  (頓號)
-ㄉˊ  ‧  (點)
-ㄑ‧  ＄  (錢)
-ㄒ‧  ＊  (星)
-# 以下是 0.2.0 新增的注音
-ㄣ‧  『   (引號)
-ㄣ    『   (因與恩同音，應避免使用)
-ㄣˊ   』
-ㄣˇ  「
-ㄣˋ   」
-ㄌ2   –    (連接號)
-ㄇ3   《    (書'名'號)
-ㄇ4    》  
-ㄌ     …   (省'略'號)
-ㄆ4    —   (破折號)
-ㄒ     ℃   (攝氏 Celsius)
-ㄒ2    ㏄   (毫升)
+  ㄐ    。  (句點)
+  ㄉ    ，  (逗號)
+  ㄇ    ：  (冒號)
+  ㄨ‧  ？  (問號)
+  ㄈ    ；  (分號)
+  ㄊ    ！  (驚嘆號)
+  ㄉˋ  、  (頓號)
+  ㄉˊ  ‧  (點)
+  ㄑ‧  ＄  (錢)
+  ㄒ‧  ＊  (星)
+  # 以下是 0.2.0 新增的注音
+  ㄣ‧  『   (引號)
+  ㄣ    『   (因與恩同音，應避免使用)
+  ㄣˊ   』
+  ㄣˇ  「
+  ㄣˋ   」
+  ㄌ2   –    (連接號)
+  ㄇ3   《    (書'名'號)
+  ㄇ4    》  
+  ㄌ     …   (省'略'號)
+  ㄆ4    —   (破折號)
+  ㄒ     ℃   (攝氏 Celsius)
+  ㄒ2    ㏄   (毫升)
  
 
 酷音輸入 的 shift + ",./;'" 也可以用
@@ -92,7 +90,7 @@ input style,
 你可以按輸入視窗中的圖釘來固定或解除固定視窗。
 
 ----------------------------
-按 control-u 可以把整個編輯區的內容清除。
+在詞音中按 control-u 可以把整個編輯區的內容清除。
 -----------------------------------
 如何在非 gnome environment(如 KDE) 修改 gcin 顯示的 button 外觀
 
@@ -109,14 +107,20 @@ export GCIN_XIM=gcin_test
 export XMODIFIERS=@im=gcin_test
 -------------------------------------------
 如果加錯詞怎麼辦？ 按滑鼠右鍵叫出設定視窗後，使用詞庫編輯的功能。你剛才加的詞
-在檔案最後。修改或刪除成正確的，輕聲是 '1'。在 gedit 中要用 big5 儲存，
-不要弄成 utf8 了。
+在檔案最後。修改或刪除成正確的，輕聲是 '1'。在 gedit 中要用 UTF-8 儲存，
+不要弄成 Big5 了。
 -------------------------------------------
 使用者的 gcin 資料毀損，要如何還原成 gcin 原來的設定:
  執行  rm -fr ~/.gcin
 當然了，使用者自己的詞庫也跟著不見。使用者可以 copy 此目錄來複製 gcin 的設定。
 -------------------------------------------
 如何加入新的 .cin 中文輸入
+
+如果你的 .cin file 仍然是big5 編碼，請先執行以下步驟
+
+mv file.cin file.cin.big5
+iconv -f big5 -t utf-8 file.cin.big5 > file.cin
+
 執行 
 $ gcin2tab file
 # cp *.gtab /usr/share/gcin/table
@@ -129,6 +133,104 @@ $ gcin2tab file
 按 control-alt-數字鍵  切換到你在 gtab.list 中定的數字鍵。注音與詞音是固定在 3 & 6 鍵上，
 不能更改的。 執行 gcin-setup 可以設定內定的輸入法。
 --------------------------------------------
+gcin 的行列 & 倉頡(.gtab) 可不可以輸入詞 ?
+只要把詞定義在 .cin 後面即可，然後執行上述的步驟，以下是幾行 examples
+...
+tw 台灣
+down 下載
+talk 聊天
+net 上網
+
+那可不可以與單字重覆定義按鍵呢？可以的，在按空白鍵後就可以選字 or 詞。
+----------------------------------------------
 如何修改 Alt-Shift-key 送出的字串。
     修改 /usr/share/gcin/table/phrase.table
 ---------------------------------------------
+gaim 及 gqview 內使用詞音時按 enter 無法送出編輯區內容。
+這是因為某些程式會把 enter 吃掉，沒有送給 gcin 處理，可能解決辦法有：
+1. 使用 Tab key
+2. 中文輸入狀態可使用 shift-space
+----------------------------------------------
+gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
+目前好像只有行列有使用，如果有需求時，可以加在 %quick 段落內。
+----------------------------------------------
+如何使用 utf8 encoding  : 使用雙重 XIM
+
+- gcin 現在內定可以執行一個 process 卻可以同時支援雙 Big5 & UTF-8，以下是一個範例，
+      export GCIN_XIM=xcin
+      export LC_ALL=zh_TW.Big5
+      export XMODIFIERS=@im=$GCIN_XIM
+      ./gcin.test &
+      sleep 1
+      rxvt.bin &
+
+      export LC_ALL=zh_TW.UTF-8
+      export XMODIFIERS=@im=$GCIN_XIM.UTF-8
+      gedit
+
+  這樣 gcin 會自動多一個 zh_TW.UTF-8 的 XIM server，在上面一個例子中， crxvt 是用 zh-TW.Big5，  
+  gedit 是用 zh_TW.UTF-8，export XMODIFIERS=@im=xcin.UTF-8，這個 gedit 就可以以注音輸入(方方土)，
+  如果你想要把 這個功能關掉，可以用，
+      export GCIN_DUAL_XIM_OFF=
+
+  上面的例子是 Big5 為主，底下的範例是 UTF-8 為主，主要差別就在 xport XMODIFIERS=@im= 部份。
+
+      export GCIN_XIM=xcin
+      export LC_ALL=zh_TW.UTF-8
+      export XMODIFIERS=@im=$GCIN_XIM
+      ./gcin.test &
+      sleep 1
+      gnome-termial &
+
+      export LC_ALL=zh_TW.Big5
+      export XMODIFIERS=@im=$GCIN_XIM.Big5
+      gedit
+ 
+------------------------------------------------
+如何使用 utf8 encoding  : 使用單一 XIM
+export GCIN_DUAL_XIM_OFF=
+export GCIN_XIM=gcin.UTF-8
+export XMODIFIERS=@im=$GCIN_XIM
+export LC_ALL=zh_TW.UTF-8
+gcin &
+gedit
+
+這個 gedit 就可以以注音輸入(方方土)
+----------------------------------------------
+我想使用倉頡行列的重複字選擇鈴聲，但是嫌聲音太長。
+你可以在用 xset b 1 設定鈴聲長短
+----------------------------------------------
+>  關於嘸蝦米打字時，底下會出來所有的拆碼
+>  這點實在是好啊，（因為小弟雖然用嘸蝦米用了一段時間了，不過很多字都還不是
+>  最簡碼，所以非常感謝這個設計，也因為這個設計讓小弟的嘸蝦米可以再進步
+>  所以，想問，有沒有可能像 MS 那樣，
+>  打注音字出來 嘸蝦米的拆碼參照？
+>  如…
+>  打:ㄅㄛ/ 出來 「嘸 PPD」這樣？
+
+有啊，按 ctrl-alt-3 輸入注音 & 選字，就會顯示你選用的目前 gtab
+輸入法的所有的可能拆字。gcin 和 windows 的不一樣，不需要去設定
+你要顯示的輸入法。
+----------------------------------------------
+為什麼倉頡按第二鍵後會跑出(譬如按 AA日日)
+   1昌 2昍   5曝 6暻 7暘   0暍
+這是引導初學者按鍵的功能，5曝代表'曝'是在5這個行(TGB廿土月)上。 34 是空白，表示沒有任何字。
+----------------------------------------------
+- gcin 的內部資料庫，已經全部轉成 UTF-8 encoding，所以現在注音/詞音可以輸入(方方土)等的 utf-8，如果要編輯 gcin 的 file，必需使用支援 utf8 encoding 的 editor 如 'gedit'，儲存的時候要確定是存成 UTF-8 encoding。
+- install 0.4.0 前請先把 詞音的資料庫匯出，並且用 iconv 轉成 utf-8 encoding：
+    執行 gcin-setup  做匯出詞庫的動作，存成 tsin.src.big5
+    執行 iconv -f big5 -t utf-8 tsin.src.big5 > tsin.src.utf-8
+    install gcin 0.4.0， 接著匯入詞庫，file name 是 tsin.src.utf-8
+- 如果已經執行 0.4.0 想還原成原來的資料(在 ~/.gcin.big5)，請重新 install 0.3.x 並執行以下動作
+    rm -fr .gcin
+    mv .gcin.big5 .gcin      
+    接下來就可以做上述的 匯出詞庫 & encoding 轉換動作。
+----------------------------------------------
+gtab(倉頡、行列) 輸入法中要如何加入新詞？
+用詞音輸入法加入。
+----------------------------------------------
+
+
+
+
+

@@ -6,19 +6,20 @@ include config.mak
 
 OBJS=gcin.o IC.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
-     gtab.o gtab-util.o phrase.o
+     gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
-             table-update.o
-OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o
-OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o
-OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o
-OBJS_kbmcv=kbmcv.o pho-sym.o
-OBJS_tsd2a=tsd2a.o pho-sym.o
+             table-update.o locale.o
+OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o
+OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o
+OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o
+OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
+OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o
-OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o gtablist.o
+OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o gtablist.o locale.o
 CFLAGS= $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
-        -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\"
+        -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
+        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\"
 
 IMdkitLIB = IMdkit/lib/libXimd.a
 
@@ -58,13 +59,12 @@ gcin2tab:  $(OBJS_gcin2tab)
 	cc -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
 
 kbmcv:  $(OBJS_kbmcv)
-	$(CC) -o $@ $(OBJS_kbmcv)
+	$(CC) -o $@ $(OBJS_kbmcv) $(LDFLAGS)
 
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
 
 install:
-	install -d $(GCIN_TABLE_DIR)
 	install -d $(datadir)/icons
 	install gcin.png $(datadir)/icons
 	install -d $(GCIN_ICON_DIR)
@@ -72,6 +72,7 @@ install:
 	install -d $(bindir)
 	install -d $(libdir)/menu
 	install -m 644 menu/* $(libdir)/menu
+	$(MAKE) -C scripts install
 	$(MAKE) -C data install
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 menu/* /usr/lib/menu; \
@@ -87,7 +88,8 @@ install:
 clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean
-	rm -f *.o *~ *.E config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
+	$(MAKE) -C scripts clean
+	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
 	cd ..; tar cvfj gcin.tbz gcin
 
 .depend:

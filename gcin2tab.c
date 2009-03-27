@@ -29,13 +29,17 @@ char *to_spc(char *s)
 
 void del_nl_spc(char *s)
 {
-	char *t;
+  char *t;
 
-	int len=strlen(s);
-	if (!*s) return;
-	t=s+len-1;
-	while (*t=='\n' || *t==' ' && *t=='\t' && s>t) t--;
-	*(t+1)=0;
+  int len=strlen(s);
+  if (!*s) return;
+
+  t=s+len-1;
+
+  while (*t=='\n' || *t==' ' || *t=='\t' && t > s)
+    t--;
+
+  *(t+1)=0;
 }
 
 
@@ -44,6 +48,7 @@ void get_line(u_char *tt)
   while (!feof(fr)) {
     fgets(tt,128,fr);
     lineno++;
+
     if (tt[0]=='#')
       continue;
     else
@@ -56,30 +61,37 @@ void cmd_arg(u_char *s, u_char **cmd, u_char **arg)
   char *t;
 
   get_line(s);
-  if (!*s) { *cmd=*arg=s; return; }
+
+  if (!*s) {
+    *cmd=*arg=s;
+    return;
+  }
 
   s=skip_spc(s);
   t=to_spc(s);
   *cmd=s;
   if (!(*t)) {
-          *arg=t;
-          return;
+    *arg=t;
+    return;
   }
+
   *t=0;
   t++;
+
   t=skip_spc(t);
   del_nl_spc(t);
+
   *arg=t;
 }
 
-sequ(char *s, char *t)
+int sequ(char *s, char *t)
 {
   return (!strcmp(s,t));
 }
 
 typedef struct {
 	u_long key;
-	u_char ch[2];
+	u_char ch[CH_SZ];
 	u_short oseq;
 } ITEM2;
 
@@ -91,16 +103,10 @@ int qcmp2(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  char tt[3];
+  char tt[CH_SZ+1];
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
-  if (a->ch[0] > b->ch[0]) return 1;
-  if (a->ch[0] < b->ch[0]) return -1;
-  if (a->ch[1] > b->ch[1]) return 1;
-  if (a->ch[1] < b->ch[1]) return -1;
-  fprintf(stderr,"%c%c is multiply defined with the same key\n",
-          a->ch[0],a->ch[1]);
-  return 0;
+  return memcmp(a->ch ,b->ch, CH_SZ);
 }
 
 int qcmp(const void *aa, const void *bb)
@@ -128,7 +134,7 @@ main(int argc, char **argv)
   u_char *cmd, *arg;
   struct TableHead th;
   int KeyNum;
-  char kname[128][2];
+  char kname[128][CH_SZ];
   char keymap[64];
   int chno,cpcount;
   u_short idx1[256], last_ser;
@@ -139,10 +145,20 @@ main(int argc, char **argv)
   char phrbuf[32768];
   int prbf_cou=0;
 
+  dbg("-- gcin2tab encoding UTF-8 --\n");
+  dbg("--- please use iconv -f big5 -t utf-8 if your file is in big5 encoding\n");
+
   if (argc<=1) {
           printf("Enter table file name [.cin] : ");
           scanf("%s", fname);
   } else strcpy(fname,argv[1]);
+
+
+  if (!strcmp(fname, "-v") || !strcmp(fname, "--version")) {
+    dbg("gcin2tab for gcin " GCIN_VERSION "\n");
+    exit(0);
+  }
+
 
   char *p;
 
@@ -188,7 +204,7 @@ main(int argc, char **argv)
 
   cmd_arg(tt,&cmd, &arg);
   if (!sequ(cmd,"%dupsel") || !(*arg) ) {
-    th.M_DUP_SEL = 9;
+    th.M_DUP_SEL = 10;
   }
   else {
     th.M_DUP_SEL=atoi(arg);
@@ -209,7 +225,7 @@ main(int argc, char **argv)
 
     kno[k]=++KeyNum;
     keymap[KeyNum]=k;
-    memcpy(&kname[KeyNum][0],arg,2);
+    bchcpy(&kname[KeyNum][0], arg);
   }
 
   keymap[0]=kname[0][0]=kname[0][1]=' ';
@@ -227,8 +243,10 @@ main(int argc, char **argv)
       if (sequ(cmd,"%quick")) break;
       k=kno[mtolower(cmd[0])]-1;
       len=strlen(arg);
-      for(i=0;i<len;i+=2)
-        memcpy(th.qkeys.quick1[k][i>>1],&arg[i],2);
+
+      for(i=0; i<len; i+=CH_SZ)
+        bchcpy(th.qkeys.quick1[k][i/CH_SZ], &arg[i]);
+
       quick_def++;
     }
 
@@ -241,7 +259,6 @@ main(int argc, char **argv)
     int len;
     u_long kk;
     int k;
-    char out[3];
 
     cmd_arg(tt,&cmd,&arg);
     if (!cmd[0] || !arg[0])
@@ -265,16 +282,19 @@ main(int argc, char **argv)
 
     memcpy(&itar[chno].key, &kk, 4);
 
-    if ((len=strlen(arg))==2) {
-      memcpy(out,arg,2);
-      memcpy(itar[chno].ch, out,2);
+    if ((len=strlen(arg)) <= CH_SZ || !(arg[0] & 0x80)) {
+      char out[CH_SZ+1];
+
+      bzero(out, sizeof(out));
+      memcpy(out, arg, len);
+      bchcpy(itar[chno].ch, out);
 //      printf("uuu %x %c%c\n", kk, out[0], out[1]);
     } else {
       itar[chno].ch[0]=phr_cou>>8;
       itar[chno].ch[1]=phr_cou&0xff;
       phridx[phr_cou++]=prbf_cou;
       strcpy(&phrbuf[prbf_cou],arg);
-//      printf("prbf_cou:%d  %s\n", prbf_cou, arg);
+//      printf("phrase:%d  len:%d'%s'\n", phr_cou, len, arg);
       prbf_cou+=len;
     }
 
@@ -284,7 +304,6 @@ main(int argc, char **argv)
   fclose(fr);
 
 
-  th.DefC=chno;
   qsort(itar, chno,sizeof(ITEM2), qcmp2);
 
   bzero(&lastit,sizeof(ITEM));
@@ -298,6 +317,7 @@ main(int argc, char **argv)
   }
 
   chno=cpcount;
+  th.DefC=chno;
   qsort(itmp,chno,sizeof(ITEM2),qcmp);
 
   for(i=0;i<chno;i++) {
@@ -320,21 +340,21 @@ main(int argc, char **argv)
           if (!def1[i]) idx1[i]=idx1[i+1];
 
   if ((fw=fopen(fname_tab,"w"))==NULL) {
-          p_err("Cannot create");
+    p_err("Cannot create");
   }
 
   printf("Defined Char:%d\n", chno);
   fwrite(&th,1,sizeof(th),fw);
   fwrite(keymap, 1, KeyNum, fw);
-  fwrite(kname, 2, KeyNum, fw);
-  fwrite(idx1,2,KeyNum+1,fw);
+  fwrite(kname, CH_SZ, KeyNum, fw);
+  fwrite(idx1,2, KeyNum+1,fw);
   fwrite(itout,sizeof(ITEM),chno, fw);
 
   if (phr_cou) {
     phridx[phr_cou++]=prbf_cou;
     printf("phrase count:%d\n", phr_cou);
-    fwrite(&phr_cou,4,1,fw);
-    fwrite(phridx,4,phr_cou,fw);
+    fwrite(&phr_cou, sizeof(int), 1, fw);
+    fwrite(phridx, sizeof(int), phr_cou, fw);
     fwrite(phrbuf,1,prbf_cou,fw);
   }
 

@@ -1,6 +1,7 @@
 #include "gcin.h"
 
-static GtkWidget *gwin_pho;
+static GtkWidget *gwin_pho, *frame;
+Window xwin_pho;
 static GtkWidget *label_pho_sele;
 static GtkWidget *button_pho;
 static GtkWidget *labels_pho[4];
@@ -8,31 +9,19 @@ static GtkWidget *label_key_codes;
 
 void disp_pho(int index, char *phochar)
 {
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (phochar, 2, &rn, &wn, &err);
+  char tt[CH_SZ+1];
 
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
+  if (phochar[0]==' ')
+    strcpy(tt, "  ");
+  else
+    utf8cpy(tt, phochar);
 
-  gtk_label_set_text(GTK_LABEL(labels_pho[index]), utf8);
-  g_free(utf8);
+  gtk_label_set_text(GTK_LABEL(labels_pho[index]), tt);
 }
 
 void disp_pho_sel(char *s)
 {
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (s, strlen(s), &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
-
-  gtk_label_set_text(GTK_LABEL(label_pho_sele), utf8);
+  gtk_label_set_text(GTK_LABEL(label_pho_sele), s);
 }
 
 
@@ -41,29 +30,10 @@ void set_key_codes_label_pho(char *s)
   if (!label_key_codes)
     return;
 
-  GError *err = NULL;
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (s, strlen(s), &rn, &wn, &err);
-
-  if (err) {
-    printf("utf8 conver error");
-    return;
-  }
-
-  gtk_label_set_text(GTK_LABEL(label_key_codes), utf8);
+  gtk_label_set_text(GTK_LABEL(label_key_codes), s);
 }
 
 
-void show_win_pho()
-{
-  gtk_widget_show(gwin_pho);
-}
-
-
-void hide_win_pho()
-{
-  gtk_widget_hide(gwin_pho);
-}
 
 
 void move_win_pho(int x, int y)
@@ -89,23 +59,28 @@ void minimize_win_pho()
   gtk_window_resize(GTK_WINDOW(gwin_pho), 10, 10);
 }
 
+
 void create_win_pho()
 {
-//  dbg("create_win_pho .....\n");
-
-  if (gwin_pho) {
-    show_win_pho();
+  if (gwin_pho)
     return;
-  }
 
   gwin_pho = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_container_set_border_width (GTK_CONTAINER (gwin_pho), 0);
   gtk_widget_realize (gwin_pho);
   GdkWindow *gdkwin = gwin_pho->window;
-
+  xwin_pho = GDK_WINDOW_XWINDOW(gdkwin);
   gdk_window_set_override_redirect(gdkwin, TRUE);
+}
 
-  GtkWidget *frame = gtk_frame_new(NULL);
+void create_win_pho_gui()
+{
+//  dbg("create_win_pho .....\n");
+
+  if (frame)
+    return;
+
+  frame = gtk_frame_new(NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
   gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
 
@@ -125,6 +100,8 @@ void create_win_pho()
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
 
   GtkWidget *button_pho = gtk_button_new_with_label("注音");
+  g_signal_connect_swapped (GTK_OBJECT (button_pho), "button_press_event",
+        G_CALLBACK (inmd_switch_popup_handler), NULL);
   gtk_box_pack_start (GTK_BOX (hbox), button_pho, FALSE, FALSE, 0);
 
   int i;
@@ -148,3 +125,18 @@ void create_win_pho()
   gtk_widget_show_all (gwin_pho);
 }
 
+
+void show_win_pho()
+{
+//  dbg("show_win_pho\n");
+  create_win_pho();
+  create_win_pho_gui();
+  gtk_widget_show_all(gwin_pho);
+}
+
+
+void hide_win_pho()
+{
+//  dbg("hide_win_pho\n");
+  gtk_widget_hide(gwin_pho);
+}

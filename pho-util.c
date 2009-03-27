@@ -15,26 +15,24 @@ static char pho_tab[]="pho.tab";
 
 void pho_load()
 {
-#ifndef  NO_PRIVATE_TSIN
   if (!phofname[0]) {
     char tt[128];
 
-    get_gcin_conf_fname(pho_tab, phofname);
+    if (!getenv("GCIN_TABLE_DIR")) {
+      get_gcin_user_fname(pho_tab, phofname);
 
-    if (access(phofname, W_OK) < 0){
-      char sys_file[256], vv[256];
+      if (access(phofname, W_OK) < 0){
+        char sys_file[256], vv[256];
 
-      get_sys_table_file_name(sys_file, pho_tab);
-      sprintf(vv,"cp %s %s\n", sys_file, phofname);
-      system(vv);
-    }
-
-#else
-    get_sys_table_file_name("pho.tab", phofname);
-#endif
+        get_sys_table_file_name(sys_file, pho_tab);
+        sprintf(vv,"cp %s %s\n", sys_file, phofname);
+        system(vv);
+      }
+    } else
+      get_sys_table_file_name(pho_tab, phofname);
   }
 
-  update_table_file(pho_tab, 1);
+  update_table_file(pho_tab, 2);
 
   FILE *fr;
 
@@ -65,6 +63,16 @@ void pho_load()
 
   idx_pho[idxnum_pho].key=0xffff;
   idx_pho[idxnum_pho].start=ch_phoN;
+
+#if 0
+  int i;
+  for(i=0; i <ch_phoN; i++) {
+    char tt[5];
+
+    utf8cpy(tt, ch_pho[i].ch);
+    dbg("oooo %s\n", tt);
+  }
+#endif
 }
 
 
@@ -81,7 +89,7 @@ int big5_pho_chars(char *big5, phokey_t *phkeys)
 
   do {
     for(; ofs < ch_phoN; ofs++)
-      if (!memcmp(big5, ch_pho[ofs].ch, 2))
+      if (!bchcmp(big5, ch_pho[ofs].ch))
         break;
 
     if (ofs==ch_phoN)
@@ -105,30 +113,30 @@ ret:
 char *phokey_to_str(phokey_t kk)
 {
   u_int k1,k2,k3,k4;
-  static u_char phchars[8];
+  static u_char phchars[CH_SZ * 4 + 1];
   int phcharsN=0;
 
   k4=(kk&7);
   kk>>=3;
-  k3=(kk&15)<<1;
+  k3=(kk&15) * CH_SZ;
   kk>>=4;
-  k2=(kk&3)<<1;
+  k2=(kk&3) * CH_SZ;
   kk>>=2;
-  k1=(kk&31)<<1;
+  k1=(kk&31) * CH_SZ;
 
   if (k1) {
-    memcpy(phchars, &pho_chars[0][k1], 2);
-    phcharsN+=2;
+    bchcpy(phchars, &pho_chars[0][k1]);
+    phcharsN+=CH_SZ;
   }
 
   if (k2) {
-    memcpy(&phchars[phcharsN], &pho_chars[1][k2], 2);
-    phcharsN+=2;
+    bchcpy(&phchars[phcharsN], &pho_chars[1][k2]);
+    phcharsN+=CH_SZ;
   }
 
   if (k3)  {
-    memcpy(&phchars[phcharsN], &pho_chars[2][k3], 2);
-    phcharsN+=2;
+    bchcpy(&phchars[phcharsN], &pho_chars[2][k3]);
+    phcharsN+=CH_SZ;
   }
 
   if (k4)

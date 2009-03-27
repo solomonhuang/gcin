@@ -91,6 +91,15 @@ void load_phrase()
 }
 
 
+void free_phrase()
+{
+  int i;
+
+  for(i=0; i < tranN; i++)
+    free(tran[i].str);
+}
+
+
 gboolean feed_phrase(KeySym ksym)
 {
   int i;

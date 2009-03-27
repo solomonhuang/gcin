@@ -18,23 +18,19 @@ void get_gcin_dir(char *tt)
 {
     strcpy(tt,(char *)getenv("HOME"));
     strcat(tt,"/.gcin");
+}
 
-    DIR *dir;
-    if ((dir=opendir(tt))==NULL) {
-      char vv[128];
 
-       mkdir(tt,0755);
-       sprintf(vv,"cp %s/* %s", TableDir, tt);
-       system(vv);
-    }
-    else
-      closedir(dir);
+void get_gcin_user_fname(char *name, char fname[])
+{
+  get_gcin_dir(fname);
+  strcat(strcat(fname,"/"),name);
 }
 
 void get_gcin_conf_fname(char *name, char fname[])
 {
   get_gcin_dir(fname);
-  strcat(strcat(fname,"/"),name);
+  strcat(strcat(fname,"/config/"),name);
 }
 
 void get_gcin_conf_str(char *name, char rstr[], char *default_str)
@@ -78,8 +74,8 @@ void save_gcin_conf_str(char *name, char *str)
   FILE *fp;
   char fname[256];
 
-  get_gcin_dir(fname);
-  strcat(strcat(fname,"/"), name);
+  get_gcin_conf_fname(name, fname);
+
   if ((fp=fopen(fname,"w"))==NULL) {
     p_err("cannot create %s", fname);
   }
@@ -105,6 +101,22 @@ char *get_gcin_xim_name()
   if (xim_name=getenv("GCIN_XIM"))
     return xim_name;
 
+  if (xim_name=getenv("XMODIFIERS")) {
+    static char find[] = "@im=";
+    static char sstr[32];
+    char *p = strstr(xim_name, find);
+
+    p += strlen(find);
+    strncpy(sstr, p, sizeof(sstr));
+    sstr[sizeof(sstr) - 1]=0;
+
+    if (p=strchr(sstr, '.'))
+      *p=0;
+
+    dbg("Try to use name from XMODIFIERS=@im=%s\n", sstr);
+    return sstr;
+  }
+
   return "xcin";
 }
 
@@ -114,6 +126,8 @@ Atom get_gcin_atom(Display *dpy)
   char tt[128];
 
   snprintf(tt, sizeof(tt), "GCIN_ATOM_%s", xim_name);
+
+  dbg("get_gcin_atom %s\n", tt);
 
   Atom atom = XInternAtom(dpy, tt, False);
 

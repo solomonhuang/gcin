@@ -5,7 +5,7 @@
 
 typedef struct {
   u_short key;
-  u_char ch[2];
+  u_char ch[CH_SZ];
   u_short count;
 } PHITEM;
 
@@ -17,44 +17,48 @@ int pho_itemsN=0;
 
 static int shiftb[]={9,7,3,0};
 
-lookup(u_char *s)
+int lookup(u_char *s)
 {
-	int i;
-	char tt[3], *pp;
+  int i;
+  char tt[CH_SZ+1], *pp;
 
+  if (*s < 128)
+    return *s-'0';
 
-	if (*s < 128)
-		return *s-'0';
-	tt[0]=s[0];
-	tt[1]=s[1];
-	tt[2]=0;
-	for(i=0;i<3;i++)
-		if (pp=strstr(pho_chars[i],tt)) break;
-	if (i==3) return 0;
-	return (((pp-pho_chars[i])>>1) << shiftb[i]);
+  bchcpy(tt, s);
+  tt[CH_SZ]=0;
+
+  for(i=0;i<3;i++)
+    if (pp=strstr(pho_chars[i],tt))
+      break;
+
+  if (i==3)
+    return 0;
+
+  return (((pp-pho_chars[i])/CH_SZ) << shiftb[i]);
 }
 
 
 void p_err(char *fmt,...)
 {
-	va_list args;
+  va_list args;
 
-	va_start(args, fmt);
-	fprintf(stderr,"gcin:");
-	vfprintf(stderr, fmt, args);
-	va_end(args);
-	fprintf(stderr,"\n");
-	exit(-1);
+  va_start(args, fmt);
+  fprintf(stderr,"gcin:");
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+  fprintf(stderr,"\n");
+  exit(-1);
 }
 
 void dbg(char *fmt,...)
 {
-	va_list args;
+  va_list args;
 
-	va_start(args, fmt);
-	vprintf(fmt, args);
-	fflush(stdout);
-	va_end(args);
+  va_start(args, fmt);
+  vprintf(fmt, args);
+  fflush(stdout);
+  va_end(args);
 }
 
 
@@ -88,7 +92,10 @@ main(int argc, char **argv)
   while (!feof(fp)) {
     fgets(s,sizeof(s),fp);
     int len=strlen(s);
-    if (s[len-1]=='\n') s[--len]=0;
+
+    if (s[len-1]=='\n')
+      s[--len]=0;
+
     if (len==0)
       continue;
 
@@ -97,10 +104,10 @@ main(int argc, char **argv)
     u_char *p = s;
 
     while (*p && *p!=' ') {
-      kk|=lookup(p);
+      kk |= lookup(p);
 
-      if (*p&128)
-        p+=2;
+      if (*p & 128)
+        p+=CH_SZ;
       else
         p++;
     }
@@ -109,9 +116,9 @@ main(int argc, char **argv)
 
     p++;
 
-    memcpy(items[itemsN].ch, p, 2);
+    bchcpy(items[itemsN].ch, p);
 
-    p+=3; // skip ch & space
+    p+= CH_SZ + 1; // skip ch & space
 
     items[itemsN].count = atoi(p);
 
@@ -139,7 +146,12 @@ main(int argc, char **argv)
 
     int l;
     for(l=i; l<j; l++) {
-      memcpy(pho_items[pho_itemsN].ch, items[l].ch, 2);
+      bchcpy(pho_items[pho_itemsN].ch, items[l].ch);
+#if 0
+      char tt[4];
+      utf8cpy(tt, items[l].ch);
+      dbg("uuu %s\n", tt);
+#endif
       pho_items[pho_itemsN].count = items[l].count;
       pho_itemsN++;
     }

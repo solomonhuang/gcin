@@ -3,15 +3,54 @@
 
 Display *dpy;
 Window root;
-static Window xim_xwin;
 int win_xl, win_yl;
 int win_x, win_y;
 int dpy_xl, dpy_yl;
+gboolean dual_xim=TRUE;
+
+DUAL_XIM_ENTRY xim_arr[2];
+DUAL_XIM_ENTRY *pxim_arr;
+
 
 u_char fullchar[]=
 "¡@¡I¡¨¡­¢C¢H¡®¡¦¡]¡^¡¯¡Ï¡A¡Ð¡D¡þ¢¯¢°¢±¢²¢³¢´¢µ¢¶¢·¢¸¡G¡F¡Õ¡×¡Ö¡H"
 "¢I¢Ï¢Ð¢Ñ¢Ò¢Ó¢Ô¢Õ¢Ö¢×¢Ø¢Ù¢Ú¢Û¢Ü¢Ý¢Þ¢ß¢à¢á¢â¢ã¢ä¢å¢æ¢ç¢è¡e¢@¡f¡s¡Å"
 "¡¥¢é¢ê¢ë¢ì¢í¢î¢ï¢ð¢ñ¢ò¢ó¢ô¢õ¢ö¢÷¢ø¢ù¢ú¢û¢ü¢ý¢þ£@£A£B£C¡a¡U¡b¡ã  ";
+
+char *half_char_to_full_char(KeySym xkey)
+{
+  if (xkey < ' ' || xkey > 127)
+    return NULL;
+  return &fullchar[(xkey-' ') * CH_SZ];
+}
+
+
+void create_win0();
+extern Window xwin0, xwin1, xwin_gtab, xwin_pho;
+void start_inmd_window()
+{
+
+  switch (default_input_method) {
+    case 6:
+      create_win0();
+
+      if (dual_xim)
+        create_win1();
+
+      xim_arr[0].xim_xwin = xwin0;
+      xim_arr[1].xim_xwin = xwin1;
+      break;
+    default:
+      create_win_gtab();
+
+      if (dual_xim)
+        create_win_pho();
+
+      xim_arr[0].xim_xwin = xwin_gtab;
+      xim_arr[1].xim_xwin = xwin_pho;
+      break;
+  }
+}
 
 
 static XIMStyle Styles[] = {
@@ -37,6 +76,8 @@ static XIMStyles im_styles;
 static XIMTriggerKey trigger_keys[] = {
         {XK_space, ControlMask, ControlMask},
         {XK_space, ShiftMask, ShiftMask},
+        {XK_space, Mod1Mask, Mod1Mask},   // Alt
+        {XK_space, Mod4Mask, Mod4Mask},   // Windows
 };
 #endif
 
@@ -45,25 +86,26 @@ static XIMEncoding chEncodings[] = {
         "COMPOUND_TEXT",
 };
 static XIMEncodings encodings;
-static XIMS xims;
 
 int gcin_ForwardEventHandler(IMForwardEventStruct *call_data);
 
 XIMS current_ims;
 IMProtocol *current_call_data;
 extern void toggle_im_enabled();
-extern void toggle_half_full_char();
+
 
 MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
 {
 //    dbg("MyTriggerNotifyHandler %d %x\n", call_data->key_index, call_data->event_mask);
 
     if (call_data->flag == 0) { /* on key */
-        if (call_data->key_index == 0) {  // dirty solution
+//        dbg("trigger %d\n", call_data->key_index);
+        if (call_data->key_index == 0 && gcin_im_toggle_keys==Control_Space ||
+            call_data->key_index == 3 && gcin_im_toggle_keys==Shift_Space ||
+            call_data->key_index == 6 && gcin_im_toggle_keys==Alt_Space ||
+            call_data->key_index == 9 && gcin_im_toggle_keys==Windows_Space
+            ) {
             toggle_im_enabled();
-        } else
-        if (call_data->key_index == 3) { // dirty solution
-            dbg("halt full char switch\n");
         }
 	return True;
     } else {
@@ -73,10 +115,24 @@ MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
 }
 
 
-
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
-//  dbg("gcin_ProtoHandler %x ims  %x\n", xims);
+//  dbg("gcin_ProtoHandler %x ims\n", ims);
+  int index;
+
+  if (ims == xim_arr[0].xims)
+    index = 0;
+  else
+  if (ims == xim_arr[1].xims)
+    index = 1;
+  else
+     p_err("bad ims %x\n", ims);
+
+  pxim_arr = &xim_arr[index];
+  switch_IC_index(index);
+
+//  dbg("index:%d\n", index);
+
   current_ims = ims;
   current_call_data = call_data;
 
@@ -87,7 +143,7 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
       IMOpenStruct *pimopen=(IMOpenStruct *)call_data;
       if(pimopen->connect_id > MAX_CONNECT - 1)
         return True;
-#if DEBUG
+#if 1
     dbg("open lang %s  connectid:%d\n", pimopen->lang.name, pimopen->connect_id);
 #endif
       return True;
@@ -185,26 +241,27 @@ void open_xim()
   encodings.count_encodings = sizeof(chEncodings)/sizeof(XIMEncoding);
   encodings.supported_encodings = chEncodings;
 
-  char *get_gcin_xim_name();
-  char *xim_server_name = get_gcin_xim_name();
 
-  if ((xims = IMOpenIM(dpy,
-          IMServerWindow,         xim_xwin,        //input window
-          IMModifiers,            "Xi18n",        //X11R6 protocol
-          IMServerName,           xim_server_name,         //XIM server name
-          IMLocale,               "zh_TW",       //XIM server locale
-          IMServerTransport,      "X/",      //Comm. protocol
-          IMInputStyles,          &im_styles,   //faked styles
-          IMEncodingList,         &encodings,
-          IMProtocolHandler,      gcin_ProtoHandler,
-          IMFilterEventMask,      KeyPressMask,
-	  IMOnKeysList, &triggerKeys,
-//	  IMOffKeysList, &triggerKeys,
-          NULL)) == NULL) {
-          p_err("IMOpenIM failed. Maybe another XIM server is running.\n");
+  int dualN = dual_xim ? 2 : 1;
+  int i;
+
+  for(i=0; i < dualN; i++) {
+    if ((xim_arr[i].xims = IMOpenIM(dpy,
+            IMServerWindow,         xim_arr[i].xim_xwin,        //input window
+            IMModifiers,            "Xi18n",        //X11R6 protocol
+            IMServerName,           xim_arr[i].xim_server_name, //XIM server name
+            IMLocale,               xim_arr[i].server_locale,  //XIM server locale
+            IMServerTransport,      "X/",      //Comm. protocol
+            IMInputStyles,          &im_styles,   //faked styles
+            IMEncodingList,         &encodings,
+            IMProtocolHandler,      gcin_ProtoHandler,
+            IMFilterEventMask,      KeyPressMask,
+            IMOnKeysList, &triggerKeys,
+  //        IMOffKeysList, &triggerKeys,
+            NULL)) == NULL) {
+            p_err("IMOpenIM failed. Maybe another XIM server is running.\n");
+    }
   }
-
-
 }
 
 
@@ -217,6 +274,7 @@ static void reload_data()
   load_tsin_conf();
   load_tsin_db();
   load_tab_pho_file();
+  load_setttings();
 }
 
 void change_tsin_font_size();
@@ -264,6 +322,7 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
        } else
          reload_data();
 
+       XFree(message);
        return GDK_FILTER_REMOVE;
      }
    }
@@ -277,12 +336,11 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
 void init_atom_property()
 {
   gcin_atom = get_gcin_atom(dpy);
-  XSetSelectionOwner(dpy, gcin_atom, xwin0, CurrentTime);
+  XSetSelectionOwner(dpy, gcin_atom, xim_arr[0].xim_xwin, CurrentTime);
 }
 
 
 
-void create_win0();
 void hide_win0();
 void do_exit();
 
@@ -294,6 +352,7 @@ void do_exit()
   free_tsin();
   free_all_IC();
   free_gtab();
+  free_phrase();
 
 #if 1
   destory_win0();
@@ -304,29 +363,62 @@ void do_exit()
   gtk_main_quit();
 }
 
-void start_inmd_window()
-{
-  extern Window xwin0, xwin_gtab;
 
-  switch (default_input_method) {
-    case 6:
-      create_win0();
-      xim_xwin = xwin0;
-      break;
-    default:
-      create_win_gtab();
-      xim_xwin = xwin_gtab;
-      break;
-  }
+static exec_script(char *name)
+{
+  char scr[128];
+
+  sprintf(scr, GCIN_SCRIPT_DIR"/%s", name);
+  system(scr);
+}
+
+static void exec_setup_scripts()
+{
+  exec_script("gcin-utf8-setup");
+  exec_script("gcin-user-setup "GCIN_TABLE_DIR);
 }
 
 
+static char *gcin_db_locale="zh_TW.Big5";
+char *get_gcin_xim_name();
+
 main(int argc, char **argv)
 {
-  setlocale(LC_ALL, "zh_TW.Big5");
+  dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
 
-  load_setttings();
+  char *locale_str;
+  xim_arr[0].server_locale = "zh_TW";
+  char *xim_server_name = get_gcin_xim_name();
+
+  strcpy(xim_arr[0].xim_server_name, xim_server_name);
+  strcpy(xim_arr[1].xim_server_name, xim_server_name);
+  if ((locale_str=getenv("LC_ALL")) && !strcmp(locale_str, "zh_TW.UTF-8")) {
+    dbg("LC_ALL=%s, gcin will use UTF-8\n", locale_str);
+
+    xim_arr[0].b_send_utf8_str = TRUE;
+    xim_arr[1].b_send_utf8_str = FALSE;
+    xim_arr[1].server_locale = "zh_TW.Big5";
+    strcat(xim_arr[1].xim_server_name, ".Big5");
+  } else {
+    xim_arr[0].b_send_utf8_str = FALSE;
+    xim_arr[1].b_send_utf8_str = TRUE;
+    xim_arr[1].server_locale = "zh_TW.UTF-8";
+    strcat(xim_arr[1].xim_server_name, ".UTF-8");
+  }
+
+
+  if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version"))) {
+    p_err(" version %s\n", GCIN_VERSION);
+  }
+
+  setlocale(LC_ALL, gcin_db_locale);
+  setenv("LC_ALL", gcin_db_locale, TRUE);
+
+  exec_setup_scripts();
+
   init_TableDir();
+  load_setttings();
+  load_gtab_list();
   load_phrase();
 
   gtk_init (&argc, &argv);
@@ -344,10 +436,10 @@ main(int argc, char **argv)
   gdk_window_add_filter(NULL, my_gdk_filter, NULL);
 
   signal(SIGINT, do_exit);
-#if 1
+
   // disable the io handler abort
   void *olderr = XSetErrorHandler((XErrorHandler)xerror_handler);
-#endif
+
   gtk_main();
 
   return 0;

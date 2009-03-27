@@ -1,3 +1,4 @@
+export GCIN_TABLE_DIR=./data
 export GCIN_XIM=gcin_test
 pkill gcin.test
 export LC_ALL=zh_TW.Big5

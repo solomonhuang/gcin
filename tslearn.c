@@ -2,7 +2,7 @@
 #include "pho.h"
 
 GtkWidget *hbox_buttons;
-char current_str[MAX_PHRASE_LEN*2+1];
+char current_str[MAX_PHRASE_LEN*CH_SZ+1];
 
 
 GtkWidget *mainwin;
@@ -19,7 +19,7 @@ static int qcmp_str(const void *aa, const void *bb)
 }
 
 
-void load_phrase()
+void load_ts_phrase()
 {
   FILE *fp;
   char fname[256];
@@ -42,24 +42,28 @@ void load_phrase()
 
   while (!feof(fp)) {
     phokey_t phbuf[MAX_PHRASE_LEN];
-    char chbuf[MAX_PHRASE_LEN * 2 + 1];
+    char chbuf[MAX_PHRASE_LEN * CH_SZ + 1];
     u_char clen;
     char usecount;
 
     clen = 0;
 
     fread(&clen,1,1,fp);
+
+    if (clen > MAX_PHRASE_LEN)
+      p_err("bad tsin db clen %d > MAX_PHRASE_LEN %d\n", clen, MAX_PHRASE_LEN);
+
     fread(&usecount,1,1,fp);
     fread(phbuf,sizeof(phokey_t), clen, fp);
-    fread(chbuf,2,clen,fp);
+    fread(chbuf, CH_SZ, clen,fp);
 
     if (clen < 2)
       continue;
 
-    chbuf[clen*2]=0;
-    phrase = realloc(phrase, sizeof(char *) * (phraseN+1));
+    chbuf[clen * CH_SZ]=0;
+    phrase = trealloc(phrase, char *, phraseN+1);
 
-    if (strlen(chbuf) < 4)
+    if (strlen(chbuf) < CH_SZ*2)
       p_err("error %d] %s clen:%d", phraseN, chbuf, clen);
 
     phrase[phraseN++] = strdup(chbuf);
@@ -92,29 +96,7 @@ static void cb_button_parse(GtkButton *button, gpointer user_data)
 
   int i;
 
-  load_phrase();
-#if 0
-  static gboolean compacted = FALSE;
-  if (!compacted) {
-    for(i=0; i < char_count; ) {
-      GtkTextIter start, end;
-
-      gtk_text_buffer_get_iter_at_offset (buffer, &start, i);
-      gtk_text_buffer_get_iter_at_offset (buffer, &end, i+1);
-
-      char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-      if (utf8[0]=='\n') {
-        gtk_text_buffer_delete(buffer, &start, &end);
-        char_count--;
-      } else
-        i++;
-
-      g_free(utf8);
-    }
-
-    compacted = TRUE;
-  }
-#endif
+  load_ts_phrase();
 
   char_count = gtk_text_buffer_get_char_count (buffer);
 
@@ -126,7 +108,7 @@ static void cb_button_parse(GtkButton *button, gpointer user_data)
     int len;
 
     for(len=MAX_PHRASE_LEN; len>=2 ; len--) {
-      u_char txt[MAX_PHRASE_LEN*2 + 1];
+      u_char txt[MAX_PHRASE_LEN*CH_SZ + 1];
       int txtN=0;
 
       gboolean b_ignore = FALSE;
@@ -136,33 +118,18 @@ static void cb_button_parse(GtkButton *button, gpointer user_data)
         gtk_text_buffer_get_iter_at_offset (buffer, &start, i+k);
         gtk_text_buffer_get_iter_at_offset (buffer, &end, i+k+1);
         char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-        int rn, wn;
-        GError *error = NULL;
 
-        u_char *locstr = g_locale_from_utf8(utf8, strlen(utf8), &rn, &wn, &error);
-        g_free(utf8);
-
-
-        if (error) {
-          dbg("utf8->locale convert err %s %s\n", utf8, error->message);
-          g_error_free(error);
-          b_ignore = TRUE;
-          continue;
-        }
-
-        if (locstr[0] < 128)
+        if (!(utf8[0] & 128))
           b_ignore = TRUE;
 
-#if 0
-        if (wn)
-          dbg("locstr %s %d\n", locstr, writen);
-#endif
-        memcpy(&txt[txtN], locstr, wn);
+        int wn = strlen(utf8);
+
+        memcpy(&txt[txtN], utf8, wn);
+
         txtN+= wn;
-        g_free(locstr);
       }
 
-      if (b_ignore || txtN < 4)
+      if (b_ignore || txtN < CH_SZ*2)
         continue;
 
       txt[txtN] = 0;
@@ -220,6 +187,7 @@ static void cb_button_ok(GtkButton *button, gpointer user_data)
   }
 
   save_phrase_to_db(pharr, current_str, bigphoN);
+
   destroy_pho_sel_area();
 
   GtkTextMark *selebound =  gtk_text_buffer_get_selection_bound(buffer);
@@ -249,14 +217,9 @@ GtkWidget *create_pho_sel_area()
     int j;
     for(j=0; j < bigpho[i].phokeysN; j++) {
       char *phostr = phokey_to_str(bigpho[i].phokeys[j]);
-      int rn, wn;
-      GError *err = NULL;
-      char *utf8 = g_locale_to_utf8 (phostr, strlen(phostr), &rn, &wn, &err);
 
-      GtkWidget *item = gtk_menu_item_new_with_label (utf8);
+      GtkWidget *item = gtk_menu_item_new_with_label (phostr);
       gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
-
-      g_free(utf8);
     }
 
     gtk_option_menu_set_menu (GTK_OPTION_MENU (bigpho[i].opt_menu), menu);
@@ -289,33 +252,22 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
     return;
 
   char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-  int rn, wn;
-  GError *error = NULL;
-
-  u_char *locstr = g_locale_from_utf8(utf8, strlen(utf8), &rn, &wn, &error);
+  strcpy(current_str, utf8);
   g_free(utf8);
 
-  strcpy(current_str, locstr);
-  int locstrN = strlen(locstr);
-
-  if (locstrN & 1) {
-    dbg("not all big5 chars");
-    goto ret;
-  }
-
-  dbg("locstr: %s", locstr);
+  int current_strN = strlen(utf8);
 
   bigphoN = 0;
   int i;
-  for(i=0; i< locstrN; i+=2) {
+  for(i=0; i < current_strN; i+=CH_SZ) {
     phokey_t phokey[64];
     big5char_pho *pbigpho = &bigpho[bigphoN++];
 
-    pbigpho->phokeysN = big5_pho_chars(&locstr[i], pbigpho->phokeys);
+    pbigpho->phokeysN = big5_pho_chars(&current_str[i], pbigpho->phokeys);
 
     if (!pbigpho->phokeysN) {
       dbg(" no mapping to pho\n");
-      goto ret;
+      return;
     }
 
     dbg(" phokeyN: %d", bigpho[i].phokeysN);
@@ -328,8 +280,6 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
 
   gtk_widget_show_all(hbox_buttons);
 
-ret:
-  g_free(locstr);
 }
 
 Display *dpy;
@@ -368,17 +318,9 @@ int main(int argc, char **argv)
 
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
-  GError *err = NULL;
-  char *text = "«ö·Æ¹«¤¤Áä, ¶K¤W§A­n tslearn ¾Ç²ßªº¤å³¹¡C";
-  int rn, wn;
-  char *utf8 = g_locale_to_utf8 (text, strlen(text), &rn, &wn, &err);
+  char *text = "æŒ‰æ»‘é¼ ä¸­éµ, è²¼ä¸Šä½ è¦ tslearn å­¸ç¿’çš„æ–‡ç« ã€‚";
 
-  if (err) {
-    dbg("conver err %s %s\n", text, err->message);
-    g_error_free(err);
-  }
-
-  gtk_text_buffer_set_text (buffer, utf8, -1);
+  gtk_text_buffer_set_text (buffer, text, -1);
 
   gtk_text_buffer_create_tag (buffer,
      "blue_background", "background", "blue", "foreground", "white", NULL);

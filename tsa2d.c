@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
-#include "pho.h"
 #include "gcin.h"
+#include "pho.h"
 
 typedef struct {
-	u_char ch[2];
+	u_char ch[CH_SZ];
 	u_short ph;
 } ITEM;
 
@@ -47,7 +47,7 @@ static int qcmp(const void *a, const void *b)
     return 1;
   if (lena < lenb)
     return -1;
-  return memcmp(&bf[cha],&bf[chb],lena*2);
+  return memcmp(&bf[cha],&bf[chb],lena*CH_SZ);
 }
 
 static int shiftb[]={9,7,3,0};
@@ -60,9 +60,11 @@ int lookup(u_char *s)
   if (*s < 128)
     return *s-'0';
 
-  tt[0]=s[0];
-  tt[1]=s[1];
-  tt[2]=0;
+  int len = utf8_sz(s);
+
+  bchcpy(tt, s);
+  tt[len]=0;
+
 
   for(i=0;i<3;i++)
     if (pp=strstr(pho_chars[i],tt))
@@ -71,25 +73,7 @@ int lookup(u_char *s)
   if (i==3)
     return 0;
 
-  return (((pp-pho_chars[i])>>1) << shiftb[i]);
-}
-
-void prph(u_short kk)
-{
-  u_int k1,k2,k3,k4;
-
-  k4=(kk&7)<<1;
-  kk>>=3;
-  k3=(kk&15)<<1;
-  kk>>=4;
-  k2=(kk&3)<<1;
-  kk>>=2;
-  k1=(kk&31)<<1;
-  printf("%c%c%c%c%c%c%c%c",
-          pho_chars[0][k1], pho_chars[0][k1+1],
-          pho_chars[1][k2], pho_chars[1][k2+1],
-          pho_chars[2][k3], pho_chars[2][k3+1],
-          pho_chars[3][k4], pho_chars[3][k4+1]);
+  return (((pp-pho_chars[i])/CH_SZ) << shiftb[i]);
 }
 
 
@@ -97,11 +81,11 @@ main(int argc, char **argv)
 {
   FILE *fp,*fw;
   u_char s[1024];
-  u_char chbuf[80][2];
+  u_char chbuf[80][CH_SZ];
   u_short phbuf[80];
   int i,j,k1,k2,k3,k4,num,idx,len, ofs, dupcou;
   u_short kk;
-  u_char tt[3], uu[3],phlen;
+  u_char phlen;
   int hashidx[TSIN_HASH_N];
   u_char clen, llen;
   gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
@@ -138,6 +122,8 @@ main(int argc, char **argv)
 
     fgets(s,sizeof(s),fp);
     len=strlen(s);
+    if (s[0]=='#')
+      continue;
 
     if (s[len-1]=='\n')
       s[--len]=0;
@@ -148,8 +134,11 @@ main(int argc, char **argv)
     i=0;
     int chbufN=0;
     while (s[i]!=' ' && i<len) {
-      memcpy(chbuf[chbufN],&s[i],2);
-      i+=2;
+      int len = utf8_sz(&s[i]);
+
+      memcpy(chbuf[chbufN], &s[i], len);
+
+      i+=len;
       chbufN++;
     }
 
@@ -157,10 +146,12 @@ main(int argc, char **argv)
     int phbufN=0;
     while (i<len && phbufN < chbufN && s[i]!=' ') {
       kk=0;
+
       while (s[i]!=' ' && i<len) {
-        kk|=lookup(&s[i]);
+        kk |= lookup(&s[i]);
+
         if (s[i]&128)
-          i+=2;
+          i += CH_SZ;
         else
           i++;
       }
@@ -192,8 +183,8 @@ main(int argc, char **argv)
     memcpy(&bf[ofs++],&usecount,1);
     memcpy(&bf[ofs],phbuf, clen * sizeof(phokey_t));
     ofs+=clen * sizeof(phokey_t);
-    memcpy(&bf[ofs],chbuf,(int)clen*2);
-    ofs+=clen * 2;
+    memcpy(&bf[ofs], chbuf, (int)clen*CH_SZ);
+    ofs+=clen * CH_SZ;
     if (ofs+100 >= bfsize) {
       bfsize+=65536;
       if (!(bf=(u_char *)realloc(bf,bfsize))) {
@@ -235,7 +226,8 @@ main(int argc, char **argv)
     idx = phidx[i];
     sidx[j]=ofs;
     len=bf[idx];
-    clen=sizeof(phokey_t)*len + 2*len + 1 + 1;
+    clen=sizeof(phokey_t)*len + CH_SZ*len + 1 + 1;
+
     if (memcmp(s, &bf[idx], clen)) {
       memcpy(&sf[ofs], &bf[idx], clen);
       memcpy(s, &bf[idx], clen);
@@ -253,11 +245,11 @@ main(int argc, char **argv)
     hashidx[i]=-1;
 
   for(i=0;i<phcount;i++) {
-    u_short kk,jj;
+    phokey_t kk,jj;
 
     idx=sidx[i];
     idx+=2;
-    memcpy(&kk,&sf[idx],2);
+    memcpy(&kk, &sf[idx], sizeof(phokey_t));
     jj=kk;
     kk>>=TSIN_HASH_SHIFT;
     if (hashidx[kk] < 0) {
@@ -291,7 +283,7 @@ main(int argc, char **argv)
   puts("Writing data tsin.idx");
   if ((fw=fopen("tsin.idx","w"))==NULL) {
     puts("create err");
-     exit(-1);
+    exit(-1);
   }
 
   fwrite(&phcount,4,1,fw);
