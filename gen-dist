@@ -1,4 +1,4 @@
-cp ~/.gcin/tsin.src data
+cp -f ~/.gcin/tsin.src data
 
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
 rm -f tags core.*

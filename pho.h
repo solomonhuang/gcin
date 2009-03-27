@@ -42,3 +42,5 @@ char *phokey_to_str(phokey_t kk);
 
 #define MAX_PH_BF_EXT (MAX_PH_BF + MAX_PHRASE_LEN + 1)
 
+
+#define TSIN_HASH_SHIFT 6

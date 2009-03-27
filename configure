@@ -1,3 +1,4 @@
+#!/bin/bash
 
 MAKE=make
 which gmake >& /dev/null

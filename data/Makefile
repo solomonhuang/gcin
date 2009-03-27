@@ -6,13 +6,13 @@ DATAKEEP=symbol-table
 all:	$(DATA)
 
 tsin:	tsin.src
-	../tsa2d $<
+	export GCIN_NO_RELOAD=; ../tsa2d $<
 
 tsin.idx:	tsin.src
-	../tsa2d $<
+	export GCIN_NO_RELOAD=; ../tsa2d $<
 
 pho.tab:	 pho.tab.src
-	../phoa2d
+	export GCIN_NO_RELOAD=; ../phoa2d
 
 et.kbm:
 	../kbmcv   et

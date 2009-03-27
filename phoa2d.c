@@ -76,8 +76,10 @@ main(int argc, char **argv)
   char *fname = "pho.tab.src";
   FILE *fp;
   char s[64];
+  gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
-  gtk_init(&argc, &argv);
+  if (reload)
+    gtk_init(&argc, &argv);
 
   if ((fp=fopen(fname,"r"))==NULL)
     p_err("cannot open %s\n", fname);
@@ -159,6 +161,8 @@ main(int argc, char **argv)
 
   fclose(fp);
 
-  send_gcin_message(GDK_DISPLAY(), "reload");
+  if (reload)
+    send_gcin_message(GDK_DISPLAY(), "reload");
+
   return 0;
 }

@@ -27,7 +27,7 @@ PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup
 PROGS_CV=kbmcv
 
 all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
-	make -C data
+	$(MAKE) -C data
 
 gcin:      $(OBJS) $(IMdkitLIB)
 	$(CC) -o $@ $(OBJS) $(IMdkitLIB) $(LDFLAGS)
@@ -56,7 +56,7 @@ kbmcv:  $(OBJS_kbmcv)
 	$(CC) -o $@ $(OBJS_kbmcv)
 
 $(IMdkitLIB):
-	make -C IMdkit/lib
+	$(MAKE) -C IMdkit/lib
 
 install:
 	install -d $(GCIN_TABLE_DIR)
@@ -67,7 +67,7 @@ install:
 	install -d $(bindir)
 	install -d $(libdir)/menu
 	install -m 644 menu/* $(libdir)/menu
-	make -C data install
+	$(MAKE) -C data install
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 menu/* /usr/lib/menu; \
 	   which update-menus >& /dev/null && update-menus; \
@@ -80,8 +80,8 @@ install:
 	   install -s $(PROGS) $(bindir); \
 	fi
 clean:
-	make -C IMdkit clean
-	make -C data clean
+	$(MAKE) -C IMdkit clean
+	$(MAKE) -C data clean
 	rm -f *.o *~ *.E config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
 	cd ..; tar cvfj gcin.tbz gcin
 

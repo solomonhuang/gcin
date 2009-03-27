@@ -13,7 +13,6 @@ typedef struct {
 	u_short ph;
 } ITEM;
 
-int hash[TSIN_HASH_N];
 
 int *phidx, *sidx, phcount;
 int bfsize, phidxsize;
@@ -103,10 +102,12 @@ main(int argc, char **argv)
   int i,j,k1,k2,k3,k4,num,idx,len, ofs, dupcou;
   u_short kk;
   u_char tt[3], uu[3],phlen;
-  int hashidx[256];
+  int hashidx[TSIN_HASH_N];
   u_char clen, llen;
+  gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
-  gtk_init(&argc, &argv);
+  if (reload)
+    gtk_init(&argc, &argv);
 
   if (argc > 1) {
     if ((fp=fopen(argv[1], "r"))==NULL) {
@@ -258,7 +259,7 @@ main(int argc, char **argv)
     idx+=2;
     memcpy(&kk,&sf[idx],2);
     jj=kk;
-    kk>>=6;
+    kk>>=TSIN_HASH_SHIFT;
     if (hashidx[kk] < 0) {
       hashidx[kk]=i;
     }
@@ -267,13 +268,13 @@ main(int argc, char **argv)
   if (hashidx[0]==-1)
     hashidx[0]=0;
 
-  hashidx[255]=phcount;
-  for(i=254;i>=0;i--) {
+  hashidx[TSIN_HASH_N-1]=phcount;
+  for(i=TSIN_HASH_N-2;i>=0;i--) {
     if (hashidx[i]==-1)
       hashidx[i]=hashidx[i+1];
   }
 
-  for(i=1;i<256;i++) {
+  for(i=1; i< TSIN_HASH_N; i++) {
     if (hashidx[i]==-1)
       hashidx[i]=hashidx[i-1];
   }
@@ -300,6 +301,8 @@ main(int argc, char **argv)
 
   fclose(fw);
 
-  send_gcin_message(GDK_DISPLAY(), "reload");
+  if (reload)
+    send_gcin_message(GDK_DISPLAY(), "reload");
+
   exit(0);
 }

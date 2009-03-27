@@ -459,7 +459,11 @@ static void get_sel_phrase()
     mlen=MAX_PHRASE_LEN;
 
   key=ph_buf[c_idx];
-  j=key>>6;
+  j= key >> TSIN_HASH_SHIFT;
+
+  if (j >= TSIN_HASH_N)
+    return;
+
   sti=hashidx[j];
   edi=hashidx[j+1];
   phrase_count = 0;
@@ -588,7 +592,11 @@ static u_char scanphr(phokey_t *pp, int plen)
   phokey_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
   u_char len, mlen, usecount, stch[MAX_PHRASE_LEN * 2];;
   int sti,edi;
-  int i=*pp>>6;
+  int i= *pp>> TSIN_HASH_SHIFT;
+
+  if (i >= TSIN_HASH_N)
+    return 0;
+
   int top=hashidx[i];
   int bot=edi=hashidx[i+1];
 

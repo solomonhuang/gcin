@@ -104,7 +104,10 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
   memcpy(&tbuf[2], phkeys, sizeof(phokey_t)* len);
   memcpy(&tbuf[sizeof(phokey_t)*len + 2], big5str, 2*len);
 
-  hashno=phkeys[0]>>6;
+  hashno=phkeys[0] >> TSIN_HASH_SHIFT;
+  if (hashno >= TSIN_HASH_N)
+    return FALSE;
+
   for(mid=hashidx[hashno]; mid<hashidx[hashno+1]; mid++) {
     u_char usecount;
 

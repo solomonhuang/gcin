@@ -1,3 +1,7 @@
+0.2.1:
+- more FreeBSD port fix from statue.bbs@bbs.sayya.org
+- 輸入 '【】' 注音會當掉的問題。
+
 0.2.0:
 新增下列符號的注音，
 ㄣ‧  『   (引號)
