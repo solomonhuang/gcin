@@ -148,9 +148,30 @@ static void cb_ts_edit()
 
 static void cb_help()
 {
+  char *editors[] = { "gedit", "kedit", "kate", NULL };
   char cmd[512];
+  char **p;
 
-  sprintf(cmd, "gedit %s/README &", DOC_DIR);
+  for (p= editors; *p; p++) {
+    char tt[64];
+
+    sprintf(tt, "/usr/bin/%s", *p);
+    if (access(tt, X_OK))
+      break;
+
+    sprintf(tt, "/usr/local/bin/%s", *p);
+    if (access(tt, X_OK))
+      break;
+  }
+
+  if (! *p) {
+    dbg("cannot invoke any editors %s", getenv("PATH"));
+    abort();
+  }
+
+
+  sprintf(cmd, "export LC_CTYPE=zh_TW.UTF-8; %s %s/README &", *p, DOC_DIR);
+  dbg("cmd %s\n", cmd);
   system(cmd);
 }
 

@@ -90,10 +90,17 @@ int sequ(char *s, char *t)
 }
 
 typedef struct {
-	u_long key;
-	u_char ch[CH_SZ];
-	u_short oseq;
+  u_long key;
+  u_char ch[CH_SZ];
+  u_short oseq;
 } ITEM2;
+
+typedef struct {
+  u_int64_t key;
+  u_char ch[CH_SZ];
+  u_short oseq;
+} ITEM2_64;
+
 
 #define MAX_K (40000)
 ITEM2 itar[MAX_K], itmp[MAX_K];

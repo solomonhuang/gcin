@@ -6,6 +6,11 @@ typedef struct {
 } ITEM;
 
 typedef struct {
+  u_char key[8];   /* If I use u_long key, the struc size will be 8 */
+  u_char ch[CH_SZ];
+} ITEM64;
+
+typedef struct {
   u_char quick1[46][10][CH_SZ];
 } QUICK_KEYS;
 
@@ -21,18 +26,19 @@ struct TableHead {
   QUICK_KEYS qkeys;
 };
 
-u_long CONVT(char *s);
+
 #define KeyBits (6)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
 #define MAX_GTAB_NUM_KEY 10
-#define MAX_GTAB_ITEM_KEY_LEN (sizeof(((ITEM*)0)->key) * 8 / KeyBits)
+#define MAX_GTAB_ITEM_KEY_LEN (sizeof(((ITEM64 *)0)->key) * 8 / KeyBits)
 #define MAX_SELKEY 16
 
 typedef u_short gtab_idx1_t;
 
 typedef struct {
   ITEM *tbl;
+  ITEM64 *tbl64;
   QUICK_KEYS qkeys;
   int use_quick;
 #define MAX_CNAME (4*CH_SZ+1)
@@ -53,6 +59,8 @@ typedef struct {
   char *phrbuf;
   char filename[16];
   time_t file_modify_time;
+  gboolean key64;        // db is 64 bit-long key
+  int max_keyN;
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
@@ -63,3 +71,6 @@ typedef enum {
   GTAB_space_auto_first_nofull=4  // windows ar30
 } GTAB_space_pressed_E;
 
+
+u_int CONVT(char *s);
+u_int64_t CONVT2(INMD *inmd, int i);

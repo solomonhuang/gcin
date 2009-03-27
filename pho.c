@@ -564,7 +564,7 @@ int feedkey_pho(KeySym xkey)
       }
 
       if (ityp3_pho && !cpg) {
-        dbg("start_idx: %d\n", start_idx);
+//        dbg("start_idx: %d\n", start_idx);
         putkey_pho(key, start_idx);
       }
 

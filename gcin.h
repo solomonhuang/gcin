@@ -91,6 +91,7 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 #include "gcin-conf.h"
 
 #define MAX_TAB_KEY_NUM 5
+#define MAX_TAB_KEY_NUM64 10
 
 #define bchcpy(a,b) memcpy(a,b, CH_SZ)
 #define bchcmp(a,b) memcmp(a,b, CH_SZ)

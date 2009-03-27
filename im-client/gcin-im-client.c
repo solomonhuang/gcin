@@ -331,6 +331,9 @@ void gcin_im_client_focus_in(GCIN_client_handle *handle)
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_focus_in error");
   }
+
+  gcin_im_client_set_cursor_location(handle, handle->spot_location.x,
+     handle->spot_location.y);
 }
 
 void gcin_im_client_focus_out(GCIN_client_handle *handle)

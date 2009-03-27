@@ -7,6 +7,7 @@
 #include "gtab.h"
 #include "pho.h"
 #include "gcin-conf.h"
+#include <regex.h>
 
 typedef enum {
   SAME_PHO_QUERY_none = 0,
@@ -20,7 +21,6 @@ extern char *TableDir;
 
 #define MAX_SEL_BUF ((CH_SZ + 1) * MAX_SELKEY + 1)
 
-u_long CONVT(char *s);
 
 INMD inmd[MAX_GTAB_NUM_KEY+1];
 
@@ -73,13 +73,15 @@ void lookup_gtab(char *ch, char out[])
   for(i=0; i < cur_inmd->DefChars; i++) {
     if (bchcmp(cur_inmd->tbl[i].ch, ch))
       continue;
-    u_long key = CONVT(cur_inmd->tbl[i].key);
+    u_int64_t key = CONVT2(cur_inmd, i);
 
     int j;
 
     int tlen=0;
     char t[CH_SZ * MAX_GTAB_ITEM_KEY_LEN + 1];
-    for(j=MAX_TAB_KEY_NUM-1; j>=0; j--) {
+    int key_num = cur_inmd->key64 ? MAX_TAB_KEY_NUM64 : MAX_TAB_KEY_NUM;
+
+    for(j=key_num-1; j>=0; j--) {
 
       int sh = j * KeyBits;
       int k = (key >> sh) & 0x3f;
@@ -403,6 +405,8 @@ void init_gtab(int inmdno, int usenow)
 
   fclose(fp);
 
+  inp->max_keyN = 5;
+
   if (usenow) {
     cur_inmd=inp;
 //    reset_inp();
@@ -415,6 +419,12 @@ static char match_phrase[MAX_PHRASE_STR_LEN];
 static int part_matched_len;
 gboolean find_match(char *str, int len, char *match_str);
 void start_gtab_pho_query(char *utf8);
+
+static void clear_phrase_match_buf()
+{
+   part_matched_len = 0;
+   match_phrase[0]=0;
+}
 
 static void putstr_inp(u_char *p)
 {
@@ -467,8 +477,7 @@ static void putstr_inp(u_char *p)
 #if DPHR
             dbg("no match\n");
 #endif
-            part_matched_len = 0;
-            match_phrase[0]=0;
+            clear_phrase_match_buf();
           }
         }
       }
@@ -520,79 +529,103 @@ static gboolean set_sel1st_i()
 
 #define swap(a,b) { tt=a; a=b; b=tt; }
 
-static u_long vmask[]=
+static u_int vmask[]=
 { 0,
   0x3f<<24,  (0x3f<<24)|(0x3f<<18), (0x3f<<24)|(0x3f<<18)|(0x3f<<12),
  (0x3f<<24)|(0x3f<<18)|(0x3f<<12)|(0x3f<<6),
  (0x3f<<24)|(0x3f<<18)|(0x3f<<12)|(0x3f<<6)|0x3f
 };
 
+#define KKK ((u_int64_t)0x3f)
 
-/* for strict match, use stack */
+
+static u_int64_t vmask64[]=
+{ 0,
+  (KKK<<54),
+  (KKK<<54)|(KKK<<48),
+  (KKK<<54)|(KKK<<48)|(KKK<<42),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18)|(KKK<<12),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18)|(KKK<<12)|(KKK<<6),
+  (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18)|(KKK<<12)|(KKK<<6)|KKK
+};
+
+#define LAST_K_bitN (cur_inmd->key64 ? 54:24)
+#define KEY_N (cur_inmd->max_keyN)
+
+// for strict match, use stack
 void wildcard()
 {
-  int i,t,vv,match, wild_ofs=0;
-  u_long kk;
+  int i,t,match, wild_ofs=0;
+  u_int64_t  kk,vv;
   int found=0;
+  regex_t reg;
 
   ClrSelArea();
   bzero(seltab,sizeof(seltab));
   /* printf("wild %d %d %d %d\n", inch[0], inch[1], inch[2], inch[3]); */
   defselN=0;
+  char regstr[16];
+  int regstrN=0;
+
+  regstr[regstrN++]=' ';
+
+  for(i=0; i < KEY_N; i++) {
+    if (!inch[i])
+      break;
+    if (inch[i] == 62) {
+      regstr[regstrN++]='.';
+      regstr[regstrN++]='*';
+    } else
+    if (inch[i] == 61) {
+      regstr[regstrN++]='.';
+    } else {
+      char c = inch[i] + '0';         // start from '0'
+      if (strchr("*.\()[]", c))
+      regstr[regstrN++] = '\\';
+      regstr[regstrN++]=c;
+    }
+  }
+
+  regstr[regstrN++]=' ';
+  regstr[regstrN]=0;
+
+//  dbg("regstr %s\n", regstr);
+
+  if (regcomp(&reg, regstr, 0)) {
+    dbg("regcomp failed\n");
+    return;
+  }
 
   char tt[MAX_SEL_BUF];
   tt[0]=0;
 
-  for(t=0; t< cur_inmd->DefChars && defselN<10; t++) {
+  for(t=0; t< cur_inmd->DefChars && defselN < strlen(cur_inmd->selkey); t++) {
     ITEM it = cur_inmd->tbl[t];
 
-    kk=CONVT(it.key);
+    kk=CONVT2(cur_inmd, t);
     match=1;
+    char ts[32];
+    int tsN=0;
 
-    for(i=0;i<ci&&match && kk;) {
-      switch (inch[i]) {
-        case 61: /* ? */
-          kk=(kk<<6) & vmask[4];
-          i++;
-          break;
-        case 62: /* * */
-          if (i==ci-1) {
-            kk=0;
-            i++;
-            break;
-          }
+    ts[tsN++]= ' ';
 
-          if (inch[i+1]=='*' || inch[i+1]=='?') {
-            i+=2;
-            continue;
-          }
-
-          do {
-            vv=(kk>>24)&0x3f;
-            kk=(kk<<6) & vmask[4];
-          } while (vv && vv!=inch[i+1]);
-
-          if (vv!=inch[i+1]) match=0;
-
-          if (i==ci-2 && kk)
-            continue;
-
-          i+=2;
-          continue;
-        default:
-          if (inch[i]!=((kk>>24)&0x3f)) {
-            match=0;
-            break;
-          }
-
-          kk=(kk<<6) & vmask[4];
-          i++;
-      } /* switch */
+    for(i=0; i < KEY_N; i++) {
+      char c = (kk >> (LAST_K_bitN - i*6)) & 0x3f;
+      if (!c)
+        break;
+      ts[tsN++] = c + '0';
     }
 
-    if (i==ci && match && !(kk&vmask[4])) {
+    ts[tsN++]= ' ';
+    ts[tsN]=0;
+
+    if (!regexec(&reg, ts, 0, 0, 0)) {
       if (wild_ofs >= wild_page) {
-        b1_cat(tt, (defselN+1)%10 + '0');
+        b1_cat(tt, cur_inmd->selkey[defselN]);
         bch_cat(tt, it.ch);
         bchcpy(seltab[defselN++],it.ch);
         b1_cat(tt, ' ');
@@ -603,14 +636,17 @@ void wildcard()
     }
   } /* for t */
 
+  regfree(&reg);
   disp_gtab_sel(tt);
 
   if (!found)
     bell();
 }
 
-static char *ptr_selkey(char key)
+static char *ptr_selkey(KeySym key)
 {
+  if (key>= XK_KP_0 && key<= XK_KP_9)
+    key-= XK_KP_0 - '0';
   return strchr(cur_inmd->selkey, key);
 }
 
@@ -657,6 +693,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   char *pselkey= NULL;
   gboolean phrase_selected = FALSE;
 
+//  dbg("uuuuu %x %x\n", key, kbstate);
+
   if (!cur_inmd)
     return 0;
 
@@ -699,12 +737,14 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     return 1;
   }
 
+  gboolean has_wild = FALSE;
 
   switch (key) {
     case XK_BackSpace:
 #if     DELETE_K
     case XK_Delete:
 #endif
+      clear_phrase_match_buf();
       last_idx=0;
       if (ci==0) return 0;
       if (ci>0) inch[--ci]=0;
@@ -721,6 +761,9 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         goto Disp_opt;
       }
       break;
+    case XK_Return:
+      clear_phrase_match_buf();
+      return 0;
     case XK_Escape:
       close_gtab_pho_win();
       if (ci) {
@@ -738,6 +781,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
       return 0;
     case ' ':
+      for(i=0;i<5;i++)
+        if (inch[i]>60) {
+          has_wild = TRUE;
+        }
+
       if (wild_mode) {
         if (defselN==10)
           wild_page+=10;
@@ -756,7 +804,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
           return 1;
         }
         return 0;
-      } else {
+      } else
+      if (!has_wild) {
 //        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);
         if (gtab_space_auto_first == GTAB_space_auto_first_any && seltab[0][0] &&
             sel1st_i==MAX_SELKEY-1 && exa_match<=cur_inmd->M_DUP_SEL) {
@@ -775,13 +824,12 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       last_full=0;
       spc_pressed=1;
 
-      for(i=0;i<5;i++)
-        if (inch[i]>60) {
-          wild_page=0;
-          wild_mode=1;
-          wildcard();
-          return 1;
-        }
+      if (has_wild) {
+        wild_page=0;
+        wild_mode=1;
+        wildcard();
+        return 1;
+      }
 
       break;
     case '?':
@@ -811,28 +859,42 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       init_gtab_pho_query_win();
       return 1;
     default:
-      if (key>=XK_KP_0 && key<=XK_KP_9)
-#if 0
-        key-=XK_KP_0-'0';
-#else
-        return 0;
+      if (key>=XK_KP_0 && key<=XK_KP_9) {
+        if (!spc_pressed)
+          return 0;
+      }
+
+      pselkey=ptr_selkey(key);
+
+#if 1 // for dayi, testcase :  6 space keypad6
+//      dbg("iiiiiiii %x %d\n", pselkey, spc_pressed);
+      if (spc_pressed && pselkey) {
+//        dbg("iiiiiiii\n");
+        int vv = pselkey - cur_inmd->selkey;
+
+        if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
+          vv++;
+
+        if (vv<0)
+          vv=9;
+
+        if (seltab[vv][0]) {
+          putstr_inp(seltab[vv]);
+          return 1;
+        }
+      }
 #endif
 
       if ((key < 32 || key > 0x7e) && (gtab_full_space_auto_first||spc_pressed)) {
 //        dbg("sel1st_i:%d  '%c'\n", sel1st_i, seltab[sel1st_i][0]);
-
         if (seltab[sel1st_i][0])
           putstr_inp(seltab[sel1st_i]);  /* select 1st */
 
         return 0;
       }
 
-      pselkey=ptr_selkey(key);
-#if 0
-      if (pselkey && !ci)
-        return 0;
-#endif
-      if (!pselkey && seltab[sel1st_i][0] && !wild_mode &&
+//      dbg("iii %x\n", pselkey);
+      if (seltab[sel1st_i][0] && !wild_mode &&
            (gtab_full_space_auto_first||spc_pressed)) {
         putstr_inp(seltab[sel1st_i]);  /* select 1st */
       }
@@ -880,10 +942,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
             return 1;
           }
       }
-
+#if 1
       if (!inkey && pselkey && defselN)
         goto YYYY;
-
+#endif
       if (!inkey && !pselkey)
         return 0;
   } /* switch */
@@ -898,7 +960,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   DispInArea();
 
-  static u_long val; // needs static
+  static u_int64_t val; // needs static
   val=0;
 
   for(i=0; i < MAX_TAB_KEY_NUM; i++)
@@ -912,31 +974,32 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     s1=cur_inmd->idx1[inch[0]];
 
   e1=cur_inmd->idx1[inch[0]+1];
-  while ((CONVT(cur_inmd->tbl[s1].key)&vmask[ci]) != val &&
-          CONVT(cur_inmd->tbl[s1].key)<val &&  s1<e1)
+  while ((CONVT2(cur_inmd, s1) & vmask[ci]) != val &&
+          CONVT2(cur_inmd, s1) < val &&  s1<e1)
     s1++;
 
   last_idx=s1;
 #if 0
   dbg("inch %d %d   val:%x\n", inch[0], inch[1], val);
-  dbg("s1:%d e1:%d key:%x ci:%d vmask[ci]:%x ch:%c%c and:%x\n", s1, e1, CONVT(cur_inmd->tbl[s1].key),
+  dbg("s1:%d e1:%d key:%x ci:%d vmask[ci]:%x ch:%c%c and:%x\n", s1, e1, CONVT2(cur_inmd, s1),
      ci, vmask[ci], cur_inmd->tbl[s1].ch[0], cur_inmd->tbl[s1].ch[1],
-     (CONVT(cur_inmd->tbl[s1].key)&vmask[ci]));
+     (CONVT2(cur_inmd, s1)&vmask[ci]));
 
   dbg("pselkey:%x  %d  defselN:%d\n", pselkey,
-       (CONVT(cur_inmd->tbl[s1].key) & vmask[ci])!=val,
+       (CONVT2(cur_inmd, s1) & vmask[ci])!=val,
        defselN);
 #endif
 
 
 XXXX:
-  if ((CONVT(cur_inmd->tbl[s1].key) & vmask[ci])!=val || (wild_mode && defselN) ||
+  if ((CONVT2(cur_inmd, s1) & vmask[ci])!=val || (wild_mode && defselN) ||
                   ((ci==cur_inmd->MaxPress||spc_pressed) && defselN && pselkey) ) {
+#if 1
 YYYY:
     if ((pselkey || wild_mode) && defselN) {
-      int vv=pselkey - cur_inmd->selkey;
+      int vv = pselkey - cur_inmd->selkey;
 
-      if ((gtab_space_auto_first & GTAB_space_auto_first_any))
+      if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
         vv++;
 
       if (vv<0)
@@ -947,6 +1010,7 @@ YYYY:
         return 1;
       }
     }
+#endif
 
     if (pselkey && !defselN)
       return 0;
@@ -972,9 +1036,9 @@ refill:
 
     exa_match=0;
     bzero(seltab, sizeof(seltab));
-    while (CONVT(cur_inmd->tbl[j].key)==val && exa_match <= cur_inmd->M_DUP_SEL) {
+    while (CONVT2(cur_inmd, j)==val && exa_match <= cur_inmd->M_DUP_SEL) {
       if (cur_inmd->tbl[j].ch[0] >= 0x80)
-        bchcpy(seltab[exa_match++],cur_inmd->tbl[j].ch);
+        bchcpy(seltab[exa_match++], cur_inmd->tbl[j].ch);
 
       j++;
     }
@@ -986,8 +1050,8 @@ refill:
       defselN--;
 
     if (gtab_disp_partial_match)
-    while((CONVT(cur_inmd->tbl[j].key)&vmask[ci])==val && j<e1) {
-      int fff=cur_inmd->keycol[(CONVT(cur_inmd->tbl[j].key)>>shiftb) & 0x3f];
+    while((CONVT2(cur_inmd, j) & vmask[ci])==val && j<e1) {
+      int fff=cur_inmd->keycol[(CONVT2(cur_inmd, j)>>shiftb) & 0x3f];
 
       if (!(seltab[fff][0]) ||
            (bchcmp(seltab[fff],cur_inmd->tbl[j].ch)>0 && fff > exa_match)) {
@@ -1004,7 +1068,7 @@ next_pg:
     defselN=more_pg=0;
     bzero(seltab,sizeof(seltab));
 
-    while(CONVT(cur_inmd->tbl[j].key)==val && defselN<cur_inmd->M_DUP_SEL && j<e1) {
+    while(CONVT2(cur_inmd, j)==val && defselN<cur_inmd->M_DUP_SEL && j<e1) {
       if (cur_inmd->tbl[j].ch[0]<0x80)
         load_phr(j++, seltab[defselN++]);
       else
@@ -1019,7 +1083,7 @@ next_pg:
       }
     }
 
-    if (j<e1 && CONVT(cur_inmd->tbl[j].key)==val && defselN==cur_inmd->M_DUP_SEL) {
+    if (j<e1 && CONVT2(cur_inmd, j)==val && defselN==cur_inmd->M_DUP_SEL) {
       pg_idx=j;
       more_pg=1;
       m_pg_mode=1;
