@@ -6,6 +6,13 @@ if [ $? = 0 ]; then
   MAKE=gmake
 fi
 
+uname | grep FreeBSD >& /dev/null
+if [ $? = 0 ]; then
+  FREEBSD=1
+else
+  FREEBSD=0
+fi
+
 
 prefix="/usr/local"
 
@@ -73,8 +80,10 @@ echo "GCIN_SCRIPT_DIR_i=\$(datadir)/gcin/script" >> config.mak
 echo "OPTFLAGS=$OPTFLAGS" >> config.mak
 echo "DOC_DIR=\$(datadir_r)/doc/gcin-$GCIN_VERSION" >> config.mak
 echo "GCIN_ICON_DIR=\$(datadir_r)/icons/gcin" >> config.mak
+echo "SYS_ICON_DIR=\$(datadir_r)/icons" >> config.mak
 echo "GCIN_ICON_DIR_i=\$(datadir)/icons/gcin" >> config.mak
 echo "GCIN_BIN_DIR=\$(bindir_r)" >> config.mak
+echo "FREEBSD=$FREEBSD" >> config.mak
 
 
 cd menu

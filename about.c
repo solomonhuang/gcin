@@ -25,6 +25,11 @@ void align_with_ui_window(GtkWidget *win);
 
 void create_about_window()
 {
+    if (about_window) {
+      gtk_window_present(GTK_WINDOW(about_window));
+      return;
+    }
+
     /* GtkWidget is the storage type for widgets */
     GtkWidget *button;
     GtkWidget *vbox = gtk_vbox_new(FALSE,3);
@@ -33,7 +38,7 @@ void create_about_window()
     /* Create a new about_window */
     about_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-    gtk_window_set_title (GTK_WINDOW (about_window), "About fftv");
+    gtk_window_set_title (GTK_WINDOW (about_window), "關於 gcin");
 
     /* It's a good idea to do this for all windows. */
     g_signal_connect (G_OBJECT (about_window), "destroy",
@@ -71,7 +76,7 @@ void create_about_window()
 
 
     /* Now on to the image stuff */
-    image = gtk_image_new_from_file ("/usr/share/icons/gcin.png");
+    image = gtk_image_new_from_file (SYS_ICON_DIR"/gcin.png");
 
     /* Create a label for the button */
     label_version = gtk_label_new ("version " GCIN_VERSION);

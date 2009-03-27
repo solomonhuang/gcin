@@ -301,7 +301,8 @@ int main(int argc, char **argv)
 
   long pos=ftell(fr);
   int olineno = lineno;
-  gboolean key64 = th2.endkey[0]!=0;
+  gboolean key64 = FALSE;
+
 
   while (!feof(fr)) {
     int len;
@@ -421,6 +422,7 @@ int main(int argc, char **argv)
 
   chno=cpcount;
   th.DefC=chno;
+  cur_inmd->DefChars = chno;
 
   if (key64)
     qsort(itmp64,chno,sizeof(ITEM2_64),qcmp_64);
@@ -462,12 +464,17 @@ int main(int argc, char **argv)
 
   if (key64) {
     fwrite(gtab64_header, 1, strlen(gtab64_header)+1, fw);
+  } else
+  if (th2.endkey[0]) {
+    dbg("32 bit with endkeys\n");
+    fwrite(gtab32_ver2_header, 1, strlen(gtab32_ver2_header)+1, fw);
   }
+
 
   printf("Defined Characters:%d\n", chno);
 
   fwrite(&th,1,sizeof(th),fw);
-  if (key64)
+  if (key64 || th2.endkey[0])
     fwrite(&th2,1,sizeof(th2),fw);
 
   fwrite(keymap, 1, KeyNum, fw);

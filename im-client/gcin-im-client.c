@@ -68,7 +68,11 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
       save_old_sigaction_single(SIGCHLD, &ori_act);
 
       if ((pid=fork())==0) {
+#if 	FREEBSD
+        setgrp();
+#else
         setpgrp();
+#endif
         execl(execbin, "gcin", NULL);
       } else {
         sleep(1);

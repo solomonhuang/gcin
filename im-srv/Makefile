@@ -8,7 +8,7 @@ OBJS = im-srv.o im-addr.o im-dispatch.o ../im-client/gcin-crypt.o
 im-srv.a:	$(OBJS)
 	ar cr $@ $(OBJS)
 	ranlib $@
-	cd ..; make
+	cd ..; $(MAKE)
 
 clean:
 	rm -f *.a *.o *~ *.E *.db config.mak tags core.* .depend

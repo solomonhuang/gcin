@@ -22,7 +22,8 @@ WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
-        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\"
+        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
+        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\"
 
 IMdkitLIB = IMdkit/lib/libXimd.a
 im-srv = im-srv/im-srv.a

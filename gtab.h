@@ -83,7 +83,7 @@ typedef enum {
 
 
 u_int64_t CONVT2(INMD *inmd, int i);
-extern char gtab64_header[];
+extern char gtab64_header[], gtab32_ver2_header[];
 extern INMD *cur_inmd;
 
 #define LAST_K_bitN (cur_inmd->key64 ? 54:24)

@@ -302,21 +302,29 @@ void init_gtab(int inmdno, int usenow)
 
   fread(ttt, 1, strlen(gtab64_header)+1, fp);
 
-  if (strcmp(ttt, gtab64_header)) {
+  gboolean read_th2 = FALSE;
+
+  if (!strcmp(ttt, gtab64_header)) {
+    inp->max_keyN = 10;
+    inp->key64 = TRUE;
+    read_th2 = TRUE;
+    dbg("it's a 64-bit .gtab\n");
+  } else
+  if (!strcmp(ttt, gtab32_ver2_header)) {
+    inp->max_keyN = 5;
+    read_th2 = TRUE;
+    dbg("it's a 32-bit ver2 .gtab\n");
+  }
+  else {
     inp->max_keyN = 5;
     fseek(fp, 0, SEEK_SET);
   }
-  else {
-    inp->max_keyN = 10;
-    inp->key64 = TRUE;
-    dbg("it's a 64-bit .gtab\n");
-  }
-
 
   strcpy(uuu,ttt);
 
   fread(&th,1,sizeof(th),fp);
-  if (inp->key64) {
+  if (read_th2) {
+    dbg("read_th2\n");
     fread(&th2,1,sizeof(th2),fp);
     memcpy(inp->endkey, th2.endkey, sizeof(th2.endkey));
   }
@@ -446,6 +454,10 @@ void init_gtab(int inmdno, int usenow)
     DispInArea();
   }
 
+
+  dbg("key64: %d\n", inp->key64);
+
+
 #if 0
   for(i='A'; i < 127; i++)
     printf("%d] %c %d\n", i, i, inp->keymap[i]);
@@ -471,8 +483,9 @@ static void clear_phrase_match_buf()
 
 static void putstr_inp(u_char *p)
 {
-  if (strlen(p) > CH_SZ)
+  if (strlen(p) > CH_SZ || p[0] < 128) {
     send_text(p);
+  }
   else {
     char tt[512];
 
@@ -737,7 +750,7 @@ void reset_gtab_all()
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
-  int i,j;
+  int i,j=0;
   static int s1,e1;
   int inkey;
   char *pselkey= NULL;
@@ -921,9 +934,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       pselkey=ptr_selkey(key);
 
 #if 1 // for dayi, testcase :  6 space keypad6
-//      dbg("iiiiiiii %x %d\n", pselkey, spc_pressed);
       if (spc_pressed && pselkey) {
-//        dbg("iiiiiiii\n");
         int vv = pselkey - cur_inmd->selkey;
 
         if ((gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
@@ -963,7 +974,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       inkey=cur_inmd->keymap[key];
       spc_pressed=0;
 
-      dbg("ci: %d\n", ci);
 #if 1
       // for cj & boshiamy to input digits
       if (!ci && !inkey)

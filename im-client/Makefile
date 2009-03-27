@@ -12,7 +12,7 @@ OBJS = gcin-im-client.o im-addr.o gcin-conf.o util.o gcin-crypt.o
 
 libgcin-im-client.so:   $(OBJS)
 	$(CC) -shared $(OBJS) -o $@
-	make -C ../gtk-im
+	$(MAKE) -C ../gtk-im
 
 install:
 	install -d $(libdir)

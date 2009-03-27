@@ -198,6 +198,10 @@ net 上網
 
 那可不可以與單字重覆定義按鍵呢？可以的，在按空白鍵後就可以選字 or 詞。
 -----------------------------------------------------------
+- 倉頡、行列輸入法中，現在可以直接輸入 linux，就可以跑出 linux，其餘的輸入法可以自己加到 .cin 後重新執行 gcin2tab。還有(gnome kde gaim gcin xmms xine gedit kate kedit adsl hbo tvbs dvd vcd lcd)
+
+新加入的 keys 不要與原有的重複，如果原有的本來就重複，那就沒關係。
+-----------------------------------------------------------
 以下的 嘸蝦米 table 僅供測試用，如果有長期使用，請購買合法版權。
 download http://edt1023.sayya.org/misc/noseeing-2.tar.gz
 tar xvfz noseeing-2.tar.gz

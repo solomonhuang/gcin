@@ -501,6 +501,9 @@ static void create_main_win()
                      G_CALLBACK (close_application),
                      NULL);
 
+  gtk_window_set_icon_from_file(GTK_WINDOW(main_window), SYS_ICON_DIR"/gcin.png", NULL);
+
+
   GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (main_window), vbox);
 
