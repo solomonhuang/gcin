@@ -67,9 +67,6 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
   if (newsockfd >= gcin_clientsN) {
     gcin_clients = trealloc(gcin_clients, GCIN_ENT, newsockfd+1);
     gcin_clientsN = newsockfd;
-  } else {
-    if (gcin_clients[newsockfd].cs)
-      free(gcin_clients[newsockfd].cs);
   }
 
   bzero(&gcin_clients[newsockfd], sizeof(gcin_clients[0]));

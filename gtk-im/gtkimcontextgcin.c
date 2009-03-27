@@ -48,11 +48,8 @@ struct _GtkIMContextGCIN
 
   GCIN_client_handle *gcin_ch;
 
-//  guint filter_key_release : 1;
-//  guint use_preedit : 1;
-//  guint finalizing : 1;
-  guint in_toplevel : 1;
-  guint has_focus : 1;
+//  guint in_toplevel : 1;
+//  guint has_focus : 1;
 };
 
 struct _GtkGCINInfo
@@ -62,7 +59,7 @@ struct _GtkGCINInfo
   GtkSettings *settings;
   gulong status_set;
   gulong preedit_set;
-  GSList *ics;
+//  GSList *ics;
 
   guint reconnecting :1;
 };
@@ -87,7 +84,6 @@ static void     gtk_im_context_gcin_get_preedit_string (GtkIMContext          *c
 						       PangoAttrList        **attrs,
 						       gint                  *cursor_pos);
 
-static void reinitialize_ic      (GtkIMContextGCIN *context_xim);
 static void set_ic_client_window (GtkIMContextGCIN *context_xim,
 				  GdkWindow       *client_window);
 
@@ -132,10 +128,12 @@ gtk_im_context_xim_register_type (GTypeModule *type_module)
 static void
 reinitialize_all_ics (GtkGCINInfo *info)
 {
+#if 0
   GSList *tmp_list;
 
   for (tmp_list = info->ics; tmp_list; tmp_list = tmp_list->next)
     reinitialize_ic (tmp_list->data);
+#endif
 }
 
 static void gcin_display_closed (GdkDisplay *display,
@@ -162,7 +160,7 @@ get_im (GtkIMContextGCIN *context_xim)
   info->settings = NULL;
   info->preedit_set = 0;
   info->status_set = 0;
-  info->ics = NULL;
+//  info->ics = NULL;
   info->reconnecting = FALSE;
 //  info->im = NULL;
 
@@ -200,11 +198,8 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
 static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
-//  im_context_gcin->use_preedit = TRUE;
-//  im_context_gcin->filter_key_release = FALSE;
-//  im_context_gcin->finalizing = FALSE;
-  im_context_gcin->has_focus = FALSE;
-  im_context_gcin->in_toplevel = FALSE;
+//  im_context_gcin->has_focus = FALSE;
+//  im_context_gcin->in_toplevel = FALSE;
 }
 
 static void
@@ -220,16 +215,6 @@ gtk_im_context_gcin_finalize (GObject *obj)
     context_xim->gcin_ch = NULL;
   }
 //  set_ic_client_window (context_xim, NULL);
-}
-
-static void
-reinitialize_ic (GtkIMContextGCIN *context_xim)
-{
-  /*
-     reset filter_key_release flag, otherwise keystrokes will be doubled
-     until reconnecting to GCIN.
-  */
-//  context_xim->filter_key_release = FALSE;
 }
 
 /* Finds the GtkWidget that owns the window, or if none, the
@@ -257,6 +242,7 @@ widget_for_window (GdkWindow *window)
  */
 static void update_in_toplevel (GtkIMContextGCIN *context_xim)
 {
+#if 0
   if (context_xim->client_widget)
     {
       GtkWidget *toplevel = gtk_widget_get_toplevel (context_xim->client_widget);
@@ -269,6 +255,7 @@ static void update_in_toplevel (GtkIMContextGCIN *context_xim)
   /* Some paranoia, in case we don't get a focus out */
   if (!context_xim->in_toplevel)
     context_xim->has_focus = FALSE;
+#endif
 }
 
 
@@ -286,10 +273,9 @@ set_ic_client_window (GtkIMContextGCIN *context_xim,
 		      GdkWindow       *client_window)
 {
 //  printf("set_ic_client_window\n");
-  reinitialize_ic (context_xim);
   if (context_xim->client_window)
     {
-      context_xim->im_info->ics = g_slist_remove (context_xim->im_info->ics, context_xim);
+//      context_xim->im_info->ics = g_slist_remove (context_xim->im_info->ics, context_xim);
       context_xim->im_info = NULL;
     }
 
@@ -299,7 +285,7 @@ set_ic_client_window (GtkIMContextGCIN *context_xim,
   if (context_xim->client_window)
     {
       context_xim->im_info = get_im (context_xim);
-      context_xim->im_info->ics = g_slist_prepend (context_xim->im_info->ics, context_xim);
+//      context_xim->im_info->ics = g_slist_prepend (context_xim->im_info->ics, context_xim);
 #if 1
       if (context_xim->gcin_ch) {
         gcin_im_client_set_window(context_xim->gcin_ch, GDK_DRAWABLE_XID(client_window));
@@ -349,11 +335,8 @@ gtk_im_context_xim_new (void)
 {
 //  printf("gtk_im_context_gcin_new\n");
   GtkIMContextGCIN *result;
-  const gchar *charset;
 
   result = GTK_IM_CONTEXT_GCIN (g_object_new (GTK_TYPE_IM_CONTEXT_GCIN, NULL));
-
-  g_get_charset (&charset);
 
   return GTK_IM_CONTEXT (result);
 }
@@ -437,13 +420,9 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
 
 //  printf("gtk_im_context_gcin_focus_in\n");
 
-  if (!context_xim->has_focus)
-    {
-      context_xim->has_focus = TRUE;
-      if (context_xim->gcin_ch) {
-        gcin_im_client_focus_in(context_xim->gcin_ch);
-      }
-    }
+  if (context_xim->gcin_ch) {
+    gcin_im_client_focus_in(context_xim->gcin_ch);
+  }
 
   return;
 }
@@ -455,13 +434,9 @@ gtk_im_context_gcin_focus_out (GtkIMContext *context)
 
 //  printf("gtk_im_context_gcin_focus_out\n");
 
-  if (context_xim->has_focus)
-    {
-      context_xim->has_focus = FALSE;
-      if (context_xim->gcin_ch) {
-        gcin_im_client_focus_out(context_xim->gcin_ch);
-      }
-    }
+  if (context_xim->gcin_ch) {
+    gcin_im_client_focus_out(context_xim->gcin_ch);
+  }
 
   return;
 }

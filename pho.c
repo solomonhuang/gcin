@@ -190,7 +190,13 @@ gboolean inph_typ_pho(int newkey)
         ttt=idx_pho[vv].key;
         mask_key_typ_pho(&ttt);
 
-        if (ttt>=key  && (!b_hsu_kbm || ttt!=0x1002)) { // hsu, keys(ld) conflict with ㄌ2 –
+//        dbg("ttt:%x\n", ttt);
+
+        if (ttt>=key  && (!b_hsu_kbm ||
+           (ttt!=0x1002 && ttt!=0x604 && ttt!=0x603))) {
+                /* hsu, keys(ld) conflict with ㄌ2 –
+                             mj           with ㄇ2 》
+                 */
           break;
         }
         else

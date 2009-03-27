@@ -101,7 +101,7 @@ static int phseq(u_char *a, u_char *b)
 
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
 {
-  int mid, ord, ph_ofs, hashno, hashno_end, i;
+  int mid, ord = 0, ph_ofs, hashno, i;
   FILE *fw;
   u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2],
          sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2];
@@ -221,7 +221,6 @@ void build_ts_gtab()
   int tstmpN=0;
 
   while (!feof(fph)) {
-    int ofs = ftell(fph);
     if (!(tstmp=trealloc(tstmp, TS_TMP, tstmpN + 1)))
       p_err("tsin.c:realloc err");
 
@@ -259,7 +258,7 @@ static int load_ts_gtab(int idx, char *tstr)
 int find_match(char *str, int len, char *match_chars)
 {
   if (!len)
-    return;
+    return 0;
 
   if (!ts_gtabN)
     build_ts_gtab();

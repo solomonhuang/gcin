@@ -19,7 +19,9 @@ Mandrake
 中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin 
 -------------------
 如果使用 .tar.bz2 安裝者， table path 是 /usr/local/share/gcin/table，而不是 /usr/share/gcin/table
-選擇 .tar.bz2 者，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)， 如果不喜歡，可以在 ./configure 後修改 config.mak。
+選擇 .tar.bz2 者，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)，不過 compile 出來的可執行檔的大小大很多，如果不喜歡，可以在 ./configure 後修改 config.mak。
+
+由 .tar.bz2 需要 install libgtk+2.0_0-devel 這個 .rpm，不過各家的名字可能不太一樣，可能要找一下。另外，你還需要 install pkg-config 這個 .rpm 。
  
 -----------------
 
@@ -360,7 +362,8 @@ gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000。
 目前只支援 GTK2，但是 gcin 有提供非常容易使用的 API 介面供其他 terminal & QT_IM_MODULE 
 使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
 
-gcin 如果使用到自己的 IM_MODULE 時，tty (console) 會出現以下 message
+gcin 如果使用到自己的 IM_MODULE 時，且用 export GCIN_CONNECT_MSG_ON=
+tty (console) 會出現以下 message
 a. connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin   
 或是
 b.  gcin client connected to server 172.x.x.x:9999
@@ -369,5 +372,6 @@ b.  gcin client connected to server 172.x.x.x:9999
 
 目前 OpenOffice GTK2 的版本好像仍然是使用 XIM。
 
-http://www.csie.nctu.edu.tw/~cp76/linux/mrxvt.tbz 是一個使用 gcin IM client 的 mrxvt。
+http://www.csie.nctu.edu.tw/~cp76/linux/mrxvt-gcin.tbz 是一個使用 gcin IM client 的 mrxvt。
+http://www.csie.nctu.edu.tw/~cp76/linux/rxvt-gcin.tbz 是一個使用 gcin IM client 的 rxvt。
 ------------------------------------------------------------------------------------------------------

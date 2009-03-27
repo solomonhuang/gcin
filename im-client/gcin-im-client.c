@@ -46,13 +46,14 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   }
 
   Atom gcin_addr_atom = get_gcin_addr_atom(dpy);
-  Window gcin_win;
+  Window gcin_win = None;
 
 
 #define MAX_TRY 3
   int loop;
   for(loop=0; loop < MAX_TRY; loop++) {
-    if (gcin_addr_atom && (gcin_win=XGetSelectionOwner(dpy, gcin_addr_atom))!=None)
+    if ((gcin_addr_atom && (gcin_win=XGetSelectionOwner(dpy, gcin_addr_atom))!=None)
+        || getenv("GCIN_IM_CLEINT_NO_AUTO_EXEC"))
       break;
     static time_t exec_time;
 
@@ -77,7 +78,7 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
     }
   }
 
-  if (loop == MAX_TRY)
+  if (loop == MAX_TRY || gcin_win == None)
     goto next;
 
 
@@ -404,9 +405,12 @@ int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr)
 {
+  // in case client didn't send focus in event
   if (!BITON(handle->flag, FLAG_GCIN_client_handle_has_focus)) {
     gcin_im_client_focus_in(handle);
     handle->flag |= FLAG_GCIN_client_handle_has_focus;
+    gcin_im_client_set_cursor_location(handle, handle->spot_location.x,
+       handle->spot_location.y);
   }
 
 //  dbg("gcin_im_client_forward_key_press\n");

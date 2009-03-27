@@ -20,8 +20,6 @@ void update_in_win_pos();
 extern char *output_buffer;
 extern int output_bufferN;
 
-
-// note that the content in p is changed
 int write_enc(int fd, void *p, int n)
 {
 
@@ -43,7 +41,7 @@ int write_enc(int fd, void *p, int n)
 
 static void shutdown_client(int fd, int rn)
 {
-  dbg("client shutdown rn %d\n", rn);
+//  dbg("client shutdown rn %d\n", rn);
   gdk_input_remove(gcin_clients[fd].tag);
 
   if (gcin_clients[fd].cs == current_CS)

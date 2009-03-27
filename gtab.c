@@ -777,10 +777,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
 
       pselkey=ptr_selkey(key);
-
+#if 0
       if (pselkey && !ci)
         return 0;
-
+#endif
       if (!pselkey && seltab[sel1st_i][0] && !wild_mode &&
            (gtab_full_space_auto_first||spc_pressed)) {
         putstr_inp(seltab[sel1st_i]);  /* select 1st */

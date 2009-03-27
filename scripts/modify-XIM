@@ -71,7 +71,7 @@ fi
 cd /etc/alternatives
 if [ -f xinput-zh_TW ]; then
   [ -f xinput-zh_TW.orig.gcin ] || mv xinput-zh_TW xinput-zh_TW.orig.gcin
-  echo > xinput-zh_TW << __END
+  cat > xinput-zh_TW << __END
 XIM=gcin
 XIM_PROGRAM=gcin
 XIM_ARGS=""

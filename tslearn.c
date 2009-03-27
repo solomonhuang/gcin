@@ -232,7 +232,7 @@ GtkWidget *create_pho_sel_area()
   g_signal_connect (G_OBJECT (button_ok), "clicked",
      G_CALLBACK (cb_button_ok), NULL);
 
-  GtkWidget *button_cancel = gtk_button_new_with_label("cancel");
+  GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   gtk_box_pack_start (GTK_BOX (hbox_pho_sel), button_cancel, FALSE, FALSE, 20);
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
      G_CALLBACK (cb_button_cancel), NULL);
@@ -260,7 +260,6 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
   bigphoN = 0;
   int i;
   for(i=0; i < current_strN; i+=CH_SZ) {
-    phokey_t phokey[64];
     big5char_pho *pbigpho = &bigpho[bigphoN++];
 
     pbigpho->phokeysN = utf8_pho_keys(&current_str[i], pbigpho->phokeys);
@@ -291,6 +290,7 @@ void do_exit()
   exit(0);
 }
 
+void load_tsin_db();
 
 int main(int argc, char **argv)
 {
@@ -333,12 +333,12 @@ int main(int argc, char **argv)
   hbox_buttons = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_buttons, FALSE, FALSE, 0);
 
-  GtkWidget *button_parse = gtk_button_new_with_label("Mark");
+  GtkWidget *button_parse = gtk_button_new_with_label("標示詞");
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_parse, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_parse), "clicked",
      G_CALLBACK (cb_button_parse), NULL);
 
-  GtkWidget *button_add = gtk_button_new_with_label("Add phrase");
+  GtkWidget *button_add = gtk_button_new_with_label("新增詞");
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_add, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_add), "clicked",
      G_CALLBACK (cb_button_add), NULL);

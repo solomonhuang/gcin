@@ -1,3 +1,19 @@
+0.6.4:
+- GTK_IM_CLIENT=gcin 用 GTK 的 mouse 右鍵來使用切換輸入法 menu ，容易造成當掉的問題。
+- 大易輸入法 圖(7oo)，無法輸入的問題。感謝 kiwi03.bbs@ptt.cc 回報問題。 
+- gcin 有時候會當掉的問題，不過，由於 gcin 在 GTK_IM_MODULES=gcin 時有自動重新啟動的功能，
+  這個問題一般是感覺不到。
+- 注音新增塵(ㄇㄢˊ) 這一個 UTF-8 才有的字。使用者必須自行  cp /usr/share/gcin/table/pho.tab ~/.gcin
+
+
+0.6.3:
+- 許氏鍵盤裡  『按』打不出來，打法是 MJ，但是打出來是『》』，Thanks to formulaone.bbs@ptt.cc
+- 注音 新增 ㄋㄜ‧ 呢
+- 為了許氏注音鍵盤新增輸入ㄣ，卻可以選擇ㄋ，Thanks to stick.bbs@bbs.cis.nctu.edu.tw
+   使用者必須自行  cp /usr/share/gcin/table/pho.tab ~/.gcin
+- Fedora Core 3 的 install script 有問題，/etc/alternatives/xinput-zh_TW 會被弄壞。
+
+
 0.6.2:
 - Makfile install 的問題，感謝 diadia.bbs@bbs.sayya.org 回報問題。
 - 詞音輸入法使用許式鍵盤"而"(ld)打不出來
