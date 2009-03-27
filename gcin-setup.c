@@ -18,6 +18,7 @@ static struct {
 
 static GtkWidget *check_button_phrase_pre_select, *check_button_gtab_dup_select_bell,
                  *check_button_gtab_auto_select_by_phrase,
+                 *check_button_gtab_press_full_auto_send,
                  *check_button_gtab_pre_select;
 
 static GtkWidget *opt_spc_opts;
@@ -356,7 +357,7 @@ struct {
   { NULL, 0},
 };
 
-static GtkWidget *spinner;
+static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol;
 
 static gboolean cb_win0_conf_ok( GtkWidget *widget,
                                    GdkEvent  *event,
@@ -364,8 +365,13 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
 {
 
   int font_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner));
-
   save_gcin_conf_int(GCIN_FONT_SIZE, font_size);
+
+  int font_size_tsin_presel = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_presel));
+  save_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PRESEL, font_size_tsin_presel);
+
+  int font_size_symbol = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_symbol));
+  save_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, font_size_symbol);
 
   save_gcin_conf_int(GTAB_DUP_SELECT_BELL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_dup_select_bell)));
@@ -375,6 +381,9 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
 
   save_gcin_conf_int(GTAB_PRE_SELECT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_pre_select)));
+
+  save_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_press_full_auto_send)));
 
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
@@ -442,15 +451,30 @@ void create_win0_conf_window()
     gtk_container_add (GTK_CONTAINER (gcin_win0_conf_window), vbox_top);
 
     GtkWidget *frame_font_size = gtk_frame_new("字型大小");
-    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size, FALSE, FALSE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (frame_font_size), 3);
-
-
     GtkAdjustment *adj =
      (GtkAdjustment *) gtk_adjustment_new (gcin_font_size, 8.0, 24.0, 1.0, 1.0, 0.0);
-
     spinner = gtk_spin_button_new (adj, 0, 0);
     gtk_container_add (GTK_CONTAINER (frame_font_size), spinner);
+
+
+    GtkWidget *frame_font_size_tsin_presel = gtk_frame_new("詞音預選詞視窗字型大小");
+    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_tsin_presel, FALSE, FALSE, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_tsin_presel), 3);
+    GtkAdjustment *adj_tsin_presel =
+     (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_presel, 8.0, 24.0, 1.0, 1.0, 0.0);
+    spinner_tsin_presel = gtk_spin_button_new (adj_tsin_presel, 0, 0);
+    gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_presel), spinner_tsin_presel);
+
+
+    GtkWidget *frame_font_size_symbol = gtk_frame_new("符號選擇視窗字型大小");
+    gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_symbol, FALSE, FALSE, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_symbol), 3);
+    GtkAdjustment *adj_symbol =
+     (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 24.0, 1.0, 1.0, 0.0);
+    spinner_symbol = gtk_spin_button_new (adj_symbol, 0, 0);
+    gtk_container_add (GTK_CONTAINER (frame_font_size_symbol), spinner_symbol);
 
 
     GtkWidget *frame_gtab = gtk_frame_new("倉頡/行列/嘸蝦米/大易");
@@ -493,6 +517,18 @@ void create_win0_conf_window()
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_pre_select),
        gtab_pre_select);
+
+
+
+    GtkWidget *hbox_gtab_press_full_auto_send = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_press_full_auto_send, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_gtab_press_full_auto_send = gtk_label_new("按滿自動送字");
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_press_full_auto_send), label_gtab_gtab_press_full_auto_send,  FALSE, FALSE, 0);
+    check_button_gtab_press_full_auto_send = gtk_check_button_new ();
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_press_full_auto_send), check_button_gtab_press_full_auto_send,  FALSE, FALSE, 0);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_press_full_auto_send),
+       gtab_press_full_auto_send);
 
 
     GtkWidget *button_close = gtk_button_new_with_label ("OK");

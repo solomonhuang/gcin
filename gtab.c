@@ -360,7 +360,7 @@ static void putstr_inp(u_char *p)
     lookup_gtab(p, tt);
     sendkey_b5(p);
 
-    if (gtab_auto_select_by_phrase) {
+    if (gtab_auto_select_by_phrase && !(gtab_space_auto_first & GTAB_space_auto_first_any)) {
       if (part_matched_len < strlen(match_phrase) &&
           !memcmp(&match_phrase[part_matched_len], p, CH_SZ)) {
           part_matched_len+=CH_SZ;
@@ -870,10 +870,7 @@ refill:
 
       j++;
     }
-#if 0
-    if (defselN)
-      qsort(seltab, defselN, MAX_CIN_PHR, qcmp_b5);
-#endif
+
     exa_match=defselN-1;
 
     while((CONVT(cur_inmd->tbl[j].key)&vmask[ci])==val && j<e1) {
@@ -904,7 +901,7 @@ next_pg:
 //        dbg("sel1st_i %d %d %d\n", ci, cur_inmd->MaxPress, spc_pressed);
         sel1st_i=0;
 
-        if (gtab_auto_select_by_phrase)
+        if (gtab_auto_select_by_phrase && !(gtab_space_auto_first & GTAB_space_auto_first_any))
           phrase_selected = set_sel1st_i();
       }
     }
@@ -922,8 +919,10 @@ next_pg:
       if (ci==cur_inmd->MaxPress)
         last_full=1;
 
-      putstr_inp(seltab[0]);
-      return 1;
+      if (spc_pressed || gtab_press_full_auto_send) {
+        putstr_inp(seltab[0]);
+        return 1;
+      }
     } else
     if (!defselN) {
       bell();

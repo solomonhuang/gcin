@@ -373,10 +373,10 @@ void load_tab_pho_file()
 }
 
 
+void show_win_pho();
+
 void init_tab_pho(int usenow)
 {
-  int i,cou;
-
   if (!ch_pho) {
     load_tab_pho_file();
   }
@@ -522,7 +522,7 @@ llll3:
 
   key = pho2key(typ_pho);
 
-#if    1
+#if    0
   dbg("typ_pho %d %d %d %d\n", typ_pho[0], typ_pho[1], typ_pho[2], typ_pho[3]);
 #endif
   if (!key)
@@ -544,15 +544,15 @@ llll3:
   if (ttt > key || (ityp3_pho && idx_pho[vv].key != key) ) {
     while (jj<4) {
       while(kk<3)
-        if (phkbm.phokbm[inph[jj]][kk].num ) {
+        if (phkbm.phokbm[(int)inph[jj]][kk].num ) {
 
           if (kk) {
-            ctyp=phkbm.phokbm[inph[jj]][kk-1].typ;
+            ctyp=phkbm.phokbm[(int)inph[jj]][kk-1].typ;
             typ_pho[ctyp]=0;
           }
 
-          kno=phkbm.phokbm[inph[jj]][kk].num;
-          ctyp=phkbm.phokbm[inph[jj]][kk].typ;
+          kno=phkbm.phokbm[(int)inph[jj]][kk].num;
+          ctyp=phkbm.phokbm[(int)inph[jj]][kk].typ;
           typ_pho[ctyp]=kno;
           kk++;
           goto llll2;

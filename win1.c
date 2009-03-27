@@ -47,7 +47,7 @@ void create_win1_gui()
 
     labels_sele[i] = gtk_label_new(NULL);
     gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
-    set_label_font_size(labels_sele[i], gcin_font_size);
+    set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
 
     gtk_container_add (GTK_CONTAINER(align), labels_sele[i]);
   }
@@ -91,6 +91,8 @@ void set_sele_text(int i, char *text, int len)
 }
 
 
+void move_win_char_index(GtkWidget *win1, int index);
+
 void disp_selections(int idx)
 {
   move_win_char_index(gwin1, idx);
@@ -128,5 +130,5 @@ void change_win1_font()
   int i;
 
   for(i=0; i < SELEN; i++)
-    set_label_font_size(labels_sele[i], gcin_font_size);
+    set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
 }

@@ -9,15 +9,12 @@ static GtkWidget *button_gtab;
 static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM];
 static GtkWidget *button_input_method_name;
 static GtkWidget *label_key_codes;
-static int max_tab_keyN=5;
 static GtkWidget *image_pin;
 
 Window xwin_gtab;
 
 void disp_gtab(int index, char *gtabchar)
 {
-  GError *err = NULL;
-  int rn, wn;
   char utf8[512];
 
   if (gtabchar[0]==' ')
@@ -111,12 +108,10 @@ void create_win_gtab()
   xwin_gtab = GDK_WINDOW_XWINDOW(gdkwin);
 }
 
-
+void create_win_sym();
 
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
-  int x=event->x, y=event->y;
-
 //  dbg("mouse_button_callback %d\n", event->button);
   switch (event->button) {
     case 1:
@@ -166,7 +161,9 @@ static void cb_clicked_fixed_pos()
 }
 
 
-static cb_half_bull()
+void toggle_half_full_char();
+
+static void cb_half_bull()
 {
   toggle_half_full_char();
 }
@@ -251,6 +248,9 @@ void create_win_gtab_gui()
 }
 
 
+void show_win_sym();
+void init_gtab(int inmdno, int usenow);
+
 void show_win_gtab()
 {
 //  dbg("show_win_gtab %d ..\n", current_IC->in_method);
@@ -269,6 +269,8 @@ void show_win_gtab()
   show_win_sym();
 }
 
+
+void hide_win_sym();
 
 void hide_win_gtab()
 {

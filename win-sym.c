@@ -72,7 +72,7 @@ static gboolean read_syms()
       tt[len-1]=0;
 
     if (!strlen(tt))
-      return;
+      break;
 
     char *p=tt;
 
@@ -101,6 +101,7 @@ static gboolean read_syms()
 }
 
 gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len);
+void send_text_call_back(char *text);
 
 static void cb_button_sym(GtkButton *button, char *str)
 {
@@ -119,7 +120,7 @@ static void cb_button_sym(GtkButton *button, char *str)
     send_text_call_back(str);
 }
 
-
+void update_active_in_win_geom();
 
 void move_win_sym()
 {
@@ -188,6 +189,8 @@ void show_win_sym()
 
 
 void lookup_gtab(char *ch, char out[]);
+void str_to_all_phokey_chars(char *b5_str, char *out);
+
 static void sym_lookup_key(char *instr, char *outstr)
 {
   if (current_IC->in_method == 3 || current_IC->in_method == 6) {
@@ -261,13 +264,15 @@ void create_win_sym()
 
     int j;
     for(j=0; j < psym->symN; j++) {
-      GError *err = NULL;
       char *str = psym->sym[j];
 
       if (!str[0])
          continue;
 
-      GtkWidget *button = gtk_button_new_with_label(str);
+      GtkWidget *button = gtk_button_new();
+      GtkWidget *label = gtk_label_new(str);
+      gtk_container_add(GTK_CONTAINER(button), label);
+      set_label_font_size(label, gcin_font_size_symbol);
 
       gtk_container_set_border_width (GTK_CONTAINER (button), 0);
       gtk_box_pack_start (GTK_BOX (hbox_row), button, FALSE, FALSE, 0);

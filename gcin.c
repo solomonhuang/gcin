@@ -124,6 +124,8 @@ void CreateIC(IMChangeICStruct *call_data);
 void DeleteIC(CARD16 icid);
 void SetIC(IMChangeICStruct * call_data);
 void GetIC(IMChangeICStruct *call_data);
+int gcin_FocusIn(IMChangeFocusStruct *call_data);
+int gcin_FocusOut(IMChangeFocusStruct *call_data);
 
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
@@ -235,6 +237,8 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
      printf("Unknown major code.\n");
      break;
   }
+
+  return True;
 }
 
 
@@ -276,7 +280,7 @@ void open_xim()
 
 
 void load_tsin_db();
-void load_tsin_conf();
+void load_tsin_conf(), load_setttings(), load_tab_pho_file();
 
 static void reload_data()
 {
@@ -322,7 +326,7 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
           False, AnyPropertyType, &actual_type, &actual_format,
           &nitems,&bytes_after,(u_char **)&message) != Success) {
           dbg("err prop");
-          return;
+          return GDK_FILTER_REMOVE;
        }
 
        dbg("message '%s'\n", message);
@@ -356,6 +360,7 @@ void do_exit();
 void destory_win0();
 void destory_win1();
 void destroy_win_gtab();
+void free_pho_mem(),free_tsin(),free_all_IC(), free_gtab(), free_phrase();
 
 void do_exit()
 {
@@ -406,8 +411,8 @@ int main(int argc, char **argv)
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
   strcpy(xim_arr[1].xim_server_name, xim_server_name);
-  if ((locale_str=getenv("LC_ALL")) && !strcmp(locale_str, "zh_TW.UTF-8")) {
-    dbg("LC_ALL=%s, gcin will use UTF-8\n", locale_str);
+  if ((locale_str=getenv("LC_CTYPE")) && !strcmp(locale_str, "zh_TW.UTF-8")) {
+    dbg("LC_CTYPE=%s, gcin will use UTF-8\n", locale_str);
 
     xim_arr[0].b_send_utf8_str = TRUE;
     xim_arr[1].b_send_utf8_str = FALSE;

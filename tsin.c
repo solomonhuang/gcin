@@ -66,11 +66,15 @@ void load_tsin_conf()
 }
 
 
+void disp_char(int index, u_char *ch);
+
 static void disp_char_chbuf(int idx)
 {
   disp_char(idx, ch_buf[idx]);
 }
 
+
+void clr_tsin_cursor(int index);
 
 static void clrcursor()
 {
@@ -78,6 +82,7 @@ static void clrcursor()
 }
 
 static int last_cursor_idx=0;
+void set_cursor_tsin(int index);
 
 static void drawcursor()
 {
@@ -100,6 +105,8 @@ static void drawcursor()
   gdk_flush();
 }
 
+void inc_pho_count(u_short key, int ch_idx);
+int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5);
 
 static void putbuf(u_char s[][CH_SZ], int len)
 {
@@ -137,6 +144,8 @@ static void putbuf(u_char s[][CH_SZ], int len)
 }
 
 
+void hide_char(int index);
+
 static void prbuf()
 {
   int i;
@@ -158,6 +167,7 @@ static void prbuf()
 
 
 static int orig_disp_in_area_x = -1;
+void disp_tsin_pho(int index, char *pho);
 
 static void clr_in_area_pho_tsin()
 {
@@ -176,6 +186,9 @@ static void disp_in_area_pho_tsin()
   }
 }
 
+
+void clrin_pho();
+void clear_chars_all();
 
 static void restore_ai()
 {
@@ -210,10 +223,14 @@ static void clr_ch_buf()
 }
 
 
+void disp_tsin_eng_pho(int eng_pho);
+
 void show_stat()
 {
   disp_tsin_eng_pho(eng_ph);
 }
+
+void load_tsin_db();
 
 static void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
                     u_char *ch)
@@ -292,15 +309,10 @@ static void dump_tsidx_all()
 
 
 void load_tab_pho_file();
+void show_win0();
 
 void init_tab_pp(int usenow)
 {
-  FILE *fr;
-  int i,cou;
-  unsigned int ttt;
-  extern char *tabfname[];
-  char phofname[128];
-
   if (!ch_pho)
     load_tab_pho_file();
 
@@ -322,12 +334,12 @@ disp_prom:
   goto disp_prom;
 }
 
+gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len);
 
 static void save_phrase()
 {
-  int tt, ofs, top,bottom, mid, ord, ph_ofs, hashno, hashno_end, i;
-  FILE *fw;
-  u_char len, tbuf[24], sbuf[24], ch[16];
+  int tt, i;
+  u_char len;
 
   if (save_frm==save_to)
     return;
@@ -349,11 +361,10 @@ static void save_phrase()
     if (!ph_buf[i])
       return;
 
-  if (!save_phrase_to_db(&ph_buf[save_frm], &ch_buf[save_frm], len)) {
+  if (!save_phrase_to_db(&ph_buf[save_frm], (char *)&ch_buf[save_frm], len)) {
     bell();
   }
 
-cursor_end:
   clrcursor();
   ph_sta=-1;
   c_idx=c_len;
@@ -362,10 +373,11 @@ cursor_end:
 }
 
 #define PH_SHIFT_N (MAX_PH_BF - 1)
+void compact_win0();
 
 static void shift_ins()
 {
-   int i,j;
+   int j;
 
    if (!c_idx && c_len >= PH_SHIFT_N) {
      c_len--;
@@ -442,10 +454,9 @@ static u_short pho_count;
 
 static void get_sel_phrase()
 {
-  int sti,edi,i,j;
+  int sti,edi,j;
   phokey_t key, stk[10];
   u_char len, mlen, stch[MAX_PHRASE_LEN * CH_SZ + 1];
-  int cnd=0;
 
   mlen=c_len-c_idx;
 
@@ -515,7 +526,12 @@ static void get_sel_pho()
 }
 
 
-static int disp_current_sel_page()
+void clear_sele();
+void set_sele_text(int i, char *text, int len);
+void disp_selections(int idx);
+void disp_arrow_up(), disp_arrow_down();
+
+static void disp_current_sel_page()
 {
   int i;
 
@@ -693,7 +709,7 @@ static void disp_pre_sel_page()
     return;
   }
 
-  if (pre_selN==0 || pre_selN==1 && pre_sel[0].len==2)
+  if (pre_selN==0 || (pre_selN==1 && pre_sel[0].len==2))
     return;
 
   clear_sele();
@@ -706,7 +722,7 @@ static void disp_pre_sel_page()
 }
 
 
-static raise_phr(int c)
+static void raise_phr(int c)
 {
   int i,j,tmp;
   FILE *fp;
@@ -731,7 +747,7 @@ static raise_phr(int c)
   fclose(fp);
 }
 
-
+void hide_selections_win();
 static void close_selection_win()
 {
   hide_selections_win();
@@ -806,12 +822,14 @@ static void hide_pre_sel()
 }
 
 
-void draw_line(int att, int x0, int y0, int x1, int y1);
+void clear_tsin_line();
 
 static void clear_disp_ph_sta()
 {
   clear_tsin_line();
 }
+
+void draw_underline(int index);
 
 static void disp_ph_sta()
 {
@@ -952,7 +970,7 @@ static gboolean pre_sel_handler(KeySym xkey)
   int len = pre_sel[c].len;
 
   if (c >= pre_selN)
-    return;
+    return 0;
 
   int j, eqlenN=0, current_ph_idx;
 
@@ -984,7 +1002,7 @@ static gboolean pre_punctuation(KeySym xkey)
 
   char *p;
 
-  if (p=strchr(shift_punc, xkey)) {
+  if ((p=strchr(shift_punc, xkey))) {
     int c = p - shift_punc;
     phokey_t key=0;
 
@@ -994,6 +1012,8 @@ static gboolean pre_punctuation(KeySym xkey)
   return 0;
 }
 
+phokey_t pho2key(char typ_pho[]);
+gboolean inph_typ_pho(char newkey);
 
 int feedkey_pp(KeySym xkey, int kbstate)
 {
@@ -1002,8 +1022,6 @@ int feedkey_pp(KeySym xkey, int kbstate)
   static u_short key;
   int i,k,pst;
   u_char match_len;
-  char usecount;
-  extern u_char fullchar[];
   int shift_m=kbstate&ShiftMask;
   int j,jj,kk, idx;
   char kno;
@@ -1222,7 +1240,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
        return 1;
      case XK_space:
        if (b_hsu_kbm && c_len && eng_ph
-           && (ityp3_pho || !typ_pho[0] && !typ_pho[1] && !typ_pho[2]) ) {
+           && (ityp3_pho || (!typ_pho[0] && !typ_pho[1] && !typ_pho[2])) ) {
          flush_tsin_buffer();
          return 1;
        }
@@ -1430,14 +1448,14 @@ llll2:
      if (ttt > key || (ityp3_pho && idx_pho[vv].key!=key) ) {
        while (jj<4) {
          while(kk<3)
-         if (phkbm.phokbm[inph[jj]][kk].num ) {
+         if (phkbm.phokbm[(int)inph[jj]][kk].num ) {
            if (kk) {
-             ctyp=phkbm.phokbm[inph[jj]][kk-1].typ;
-             typ_pho[ctyp]=0;
+             ctyp=phkbm.phokbm[(int)inph[jj]][kk-1].typ;
+             typ_pho[(int)ctyp]=0;
            }
-           kno=phkbm.phokbm[inph[jj]][kk].num;
-           ctyp=phkbm.phokbm[inph[jj]][kk].typ;
-           typ_pho[ctyp]=kno;
+           kno=phkbm.phokbm[(int)inph[jj]][kk].num;
+           ctyp=phkbm.phokbm[(int)inph[jj]][kk].typ;
+           typ_pho[(int)ctyp]=kno;
            kk++;
            goto llll2;
          } else kk++;
@@ -1467,7 +1485,7 @@ llll2:
 
    if (ph_sta < 0) {
 restart:
-     if (match_len=scanphr(&ph_buf[c_idx-1],1))
+     if ((match_len=scanphr(&ph_buf[c_idx-1],1)))
        ph_sta=c_idx-1;
 
 //     dbg("ph_sta < 0, scanphr c_idx:%d match_len:%d\n", c_idx, match_len);
@@ -1488,7 +1506,7 @@ restart:
 
      while (ph_sta < c_idx) {
 //       dbg("ph_sta:%d\n", ph_sta);
-       if (max_match_phrase_len = scanphr(&ph_buf[ph_sta], c_idx - ph_sta)) {
+       if ((max_match_phrase_len = scanphr(&ph_buf[ph_sta], c_idx - ph_sta))) {
 //         dbg("max_match_phrase_len: %d\n", max_match_phrase_len);
          break;
        } else

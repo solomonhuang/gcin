@@ -81,3 +81,4 @@ char *half_char_to_full_char(KeySym xkey);
 void send_text(char *text);
 void sendkey_b5(char *bchar);
 void bell();
+void set_label_font_size(GtkWidget *label, int size);
