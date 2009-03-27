@@ -69,6 +69,21 @@ if  [ -d $xinitdir ]; then
     sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < xinput.orig.gcin > \
       xinput
     chmod 755 xinput
+  #SuSE 9.1 This is a testing, contributed by swyear@bbs.openfind.com.tw
+  elif [ -f ../xim ]; then
+    cd ..
+    if [ ! -f xim.orig.gcin ]; then
+      mv xim xim.orig.gcin
+    fi
+    declare -i TWline=`grep -n 'zh_TW\*)' xim.orig.gcin | cut -b 1-2`
+    declare -i CNline=`grep -n 'zh_CN\*)' xim.orig.gcin | cut -b 1-2`
+    declare -i dellineb=$TWline+1
+    declare -i dellinee=$CNline-2
+    sed ''$dellineb','$dellinee' d' < xim.orig.gcin > xim10
+    sed ''$TWline' a \ export XMODIFIERS="@im=gcin"' < xim10 > xim11
+    sed ''$dellineb' a \ gcin &' < xim11 >xim
+    rm -f xim1*
+    chmod 755 xim
   # others
   else
     echo "Please modify your XIM settings manually"

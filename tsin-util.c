@@ -27,6 +27,7 @@ void load_tsin_db()
       get_sys_table_file_name("tsin", tsfname);
   }
 
+
   strcpy(tsidxfname, tsfname);
   strcat(tsidxfname, ".idx");
 
@@ -54,6 +55,8 @@ void load_tsin_db()
 
   if (fph)
     fclose(fph);
+
+  dbg("tsfname: %s\n", tsfname);
 
   if ((fph=fopen(tsfname,"r+"))==NULL)
     p_err("Cannot open %s", tsfname);
@@ -191,19 +194,18 @@ int read_tsin_phrase(char *str)
   return len * CH_SZ;
 }
 
+typedef struct {
+  char ts[MAX_PHRASE_STR_LEN];
+  int ofs;
+} TS_TMP;
 
 static int qcmp_ts_gtab(const void *aa, const void *bb)
 {
-  int aofs = *((int *)aa), bofs = *((int *)bb);
-  u_char a[MAX_PHRASE_STR_LEN], b[MAX_PHRASE_STR_LEN];
+  TS_TMP *a = (TS_TMP *)aa, *b = (TS_TMP *)bb;
 
-  fseek(fph, aofs, SEEK_SET);
-  read_tsin_phrase(a);
-  fseek(fph, bofs, SEEK_SET);
-  read_tsin_phrase(b);
-
-  return strcmp(a, b);
+  return strcmp(a->ts, b->ts);
 }
+
 
 void build_ts_gtab()
 {
@@ -216,22 +218,33 @@ void build_ts_gtab()
     ts_gtab = NULL;
   }
 
-  ts_gtabN = 0;
+  TS_TMP *tstmp=NULL;
+  int tstmpN=0;
 
   while (!feof(fph)) {
     int ofs = ftell(fph);
-    u_char a[MAX_PHRASE_STR_LEN];
-
-    read_tsin_phrase(a);
-
-    if (!(ts_gtab=trealloc(ts_gtab, int, ts_gtabN + 1)))
+    if (!(tstmp=trealloc(tstmp, TS_TMP, tstmpN + 1)))
       p_err("tsin.c:realloc err");
 
-    ts_gtab[ts_gtabN] = ftell(fph);
-    ts_gtabN++;
+    tstmp[tstmpN].ofs = ftell(fph);
+
+    if (!read_tsin_phrase(tstmp[tstmpN].ts))
+      break;
+
+    tstmpN++;
   }
 
-  qsort(ts_gtab, ts_gtabN, sizeof(int), qcmp_ts_gtab);
+  qsort(tstmp, tstmpN, sizeof(TS_TMP), qcmp_ts_gtab);
+
+  ts_gtabN = tstmpN;
+  ts_gtab = tmalloc(int, ts_gtabN);
+
+  int i;
+  for(i=0; i < tstmpN; i++) {
+    ts_gtab[i] = tstmp[i].ofs;
+  }
+
+  free(tstmp);
 }
 
 

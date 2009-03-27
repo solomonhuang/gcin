@@ -4,11 +4,13 @@
 typedef u_short phokey_t;
 
 typedef struct {
-  u_char selkey[12];
+  char selkey[12];
   struct {
     char num, typ;
   } phokbm[128][3];  // for 26 keys pho, it may have up-to 3 pho char for a key
 } PHOKBM;
+
+extern PHOKBM phkbm;
 
 typedef struct {
   u_char ch[CH_SZ];

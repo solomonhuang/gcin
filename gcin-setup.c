@@ -6,7 +6,9 @@ static struct {
   char *kbm;
 }  kbm_sel[]= {
  {"標準 standard", "zo"},
+ {"標準 standard 使用 asdf 選擇", "zo-asdf"},
  {"倚天 Eten", "et"},
+ {"倚天 Eten 使用 asdf 選擇", "et-asdf"},
  {"IBM", "ibm"},
 };
 

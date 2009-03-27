@@ -925,42 +925,54 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
 
 static gboolean pre_sel_handler(KeySym xkey)
 {
-  static char shift_digits[]="!@#$%^&*(";
+  static char shift_sele[]="!@#$%^&*()asdfghjkl:";
+  static char noshi_sele[]="1234567890asdfghjkl;";
   char *p;
 
   if (!pre_selN || !phrase_pre_select)
     return 0;
 
-  if (p=strchr(shift_digits, xkey)) {
-    int c = p - shift_digits;
-    int len = pre_sel[c].len;
+  if (isupper(xkey))
+    xkey = xkey - 'A' + 'a';
 
-    if (c >= pre_selN)
-      return;
+//  dbg("pre_sel_handler aa\n");
 
-    int j, eqlenN=0, current_ph_idx;
+  if (!(p=strchr(shift_sele, xkey)))
+    return 0;
 
-    for(j=0; j < pre_selN; j++) {
-      if (pre_sel[j].len != len || phokey_t_seq(pre_sel[j].phokey, pre_sel[c].phokey, len))
-        continue;
+  int c = p - shift_sele;
+  char noshi = noshi_sele[c];
 
-      if (j==c)
-        current_ph_idx = eqlenN;
+  if (!(p=strchr(phkbm.selkey, noshi)))
+    return 0;
 
-      selidx[eqlenN++]=pre_sel[j].phidx;
-    }
+  c = p - phkbm.selkey;
+
+  int len = pre_sel[c].len;
+
+  if (c >= pre_selN)
+    return;
+
+  int j, eqlenN=0, current_ph_idx;
+
+  for(j=0; j < pre_selN; j++) {
+    if (pre_sel[j].len != len || phokey_t_seq(pre_sel[j].phokey, pre_sel[c].phokey, len))
+      continue;
+
+    if (j==c)
+      current_ph_idx = eqlenN;
+
+    selidx[eqlenN++]=pre_sel[j].phidx;
+  }
 
 //    dbg("eqlenN:%d %d\n", eqlenN, current_ph_idx);
 
-    if (eqlenN > 1) {
-      raise_phr(current_ph_idx);
-    }
-
-    full_match = 0;
-    return add_to_tsin_buf_phsta(pre_sel[c].str, pre_sel[c].phokey, len);
+  if (eqlenN > 1) {
+    raise_phr(current_ph_idx);
   }
 
-  return 0;
+  full_match = 0;
+  return add_to_tsin_buf_phsta(pre_sel[c].str, pre_sel[c].phokey, len);
 }
 
 
@@ -1256,7 +1268,7 @@ gboolean feedkey_pp(KeySym xkey, int kbstate)
        }
 
 
-       u_char *pp;
+       char *pp;
 
        if ((pp=strchr(phkbm.selkey,xkey)) && sel_pho) {
          int c=pp-phkbm.selkey;
@@ -1357,7 +1369,7 @@ asc_char:
         if (tsin_half_full) {
           bchcpy(ch_buf[c_idx], half_char_to_full_char(xkey));
         } else {
-          dbg("%c\n", tt);
+//          dbg("%c\n", tt);
           ch_buf[c_idx][0]=tt;
         }
 

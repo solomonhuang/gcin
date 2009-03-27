@@ -228,7 +228,7 @@ int feedkey_pho(KeySym xkey)
   static int ctyp;
   static unsigned int vv, ii, ttt;
   static u_short key;
-  u_char *pp=NULL;
+  char *pp=NULL;
   char kno;
   int i,j,jj=0,kk=0;
   char out_buffer[(CH_SZ+2) * 10 + 4];

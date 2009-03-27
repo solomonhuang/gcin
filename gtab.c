@@ -274,6 +274,8 @@ void init_gtab(int inmdno, int usenow)
     p_err("init_tab:2 err open %s", ttt);
   }
 
+  dbg("gtab file %s\n", ttt);
+
   strcpy(uuu,ttt);
 
   fread(&th,1,sizeof(th),fp);

@@ -9,7 +9,7 @@ void big5_utf8_n(char *s, int len, char out[])
   char *utf8 = g_locale_to_utf8 (s, len, &rn, &wn, &err);
 
   if (err) {
-    printf("utf8 conver error");
+    printf("utf8 conver error\n");
     out[0]=0;
 //    abort();
     return;

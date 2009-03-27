@@ -1,4 +1,5 @@
 #include "gcin.h"
+#include "pho.h"
 
 static GtkWidget *gwin1, *frame;
 Window xwin1;
@@ -74,6 +75,7 @@ void clear_sele()
 }
 
 
+
 void set_sele_text(int i, char *text, int len)
 {
   char tt[128];
@@ -82,7 +84,7 @@ void set_sele_text(int i, char *text, int len)
   memcpy(utf8, text, len);
   utf8[len]=0;
 
-  snprintf(tt, sizeof(tt), "%d %s", i+1, utf8);
+  snprintf(tt, sizeof(tt), "%c %s", phkbm.selkey[i], utf8);
 
   gtk_label_set_text(GTK_LABEL(labels_sele[i]), tt);
   gtk_widget_show(labels_sele[i]);

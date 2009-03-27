@@ -1,3 +1,12 @@
+0.4.7:
+- gtab(倉頡、行列…等) 輸入法在 reiser file system 第一次選字時會停頓一分鐘的問題，其他 file system 
+  停頓 0.5 秒的問題也沒有了。
+
+0.4.6:
+- Apply Suse install script from swyear@bbs.openfind.com.tw
+- 現在詞音中可以用asdf來選字或詞，這樣就比數字鍵更容易選，不用移開手指。
+- 全形英數字輸入的問題。
+
 0.4.5:
 - gcin 在 root input style (gedit, gnome-terminal ...) 的 window， focus-in/focus-out 時 window
   跑來跑去的情形改善了不少。

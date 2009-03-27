@@ -2,7 +2,7 @@ include ../config.mak
 
 .SUFFIXES:	.kbm .cin .gtab
 
-DATA=pho.tab et.kbm zo.kbm ibm.kbm tsin tsin.idx cj.gtab ar30.gtab
+DATA=pho.tab et.kbm et-asdf.kbm zo.kbm zo-asdf.kbm ibm.kbm tsin tsin.idx cj.gtab ar30.gtab
 DATAKEEP=symbol-table gtab.list phrase.table
 
 all:	$(DATA)
@@ -19,8 +19,14 @@ pho.tab:	 pho.tab.src
 et.kbm:
 	../kbmcv   et
 
+et-asdf.kbm:
+	../kbmcv   et-asdf
+
 zo.kbm:
 	../kbmcv   zo
+
+zo-asdf.kbm:
+	../kbmcv   zo-asdf
 
 ibm.kbm:
 	../kbmcv   ibm
