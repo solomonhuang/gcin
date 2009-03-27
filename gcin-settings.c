@@ -7,7 +7,7 @@ int gtab_dup_select_bell;
 int gtab_full_space_auto_first;
 int gtab_auto_select_by_phrase;
 int gcin_im_toggle_keys;
-
+int gtab_pre_select;
 
 void load_setttings()
 {
@@ -19,4 +19,5 @@ void load_setttings()
   gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, 1);
   gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, 1);
   gcin_im_toggle_keys = get_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, 0);
+  gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
 }

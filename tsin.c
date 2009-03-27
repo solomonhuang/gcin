@@ -6,6 +6,7 @@
 #include "pho.h"
 #include "tsin.h"
 
+extern gboolean b_hsu_kbm;
 
 extern PHO_ITEM *ch_pho;
 extern char *pho_chars[];
@@ -994,9 +995,9 @@ static gboolean pre_punctuation(KeySym xkey)
 }
 
 
-gboolean feedkey_pp(KeySym xkey, int kbstate)
+int feedkey_pp(KeySym xkey, int kbstate)
 {
-  static char ctyp;
+  char ctyp=0;
   static u_int ii;
   static u_short key;
   int i,k,pst;
@@ -1220,6 +1221,11 @@ gboolean feedkey_pp(KeySym xkey, int kbstate)
        disp_current_sel_page();
        return 1;
      case XK_space:
+       if (b_hsu_kbm && c_len && eng_ph
+           && (ityp3_pho || !typ_pho[0] && !typ_pho[1] && !typ_pho[2]) ) {
+         flush_tsin_buffer();
+         return 1;
+       }
      case XK_Down:
        if (!eng_ph && xkey == XK_space)
            goto asc_char;
@@ -1228,16 +1234,11 @@ gboolean feedkey_pp(KeySym xkey, int kbstate)
          ctyp=3;
          kno=0;
 
-         if (typ_pho[0] && !typ_pho[1] && !typ_pho[2] && !typ_pho[3]) {
-           char tc=inph[0];
-           if(phkbm.phokbm[tc][1].typ==2) {
-             typ_pho[0]=0;
-             typ_pho[2]=phkbm.phokbm[tc][1].num;
-           }
-         }
+         inph_typ_pho(xkey);
          goto llll1;
        }
 
+change_char:
        if (!c_len)
          return 0;
 
@@ -1258,6 +1259,10 @@ gboolean feedkey_pp(KeySym xkey, int kbstate)
 
        disp_current_sel_page();
        return 1;
+     case XK_q:
+     case XK_Q:
+       if (b_hsu_kbm && eng_ph)
+         goto change_char;
      default:
        if ((kbstate & ControlMask)) {
          if (xkey==XK_u) {
@@ -1266,7 +1271,6 @@ gboolean feedkey_pp(KeySym xkey, int kbstate)
          } else
            return 0;
        }
-
 
        char *pp;
 
@@ -1388,84 +1392,69 @@ asc_char:
         drawcursor();
         return 1;
    } else { /* pho */
-        if (xkey > 127)
-          return 0;
+     if (xkey > 127)
+       return 0;
 
-        if (xkey >= 'A' && xkey <='Z')
-          xkey+=0x20;
+     if (xkey >= 'A' && xkey <='Z')
+       xkey+=0x20;
 
-        ctyp=-1;
-        for(i=2;i>=0;i--)
-          if (typ_pho[i])
-            break;
+     inph_typ_pho(xkey);
 
-        kno=phkbm.phokbm[xkey][0].num;
-        ctyp=phkbm.phokbm[xkey][0].typ;
+     if (typ_pho[3])
+       ctyp = 3;
 
-        for(j=0;j<3;j++)
-          if (phkbm.phokbm[xkey][j].typ > i) {
-            kno=phkbm.phokbm[xkey][j].num;
-            ctyp=phkbm.phokbm[xkey][j].typ;
-            break;
-          }
-
-        if (!kno)
-          return 0;
-
-        typ_pho[ctyp]=kno;
-        inph[ctyp]=xkey;
 llll1:
-        jj=0;
-        kk=1;
+     jj=0;
+     kk=1;
 llll2:
-        if (ctyp==3)
-          ityp3_pho=1;  /* last key is entered */
+     if (ctyp==3)
+       ityp3_pho=1;  /* last key is entered */
 
-        disp_in_area_pho_tsin();
+     disp_in_area_pho_tsin();
 
-        key = pho2key(typ_pho);
+     key = pho2key(typ_pho);
 
-        int vv=hash_pho[typ_pho[0]];
-        phokey_t ttt=0xffff;
-        while (vv<idxnum_pho) {
-          ttt=idx_pho[vv].key;
-          if (!typ_pho[0]) ttt &= ~(31<<9);
-          if (!typ_pho[1]) ttt &= ~(3<<7);
-          if (!typ_pho[2]) ttt &= ~(15<<3);
-          if (!typ_pho[3]) ttt &= ~(7);
-          if (ttt>=key) break;
-          else
-          vv++;
-        }
+     int vv=hash_pho[typ_pho[0]];
+     phokey_t ttt=0xffff;
+     while (vv<idxnum_pho) {
+       ttt=idx_pho[vv].key;
+       if (!typ_pho[0]) ttt &= ~(31<<9);
+       if (!typ_pho[1]) ttt &= ~(3<<7);
+       if (!typ_pho[2]) ttt &= ~(15<<3);
+       if (!typ_pho[3]) ttt &= ~(7);
+       if (ttt>=key) break;
+       else
+       vv++;
+     }
 
-        if (ttt > key || (ityp3_pho && idx_pho[vv].key!=key) ) {
-          while (jj<4) {
-            while(kk<3)
-            if (phkbm.phokbm[inph[jj]][kk].num ) {
-              if (kk) {
-                ctyp=phkbm.phokbm[inph[jj]][kk-1].typ;
-                typ_pho[ctyp]=0;
-              }
-              kno=phkbm.phokbm[inph[jj]][kk].num;
-              ctyp=phkbm.phokbm[inph[jj]][kk].typ;
-              typ_pho[ctyp]=kno;
-              kk++;
-              goto llll2;
-            } else kk++;
-            jj++;
-            kk=1;
-          }
+     if (ttt > key || (ityp3_pho && idx_pho[vv].key!=key) ) {
+       while (jj<4) {
+         while(kk<3)
+         if (phkbm.phokbm[inph[jj]][kk].num ) {
+           if (kk) {
+             ctyp=phkbm.phokbm[inph[jj]][kk-1].typ;
+             typ_pho[ctyp]=0;
+           }
+           kno=phkbm.phokbm[inph[jj]][kk].num;
+           ctyp=phkbm.phokbm[inph[jj]][kk].typ;
+           typ_pho[ctyp]=kno;
+           kk++;
+           goto llll2;
+         } else kk++;
+         jj++;
+         kk=1;
+       }
 
-          bell(); ityp3_pho=typ_pho[3]=0;
-          disp_in_area_pho_tsin();
-          return 1;
-        }
+       bell(); ityp3_pho=typ_pho[3]=0;
+       disp_in_area_pho_tsin();
+       return 1;
+     }
 
-        if (key==0 || !ityp3_pho)
-          return 1;
+     if (key==0 || !ityp3_pho)
+       return 1;
 
-        ii=idx_pho[vv].start;
-        start_idx=ii;
+     ii=idx_pho[vv].start;
+     start_idx=ii;
    } /* pho */
 
    put_b5_char(ch_pho[start_idx].ch, key);

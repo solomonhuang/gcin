@@ -1,4 +1,4 @@
-xcin -x xcin.test &
+export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=xcin.test
-rxvt.bin
-pkill xcin
+xcin -x xcin.test &
+rxvt.bin && pkill xcin

@@ -1,3 +1,12 @@
+0.4.9
+- Apply gtab X modifier patch from diadia.bbs@bbs.sayya.org
+- Bug in kbmcv.
+- gtab(倉頡、行列…等) 有時候會 coredump 的問題。
+
+0.4.8:
+- 新增(注音/詞音) 許式鍵盤、倚天26鍵及倚天26鍵-asdf 的支援
+- gtab(倉頡、行列…等) 如果覺得在輸入時，預覽/預選字畫面會跳動，現在有選項可以關掉。
+
 0.4.7:
 - gtab(倉頡、行列…等) 輸入法在 reiser file system 第一次選字時會停頓一分鐘的問題，其他 file system 
   停頓 0.5 秒的問題也沒有了。

@@ -44,9 +44,7 @@ void set_current_input_style(InputStyle_E style)
 void send_text(char *text)
 {
   XTextProperty tp;
-  extern gboolean b_send_utf8_str;
   char outbuf[512];
-
 
   if (pxim_arr->b_send_utf8_str) {
     Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
@@ -78,13 +76,16 @@ void sendkey_b5(char *bchar)
   send_text(tt);
 }
 
-static bounce_back_key()
+static void bounce_back_key()
 {
     IMForwardEventStruct forward_ev = *(current_forward_eve);
     IMForwardEvent(current_ims, (XPointer)&forward_ev);
 }
 
 void hide_win0();
+void hide_win_gtab();
+void hide_win_int();
+void hide_win_pho();
 
 void hide_in_win(IC *ic)
 {
@@ -114,6 +115,10 @@ void hide_in_win(IC *ic)
   }
 }
 
+void show_win_pho();
+void show_win0();
+void show_win_int();
+void show_win_gtab();
 
 void show_in_win(IC *ic)
 {
@@ -138,6 +143,11 @@ void show_in_win(IC *ic)
       show_win_gtab();
   }
 }
+
+void move_win_gtab(int x, int y);
+void move_win_int(int x, int y);
+void move_win0(int x, int y);
+void move_win_pho(int x, int y);
 
 void move_in_win(IC *ic, int x, int y)
 {
@@ -168,6 +178,7 @@ void move_in_win(IC *ic, int x, int y)
 }
 
 void move_IC_win0(IC *rec);
+void move_IC_in_win(IC *rec);
 
 void update_in_win_pos()
 {
@@ -208,6 +219,7 @@ void update_in_win_pos()
 
 extern IMProtocol *current_call_data;
 IC *findIC();
+gboolean flush_tsin_buffer();
 
 void toggle_im_enabled()
 {
@@ -224,8 +236,6 @@ void toggle_im_enabled()
       current_IC->b_im_enabled = TRUE;
 
       if (!current_IC->in_method) {
-        extern int initial_inmd;
-
         init_in_method(default_input_method);
       }
 
@@ -234,6 +244,9 @@ void toggle_im_enabled()
       show_in_win(current_IC);
     }
 }
+
+void get_win_gtab_geom();
+void get_win0_geom();
 
 void update_active_in_win_geom()
 {
@@ -250,6 +263,9 @@ void update_active_in_win_geom()
   }
 }
 
+void disp_gtab_half_full(gboolean hf);
+void tsin_toggle_half_full();
+
 void toggle_half_full_char()
 {
 
@@ -261,6 +277,11 @@ void toggle_half_full_char()
   }
 //  dbg("half full toggle\n");
 }
+
+void init_gtab(int inmdno, int usenow);
+void init_inter_code(int usenow);
+void init_tab_pp(int usenow);
+void init_tab_pho(int usenow);
 
 void init_in_method(int in_no)
 {
@@ -294,8 +315,12 @@ void init_in_method(int in_no)
 }
 
 
-gboolean feedkey_pho(KeySym xkey);
-gboolean feedkey_pp(KeySym xkey, int state);
+int feedkey_pho(KeySym xkey);
+int feedkey_pp(KeySym xkey, int state);
+int feedkey_gtab(KeySym key, int kbstate);
+int feed_phrase(KeySym ksym);
+int feedkey_intcode(KeySym key);
+void tsin_set_eng_ch(int nmod);
 
 void ProcessKey()
 {
@@ -304,14 +329,12 @@ void ProcessKey()
 
   memset(strbuf, 0, STRBUFLEN);
   XKeyEvent *kev = (XKeyEvent*)&current_forward_eve->event;
-  int count = XLookupString(kev, strbuf, STRBUFLEN, &keysym, NULL);
-
+  XLookupString(kev, strbuf, STRBUFLEN, &keysym, NULL);
 
   if (strlen(callback_str_buffer)) {
     send_text(callback_str_buffer);
     callback_str_buffer[0]=0;
   }
-
 
   if (keysym == XK_space) {
 #if 0
@@ -326,6 +349,7 @@ void ProcessKey()
     ) {
       if (current_IC->in_method == 6)
         tsin_set_eng_ch(1);
+
       toggle_im_enabled();
       return;
     }
@@ -361,13 +385,13 @@ void ProcessKey()
       status = feedkey_pp(keysym, kev->state);
       break;
     case 0:
-      status = feedkey_intcode(keysym, kev->state);
+      status = feedkey_intcode(keysym);
       break;
     default:
       status = feedkey_gtab(keysym, kev->state);
       break;
   }
-ret:
+
   if (!status)
     bounce_back_key();
 }
@@ -384,10 +408,13 @@ int gcin_ForwardEventHandler(IMForwardEventStruct *call_data)
     	return True;
     }
 
-    ProcessKey(call_data);
+    ProcessKey();
+
+    return False;
 }
 
 IC *FindIC(CARD16 icid);
+void load_IC(IC *rec);
 
 int gcin_FocusIn(IMChangeFocusStruct *call_data)
 {

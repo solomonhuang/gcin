@@ -55,7 +55,6 @@ void utf8_big5(char *s, char out[])
 
 int utf8_sz(char *s)
 {
-
   if (!(*s & 0x80))
     return 1;
 

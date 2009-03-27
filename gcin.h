@@ -1,11 +1,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <X11/Xlib.h>
 #include <X11/Xlocale.h>
 #include <X11/keysym.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
+#include <string.h>
 #include "IMdkit.h"
 #include "Xi18n.h"
 #include "IC.h"
@@ -47,10 +49,6 @@ typedef enum {
 
 #define ROW_ROW_SPACING (2)
 
-void get_gcin_dir(char *tt);
-Atom get_gcin_atom(Display *dpy);
-void get_sys_table_file_name(char *name, char *fname);
-char *half_char_to_full_char(KeySym xkey);
 
 #define MAX_GCIN_STR (256)
 
@@ -63,6 +61,7 @@ extern int dpy_xl, dpy_yl;
 extern int gcin_font_size;
 
 void big5_utf8(char *s, char out[]);
+void utf8_big5(char *s, char out[]);
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 #include "gcin-conf.h"
@@ -74,3 +73,11 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 int utf8_sz(char *s);
 void utf8cpy(char *t, char *s);
+
+void get_gcin_dir(char *tt);
+Atom get_gcin_atom(Display *dpy);
+void get_sys_table_file_name(char *name, char *fname);
+char *half_char_to_full_char(KeySym xkey);
+void send_text(char *text);
+void sendkey_b5(char *bchar);
+void bell();

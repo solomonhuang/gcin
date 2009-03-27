@@ -347,6 +347,9 @@ void init_atom_property()
 
 void hide_win0();
 void do_exit();
+void destory_win0();
+void destory_win1();
+void destroy_win_gtab();
 
 void do_exit()
 {
@@ -368,7 +371,7 @@ void do_exit()
 }
 
 
-static exec_script(char *name)
+static void exec_script(char *name)
 {
   char scr[128];
 
@@ -385,8 +388,9 @@ static void exec_setup_scripts()
 
 static char *gcin_db_locale="zh_TW.Big5";
 char *get_gcin_xim_name();
+void load_phrase(), init_TableDir(),  load_gtab_list();
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
 
@@ -442,7 +446,8 @@ main(int argc, char **argv)
   signal(SIGINT, do_exit);
 
   // disable the io handler abort
-  void *olderr = XSetErrorHandler((XErrorHandler)xerror_handler);
+  // void *olderr =
+    XSetErrorHandler((XErrorHandler)xerror_handler);
 
   gtk_main();
 

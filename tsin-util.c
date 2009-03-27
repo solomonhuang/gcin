@@ -182,6 +182,7 @@ int read_tsin_phrase(char *str)
 {
   u_char len, usecount;
   u_char pho[sizeof(phokey_t) * MAX_PHRASE_LEN];
+  len = 0;
 
   fread(&len, 1, 1, fph);
   if (len > MAX_PHRASE_LEN || len <=0)

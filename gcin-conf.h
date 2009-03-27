@@ -6,6 +6,7 @@
 #define GTAB_FULL_SPACE_AUTO_FIRST "gtab-full-space-auto-first"
 #define GTAB_AUTO_SELECT_BY_PHRASE "gtab-auto-select-by_phrase"
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
+#define GTAB_PRE_SELECT "gtab-pre-select"
 
 extern int gcin_font_size;
 extern int default_input_method;
@@ -14,3 +15,4 @@ extern int gtab_dup_select_bell;
 extern int gtab_full_space_auto_first;
 extern int gtab_auto_select_by_phrase;
 extern int gcin_im_toggle_keys;
+extern int gtab_pre_select;

@@ -10,7 +10,6 @@
 
 extern char *TableDir;
 
-
 #define MAX_SEL_BUF ((CH_SZ + 1) * MAX_SELKEY + 1)
 
 u_long CONVT(char *s);
@@ -21,14 +20,13 @@ INMD *cur_inmd;
 static int spc_pressed=0;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
 static int defselN=0;
-static u_long inch[MAX_TAB_KEY_NUM];
+static KeySym inch[MAX_TAB_KEY_NUM];
 static int ci;
 static int last_full, last_idx;
-static int more_pg,pg_idx, m_pg_mode;
+static int more_pg, pg_idx, m_pg_mode;
 static int sel1st_i = MAX_SELKEY - 1;
 static int wild_mode;
 static int wild_page;
-static u_long val;
 
 /* for array30-like quick code */
 static char keyrow[]=
@@ -52,6 +50,7 @@ static int qcmp_strlen(const void *aa, const void *bb)
 
   return strlen(a) - strlen(b);
 }
+
 
 void lookup_gtab(char *ch, char out[])
 {
@@ -99,8 +98,6 @@ void lookup_gtab(char *ch, char out[])
   for(i=0; i < tbufN; i++) {
 #define MAX_DISP_MATCH 40
     if (strlen(out) < MAX_DISP_MATCH) {
-      int len = strlen(tbuf[i]);
-
       strcat(out, tbuf[i]);
       if (i < tbufN-1)
         strcat(out, " |");
@@ -109,7 +106,9 @@ void lookup_gtab(char *ch, char out[])
     free(tbuf[i]);
   }
 
+  void set_key_codes_label(char *s);
   set_key_codes_label(out);
+  void set_key_codes_label_pho(char *s);
   set_key_codes_label_pho(out);
 }
 
@@ -132,7 +131,7 @@ char *b1_cat(char *s, char c)
   t[0]=c;
   t[1]=0;
 
-  strcat(s, t);
+  return strcat(s, t);
 }
 
 
@@ -142,11 +141,12 @@ char *bch_cat(char *s, char *ch)
   memcpy(t, ch, CH_SZ);
   t[CH_SZ]=0;
 
-  strcat(s, t);
+  return strcat(s, t);
 }
 
 
 void minimize_win_gtab();
+void disp_gtab_sel(char *s);
 
 static void ClrSelArea()
 {
@@ -155,6 +155,7 @@ static void ClrSelArea()
 }
 
 
+void disp_gtab(int index, char *gtabchar);
 static void ClrInArea()
 {
   int i;
@@ -188,14 +189,6 @@ static void DispInArea()
   for(; i < cur_inmd->MaxPress; i++) {
     disp_gtab(i, "  ");
   }
-}
-
-static void reset_inp()
-{
-  ClrIn();
-  ClrInArea();
-  ClrSelArea();
-  last_full=0;
 }
 
 
@@ -237,6 +230,7 @@ void load_gtab_list()
   fclose(fp);
 }
 
+void set_gtab_input_method_name(char *s);
 
 void init_gtab(int inmdno, int usenow)
 {
@@ -257,7 +251,7 @@ void init_gtab(int inmdno, int usenow)
   int rval = stat(ttt, &st);
 
   if (rval < 0) {
-    dbg("init_tab:1 err open %s", ttt);
+    dbg("init_tab:1 err open %s\n", ttt);
     return;
   }
 
@@ -292,7 +286,7 @@ void init_gtab(int inmdno, int usenow)
   dbg("MaxPress:%d\n", th.MaxPress);
 
   for(i=0;i<th.KeyS;i++) {
-    inp->keymap[ttt[i]]=i;
+    inp->keymap[(int)ttt[i]]=i;
     inp->keymap[toupper(ttt[i])]=i;
     inp->keycol[i]=key_col(ttt[i]);
   }
@@ -453,15 +447,11 @@ static u_long vmask[]=
  (0x3f<<24)|(0x3f<<18)|(0x3f<<12)|(0x3f<<6)|0x3f
 };
 
-static int qcmp_b5(const void *a, const void *b)
-{
-  return strcmp((char *)a,(char *) b);
-}
 
 /* for strict match, use stack */
 void wildcard()
 {
-  int i,j,t,vv,match, wild_ofs=0;
+  int i,t,vv,match, wild_ofs=0;
   u_long kk;
   int found=0;
 
@@ -557,7 +547,7 @@ static void load_phr(int j, char *tt)
   len = ofs1 - ofs;
 
   if (len > 128 || len <= 0) {
-    error("phrae error %d\n", len);
+    dbg("phrae error %d\n", len);
     strcpy(tt,"err");
     return;
   }
@@ -706,6 +696,14 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         return 1;
       }
       return 0;
+    case XK_Shift_L:
+    case XK_Shift_R:
+    case XK_Control_R:
+    case XK_Control_L:
+    case XK_Alt_L:
+    case XK_Alt_R:
+    case XK_Caps_Lock:
+      return 0;
     default:
       if (key>=XK_KP_0 && key<=XK_KP_9)
         key-=XK_KP_0-'0';
@@ -731,6 +729,9 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
       if (wild_mode)
         goto XXXX;
+
+      if (key > 0x7f)
+        return 0;
 
       inkey=cur_inmd->keymap[key];
       spc_pressed=0;
@@ -785,7 +786,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   DispInArea();
 
-  val=0;
+  u_long val=0;
   for(i=0; i < MAX_TAB_KEY_NUM; i++)
     val|= inch[i] << (KeyBits * (MAX_TAB_KEY_NUM - 1 - i));
 
@@ -811,7 +812,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 XXXX:
   if ((CONVT(cur_inmd->tbl[s1].key) & vmask[ci])!=val || (wild_mode && defselN) ||
-                  (ci==cur_inmd->MaxPress||spc_pressed) && defselN && pselkey) {
+                  ((ci==cur_inmd->MaxPress||spc_pressed) && defselN && pselkey)) {
 YYYY:
     if ((pselkey || wild_mode) && defselN) {
       int vv=pselkey - cur_inmd->selkey;
@@ -948,7 +949,8 @@ Disp_opt:
       strcat(tt, "   ");
   }
 
-  disp_gtab_sel(tt);
+  if (gtab_pre_select || spc_pressed || last_full)
+    disp_gtab_sel(tt);
 
   return 1;
 }

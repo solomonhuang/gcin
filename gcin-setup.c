@@ -9,12 +9,16 @@ static struct {
  {"標準 standard 使用 asdf 選擇", "zo-asdf"},
  {"倚天 Eten", "et"},
  {"倚天 Eten 使用 asdf 選擇", "et-asdf"},
+ {"倚天 26 鍵", "et26"},
+ {"倚天 26 鍵,使用 asdf 選擇", "et26-asdf"},
+ {"許氏(國音,自然)", "hsu"},
  {"IBM", "ibm"},
 };
 
 static GtkWidget *check_button_phrase_pre_select, *check_button_gtab_dup_select_bell,
                  *check_button_gtab_full_space_auto_first,
-                 *check_button_gtab_auto_select_by_phrase;
+                 *check_button_gtab_auto_select_by_phrase,
+                 *check_button_gtab_pre_select;
 
 static char *tsin_eng_ch_sw[]={
   "CapsLock",
@@ -356,6 +360,9 @@ static gboolean cb_win0_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_auto_select_by_phrase)));
 
+  save_gcin_conf_int(GTAB_PRE_SELECT,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_pre_select)));
+
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
   gtk_widget_destroy(gcin_win0_conf_window); gcin_win0_conf_window = NULL;
 }
@@ -396,9 +403,17 @@ void create_win0_conf_window()
     gtk_container_add (GTK_CONTAINER (frame_font_size), spinner);
 
 
+    GtkWidget *frame_gtab = gtk_frame_new("倉頡/行列/嘸蝦米/大易");
+    gtk_container_set_border_width (GTK_CONTAINER (frame_gtab), 5);
+    gtk_box_pack_start (GTK_BOX (vbox_top), frame_gtab, FALSE, FALSE, 0);
+    GtkWidget *vbox_gtab = gtk_vbox_new (FALSE, 10);
+    gtk_container_add (GTK_CONTAINER (frame_gtab), vbox_gtab);
+    gtk_container_set_border_width (GTK_CONTAINER (vbox_gtab), 10);
+
+
     GtkWidget *hbox_gtab_dup_select_bell = gtk_hbox_new (FALSE, 10);
-    gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gtab_dup_select_bell, FALSE, FALSE, 0);
-    GtkWidget *label_gtab_sele = gtk_label_new("倉頡行列…輸入法\n重複字選擇鈴聲");
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_dup_select_bell, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_sele = gtk_label_new("重複字選擇鈴聲");
     gtk_box_pack_start (GTK_BOX (hbox_gtab_dup_select_bell), label_gtab_sele,  FALSE, FALSE, 0);
     check_button_gtab_dup_select_bell = gtk_check_button_new ();
     gtk_box_pack_start (GTK_BOX (hbox_gtab_dup_select_bell),check_button_gtab_dup_select_bell,  FALSE, FALSE, 0);
@@ -408,8 +423,8 @@ void create_win0_conf_window()
 
 
     GtkWidget *hbox_gtab_full_space_auto_first = gtk_hbox_new (FALSE, 10);
-    gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gtab_full_space_auto_first, FALSE, FALSE, 0);
-    GtkWidget *label_gtab_full_space = gtk_label_new("倉頡行列…按滿\n空白自動選擇第一個");
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_full_space_auto_first, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_full_space = gtk_label_new("按滿空白自動選擇第一個");
     gtk_box_pack_start (GTK_BOX (hbox_gtab_full_space_auto_first), label_gtab_full_space,  FALSE, FALSE, 0);
     check_button_gtab_full_space_auto_first = gtk_check_button_new ();
     gtk_box_pack_start (GTK_BOX (hbox_gtab_full_space_auto_first),check_button_gtab_full_space_auto_first,  FALSE, FALSE, 0);
@@ -419,14 +434,25 @@ void create_win0_conf_window()
 
 
     GtkWidget *hbox_gtab_auto_select_by_phrase = gtk_hbox_new (FALSE, 10);
-    gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gtab_auto_select_by_phrase, FALSE, FALSE, 0);
-    GtkWidget *label_gtab_auto_select = gtk_label_new("倉頡行列…自動\n由詞庫自動選擇字");
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_auto_select_by_phrase, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_auto_select = gtk_label_new("自動由詞庫自動選擇字");
     gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), label_gtab_auto_select,  FALSE, FALSE, 0);
     check_button_gtab_auto_select_by_phrase = gtk_check_button_new ();
     gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase),check_button_gtab_auto_select_by_phrase,  FALSE, FALSE, 0);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_auto_select_by_phrase),
        gtab_auto_select_by_phrase);
+
+
+    GtkWidget *hbox_gtab_pre_select = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_pre_select, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_pre_select = gtk_label_new("預覽/預選 字");
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_pre_select), label_gtab_pre_select,  FALSE, FALSE, 0);
+    check_button_gtab_pre_select = gtk_check_button_new ();
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_pre_select),check_button_gtab_pre_select,  FALSE, FALSE, 0);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_pre_select),
+       gtab_pre_select);
 
 
     GtkWidget *button_close = gtk_button_new_with_label ("OK");

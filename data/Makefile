@@ -1,8 +1,11 @@
 include ../config.mak
 
-.SUFFIXES:	.kbm .cin .gtab
+.SUFFIXES:	.kbmsrc .kbm .cin .gtab
 
-DATA=pho.tab et.kbm et-asdf.kbm zo.kbm zo-asdf.kbm ibm.kbm tsin tsin.idx cj.gtab ar30.gtab
+DATA=pho.tab tsin.idx \
+     cj.gtab ar30.gtab \
+     et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
+     ibm.kbm tsin hsu.kbm
 DATAKEEP=symbol-table gtab.list phrase.table
 
 all:	$(DATA)
@@ -16,23 +19,11 @@ tsin.idx:	tsin.src
 pho.tab:	 pho.tab.src
 	export GCIN_NO_RELOAD=; ../phoa2d
 
-et.kbm:
-	../kbmcv   et
-
-et-asdf.kbm:
-	../kbmcv   et-asdf
-
-zo.kbm:
-	../kbmcv   zo
-
-zo-asdf.kbm:
-	../kbmcv   zo-asdf
-
-ibm.kbm:
-	../kbmcv   ibm
-
 .cin.gtab:
 	../gcin2tab $<
+
+.kbmsrc.kbm:	../kbmcv
+	../kbmcv $<
 
 install:
 	install -d $(GCIN_TABLE_DIR)

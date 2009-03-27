@@ -36,7 +36,7 @@ void del_nl_spc(char *s)
 
   t=s+len-1;
 
-  while (*t=='\n' || *t==' ' || *t=='\t' && t > s)
+  while (*t=='\n' || *t==' ' || (*t=='\t' && t > s))
     t--;
 
   *(t+1)=0;
@@ -103,9 +103,9 @@ int qcmp2(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  char tt[CH_SZ+1];
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
+
   return memcmp(a->ch ,b->ch, CH_SZ);
 }
 
@@ -121,9 +121,9 @@ int qcmp(const void *aa, const void *bb)
 
 #define mtolower(ch) (ch>='A'&&ch<='Z'?ch+0x20:ch)
 
-char kno[128];
+static char kno[128];
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   int i;
   char fname[64];
@@ -137,10 +137,9 @@ main(int argc, char **argv)
   char kname[128][CH_SZ];
   char keymap[64];
   int chno,cpcount;
-  u_short idx1[256], last_ser;
+  u_short idx1[256];
   char def1[256];
   int quick_def;
-  int sel1st_def;
   int phridx[12000], phr_cou=0;
   char phrbuf[32768];
   int prbf_cou=0;
@@ -162,7 +161,7 @@ main(int argc, char **argv)
 
   char *p;
 
-  if(p=strchr(fname, '.'))
+  if((p=strchr(fname, '.')))
     *p = 0;
 
   strcpy(fname_cin,fname);
@@ -174,6 +173,7 @@ main(int argc, char **argv)
 
   if ((fr=fopen(fname_cin,"r"))==NULL)
           p_err("Cannot open %s\n", fname_cin);
+
   bzero(&th,sizeof(th));
   bzero(kno,sizeof(kno));
   bzero(keymap,sizeof(keymap));
@@ -194,7 +194,7 @@ main(int argc, char **argv)
   cmd_arg(tt, &cmd, &arg);
   if (!(sequ(cmd,"%prompt") || sequ(cmd,"%cname")) || !(*arg) )
     p_err("%d:  %%prompt prompt_name  expected", lineno);
-  strcpy(th.cname, arg);
+  strncpy(th.cname, arg, MAX_CNAME);
   printf("cname %s\n", th.cname);
 
   cmd_arg(tt,&cmd, &arg);
@@ -220,10 +220,10 @@ main(int argc, char **argv)
     cmd_arg(tt,&cmd, &arg);
     if (sequ(cmd,"%keyname")) break;
     k=mtolower(cmd[0]);
-    if (kno[k])
+    if (kno[(int)k])
       p_err("%d:  key %c is already used",lineno, k);
 
-    kno[k]=++KeyNum;
+    kno[(int)k]=++KeyNum;
     keymap[KeyNum]=k;
     bchcpy(&kname[KeyNum][0], arg);
   }
@@ -245,7 +245,7 @@ main(int argc, char **argv)
       len=strlen(arg);
 
       for(i=0; i<len; i+=CH_SZ)
-        bchcpy(th.qkeys.quick1[k][i/CH_SZ], &arg[i]);
+        bchcpy(th.qkeys.quick1[(int)k][i/CH_SZ], &arg[i]);
 
       quick_def++;
     }
@@ -327,7 +327,6 @@ main(int argc, char **argv)
   bzero(def1,sizeof(def1));
   bzero(idx1,sizeof(idx1));
   for(i=0;i<chno;i++) {
-    char tt[3];
     int kk=(CONVT(itout[i].key)>>24) & 0x3f;
     if (!def1[kk]) {
       idx1[kk]=(u_short)i;
@@ -359,4 +358,6 @@ main(int argc, char **argv)
   }
 
   fclose(fw);
+
+  return 0;
 }

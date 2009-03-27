@@ -1,4 +1,4 @@
-#define MAX_CIN_PHR (32*CH_SZ)
+#define MAX_CIN_PHR (32*CH_SZ + 1)
 
 typedef struct {
   u_char key[4];   /* If I use u_long key, the struc size will be 8 */
@@ -34,7 +34,8 @@ typedef struct {
   ITEM *tbl;
   QUICK_KEYS qkeys;
   int use_quick;
-  char cname[16];
+#define MAX_CNAME (4*CH_SZ+1)
+  char cname[MAX_CNAME];
   u_char keycol[50];
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:4  changjei:5 */
