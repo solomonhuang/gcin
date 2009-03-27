@@ -1,3 +1,11 @@
+
+MAKE=make
+which gmake >& /dev/null
+if [ $? = 0 ]; then
+  MAKE=gmake
+fi
+
+
 prefix="/usr/local"
 
 for opt do
@@ -43,7 +51,8 @@ if [ $prefix = /usr ]; then
   OPTFLAGS="-O"
 fi
 
-echo "GTKINC=$GTKINC" > config.mak
+echo "MAKE=$MAKE" > config.mak
+echo "GTKINC=$GTKINC" >> config.mak
 echo "prefix=$prefix" >> config.mak
 echo "bindir=$bindir" >> config.mak
 echo "datadir=$datadir" >> config.mak

@@ -10,6 +10,8 @@
 #include "Xi18n.h"
 #include "IC.h"
 
+#define CH_SZ (2) // big5 size ( 2 bytes), will be changed to 3 if unicode is used
+
 extern Display *dpy;
 void p_err(char *fmt,...);
 void dbg(char *fmt,...);
@@ -41,6 +43,7 @@ typedef enum {
 
 void get_gcin_dir(char *tt);
 Atom get_gcin_atom(Display *dpy);
+void get_sys_table_file_name(char *name, char *fname);
 
 #define MAX_GCIN_STR (256)
 

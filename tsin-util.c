@@ -13,7 +13,6 @@ FILE *fph;
 int phcount, a_phcount;
 char tsfname[64]="";
 char tsidxfname[64]="";
-extern char *TableDir;
 
 void load_tsin_db()
 {
@@ -21,12 +20,9 @@ void load_tsin_db()
     char tt[128];
 
 #ifndef  NO_PRIVATE_TSIN
-    get_gcin_dir(tt);
-    strcat(tt,"/tsin");
-    strcpy(tsfname,tt);
+    get_gcin_conf_fname("tsin", tsfname);
 #else
-    strcpy(tsfname, TableDir);
-    strcat(tsfname, "tsin");
+    get_sys_table_file_name("tsin", tsfname);
 #endif
   }
 
@@ -149,7 +145,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *big5str, int len)
   for(;hashno<256;hashno++) hashidx[hashno]++;
 
   if ((fw=fopen(tsidxfname,"w"))==NULL) {
-    error("%s create err", tsidxfname);
+    dbg("%s create err", tsidxfname);
     return FALSE;
   }
 

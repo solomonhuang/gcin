@@ -6,7 +6,6 @@
 #include "pho.h"
 
 #define b2cpy(a,b) memcpy(a,b,2)
-#define CH_SZ (2) // big5 size ( 2 bytes), will be changed to 3 if unicode is used
 
 extern PHO_ITEM *ch_pho;
 extern char *pho_chars[];
@@ -305,7 +304,6 @@ void init_tab_pp(int usenow)
   FILE *fr;
   int i,cou;
   unsigned int ttt;
-  extern char *TableDir;
   extern char *tabfname[];
   char phofname[128];
 
@@ -722,7 +720,7 @@ static raise_phr(int c)
   selidx[0]=tmp;
 
   if ((fp=fopen(tsidxfname,"r+"))==NULL) {
-    error("%s modify err", tsidxfname);
+    dbg("%s modify err", tsidxfname);
     return;
   }
 
@@ -1256,17 +1254,18 @@ gboolean feedkey_pp(KeySym xkey, int kbstate)
 
          if (len > 2) {
            memcpy(ch_buf[c_idx], sel_text, len);
+           memcpy(ch_obuf[c_idx], sel_text, len);
            raise_phr(c);
          } else
          if (len == 2) { // single chinese char
            i= c_idx==c_len?c_idx-1:c_idx;
            key=ph_buf[i];
-           memcpy(ch_buf[i], sel_text, 2);
-#if 0
-           memcpy(ch_obuf[i], sel_text, 2);
+           memcpy(ch_buf[i], sel_text, CH_SZ);
+#if 1
+           memcpy(ch_obuf[i], sel_text, CH_SZ);
 #endif
            if (i && psta[i]<i)
-             memcpy(ch_buf[i-1],ch_obuf[i-1],2);
+             memcpy(ch_buf[i-1],ch_obuf[i-1], CH_SZ);
          }
 
          if (len) {

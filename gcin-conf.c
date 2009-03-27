@@ -114,3 +114,8 @@ Atom get_gcin_atom(Display *dpy)
   return atom;
 }
 
+
+void get_sys_table_file_name(char *name, char *fname)
+{
+  sprintf(fname, "%s/%s", TableDir, name);
+}

@@ -4,43 +4,6 @@
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*2+1];
 
-char *phokey_to_str(u_short kk)
-{
-  u_int k1,k2,k3,k4;
-  static u_char phchars[8];
-  int phcharsN=0;
-
-  k4=(kk&7);
-  kk>>=3;
-  k3=(kk&15)<<1;
-  kk>>=4;
-  k2=(kk&3)<<1;
-  kk>>=2;
-  k1=(kk&31)<<1;
-
-  if (k1) {
-    memcpy(phchars, &pho_chars[0][k1], 2);
-    phcharsN+=2;
-  }
-
-  if (k2) {
-    memcpy(&phchars[phcharsN], &pho_chars[1][k2], 2);
-    phcharsN+=2;
-  }
-
-  if (k3)  {
-    memcpy(&phchars[phcharsN], &pho_chars[2][k3], 2);
-    phcharsN+=2;
-  }
-
-  if (k4)
-    phchars[phcharsN++] = k4 + '0';
-
-  phchars[phcharsN] = 0;
-
-  return phchars;
-}
-
 
 GtkWidget *mainwin;
 GtkTextBuffer *buffer;

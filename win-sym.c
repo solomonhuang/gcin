@@ -99,7 +99,6 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len);
 
 static void cb_button_sym(GtkButton *button, char *str)
 {
-#if 1
 //  dbg("select %s\n", str);
   phokey_t pho[256];
   int len = strlen(str);
@@ -110,11 +109,6 @@ static void cb_button_sym(GtkButton *button, char *str)
     big5_pho_chars(str+i, &pho[i>>1]);
 
   add_to_tsin_buf(str, pho, strlen(str) / 2);
-#else
-  flush_tsin_buffer();
-  dbg("jjjjjjjjjjjjjjjjjjj %s\n", str);
-  send_text(str);
-#endif
 }
 
 
@@ -163,6 +157,33 @@ void show_win_sym()
   gtk_widget_show(gwin_sym);
   move_win_sym();
 }
+
+static void str_to_all_phokey_chars(char *b5_str, char *out)
+{
+  int len=strlen(b5_str);
+
+  out[0]=0;
+
+  int h;
+
+  for(h=0; h < strlen(b5_str); h+=CH_SZ) {
+    phokey_t phos[32];
+
+    int n=big5_pho_chars(&b5_str[h], phos);
+
+    int i;
+    for(i=0; i < n; i++) {
+      char *pstr = phokey_to_str(phos[i]);
+      strcat(out, pstr);
+      if (i < n -1)
+        strcat(out, " ");
+    }
+
+    if (h < len - CH_SZ)
+      strcat(out, " | ");
+  }
+}
+
 
 void create_win_sym()
 {
@@ -215,10 +236,25 @@ void create_win_sym()
          continue;
 
       GtkWidget *button = gtk_button_new_with_label(utf8);
+      g_free(utf8);
+
       gtk_container_set_border_width (GTK_CONTAINER (button), 0);
       gtk_box_pack_start (GTK_BOX (hbox_row), button, FALSE, FALSE, 0);
 
-      g_free(utf8);
+      if (strlen(str)>=CH_SZ) {
+        char *pho_utf8 = NULL;
+        char phos[32];
+
+        str_to_all_phokey_chars(str, phos);
+        int phos_len = strlen(phos);
+
+        if (phos_len) {
+          pho_utf8 = g_locale_to_utf8 (phos, phos_len, &rn, &wn, &err);
+          GtkTooltips *button_pho_tips = gtk_tooltips_new ();
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button, pho_utf8, NULL);
+          g_free(pho_utf8);
+        }
+      }
 
       g_signal_connect (G_OBJECT (button), "clicked",
          G_CALLBACK (cb_button_sym), str);

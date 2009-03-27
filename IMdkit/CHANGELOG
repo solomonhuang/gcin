@@ -1,3 +1,5 @@
+Fixed several memory leak using valgrind
+        by Edward Liu (cp76@alumni.csie.nctu.edu.tw) June 2004
 
 Fixed a bug which causes onthespot style not work.
 	by Justin Yu(justiny@turbolinux.com.cn) 2000/06/20

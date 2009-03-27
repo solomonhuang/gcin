@@ -185,12 +185,9 @@ void load_tab_pho_file()
   char phokbm_name[MAX_GCIN_STR];
 
   get_gcin_conf_str("phonetic-keyboard", phokbm_name, "zo");
+  strcat(phokbm_name, ".kbm");
+  get_sys_table_file_name(phokbm_name, kbmfname);
 
-  if (!phokbm_name[0]) {
-    strcpy(phokbm_name, "zo");
-  }
-
-  strcat(strcat(strcat(strcpy(kbmfname, TableDir),"/"),phokbm_name),".kbm");
   if ((fr=fopen(kbmfname,"r"))==NULL) {
      p_err("Cannot open %s", kbmfname);
   }

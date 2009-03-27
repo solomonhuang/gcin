@@ -14,7 +14,7 @@ void compact_win0();
 void move_win0(int x, int y);
 void get_win0_geom();
 
-struct {
+static struct {
   GtkWidget *vbox;
   GtkWidget *label;
   GtkWidget *line;
@@ -67,7 +67,7 @@ void disp_char(int index, u_char *ch)
 //  dbg("disp_char %d %c%c\n", index, ch[0], ch[1]);
   create_char(index);
 
-  memcpy(tt, ch, 2);
+  memcpy(tt, ch, CH_SZ);
 
   if (*ch < 127) {
     tt[1] = 0;
@@ -89,9 +89,6 @@ void disp_char(int index, u_char *ch)
   gtk_label_set_text(GTK_LABEL(label), utf8);
   gtk_widget_show(label);
   gtk_widget_show(chars[index].vbox);
-#if 0
-  gdk_flush();
-#endif
 
   get_win0_geom();
 
@@ -105,7 +102,7 @@ void hide_char(int index)
 {
   if (!chars[index].vbox)
     return;
-  gtk_label_set_text(GTK_LABEL(chars[index].label), NULL);
+  gtk_label_set_text(GTK_LABEL(chars[index].label), "");
   gtk_widget_hide_all(chars[index].vbox);
 }
 
@@ -436,6 +433,7 @@ void create_win0_gui()
       G_CALLBACK (cb_clicked_fixed_pos), (gpointer) NULL);
 
   gtk_widget_show_all (gwin0);
+  gdk_flush();
   create_win1();
 }
 
