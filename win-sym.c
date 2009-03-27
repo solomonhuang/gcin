@@ -139,6 +139,7 @@ void move_win_sym()
 
   gtk_widget_size_request(gwin_sym, &sz);
   winsym_xl = sz.width;  winsym_yl = sz.height;
+
   int wx = win_x, wy = win_y + win_yl;
 
   if (wx + winsym_xl > dpy_xl)
@@ -176,12 +177,10 @@ void show_win_sym()
 
   gwin_sym = win_syms[current_CS->in_method];
 
-  if (!gwin_sym || !win_sym_enabled)
+  if (!gwin_sym || !win_sym_enabled || !current_CS->b_im_enabled)
     return;
-#if 0
-  dbg("show_win_sym %x\n", gwin_sym);
-#endif
-  gtk_widget_show(gwin_sym);
+
+  gtk_widget_show_all(gwin_sym);
   move_win_sym(gwin_sym);
 }
 
@@ -213,12 +212,20 @@ extern INMD *cur_inmd;
 
 void create_win_sym()
 {
-  if (current_CS)
-    gwin_sym = win_syms[current_CS->in_method];
+  if (!current_CS) {
+    dbg("create_win_sym, null CS\n");
+    return;
+  }
+
+  if (current_CS->in_method < 0 || current_CS->in_method > 10) {
+    p_err("bad current_CS %d\n", current_CS->in_method);
+  }
+
+
+  gwin_sym = win_syms[current_CS->in_method];
 
   if (current_CS->in_method != 3 && current_CS->in_method != 6 && !cur_inmd)
     return;
-
 
   if (read_syms()) {
     if (gwin_sym)
@@ -302,7 +309,7 @@ void create_win_sym()
     gtk_widget_show_all(gwin_sym);
 
   move_win_sym(gwin_sym);
-#if 1
+#if 0
   dbg("in_method:%d\n", current_CS->in_method);
 #endif
   return;

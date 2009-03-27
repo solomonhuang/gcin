@@ -98,9 +98,10 @@ char *get_gcin_xim_name()
 {
   char *xim_name;
 
-  if ((xim_name=getenv("GCIN_XIM")))
+  if ((xim_name=getenv("GCIN_XIM"))) {
+//    dbg("GCIN_XIM is set with %s\n", xim_name);
     return xim_name;
-
+  }
   if ((xim_name=getenv("XMODIFIERS"))) {
     static char find[] = "@im=";
     static char sstr[32];
@@ -113,7 +114,7 @@ char *get_gcin_xim_name()
     if ((p=strchr(sstr, '.')))
       *p=0;
 
-    dbg("Try to use name from XMODIFIERS=@im=%s\n", sstr);
+//    dbg("Try to use name from XMODIFIERS=@im=%s\n", sstr);
     return sstr;
   }
 
@@ -126,8 +127,6 @@ Atom get_gcin_atom(Display *dpy)
   char tt[128];
 
   snprintf(tt, sizeof(tt), "GCIN_ATOM_%s", xim_name);
-
-  dbg("get_gcin_atom %s\n", tt);
 
   Atom atom = XInternAtom(dpy, tt, False);
 

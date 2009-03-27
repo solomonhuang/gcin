@@ -1,0 +1,14 @@
+CC=gcc
+MAKE=/usr/local/bin/make
+GTKINC=-DSOL=1 -DXTHREADS -D_REENTRANT -DXUSE_MTSAFE_API -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/X11R6/include -I/usr/include/atk-1.0 -I/usr/include/pango-1.0 -I/usr/include/freetype2 -I/usr/include/freetype2/freetype2 -I/usr/include/freetype2/freetype2/config -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+prefix=/usr/local
+bindir=/usr/local/bin
+datadir=/usr/local/share
+libdir=/usr/local/lib
+LDFLAGS=-lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lm -lpangox-1.0 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -ldl -lglib-2.0 -lX11 -lsocket -lnsl
+GCIN_VERSION=0.5.7
+GCIN_TABLE_DIR=$(datadir)/gcin/table
+GCIN_SCRIPT_DIR=$(datadir)/gcin/script
+OPTFLAGS=-g
+DOC_DIR=/usr/local/share/doc/gcin-0.5.7
+GCIN_ICON_DIR=$(datadir)/icons/gcin

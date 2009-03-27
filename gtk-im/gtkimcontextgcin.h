@@ -17,8 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __GTK_IM_CONTEXT_XIM_H__
-#define __GTK_IM_CONTEXT_XIM_H__
+#ifndef __GTK_IM_CONTEXT_GCIN_H__
+#define __GTK_IM_CONTEXT_GCIN_H__
 
 #include <gtk/gtkimcontext.h>
 #include "gdk/gdkx.h"
@@ -28,32 +28,32 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-extern GType gtk_type_im_context_xim;
+extern GType gtk_type_im_context_gcin;
 
-#define GTK_TYPE_IM_CONTEXT_XIM              gtk_type_im_context_xim
-#define GTK_IM_CONTEXT_XIM(obj)              (GTK_CHECK_CAST ((obj), GTK_TYPE_IM_CONTEXT_XIM, GtkIMContextXIM))
-#define GTK_IM_CONTEXT_XIM_CLASS(klass)      (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_IM_CONTEXT_XIM, GtkIMContextXIMClass))
-#define GTK_IS_IM_CONTEXT_XIM(obj)           (GTK_CHECK_TYPE ((obj), GTK_TYPE_IM_CONTEXT_XIM))
-#define GTK_IS_IM_CONTEXT_XIM_CLASS(klass)   (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_IM_CONTEXT_XIM))
-#define GTK_IM_CONTEXT_XIM_GET_CLASS(obj)    (GTK_CHECK_GET_CLASS ((obj), GTK_TYPE_IM_CONTEXT_XIM, GtkIMContextXIMClass))
+#define GTK_TYPE_IM_CONTEXT_GCIN              gtk_type_im_context_gcin
+#define GTK_IM_CONTEXT_GCIN(obj)              (GTK_CHECK_CAST ((obj), GTK_TYPE_IM_CONTEXT_GCIN, GtkIMContextGCIN))
+#define GTK_IM_CONTEXT_GCIN_CLASS(klass)      (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_IM_CONTEXT_GCIN, GtkIMContextGCINClass))
+#define GTK_IS_IM_CONTEXT_GCIN(obj)           (GTK_CHECK_TYPE ((obj), GTK_TYPE_IM_CONTEXT_GCIN))
+#define GTK_IS_IM_CONTEXT_GCIN_CLASS(klass)   (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_IM_CONTEXT_GCIN))
+#define GTK_IM_CONTEXT_GCIN_GET_CLASS(obj)    (GTK_CHECK_GET_CLASS ((obj), GTK_TYPE_IM_CONTEXT_GCIN, GtkIMContextGCINClass))
 
 
-typedef struct _GtkIMContextXIM       GtkIMContextXIM;
-typedef struct _GtkIMContextXIMClass  GtkIMContextXIMClass;
+typedef struct _GtkIMContextGCIN       GtkIMContextGCIN;
+typedef struct _GtkIMContextGCINClass  GtkIMContextGCINClass;
 
-struct _GtkIMContextXIMClass
+struct _GtkIMContextGCINClass
 {
   GtkIMContextClass parent_class;
 };
 
-void gtk_im_context_xim_register_type (GTypeModule *type_module);
+void gtk_im_context_gcin_register_type (GTypeModule *type_module);
 GtkIMContext *gtk_im_context_xim_new (void);
 
-void gtk_im_context_xim_shutdown (void);
+void gtk_im_context_gcin_shutdown (void);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
 
-#endif /* __GTK_IM_CONTEXT_XIM_H__ */
+#endif /* __GTK_IM_CONTEXT_GCIN_H__ */

@@ -5,11 +5,11 @@ pkill gcin.test
 ../gcin.test &
 
 export LC_ALL=zh_TW.Big5
-export XMODIFIERS=@im=$GCIN_XIM
 export LD_LIBRARY_PATH="../im-client"
 
-export LD_PRELOAD=./im-gcin.so
-gedit
+export XMODIFIERS=@im=$GCIN_XIM
+export LD_PRELOAD=../gtk-im/im-gcin.so
+valgrind --tool=memcheck gedit
 
 unset LD_PRELOAD
 pkill gcin.test

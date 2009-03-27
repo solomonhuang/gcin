@@ -51,7 +51,14 @@ if [ $? = 0 ]; then
 
   sed -e "s/im=SCIM/im=xcin/" < i18n.orig.gcin |
   sed -e "s/scim -d/gcin/" | \
-  sed -e "s/MODULE=scim/MODULE=xim/" > i18n
+  sed -e "s/GTK_IM_MODULE=scim/GTK_IM_MODULE=gcin/" | \
+  sed -e "s/QT_IM_MODULE=scim/QT_IM_MODULE=xim/" > i18n
+fi
+
+#add GTK_IM_MODULE=gcin if necessary
+egrep '^GTK_IM_MODULE=gcin' i18n >& /dev/null
+if [ $? != 0 ]; then
+  echo -e "\nGTK_IM_MODULE=gcin" >> i18n
 fi
 
 cd /usr/X11R6/bin
@@ -64,3 +71,4 @@ if [ $? = 0 ]; then
   sed -e "s/XIM=SCIM/#XIM=xim/" < crxvt.orig.cin > crxvt
   chmod 755 crxvt
 fi
+

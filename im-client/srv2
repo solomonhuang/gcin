@@ -1,0 +1,4 @@
+rm -f core.*
+make
+export GCIN_XIM=gcin_test2
+../gcin.test &

@@ -50,7 +50,6 @@ gboolean inph_typ_pho(int newkey)
 
   }
 
-
   if (b_hsu_kbm) {
     if (typ_pho[1] && !typ_pho[2]) {
       for(i=0; i < 3; i++)
@@ -61,7 +60,6 @@ gboolean inph_typ_pho(int newkey)
         }
     }
   }
-
 
   int max_in_idx;
 
@@ -120,25 +118,6 @@ gboolean inph_typ_pho(int newkey)
   if (insert < 0)
     return FALSE;
 
-  // forced to type 2
-  if (inph[0] && (newkey == ' '|| typ_pho[3]) &&
-      !typ_pho[1] && !typ_pho[2] && (!b_hsu_kbm || inph[0]!='a')) {
-    int midx = phkbm.phokbm[(int)inph[0]][2].typ==2 ? 2:1;
-    int mnum = phkbm.phokbm[(int)inph[0]][midx].num;
-
-    if (mnum) {
-      int mtyp = phkbm.phokbm[(int)inph[0]][midx].typ;
-#if TKBM
-       dbg("ooooooooooo %d %d %d\n", midx, mnum, mtyp);
-#endif
-      if (mtyp==2) {
-        typ_pho[0]=0;
-        typ_pho[mtyp] = mnum;
-        return TRUE;
-      }
-    }
-  }
-
 
   if (inph[3] && inph[0]=='c' && !typ_pho[1] && !typ_pho[2] &&
       phkbm.phokbm['c'][1].num) {
@@ -194,6 +173,24 @@ gboolean inph_typ_pho(int newkey)
     }
   }
 
+  // forced to type 2
+  if (inph[0] && (newkey == ' '|| typ_pho[3]) &&
+      !typ_pho[1] && !typ_pho[2] && (!b_hsu_kbm || inph[0]!='a')) {
+    int midx = phkbm.phokbm[(int)inph[0]][2].typ==2 ? 2:1;
+    int mnum = phkbm.phokbm[(int)inph[0]][midx].num;
+
+    if (mnum) {
+      int mtyp = phkbm.phokbm[(int)inph[0]][midx].typ;
+#if TKBM
+       dbg("ooooooooooo %d %d %d\n", midx, mnum, mtyp);
+#endif
+      if (mtyp==2) {
+        typ_pho[0]=0;
+        typ_pho[mtyp] = mnum;
+        return TRUE;
+      }
+    }
+  }
 
   return FALSE;
 }

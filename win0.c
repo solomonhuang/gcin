@@ -8,10 +8,11 @@ extern Display *dpy;
 GtkWidget *frame;
 static GtkWidget *image_pin;
 
-static GtkWidget *hbox_edit, *hbox_row1;
+static GtkWidget *hbox_edit, *hbox_row2;
 static PangoAttrList* attr_list, *attr_list_blank;
 
 void compact_win0();
+void compact_win0_x();
 void move_win0(int x, int y);
 void get_win0_geom();
 
@@ -24,6 +25,18 @@ static struct {
 static GtkWidget *button_pho;
 static GtkWidget *labels_pho[4];
 static GtkWidget *button_eng_ph;
+static int max_yl;
+
+
+void disp_hide_tsin_status_row()
+{
+  if (tsin_disp_status_row)
+    gtk_widget_show_all(hbox_row2);
+  else {
+    gtk_widget_hide_all(hbox_row2);
+    compact_win0();
+  }
+}
 
 void set_label_font_size(GtkWidget *label, int size)
 {
@@ -183,9 +196,6 @@ void clr_tsin_cursor(int index)
 }
 
 
-
-
-
 void disp_tsin_pho(int index, char *pho)
 {
   if (index>=3)
@@ -264,9 +274,22 @@ void move_win_char_index(GtkWidget *win1, int index)
 }
 
 
+
+void compact_win0_x()
+{
+  int win_xl, win_yl;
+
+  gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
+  if (max_yl < win_yl)
+    max_yl = win_yl;
+
+  gtk_window_resize(GTK_WINDOW(gwin0), 60, max_yl);
+}
+
 void compact_win0()
 {
-  gtk_window_resize(GTK_WINDOW(gwin0), 60, 40);
+  max_yl = 0;
+  gtk_window_resize(GTK_WINDOW(gwin0), 60, 16);
 }
 
 
@@ -291,6 +314,8 @@ void move_win0(int x, int y)
 
   win_x = x;  win_y = y;
   gtk_window_move(GTK_WINDOW(gwin0), x, y);
+
+  show_win_sym();
 }
 
 GtkWidget *gwin1;
@@ -315,11 +340,6 @@ void clear_tsin_line()
 }
 
 
-void cb_pho_lookup(void *data, char *instr, char *outstr)
-{
-   str_to_all_phokey_chars(instr, outstr);
-}
-
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
 //  dbg("mouse_button_callback %d\n", event->button);
@@ -328,12 +348,13 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
       create_win_sym();
       break;
     case 2:
+      inmd_switch_popup_handler(widget, event);
       break;
     case 3:
 #if DEBUG
       dbg("exec gcin\n");
 #endif
-      system("gcin-setup &");
+      system(GCIN_BIN_DIR"/gcin-setup &");
       break;
   }
 
@@ -367,6 +388,8 @@ static void cb_clicked_fixed_pos()
 
   set_currenet_IC_pin_image_pin();
 }
+
+void tsin_toggle_eng_ch();
 
 static void cb_clicked_eng_ph()
 {
@@ -408,14 +431,8 @@ void create_win0_gui()
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
   /* This packs the button into the gwin0 (a gtk container). */
   gtk_container_add (GTK_CONTAINER (frame), vbox_top);
-#if 0
-  g_signal_connect(G_OBJECT(vbox_top),"button-press-event",
-                   G_CALLBACK(mouse_button_callback), NULL);
 
-  g_signal_connect(G_OBJECT(frame),"button-press-event",
-                   G_CALLBACK(mouse_button_callback), NULL);
-#endif
-  hbox_row1 = gtk_hbox_new (FALSE, 0);
+  GtkWidget *hbox_row1 = gtk_hbox_new (FALSE, 0);
   /* This packs the button into the gwin0 (a gtk container). */
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_row1, FALSE, FALSE, 0);
 
@@ -449,10 +466,6 @@ void create_win0_gui()
   gtk_box_pack_start (GTK_BOX (hbox_row1), button_pho, FALSE, FALSE, 0);
   GtkWidget *hbox_pho = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (button_pho), hbox_pho);
-#if 0
-  g_signal_connect (G_OBJECT (button_pho), "clicked",
-      G_CALLBACK (cb_clicked), (gpointer) NULL);
-#endif
 
   g_signal_connect(G_OBJECT(button_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
@@ -472,7 +485,7 @@ void create_win0_gui()
     set_label_font_size(label, gcin_font_size_tsin_pho_in);
   }
 
-  GtkWidget *hbox_row2 = gtk_hbox_new (FALSE, 0);
+  hbox_row2 = gtk_hbox_new (FALSE, 0);
 //  gtk_container_set_border_width (GTK_CONTAINER (hbox_row2), 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_row2, FALSE, FALSE, 0);
   GtkWidget *button_tsin = gtk_button_new_with_label("詞音");
@@ -496,6 +509,9 @@ void create_win0_gui()
   clr_in_area_pho_tsin();
 
   gtk_widget_show_all (gwin0);
+
+  disp_hide_tsin_status_row();
+
   gdk_flush();
 
   create_win1();
@@ -572,5 +588,8 @@ void change_tsin_font_size()
     set_label_font_size(label, gcin_font_size);
   }
 
+  compact_win0();
+
   change_win1_font();
 }
+

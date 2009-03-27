@@ -1,4 +1,5 @@
 rm -f core.*
+
 make
 export GCIN_XIM=gcin_test
 pkill gcin.test
@@ -6,10 +7,7 @@ pkill gcin.test
 
 export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=$GCIN_XIM
-export LD_LIBRARY_PATH="../im-client"
 
-export LD_PRELOAD=./im-gcin.so
-gedit
+crxvt
 
-unset LD_PRELOAD
 pkill gcin.test

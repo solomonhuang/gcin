@@ -1,3 +1,41 @@
+0.6.0:
+- gcin-setup OK button 改成 gnome 的 icon。
+- 注音 "性問" 的問題，感謝 PCMan.bbs@bbs.sayya.org 回報問題，這是詞庫資料的問題，'免'這個字的注音有問題。
+- 詞音如果編輯區內有文字時，向左向右鍵現在不會移動到應用程式的游標位置。
+
+0.5.9:
+- 修正了 root input style ，回復到以前跟著 mouse pointer 跑的方式。
+- 現在會自動加 GTK_IM_MODULE 到 /etc/sysconfig/i18n
+
+0.5.8:
+- 詞音: 新增選項，空白鍵可以設定成是選擇同音字/詞或是送出編輯區的內容。
+  不過建議還是用原來的選擇同音字較佳，因為使用向下鍵去選字比較麻煩，必須移動手到向下鍵。
+- 新增 Control-Shift 循環切換輸入法，在 gcin-setup 中也可以設定要循環的輸入法，譬如你可以只選嘸蝦米 &
+  注音，這樣用注音查詢字根就更容易了。同時 gnome-terminal 下切換輸入法也更容易了。
+- 詞音: 現在可以在注音輸入鈕中按滑鼠中鍵來切換輸入法，所以把狀態列關閉後，現在也可以切換輸入法。
+- 謝謝 scsi@msxx.com.tw 回報 Gentoo build 的問題並提供建議。
+- 詞音使用 asdf 選擇時，CapsLock 如果有打開，則無法選字的問題。
+- 開啟詞音視窗時，上一次沒打完的注音現在會被清除。
+
+0.5.7:
+- 詞音輸入法用 Caps Lock 中英切換切換完後，按 Ctlr-Space 關閉 gcin 視窗後會
+  還原開啟視窗時的大小寫狀態。
+- 現在有選項可以把詞音輸入的狀態列關閉，這樣看起來視窗更小更簡潔。
+- 注音 倚天 26 '自'無法輸入的問題。
+- 新增 GTK_IM_MODULE im-gcin.so
+- 詞音由於現在有了 key release event，現在也可以用 Shift 來切換中/英 (限 GTK_IM_MODULE=gcin)
+- 新增【大易】輸入法。
+- 感謝 ar30.cin from cherico.bbs@ptt.cc: 【行列】同時輸入Unicode中所有的漢字，
+  包括簡體，繁體，日文漢字等。
+
+GTK_IM_MODULE 使用 gcin 自己的 .so，和XIM相比， 有何好處？
+  1. gcin 掛掉重新執行時比較不會有程式跟著一起掛掉的情形，現在可以直接在 gnome-terminal 下 
+      'pkill gcin'，不用擔心 gnome-terminal 會停在那邊不動。       
+  2. GTK2 的程式 locale 即使設定成 zh_TW.Big5 也還是可以輸入所有的 UTF-8 字。
+  3. gcin 的協定對 input focus 的處理比 XIM 好。
+  4. client 直接 對 gcin server 互傳資料，不透過 X server，延遲會比較少。
+  5. 如果發現 gcin server 沒有在執行，會自動執行 gcin。
+
 0.5.6:
 - 許式鍵盤 ( 7 吃) 無法輸入的問題。
 - 倚天 26 (ULㄩ ㄥ  XTㄨ ㄤ  EP ㄧ ㄡ) 無法輸入的問題。

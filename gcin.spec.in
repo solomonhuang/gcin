@@ -45,9 +45,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0755)
 %doc README
 %{_bindir}/*
+%{_includedir}/*
 %{_datadir}/gcin/*
 %{_datadir}/icons/*
 %{_libdir}/menu/*
+%{_libdir}/gtk-2.0/*
+%{_libdir}/lib*
 
 %post
 xinitdir=/etc/X11/xinit
@@ -103,6 +106,13 @@ if [ $? = 0 ]; then
   sed -e "s/scim -d/gcin/" | \
   sed -e "s/MODULE=scim/MODULE=xim/" > i18n
 fi
+
+#add GTK_IM_MODULE=gcin if necessary
+egrep '^GTK_IM_MODULE=gcin' i18n >& /dev/null
+if [ $? != 0 ]; then
+  echo -e "\nGTK_IM_MODULE=gcin" >> i18n
+fi
+
 cd /usr/X11R6/bin
 grep -i scim crxvt >& /dev/null
 if [ $? = 0 ]; then
@@ -113,6 +123,11 @@ if [ $? = 0 ]; then
   sed -e "s/XIM=SCIM/#XIM=xim/" < crxvt.orig.cin > crxvt
   chmod 755 crxvt
 fi
+# install gtk IM module
+cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib
+cp gtk.immodules.lib gtk.immodules
+
+ldconfig
 %update_menus
 
 %postun

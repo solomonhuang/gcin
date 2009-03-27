@@ -57,7 +57,9 @@ Mandrake
   ㄌ     …   (省'略'號)
   ㄆ4    —   (破折號)
   ㄒ     ℃   (攝氏 Celsius)
-  ㄒ2    ㏄   (毫升)
+  ㄒ2    ㏄  (毫升)
+  ㄍ‧ ♂   (公)
+  ㄇ‧ ♀   (母) 
  
 
 酷音輸入 的 shift + ",./;'" 也可以用
@@ -102,6 +104,11 @@ input style,
 就可以在 Gnome 2.X 上使用 over-the-spot。
 依照不同的 gtk 版本，必須把上述的 2.2.0 換成 2.4.0 或 2.6.0
 
+mozilla gtk2-ft 的版本中是不支援 over-the-spot，如果要用 over-the-spot，必須 download
+http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
+mozilla gtk2-ft 有什麼優點，用 GTK2 的優點就是與系統的主題(theme) 完全整合，比較漂亮，
+而且 GTK1 完全不用了之後，比較節省 memory。
+
 ----------------------------
 在詞音中按 control-u 可以把整個編輯區的內容清除。
 -----------------------------------
@@ -145,6 +152,14 @@ $ gcin2tab file
 
 按 control-alt-數字鍵  切換到你在 gtab.list 中定的數字鍵。注音與詞音是固定在 3 & 6 鍵上，
 不能更改的。 執行 gcin-setup 可以設定內定的輸入法。
+
+----------------------------------------------------------------------------------------------------------
+From cherico.bbs@ptt.cc:
+行列同時輸入Unicode中所有的漢字，
+包括簡體，繁體，日文漢字等。
+http://home.pchome.com.tw/web/cherico/array-utf8.png
+ar30.cin ar30.gtab 和簡體字根表：
+http://home.pchome.com.tw/web/cherico/ar30utf8.tgz
 --------------------------------------------
 gcin 的行列 & 倉頡(.gtab) 可不可以輸入詞 ?
 只要把詞定義在 .cin 後面即可，然後執行上述的步驟，以下是幾行 examples
@@ -163,6 +178,8 @@ gaim 及 gqview 內使用詞音時按 enter 無法送出編輯區內容。
 這是因為某些程式會把 enter 吃掉，沒有送給 gcin 處理，可能解決辦法有：
 1. 使用 Tab key
 2. 中文輸入狀態可使用 shift-space
+
+gaim 裏面有選項可以設定成用 ctrl-Enter 送出內容，這樣就可以在 gcin   內用 Enter。
 ----------------------------------------------
 gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
 目前好像只有行列有使用，如果有需求時，可以加在 %quick 段落內。
@@ -224,6 +241,8 @@ gedit
 有啊，按 ctrl-alt-3 輸入注音 & 選字，就會顯示你選用的目前 gtab
 輸入法的所有的可能拆字。gcin 和 windows 的不一樣，不需要去設定
 你要顯示的輸入法。
+
+另外，如果字的某部份忘了如何拆，你可以用 '*' or '?' wildcard 來幫助你選字。
 ----------------------------------------------
 為什麼倉頡按第二鍵後會跑出(譬如按 AA日日)
    1昌 2昍   5曝 6暻 7暘   0暍
@@ -243,7 +262,7 @@ gedit
 gtab(倉頡、行列) 輸入法中要如何加入新詞？
 用詞音輸入法加入。
 ----------------------------------------------
-如果使用許氏鍵盤，'q' 是用來選字詞，空白鍵則改為送出編輯區的字串。
+如果使用許氏鍵盤，'q' 是用來選字詞。
 ----------------------------------------------
 為什麼 crxvt 內 不能用 gcin，這是因為你在某個地方有設定 XMODIFIERS=@im=gcin，
 gcin 就用 這個來當 XIM name， /usr/X11R6/bin/crxvt 這個 shell script 會設定
@@ -276,5 +295,70 @@ gedit diff.txt
 2. cp fonts.conf /etc/fonts
 --------------------------------------------------
 詞音輸入的視窗在打滿注音後會縮回去，看起來有點討厭。
-Answer: 注音輸入的區域的字型必須比編輯區的小個幾點就沒有這個問題。
+Answer: 注音輸入的區域的字型必須比編輯區的小個幾點就沒有這個問題。如果你有 install 日文字型，
+且使用 12/23/2004 以前的 fonts.conf，則還是會有縮回去的問題，請下載最新的 fonts.conf。
 --------------------------------------------------
+gcin coredump 如幫忙 debug
+
+cd gcin-0.5.x
+export  GCIN_DEBUG=1
+make clean
+./configure
+
+修改 config.mak 把
+OPTFLAGS=-O
+取代成
+OPTFLAGS=-g
+
+make
+
+
+make 完了之後，執行
+
+./tgdb
+
+(gdb) r
+
+r 指令會開始執行 gcin， 掛了之後，
+
+(gdb) bt
+
+下了 bt 以後會有類似以下的訊息，把這個 post 出來。
+
+#0  0xffffe410 in ?? ()
+#1  0xbffff278 in ?? ()
+#2  0xffffffff in ?? ()
+#3  0x00000001 in ?? ()
+#4  0x40548e5d in poll () from /lib/tls/libc.so.6
+#5  0x404212e7 in g_main_loop_get_context () from /usr/lib/libglib-2.0.so.0
+------------------------------------------------------------------------------------------------------
+GTK_IM_MODULE 使用 gcin 自己的 .so，和XIM相比，有何好處？
+  1. gcin 掛掉重新執行時比較不會有程式跟著一起掛掉的情形，現在可以直接在 gnome-terminal 下 
+      'pkill gcin'，不用擔心 gnome-terminal 會停在那邊不動 (mozilla-gtk2 除外)。
+  2. GTK2 的程式 locale 即使設定成 zh_TW.Big5 也還是可以輸入所有的 UTF-8 字。
+  3. 詞音由於現在有了 key release event，現在也可以用 Shift 來切換中/英。
+  3. gcin 的協定對 input focus 的處理比 XIM 好。
+  4. client 直接 對 gcin server 互傳資料，不透過 X server，延遲會比較少。
+  5. 如果發現 gcin server 沒有在執行，會自動執行 gcin。
+
+大部份(Mdk 10.0,10.1) install gcin即可直接使用，如果沒有，
+  export GTK_IM_MODULE=gcin
+通常是設定在
+    /etc/sysconfig/i18n
+gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000。
+如果因為 firewall 的緣故無法使用， export GTK_IM_MODULE=xim 可以指定使用 XIM。
+目前支援很簡單的編碼以避免 plaintext 在傳送，未來可能會支援 SSL。
+雖然目前是用很簡單的 encoding，如果 gcin 搭配 ssh X11 forwarding 應該是非常安全的。
+而且 data 不像 SSL 會變大，更適合在 low bandwidth 使用。
+
+目前只支援 GTK2，但是 gcin 有提供非常容易使用的 API 介面供其他 terminal & QT_IM_MODULE 
+使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
+
+
+gcin 如果使用到自己的 IM_MODULE 時，tty (console) 會出現以下 message
+a. connect to unix socket addr /tmp/gcin-????/socket-:0.0-xcin   
+或是
+b.  gcin client connected to server 172.x.x.x:9999
+
+只需要一個 gcin 執行就可以，不需要為了同時支援 GTK_IM_MODULE & XIM 而執行兩個 gcin process。
+------------------------------------------------------------------------------------------------------

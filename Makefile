@@ -21,7 +21,7 @@ WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
-        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\"
+        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\"
 
 IMdkitLIB = IMdkit/lib/libXimd.a
 im-srv = im-srv/im-srv.a
@@ -34,6 +34,8 @@ PROGS_CV=kbmcv
 
 all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
+	$(MAKE) -C im-client
+	$(MAKE) -C gtk-im
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
 	$(CC) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
@@ -73,23 +75,21 @@ $(im-srv):
 install:
 	install -d $(datadir)/icons
 	install gcin.png $(datadir)/icons
-	install -d $(GCIN_ICON_DIR)
-	install -m 644 icons/* $(GCIN_ICON_DIR)
+	install -d $(GCIN_ICON_DIR_i)
+	install -m 644 icons/* $(GCIN_ICON_DIR_i)
 	install -d $(bindir)
-	install -d $(libdir)/menu
-	install -m 644 menu/* $(libdir)/menu
 	$(MAKE) -C scripts install
 	$(MAKE) -C data install
+	$(MAKE) -C im-client install
+	$(MAKE) -C gtk-im install
+	$(MAKE) -C menu install
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
-	   install -m 644 menu/* /usr/lib/menu; \
-	   which update-menus >& /dev/null && update-menus; \
 	   sh modify-XIM; \
 	   install -d $(DOC_DIR); \
 	   install -m 644 README $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
 	else \
-	   install -m 644 menu/* $(libdir)/menu; \
 	   install -s $(PROGS) $(bindir); \
 	fi
 clean:

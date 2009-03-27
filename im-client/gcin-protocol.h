@@ -51,3 +51,21 @@ typedef struct {
 #define to_gcin_endian_2(pp) do { } while (0)
 #define to_gcin_endian_4(pp) do { } while (0)
 #endif
+
+#define __GCIN_PASSWD_N_ (31)
+
+typedef struct GCIN_PASSWD {
+  unsigned long seed;
+  u_char passwd[__GCIN_PASSWD_N_];
+} GCIN_PASSWD;
+
+
+typedef struct {
+  u_int ip;
+  u_short port;
+  GCIN_PASSWD passwd;
+} Server_IP_port;
+
+
+void __gcin_enc_mem(u_char *p, int n, GCIN_PASSWD *passwd, unsigned long *seed);
+

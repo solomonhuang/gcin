@@ -19,10 +19,10 @@
 
 #include "gtkintl.h"
 #include "gtk/gtkimmodule.h"
-#include "gtkimcontextxim.h"
+#include "gtkimcontextgcin.h"
 #include <string.h>
 
-static const GtkIMContextInfo xim_ja_info = {
+static const GtkIMContextInfo gcin_ja_info = {
   "gcin",		           /* ID */
   N_("gcin Input Method"),            /* Human readable name */
   GETTEXT_PACKAGE,		   /* Translation domain */
@@ -31,28 +31,28 @@ static const GtkIMContextInfo xim_ja_info = {
 };
 
 static const GtkIMContextInfo *info_list[] = {
-  &xim_ja_info
+  &gcin_ja_info
 };
 
 void
 im_module_init (GTypeModule *type_module)
 {
-  printf("im_module_init\n");
+//  printf("im_module_init\n");
   gtk_im_context_xim_register_type (type_module);
 }
 
 void
 im_module_exit (void)
 {
-  printf("im_module_exit\n");
-  gtk_im_context_xim_shutdown ();
+//  printf("im_module_exit\n");
+  gtk_im_context_gcin_shutdown ();
 }
 
 void
 im_module_list (const GtkIMContextInfo ***contexts,
 		int                      *n_contexts)
 {
-  printf("im_module_list\n");
+//  printf("im_module_list\n");
   *contexts = info_list;
   *n_contexts = G_N_ELEMENTS (info_list);
 }
@@ -60,8 +60,8 @@ im_module_list (const GtkIMContextInfo ***contexts,
 GtkIMContext *
 im_module_create (const gchar *context_id)
 {
-  printf("im_module_create %s\n", context_id);
-  if (strcmp (context_id, "xim") == 0)
+//  printf("im_module_create %s\n", context_id);
+  if (strcmp (context_id, "gcin") == 0)
     return gtk_im_context_xim_new ();
   else
     return NULL;

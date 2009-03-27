@@ -1,5 +1,6 @@
-#include "gcin.h"
 #include <signal.h>
+// #include <openssl/ssl.h>
+#include "gcin.h"
 
 Display *dpy;
 Window root;
@@ -109,7 +110,7 @@ int MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
             (call_data->key_index == 6 && gcin_im_toggle_keys==Alt_Space) ||
             (call_data->key_index == 9 && gcin_im_toggle_keys==Windows_Space)
             ) {
-            toggle_im_enabled();
+            toggle_im_enabled(0);
         }
 	return True;
     } else {
@@ -280,12 +281,15 @@ void open_xim()
 void load_tsin_db();
 void load_tsin_conf(), load_setttings(), load_tab_pho_file();
 
+void disp_hide_tsin_status_row();
+
 static void reload_data()
 {
   dbg("reload_data\n");
-  load_tsin_db();
-  load_tab_pho_file();
   load_setttings();
+  load_tsin_db();
+  disp_hide_tsin_status_row();
+  load_tab_pho_file();
 }
 
 void change_tsin_font_size();
@@ -404,9 +408,15 @@ void init_im_serv();
 
 int main(int argc, char **argv)
 {
+//  SSL_library_init();
+
   dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
   char *lc_ctype = getenv("LC_CTYPE");
   char *lc_all = getenv("LC_ALL");
+  if (!lc_ctype)
+    lc_ctype = "";
+  if (!lc_all)
+    lc_all = "";
   dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s\n", lc_ctype, lc_all);
 
   xim_arr[0].server_locale = "zh_TW";
@@ -420,13 +430,13 @@ int main(int argc, char **argv)
     xim_arr[1].b_send_utf8_str = FALSE;
     xim_arr[1].server_locale = "zh_TW.Big5";
     strcat(xim_arr[1].xim_server_name, ".Big5");
-    dbg("gcin will use UTF-8 as default encoding\n");
+    dbg("gcin will use UTF-8 as the default encoding\n");
   } else {
     xim_arr[0].b_send_utf8_str = FALSE;
     xim_arr[1].b_send_utf8_str = TRUE;
     xim_arr[1].server_locale = "zh_TW.UTF-8";
     strcat(xim_arr[1].xim_server_name, ".UTF-8");
-    dbg("gcin will use Big5 as default encoding\n");
+    dbg("gcin will use Big5 as the default encoding\n");
   }
 
 
@@ -437,7 +447,13 @@ int main(int argc, char **argv)
   // temporaray solution
   static char tmplocale[]="zh_TW.Big5";
   setlocale(LC_ALL, tmplocale);
+#if SOL
+  char tstr[128];
+  sprintf(tstr, "LC_ALL=%s", tmplocale);
+  putenv(tstr);
+#else
   setenv("LC_ALL", tmplocale, TRUE);
+#endif
 
   exec_setup_scripts();
 
@@ -467,7 +483,7 @@ int main(int argc, char **argv)
     XSetErrorHandler((XErrorHandler)xerror_handler);
 
 #if 1
-  init_gcin_im_serv();
+  init_gcin_im_serv(xim_arr[0].xim_xwin);
 #endif
 
   gtk_main();

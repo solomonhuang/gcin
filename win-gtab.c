@@ -79,6 +79,7 @@ void set_key_codes_label(char *s)
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
 }
 
+void show_win_sym();
 
 void move_win_gtab(int x, int y)
 {
@@ -101,6 +102,8 @@ void move_win_gtab(int x, int y)
 
   win_x = x;  win_y = y;
   gtk_window_move(GTK_WINDOW(gwin_gtab), x, y);
+
+  show_win_sym();
 }
 
 void set_gtab_input_method_name(char *s)
@@ -140,7 +143,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 #if DEBUG
       dbg("exec gcin\n");
 #endif
-      system("gcin-setup &");
+      system(GCIN_BIN_DIR"/gcin-setup &");
       break;
   }
 
@@ -263,8 +266,7 @@ void create_win_gtab_gui()
 }
 
 
-void show_win_sym();
-void init_gtab(int inmdno, int usenow);
+gboolean init_gtab(int inmdno, int usenow);
 
 void show_win_gtab()
 {
@@ -277,7 +279,6 @@ void show_win_gtab()
     if (current_CS->fixed_pos)
       move_win_gtab(0,0);
   }
-
 
   init_gtab(current_CS->in_method, True);
   gtk_widget_show(gwin_gtab);

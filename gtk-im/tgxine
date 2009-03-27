@@ -9,7 +9,7 @@ export XMODIFIERS=@im=$GCIN_XIM
 export LD_LIBRARY_PATH="../im-client"
 
 export LD_PRELOAD=./im-gcin.so
-gedit
+gxine
 
 unset LD_PRELOAD
 pkill gcin.test

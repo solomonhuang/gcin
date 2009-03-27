@@ -1,6 +1,7 @@
 #include "gcin.h"
 #include "gtab.h"
 
+
 static  GtkWidget *menu;
 
 void cb_update_menu_select(GtkWidget  *item,  gpointer data)
@@ -54,3 +55,5 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event)
 
   return FALSE;
 }
+
+

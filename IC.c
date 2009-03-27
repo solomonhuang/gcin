@@ -196,6 +196,7 @@ void load_IC(IC *rec)
    ClientState *cs = &rec->cs;
    Window win = cs->client_win;
 
+#if 1
    if (current_CS != cs && (win == focus_win || !current_CS))
      current_CS = cs;
 
@@ -206,30 +207,28 @@ void load_IC(IC *rec)
      if (cs->b_im_enabled)
        show_in_win(cs);
    }
+#endif
 
    if (cs->input_style & XIMPreeditCallbacks) {
-#if DEBUG
-     dbg("rec->input_style onspot\n", rec->input_style);
-#endif
      set_current_input_style(InputStyleOnSpot);
+#if 0
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
+#endif
    } else
    if (cs->input_style & XIMPreeditPosition) {
-#if DEBUG
-     dbg("rec->input_style overspot\n", rec->input_style);
-#endif
      set_current_input_style(InputStyleOverSpot);
+#if 1
      if (cs->b_im_enabled)
        move_IC_in_win(cs);
+#endif
    }
 
    if (cs->input_style & XIMPreeditNothing) {
-#if DEBUG
-     dbg("rec->input_style root\n", rec->input_style);
-#endif
+#if 1
      set_current_input_style(InputStyleRoot);
      move_IC_in_win(cs);
+#endif
    }
 }
 
@@ -253,14 +252,11 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 		else if (Is (XNClientWindow, ic_attr)) {
                     rec->cs.client_win = *(Window*)ic_attr->value;
 #if DEBUG
-		    dbg("rec->client_win %x\n", rec->client_win);
+		    dbg("rec->client_win %x\n", cs->client_win);
 #endif
 		}
 		else if (Is (XNFocusWindow, ic_attr)) {
                     rec->focus_win = *(Window*)ic_attr->value;
-#if DEBUG
-		    dbg("rec->focus_win %x\n", rec->focus_win);
-#endif
                 }
 		else
 		    fprintf(stderr, "Unknown attr: %s a\n", ic_attr->name);
@@ -447,7 +443,7 @@ void GetIC(IMChangeICStruct *call_data)
             *(XPoint*)pre_attr->value = cs->spot_location;
 	    pre_attr->value_length = sizeof(XPoint);
 #if DEBUG
-            dbg("over splot %d %d\n", rec->pre_attr.spot_location.x,  rec->pre_attr.spot_location.y);
+            dbg("over splot %d %d\n", cs->spot_location.x,  cs->spot_location.y);
 #endif
 	} else if (Is (XNFontSet, pre_attr)) {
 	    CARD16 base_len = (CARD16)strlen(rec->pre_attr.base_font);

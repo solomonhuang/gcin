@@ -31,7 +31,7 @@ void send_text_call_back(char *text)
 InputStyle_E current_input_style;
 ClientState *current_CS;
 
-void init_in_method(int in_no);
+gboolean init_in_method(int in_no);
 
 void set_current_input_style(InputStyle_E style)
 {
@@ -74,15 +74,18 @@ void export_text_xim()
   char *text = output_buffer;
 
   if (!output_bufferN)
-    return 0;
+    return;
 
 
   XTextProperty tp;
   char outbuf[512];
 
+#if !SOL
   if (pxim_arr->b_send_utf8_str) {
     Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
-  } else {
+  } else
+#endif
+  {
     utf8_big5(output_buffer, outbuf);
     text = outbuf;
     XmbTextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
@@ -185,9 +188,10 @@ void move_in_win(ClientState *cs, int x, int y)
     return;
   }
 
-#if DEBUG
+#if DEBUG || 0
   dbg("move_in_win %d %d\n",x, y);
 #endif
+
   switch (cs->in_method) {
     case 3:
       move_win_pho(x, y);
@@ -246,11 +250,25 @@ void update_in_win_pos()
 IC *findIC();
 gboolean flush_tsin_buffer();
 
-void toggle_im_enabled()
+void toggle_im_enabled(u_int kev_state)
 {
 //    dbg("toggle_im_enabled\n");
+    if (!current_CS)
+      return;
+
+    if (current_CS->in_method < 0 || current_CS->in_method > 10)
+      return;
+
+    static u_int orig_caps_state;
 
     if (current_CS->b_im_enabled) {
+
+      if (current_CS->in_method== 6 && (kev_state & LockMask) != orig_caps_state &&
+          tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
+        KeyCode caps = XKeysymToKeycode(dpy, XK_Caps_Lock);
+        XTestFakeKeyEvent(dpy, caps, True, CurrentTime);
+        XTestFakeKeyEvent(dpy, caps, False, CurrentTime);
+      }
 
       if (current_CS->in_method)
         flush_tsin_buffer();
@@ -259,6 +277,7 @@ void toggle_im_enabled()
       current_CS->b_im_enabled = FALSE;
     } else {
       current_CS->b_im_enabled = TRUE;
+      orig_caps_state = kev_state & LockMask;
 
       if (!current_CS->in_method) {
         init_in_method(default_input_method);
@@ -303,16 +322,17 @@ void toggle_half_full_char()
 //  dbg("half full toggle\n");
 }
 
-void init_gtab(int inmdno, int usenow);
+gboolean init_gtab(int inmdno, int usenow);
 void init_inter_code(int usenow);
 void init_tab_pp(int usenow);
 void init_tab_pho(int usenow);
 
-void init_in_method(int in_no)
+gboolean init_in_method(int in_no)
 {
+  gboolean status = TRUE;
 
   if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
-    return;
+    return FALSE;
 
   if (current_CS->in_method != in_no)
     hide_in_win(current_CS);
@@ -332,11 +352,30 @@ void init_in_method(int in_no)
       break;
     default:
       show_win_gtab();
-      init_gtab(in_no, True);
+//      init_gtab(in_no, True);
       break;
   }
 
   update_in_win_pos();
+  return status;
+}
+
+
+static void cycle_next_in_method()
+{
+
+  int i;
+
+  for(i=1; i <= 10; i++) {
+    int v = (current_CS->in_method + i) % 10;
+    if (!(gcin_flags_im_enabled & (1<<v)))
+      continue;
+    if (!inmd[v].cname[0])
+      continue;
+
+    init_in_method(v);
+    return;
+  }
 }
 
 
@@ -350,7 +389,11 @@ void tsin_set_eng_ch(int nmod);
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
-  focus_win = current_CS->client_win;
+  if (!current_CS)
+    return FALSE;
+
+  if (current_CS->client_win)
+    focus_win = current_CS->client_win;
 
   if (strlen(callback_str_buffer)) {
     send_text(callback_str_buffer);
@@ -368,10 +411,12 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       ((kev_state & ShiftMask) && gcin_im_toggle_keys==Shift_Space) ||
       ((kev_state & Mod4Mask) && gcin_im_toggle_keys==Windows_Space)
     ) {
-      if (current_CS->in_method == 6)
+      if (current_CS->in_method == 6) {
         tsin_set_eng_ch(1);
 
-      toggle_im_enabled();
+      }
+
+      toggle_im_enabled(kev_state);
       return TRUE;
     }
   }
@@ -385,9 +430,15 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     return TRUE;
   }
 
-  gboolean status = FALSE;
+  if ((keysym == XK_Control_L || keysym == XK_Control_R)
+                   && (kev_state & ShiftMask) ||
+      (keysym == XK_Shift_L || keysym == XK_Shift_R)
+                   && (kev_state & ControlMask)) {
+     cycle_next_in_method();
+     return TRUE;
+  }
 
-  if ((kev_state & ControlMask) && (kev_state&(GDK_MOD1_MASK|GDK_MOD5_MASK))) {
+  if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
     init_in_method(keysym- XK_0);
     return TRUE;
   }
@@ -411,6 +462,26 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
   return FALSE;
 }
+
+
+
+// return TRUE if the key press is processed
+gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
+{
+  if (!current_CS || !current_CS->b_im_enabled)
+    return FALSE;
+
+  if (current_CS->client_win)
+    focus_win = current_CS->client_win;
+
+  switch(current_CS->in_method) {
+    case 6:
+      return feedkey_pp_release(keysym, kev_state);
+  }
+
+  return FALSE;
+}
+
 
 
 int xim_ForwardEventHandler(IMForwardEventStruct *call_data)
@@ -445,19 +516,33 @@ void load_IC(IC *rec);
 
 int gcin_FocusIn(ClientState *cs)
 {
-    if (cs) {
-      Window win = cs->client_win;
+  Window win = cs->client_win;
 
-      if (focus_win != win) {
-        hide_in_win(current_CS);
-        focus_win = win;
-      }
+  if (cs) {
+    Window win = cs->client_win;
+
+    if (focus_win != win) {
+      hide_in_win(current_CS);
+      focus_win = win;
     }
+  }
 
-#if DEBUG
-    dbg("focus in %d\n", call_data->icid);
+  if (current_CS != cs && (win == focus_win || !current_CS))
+    current_CS = cs;
+
+  if (win == focus_win) {
+    if (cs->b_im_enabled) {
+      move_IC_in_win(cs);
+      show_in_win(cs);
+    } else
+      hide_in_win(cs);
+  }
+
+
+#if DEBUG || 0
+  dbg("gcin_FocusIn %x %x\n",cs, current_CS);
 #endif
-    return True;
+  return True;
 }
 
 
@@ -474,7 +559,7 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
     }
 
 #if DEBUG
-    dbg("focus in %d\n", call_data->icid);
+    dbg("xim_gcin_FocusIn %d\n", call_data->icid);
 #endif
     return True;
 }
@@ -484,8 +569,8 @@ int gcin_FocusOut(ClientState *cs)
     if (cs == current_CS) {
       hide_in_win(cs);
     }
-#if DEBUG
-    dbg("focus out %d\n", call_data->icid);
+#if DEBUG || 0
+    dbg("focus out %x %x\n", cs, current_CS);
 #endif
 //    focus_win = 0;
 

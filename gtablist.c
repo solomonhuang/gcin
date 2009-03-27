@@ -25,6 +25,7 @@ typedef struct
   gchar *name;
   gchar *key;
   gchar *file;
+  gboolean used;
   gboolean editable;
 } Item;
 
@@ -33,9 +34,11 @@ enum
   COLUMN_NAME,
   COLUMN_KEY,
   COLUMN_FILE,
+  COLUMN_USE,
   COLUMN_EDITABLE,
   NUM_COLUMNS
 };
+
 
 static GArray *articles = NULL;
 
@@ -84,7 +87,9 @@ add_items (void)
 
     foo.name = g_strdup(name);
     foo.key = g_strdup(key);
+    int in_no = atoi(foo.key);
     foo.file = g_strdup(file);
+    foo.used = (gcin_flags_im_enabled & (1 << in_no)) != 0;
     foo.editable = FALSE;
     g_array_append_vals (articles, &foo, 1);
   }
@@ -108,7 +113,7 @@ create_model (void)
 
   /* create list store */
   model = gtk_list_store_new (NUM_COLUMNS,G_TYPE_STRING, G_TYPE_STRING,
-                              G_TYPE_STRING, G_TYPE_BOOLEAN);
+                              G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
 
   /* add items */
   for (i = 0; i < articles->len; i++) {
@@ -121,6 +126,8 @@ create_model (void)
 			  g_array_index (articles, Item, i).key,
 			  COLUMN_FILE,
 			  g_array_index (articles, Item, i).file,
+			  COLUMN_USE,
+			  g_array_index (articles, Item, i).used,
 			  COLUMN_EDITABLE,
 			  g_array_index (articles, Item, i).editable,
 			  -1);
@@ -153,6 +160,7 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, imkeys[idx].keynum);
+  save_gcin_conf_int(GCIN_FLAGS_IM_ENABLED, gcin_flags_im_enabled);
 
   gtk_widget_destroy(gtablist_window);
 
@@ -164,10 +172,36 @@ static void cb_cancel (GtkWidget *widget, gpointer data)
   gtk_widget_destroy(gtablist_window);
 }
 
+static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer data)
+{
+  GtkTreeModel *model = GTK_TREE_MODEL (data);
+  GtkTreeIter iter;
+  GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
+  gboolean value;
+
+  printf("toggled\n");
+
+  gtk_tree_model_get_iter (model, &iter, path);
+  gtk_tree_model_get (model, &iter, COLUMN_USE, &value, -1);
+  int i = gtk_tree_path_get_indices (path)[0];
+  char *key=g_array_index (articles, Item, i).key;
+  int in_no = atoi(key);
+
+  gcin_flags_im_enabled ^= 1 << in_no;
+  value ^= 1;
+
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_USE, value, -1);
+  gtk_tree_path_free (path);
+
+  return TRUE;
+}
+
+
 static void
 add_columns (GtkTreeView *treeview)
 {
   GtkCellRenderer *renderer;
+  GtkTreeModel *model = gtk_tree_view_get_model (treeview);
 
   /* name column */
 
@@ -201,6 +235,20 @@ add_columns (GtkTreeView *treeview)
                                                "text", COLUMN_FILE,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
+#if 1
+  // use column
+  renderer = gtk_cell_renderer_toggle_new ();
+  g_signal_connect (G_OBJECT (renderer), "toggled",
+		    G_CALLBACK (toggled), model);
+
+  g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
+
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
+					       -1, "使用",
+					       renderer,
+					       "active", COLUMN_USE,
+					       NULL);
+#endif
 }
 
 
@@ -317,17 +365,17 @@ void create_gtablist_window (void)
   hbox = gtk_hbox_new (TRUE, 4);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
-  button = gtk_button_new_with_label ("OK");
+  button = gtk_button_new_from_stock (GTK_STOCK_OK);
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  button = gtk_button_new_with_label ("Cancel");
+  button = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_cancel), treeview);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 300, 250);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 360, 350);
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);

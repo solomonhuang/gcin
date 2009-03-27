@@ -12,6 +12,11 @@
 #include "Xi18n.h"
 #include "IC.h"
 
+#if CLIENT_LIB
+#define p_err __gcin_p_err
+#define dbg __gcin_dbg
+#define zmalloc __gcin_zmalloc
+#endif
 
 #define CH_SZ (3) // big5 size ( 2 bytes), will be changed to 3 if unicode is used
 
@@ -21,8 +26,11 @@ void *zmalloc(int n);
 #define trealloc(p,type,n)  (type*)realloc(p, sizeof(type) * (n+1))
 
 extern Display *dpy;
+
+
 void p_err(char *fmt,...);
 void dbg(char *fmt,...);
+
 
 extern GtkWidget *gwin0;
 extern GdkWindow *gdkwin0;
@@ -56,6 +64,11 @@ enum {
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift=4,
 } TSIN_CHINESE_ENGLISH_TOGGLE_KEY;
 
+
+enum {
+  TSIN_SPACE_OPT_SELECT_CHAR = 1,
+  TSIN_SPACE_OPT_FLUSH_BUFFER = 2,
+} TSIN_SPACE_OPT;
 
 
 #define ROW_ROW_SPACING (2)
@@ -94,3 +107,5 @@ void sendkey_b5(char *bchar);
 void bell();
 void set_label_font_size(GtkWidget *label, int size);
 void send_gcin_message(Display *dpy, char *s);
+
+#define BITON(flag, bit) ((flag) & (bit))

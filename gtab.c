@@ -233,7 +233,7 @@ void load_gtab_list()
 
 void set_gtab_input_method_name(char *s);
 
-void init_gtab(int inmdno, int usenow)
+gboolean init_gtab(int inmdno, int usenow)
 {
   FILE *fp;
   char ttt[128],uuu[128];
@@ -342,6 +342,8 @@ void init_gtab(int inmdno, int usenow)
     set_gtab_input_method_name(inp->cname);
     DispInArea();
   }
+
+  return TRUE;
 }
 
 static char match_phrase[MAX_PHRASE_STR_LEN];

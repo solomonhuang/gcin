@@ -1,0 +1,5 @@
+export LC_ALL=zh_TW.Big5
+export GTK_IM_MODULE=scim
+export XMODIFIERS=@im=scim
+gnome-terminal --new-window &
+gedit --new-window &
