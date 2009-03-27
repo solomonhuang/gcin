@@ -1,3 +1,9 @@
+0.6.2:
+- Makfile install 的問題，感謝 diadia.bbs@bbs.sayya.org 回報問題。
+- 詞音輸入法使用許式鍵盤"而"(ld)打不出來
+- 新增類似嘸蝦米的同音字查詢，按 '`' (backquote) 後就會出現注音的視窗，輸入要查詢的同音字就可以了。
+- connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin 的訊息，現在內定是關閉的，如果要打開，可以用 export GCIN_CONNECT_MSG_ON=
+
 0.6.1:
 - 詞音如果編輯區內有文字時，向上鍵現在不會移動到應用程式的游標位置。感謝  garychang.bbs@bbs.ee.ttu.edu.tw, PCMan.bbs@bbs.sayya.org 提供的 patch 。
 - GTK_IM_MODULE connection 沒有 closed 的問題。
@@ -47,7 +53,7 @@ GTK_IM_MODULE 使用 gcin 自己的 .so，和XIM相比， 有何好處？
   5. 如果發現 gcin server 沒有在執行，會自動執行 gcin。
 
 0.5.6:
-- 許式鍵盤 ( 7 吃) 無法輸入的問題。
+- 許式鍵盤 ( v 吃) 無法輸入的問題。
 - 倚天 26 (ULㄩ ㄥ  XTㄨ ㄤ  EP ㄧ ㄡ) 無法輸入的問題。
 
 0.5.5:

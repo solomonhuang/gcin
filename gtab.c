@@ -8,6 +8,14 @@
 #include "pho.h"
 #include "gcin-conf.h"
 
+typedef enum {
+  SAME_PHO_QUERY_none = 0,
+  SAME_PHO_QUERY_gtab_input = 1,
+  SAME_PHO_QUERY_pho_select = 2,
+} SAME_PHO_QUERY;
+
+static SAME_PHO_QUERY same_pho_query_state = SAME_PHO_QUERY_none;
+
 extern char *TableDir;
 
 #define MAX_SEL_BUF ((CH_SZ + 1) * MAX_SELKEY + 1)
@@ -179,6 +187,18 @@ static void ClrIn()
   sel1st_i=MAX_SELKEY-1;
 }
 
+
+void hide_win_pho();
+
+void close_gtab_pho_win()
+{
+  if (same_pho_query_state != SAME_PHO_QUERY_none) {
+    same_pho_query_state = SAME_PHO_QUERY_none;
+    hide_win_pho();
+  }
+}
+
+
 static void DispInArea()
 {
   int i;
@@ -233,7 +253,7 @@ void load_gtab_list()
 
 void set_gtab_input_method_name(char *s);
 
-gboolean init_gtab(int inmdno, int usenow)
+void init_gtab(int inmdno, int usenow)
 {
   FILE *fp;
   char ttt[128],uuu[128];
@@ -342,13 +362,12 @@ gboolean init_gtab(int inmdno, int usenow)
     set_gtab_input_method_name(inp->cname);
     DispInArea();
   }
-
-  return TRUE;
 }
 
 static char match_phrase[MAX_PHRASE_STR_LEN];
 static int part_matched_len;
 gboolean find_match(char *str, int len, char *match_str);
+void start_gtab_pho_query(char *utf8);
 
 static void putstr_inp(u_char *p)
 {
@@ -357,8 +376,19 @@ static void putstr_inp(u_char *p)
   else {
     char tt[512];
 
+    if (same_pho_query_state == SAME_PHO_QUERY_gtab_input) {
+      same_pho_query_state = SAME_PHO_QUERY_pho_select;
+      start_gtab_pho_query(p);
+
+      ClrIn();
+      ClrSelArea();
+      ClrInArea();
+      return;
+    }
+
     lookup_gtab(p, tt);
     sendkey_b5(p);
+
 
     if (gtab_auto_select_by_phrase && !(gtab_space_auto_first & GTAB_space_auto_first_any)) {
       if (part_matched_len < strlen(match_phrase) &&
@@ -559,7 +589,18 @@ static void load_phr(int j, char *tt)
   tt[len]=0;
 }
 
+void init_gtab_pho_query_win();
+int feedkey_pho(KeySym xkey);
 
+void set_gtab_target_displayed()
+{
+  close_gtab_pho_win();
+}
+
+gboolean is_gtab_query_mode()
+{
+  return same_pho_query_state == SAME_PHO_QUERY_pho_select;
+}
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -575,6 +616,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (kbstate & (Mod1Mask|ControlMask)) {
       return 0;
   }
+
+
+  if (same_pho_query_state == SAME_PHO_QUERY_pho_select)
+    return feedkey_pho(key);
 
   if (current_CS->b_half_full_char) {
      char *s = half_char_to_full_char(key);
@@ -630,10 +675,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
       break;
     case XK_Escape:
+      close_gtab_pho_win();
       if (ci) {
+        ClrIn();
         ClrSelArea();
         ClrInArea();
-        ClrIn();
         return 1;
       } else
         return 0;
@@ -713,6 +759,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     case XK_Alt_R:
     case XK_Caps_Lock:
       return 0;
+    case '`':
+      same_pho_query_state = SAME_PHO_QUERY_gtab_input;
+      init_gtab_pho_query_win();
+      return 1;
     default:
       if (key>=XK_KP_0 && key<=XK_KP_9)
         key-=XK_KP_0-'0';

@@ -48,9 +48,9 @@ struct _GtkIMContextGCIN
 
   GCIN_client_handle *gcin_ch;
 
-  guint filter_key_release : 1;
+//  guint filter_key_release : 1;
 //  guint use_preedit : 1;
-  guint finalizing : 1;
+//  guint finalizing : 1;
   guint in_toplevel : 1;
   guint has_focus : 1;
 };
@@ -201,8 +201,8 @@ static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
 //  im_context_gcin->use_preedit = TRUE;
-  im_context_gcin->filter_key_release = FALSE;
-  im_context_gcin->finalizing = FALSE;
+//  im_context_gcin->filter_key_release = FALSE;
+//  im_context_gcin->finalizing = FALSE;
   im_context_gcin->has_focus = FALSE;
   im_context_gcin->in_toplevel = FALSE;
 }
@@ -213,7 +213,7 @@ gtk_im_context_gcin_finalize (GObject *obj)
 //  printf("gtk_im_context_gcin_finalize\n");
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (obj);
 
-  context_xim->finalizing = TRUE;
+//  context_xim->finalizing = TRUE;
 
   if (context_xim->gcin_ch) {
     gcin_im_client_close(context_xim->gcin_ch);
@@ -229,7 +229,7 @@ reinitialize_ic (GtkIMContextGCIN *context_xim)
      reset filter_key_release flag, otherwise keystrokes will be doubled
      until reconnecting to GCIN.
   */
-  context_xim->filter_key_release = FALSE;
+//  context_xim->filter_key_release = FALSE;
 }
 
 /* Finds the GtkWidget that owns the window, or if none, the

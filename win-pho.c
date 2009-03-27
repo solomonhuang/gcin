@@ -1,6 +1,7 @@
 #include "gcin.h"
 
-static GtkWidget *gwin_pho, *frame;
+static GtkWidget *gwin_pho;
+static GtkWidget *frame;
 Window xwin_pho;
 static GtkWidget *label_pho_sele;
 static GtkWidget *button_pho;
@@ -38,19 +39,21 @@ void set_key_codes_label_pho(char *s)
 
 void move_win_pho(int x, int y)
 {
-  gtk_window_get_size(GTK_WINDOW(gwin_pho), &win_xl, &win_yl);
+  int twin_xl, twin_yl;
 
-  if (x + win_xl > dpy_xl)
-    x = dpy_xl - win_xl;
+  gtk_window_get_size(GTK_WINDOW(gwin_pho), &twin_xl, &twin_yl);
+
+  if (x + twin_xl > dpy_xl)
+    x = dpy_xl - twin_xl;
   if (x < 0)
     x = 0;
 
-  if (y + win_yl > dpy_yl)
-    y = dpy_yl - win_yl;
+  if (y + twin_yl > dpy_yl)
+    y = dpy_yl - twin_yl;
   if (y < 0)
     y = 0;
 
-  win_x = x;  win_y = y;
+//  win_x = x;  win_y = y;
   gtk_window_move(GTK_WINDOW(gwin_pho), x, y);
 }
 
@@ -138,5 +141,15 @@ void show_win_pho()
 void hide_win_pho()
 {
 //  dbg("hide_win_pho\n");
+  if (!gwin_pho)
+    return;
   gtk_widget_hide(gwin_pho);
+}
+
+
+void init_gtab_pho_query_win()
+{
+  init_tab_pho();
+  get_win_gtab_geom();
+  move_win_pho(win_x, win_y + win_yl);
 }

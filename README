@@ -18,8 +18,8 @@ Mandrake
 其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X 
 中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin 
 -------------------
-
 如果使用 .tar.bz2 安裝者， table path 是 /usr/local/share/gcin/table，而不是 /usr/share/gcin/table
+選擇 .tar.bz2 者，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)， 如果不喜歡，可以在 ./configure 後修改 config.mak。
  
 -----------------
 
@@ -246,6 +246,9 @@ gedit
 你要顯示的輸入法。
 
 另外，如果字的某部份忘了如何拆，你可以用 '*' or '?' wildcard 來幫助你選字。
+
+- 新增類似嘸蝦米的同音字查詢，按 '`' (backquote) 後就會出現注音的視窗，輸入要查詢的同音字就可以了。
+
 ----------------------------------------------
 為什麼倉頡按第二鍵後會跑出(譬如按 AA日日)
    1昌 2昍   5曝 6暻 7暘   0暍
@@ -358,7 +361,7 @@ gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000。
 使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
 
 gcin 如果使用到自己的 IM_MODULE 時，tty (console) 會出現以下 message
-a. connect to unix socket addr /tmp/gcin-????/socket-:0.0-xcin   
+a. connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin   
 或是
 b.  gcin client connected to server 172.x.x.x:9999
 

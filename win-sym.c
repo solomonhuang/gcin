@@ -112,7 +112,7 @@ static void cb_button_sym(GtkButton *button, char *str)
   bzero(pho, sizeof(pho));
   int i;
   for(i=0; i < len; i+=CH_SZ)
-    big5_pho_chars(str+i, &pho[i/CH_SZ]);
+    utf8_pho_keys(str+i, &pho[i/CH_SZ]);
 
   if (current_CS->in_method == 6)
     add_to_tsin_buf(str, pho, strlen(str) / CH_SZ);

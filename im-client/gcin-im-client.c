@@ -30,7 +30,7 @@ Atom get_gcin_addr_atom(Display *dpy);
 static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Display *dpy)
 {
 //  dbg("gcin_im_client_reopen\n");
-
+  int dbg_msg = getenv("GCIN_CONNECT_MSG_ON") != NULL;
   int sockfd=0;
   int servlen;
   char *addr;
@@ -121,15 +121,13 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   }
 
   if (connect(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0) {
-#if 0
-    dbg("gcin_im_client_open cannot open %s: ", sock_path) ;
-    perror("connect");
-#endif
     close(sockfd);
     sockfd = 0;
     goto tcp;
   }
-  dbg("connected to unix socket addr %s\n", sock_path);
+
+  if (dbg_msg)
+    dbg("connected to unix socket addr %s\n", sock_path);
   goto next;
 
   struct sockaddr_in in_serv_addr;
@@ -155,7 +153,10 @@ tcp:
   }
 
   u_char *pp = (char *)&srv_ip_port.ip;
-  dbg("gcin client connected to server %d.%d.%d.%d:%d\n", pp[0], pp[1], pp[2], pp[3], ntohs(srv_ip_port.port));
+  if (dbg_msg)
+    dbg("gcin client connected to server %d.%d.%d.%d:%d\n",
+        pp[0], pp[1], pp[2], pp[3], ntohs(srv_ip_port.port));
+
   tcp = TRUE;
 
   GCIN_client_handle *handle;

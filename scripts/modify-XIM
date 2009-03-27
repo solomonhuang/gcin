@@ -3,9 +3,8 @@ ximorig=XIM.orig.gcin
 if  [ -d $xinitdir ]; then
   cd $xinitdir
   if [ -f XIM ]; then
-    if [ ! -f $ximorig ]; then
-      mv XIM $ximorig
-    fi
+    [ -f $ximorig ] || mv XIM $ximorig
+
     sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < $ximorig > XIM
     chmod 755 XIM
   # RH9, contributed by xacid.bbs@wretch.twbbs.org
@@ -45,9 +44,7 @@ cd /etc/sysconfig
 ## below is for Mandrake 10.1
 grep -i scim i18n >& /dev/null
 if [ $? = 0 ]; then
-  if [ ! -f i18n.orig.gcin ]; then
-    mv i18n i18n.orig.gcin
-  fi
+  [ -f i18n.orig.gcin ] || mv i18n i18n.orig.gcin
 
   sed -e "s/im=SCIM/im=xcin/" < i18n.orig.gcin |
   sed -e "s/scim -d/gcin/" | \
@@ -64,12 +61,22 @@ fi
 cd /usr/X11R6/bin
 grep -i scim crxvt >& /dev/null
 if [ $? = 0 ]; then
-  if [ ! -f crxvt.orig.cin ]; then
-    mv crxvt crxvt.orig.cin
-  fi
+  [ -f crxvt.orig.cin ] || mv crxvt crxvt.orig.cin
 
   sed -e "s/XIM=SCIM/#XIM=xim/" < crxvt.orig.cin > crxvt
   chmod 755 crxvt
+fi
+
+# below is for Fedora Core 3
+cd /etc/alternatives
+if [ -f xinput-zh_TW ]; then
+  [ -f xinput-zh_TW.orig.gcin ] || mv xinput-zh_TW xinput-zh_TW.orig.gcin
+  echo > xinput-zh_TW << __END
+XIM=gcin
+XIM_PROGRAM=gcin
+XIM_ARGS=""
+GTK_IM_MODULE=gcin
+__END
 fi
 
 # install gtk IM module

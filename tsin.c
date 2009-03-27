@@ -853,7 +853,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
         continue;
 
       phokey_t tpho[32];
-      big5_pho_chars(&str[i*CH_SZ], tpho);
+      utf8_pho_keys(&str[i*CH_SZ], tpho);
       pho[i] = tpho[0];
     }
 
@@ -1397,7 +1397,7 @@ asc_char:
 
         phokey_t tphokeys[32];
         tphokeys[0]=0;
-        big5_pho_chars(ch_buf[c_idx], tphokeys);
+        utf8_pho_keys(ch_buf[c_idx], tphokeys);
 
         disp_char_chbuf(c_idx);
         ph_buf[c_idx]=tphokeys[0];

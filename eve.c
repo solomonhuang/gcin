@@ -261,7 +261,7 @@ void toggle_im_enabled(u_int kev_state)
         XTestFakeKeyEvent(dpy, caps, False, CurrentTime);
       }
 
-      if (current_CS->in_method)
+      if (current_CS->in_method == 6)
         flush_tsin_buffer();
 
       hide_in_win(current_CS);
@@ -285,11 +285,14 @@ void get_win0_geom();
 
 void update_active_in_win_geom()
 {
+  dbg("update_active_in_win_geom\n");
   switch (current_CS->in_method) {
     case 3:
       get_win0_geom();
+      break;
     case 6:
       get_win0_geom();
+      break;
     case 0:
       break;
     default:
@@ -313,10 +316,10 @@ void toggle_half_full_char()
 //  dbg("half full toggle\n");
 }
 
-gboolean init_gtab(int inmdno, int usenow);
+void init_gtab(int inmdno, int usenow);
 void init_inter_code(int usenow);
 void init_tab_pp(int usenow);
-void init_tab_pho(int usenow);
+void init_tab_pho();
 
 gboolean init_in_method(int in_no)
 {
@@ -333,7 +336,7 @@ gboolean init_in_method(int in_no)
 
   switch (in_no) {
     case 3:
-      init_tab_pho(True);
+      init_tab_pho();
       break;
     case 6:
       init_tab_pp(True);

@@ -23,11 +23,43 @@ gboolean b_hsu_kbm;
 #define MAX_HASH_PHO 27
 u_short hash_pho[MAX_HASH_PHO+1];
 
+char typ_pho_len[]={5, 2, 4, 3};
+
 phokey_t pho2key(char typ_pho[])
 {
+#if 1
+  phokey_t key=typ_pho[0];
+  int i;
+
+  for(i=1; i < 4; i++) {
+    key =  typ_pho[i] | (key << typ_pho_len[i]) ;
+  }
+
+  return key;
+#else
   return (u_short)typ_pho[0]<<9 | (u_short) typ_pho[1]<<7 |
          (u_short)typ_pho[2]<<3 | typ_pho[3];
+#endif
 }
+
+static void key_typ_pho(phokey_t phokey, char rtyp_pho[])
+{
+#if 1
+  rtyp_pho[3] = phokey & 7;
+  phokey >>= 3;
+  rtyp_pho[2] = phokey & 0xf;
+  phokey >>=4;
+  rtyp_pho[1] = phokey & 0x3;
+  phokey >>=2;
+  rtyp_pho[0] = phokey;
+#else
+  for(i=3; i>=0; i++) {
+    rtyp_pho[i] = ((1<<rtyp_pho_len[i]) - 1) & phokey;
+    phokey >>= type_pho_len[i];
+  }
+#endif
+}
+
 
 void mask_key_typ_pho(phokey_t *key)
 {
@@ -158,8 +190,9 @@ gboolean inph_typ_pho(int newkey)
         ttt=idx_pho[vv].key;
         mask_key_typ_pho(&ttt);
 
-        if (ttt>=key)
+        if (ttt>=key  && (!b_hsu_kbm || ttt!=0x1002)) { // hsu, keys(ld) conflict with ㄌ2 –
           break;
+        }
         else
           vv++;
       }
@@ -327,6 +360,7 @@ void inc_pho_count(phokey_t key, int ch_idx)
 
 
 void lookup_gtab(char *ch, char out[]);
+gboolean is_gtab_query_mode();
 
 void putkey_pho(u_short key, int idx)
 {
@@ -339,6 +373,9 @@ void putkey_pho(u_short key, int idx)
   clrin_pho();
   clr_in_area_pho();
   ClrSelArea();
+
+  if (is_gtab_query_mode())
+    set_gtab_target_displayed();
 }
 
 
@@ -397,7 +434,7 @@ void load_tab_pho_file()
 
 void show_win_pho();
 
-void init_tab_pho(int usenow)
+void init_tab_pho()
 {
   if (!ch_pho) {
     load_tab_pho_file();
@@ -431,6 +468,8 @@ int feedkey_pho(KeySym xkey)
       clrin_pho();
       ClrSelArea();
       clr_in_area_pho();
+      if (is_gtab_query_mode())
+        close_gtab_pho_win();
       return 1;
     case XK_BackSpace:
       ityp3_pho=0;
@@ -649,4 +688,48 @@ proc_state:
   disp_pho_sel(out_buffer);
 
   return 1;
+}
+
+static char typ_pho_no_to_xkey(int typ, u_char num)
+{
+  int i, j;
+
+  for(i=' '; i < 127; i++)
+    for(j=0; j < 3; j++)
+      if (phkbm.phokbm[i][j].typ == typ && phkbm.phokbm[i][j].num == num)
+        return i;
+
+  return 0;
+}
+
+
+void start_gtab_pho_query(char *utf8)
+{
+  phokey_t phokeys[32];
+  int phokeysN, i;
+
+  phokeysN = utf8_pho_keys(utf8, phokeys);
+  if (phokeysN <= 0)
+    return;
+
+  char rtyp_pho[4];
+  bzero(rtyp_pho, sizeof(rtyp_pho));
+  key_typ_pho(phokeys[0], rtyp_pho);
+
+  char xkeys[4];
+  bzero(xkeys, sizeof(xkeys));
+
+  for(i=0; i < 4; i++) {
+    if (!rtyp_pho[i])
+      continue;
+
+    xkeys[i] = typ_pho_no_to_xkey(i, rtyp_pho[i]);
+  }
+
+  if (!xkeys[3])
+    xkeys[3] = ' ';
+
+  for(i=0; i < 4; i++) {
+    feedkey_pho(xkeys[i]);
+  }
 }

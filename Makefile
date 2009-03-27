@@ -86,7 +86,6 @@ install:
 	$(MAKE) -C menu install
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
-	   sh modify-XIM; \
 	   install -d $(DOC_DIR); \
 	   install -m 644 README $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
@@ -109,6 +108,7 @@ config.mak: VERSION.gcin configure
 	./configure
 
 gcin.spec:	gcin.spec.in
+	rm -f $@
 	sed -e "s/__gcin_version__/$(GCIN_VERSION)/" < $< > $@
 
 include .depend

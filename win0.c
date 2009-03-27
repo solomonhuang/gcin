@@ -245,7 +245,7 @@ void get_char_index_xy(int index, int *rx, int *ry)
   gtk_widget_translate_coordinates(widget, gwin0,
          0, sz.height, &wx, &wy);
 
-//  printf("wy: %d %d   wx:%d\n", wy, sz.height, wx);
+//  dbg("wy: %d %d   wx:%d\n", wy, sz.height, wx);
 
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
 

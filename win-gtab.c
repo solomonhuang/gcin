@@ -1,8 +1,8 @@
 #include "gcin.h"
 #include <X11/extensions/XTest.h>
 
-
-static GtkWidget *gwin_gtab, *frame;
+static GtkWidget *gwin_gtab;
+static GtkWidget *frame;
 static GtkWidget *label_gtab_sele;
 static GtkWidget *label_half_full;
 static GtkWidget *button_gtab;
@@ -83,6 +83,8 @@ void show_win_sym();
 
 void move_win_gtab(int x, int y)
 {
+//  dbg("move_win_gtab %d %d\n", x, y);
+
   if (current_CS && current_CS->fixed_pos) {
     x = current_CS->fixed_x;
     y = current_CS->fixed_y;
@@ -266,7 +268,7 @@ void create_win_gtab_gui()
 }
 
 
-gboolean init_gtab(int inmdno, int usenow);
+void init_gtab(int inmdno, int usenow);
 
 void show_win_gtab()
 {
@@ -287,6 +289,7 @@ void show_win_gtab()
 
 
 void hide_win_sym();
+void close_gtab_pho_win();
 
 void hide_win_gtab()
 {
@@ -295,6 +298,8 @@ void hide_win_gtab()
     return;
 
   gtk_widget_hide(gwin_gtab);
+  close_gtab_pho_win();
+
   hide_win_sym();
 }
 
@@ -325,3 +330,4 @@ void get_win_gtab_geom()
   gtk_widget_size_request(gwin_gtab, &sz);
   win_xl = sz.width;  win_yl = sz.height;
 }
+

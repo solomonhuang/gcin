@@ -83,7 +83,7 @@ void free_pho_mem()
     free(ch_pho);
 }
 
-int big5_pho_chars(char *big5, phokey_t *phkeys)
+int utf8_pho_keys(char *big5, phokey_t *phkeys)
 {
   int ofs=0;
   int phkeysN=0;
@@ -159,7 +159,7 @@ void str_to_all_phokey_chars(char *b5_str, char *out)
   for(h=0; h < strlen(b5_str); h+=CH_SZ) {
     phokey_t phos[32];
 
-    int n=big5_pho_chars(&b5_str[h], phos);
+    int n=utf8_pho_keys(&b5_str[h], phos);
 
     int i;
     for(i=0; i < n; i++) {

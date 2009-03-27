@@ -263,7 +263,7 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
     phokey_t phokey[64];
     big5char_pho *pbigpho = &bigpho[bigphoN++];
 
-    pbigpho->phokeysN = big5_pho_chars(&current_str[i], pbigpho->phokeys);
+    pbigpho->phokeysN = utf8_pho_keys(&current_str[i], pbigpho->phokeys);
 
     if (!pbigpho->phokeysN) {
       dbg(" no mapping to pho\n");

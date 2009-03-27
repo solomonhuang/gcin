@@ -18,7 +18,7 @@ install:
 	install -d $(libdir)
 	install -m 755 libgcin-im-client.so $(libdir)
 	if [ $(prefix) = /usr/local ]; then \
-	  grep /usr/local/lib /etc/ld.so.conf > /dev/null 2>&1 || echo /usr/local/lib > /etc/ld.so.conf; \
+	  grep /usr/local/lib /etc/ld.so.conf > /dev/null 2>&1 || echo /usr/local/lib >> /etc/ld.so.conf; \
 	  ldconfig; \
 	fi; \
 	install -d $(includedir); \
