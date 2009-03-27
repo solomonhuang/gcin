@@ -392,6 +392,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   if (strlen(callback_str_buffer)) {
     send_text(callback_str_buffer);
     callback_str_buffer[0]=0;
+    return TRUE;
   }
 
   if (keysym == XK_space) {

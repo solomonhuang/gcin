@@ -31,8 +31,11 @@ static void gen_passwd_idx()
 {
   srv_ip_port.passwd.seed = (rand() >> 1) % __GCIN_PASSWD_N_;
 
+  Server_IP_port tsrv_ip_port = srv_ip_port;
+
+  to_gcin_endian_4(&srv_ip_port.passwd.seed);
   XChangeProperty(dpy, prop_win , addr_atom, XA_STRING, 8,
-     PropModeReplace, (char *)&srv_ip_port, sizeof(srv_ip_port));
+     PropModeReplace, (char *)&tsrv_ip_port, sizeof(srv_ip_port));
 
   XSync(GDK_DISPLAY(), FALSE);
 }

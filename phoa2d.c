@@ -7,6 +7,7 @@ typedef struct {
   u_short key;
   u_char ch[CH_SZ];
   u_short count;
+  int oseq;
 } PHITEM;
 
 PHITEM items[MAX_CHS];
@@ -71,7 +72,10 @@ int qcmp_key(const void *aa, const void *bb)
   if ((d=a->key - b->key))
     return a->key - b->key;
 
-  return b->count - a->count;
+  if ((d = b->count - a->count))
+    return d;
+
+  return a->oseq - b->oseq;
 }
 
 
@@ -101,7 +105,7 @@ int main(int argc, char **argv)
     if (len==0)
       continue;
 
-    u_short kk=0;
+    phokey_t kk=0;
     u_char *p = s;
 
     while (*p && *p!=' ') {
@@ -122,6 +126,7 @@ int main(int argc, char **argv)
     p+= CH_SZ + 1; // skip ch & space
 
     items[itemsN].count = atoi(p);
+    items[itemsN].oseq = itemsN;
 
     itemsN++;
   }
@@ -133,10 +138,10 @@ int main(int argc, char **argv)
   int i;
 
   PHO_IDX pho_idx[3000];
-  int pho_idxN=0;
+  u_short pho_idxN=0;
 
   for(i=0; i < itemsN; ) {
-    u_short key = items[i].key;
+    phokey_t key = items[i].key;
     pho_idx[pho_idxN].key = key;
     pho_idx[pho_idxN].start = i;
     pho_idxN++;
@@ -160,15 +165,17 @@ int main(int argc, char **argv)
     i = j;
   }
 
-  dbg("pho_itemsN:%d  pho_idxN:%d\n", pho_itemsN, pho_idxN);
-
   char *fname_out = "pho.tab";
 
   if ((fp=fopen(fname_out,"w"))==NULL)
     p_err("cannot create %s\n", fname_out);
 
   fwrite("PH",1,2,fp);
+//  dbg("pho_itemsN:%d  pho_idxN:%d\n", pho_itemsN, pho_idxN);
   fwrite(&pho_idxN, sizeof(u_short), 1, fp);
+#if 0
+  fclose(fp); exit(0);
+#endif
   fwrite(pho_idx, sizeof(PHO_IDX), pho_idxN, fp);
   fwrite(pho_items, sizeof(PHO_ITEM), pho_itemsN, fp);
 

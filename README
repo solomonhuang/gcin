@@ -17,6 +17,13 @@ Mandrake
 
 其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X 
 中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin 
+
+---------------------
+Fedora rpms
+
+http://linux.nchc.org.tw/fedora/apt/fedora/linux/3/i386/RPMS.drbl-extra/
+ftp://cle.linux.org.tw/apt/heidelberg/Fedora/RPMS.cle/
+
 -------------------
 如果使用 .tar.bz2 安裝者， table path 是 /usr/local/share/gcin/table，而不是 /usr/share/gcin/table
 選擇 .tar.bz2 者，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)，不過 compile 出來的可執行檔的大小大很多，如果不喜歡，可以在 ./configure 後修改 config.mak，把 OPTFLAGS=-g 改成 OPTFLAGS=-O

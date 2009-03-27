@@ -169,7 +169,7 @@ int main(int argc, char **argv)
   char kname[128][CH_SZ];
   char keymap[64];
   int chno,cpcount;
-  u_short idx1[256];
+  gtab_idx1_t idx1[256];
   char def1[256];
   int quick_def;
   int phridx[12000], phr_cou=0;
@@ -320,6 +320,13 @@ int main(int argc, char **argv)
   fseek(fr, pos, SEEK_SET);
   lineno=olineno;
 
+  INMD inmd, *cur_inmd = &inmd;
+
+  cpcount=0;
+  cur_inmd->key64 = key64;
+  cur_inmd->tbl64 = itout64;
+  cur_inmd->tbl = itout;
+
   puts("char def");
   chno=0;
   while (!feof(fr)) {
@@ -335,8 +342,6 @@ int main(int argc, char **argv)
 
     len=strlen(cmd);
 
-#define LAST_K_bitN (key64 ? 54:24)
-
     if (len > th.MaxPress)
       th.MaxPress=len;
 
@@ -346,13 +351,15 @@ int main(int argc, char **argv)
     kk=0;
     for(i=0;i<len;i++) {
       k=kno[mtolower(cmd[i])];
-      kk|=(u_int64_t)k<<(LAST_K_bitN-i*6);
+      kk|=(u_int64_t)k << ( LAST_K_bitN - i*6);
     }
 
     if (key64)
       memcpy(&itar64[chno].key, &kk, 8);
-    else
-      memcpy(&itar[chno].key, &kk, 4);
+    else {
+      u_int key32 = kk;
+      memcpy(&itar[chno].key, &key32, 4);
+    }
 
     if ((len=strlen(arg)) <= CH_SZ && (arg[0] & 0x80)) {
       char out[CH_SZ+1];
@@ -393,12 +400,6 @@ int main(int argc, char **argv)
     qsort(itar, chno,sizeof(ITEM2), qcmp2);
 
 
-  INMD inmd, *cur_inmd = &inmd;
-
-  cpcount=0;
-  cur_inmd->key64 = key64;
-  cur_inmd->tbl64 = itout64;
-  cur_inmd->tbl = itout;
 
   if (key64) {
     for(i=0;i<chno;i++) {
@@ -436,7 +437,8 @@ int main(int argc, char **argv)
 
   bzero(def1,sizeof(def1));
   bzero(idx1,sizeof(idx1));
-  for(i=0;i<chno;i++) {
+
+  for(i=0; i<chno; i++) {
     u_int64_t key = CONVT2(cur_inmd, i);
     int kk = (key>>LAST_K_bitN) & 0x3f;
 
@@ -466,7 +468,7 @@ int main(int argc, char **argv)
 
   fwrite(keymap, 1, KeyNum, fw);
   fwrite(kname, CH_SZ, KeyNum, fw);
-  fwrite(idx1,2, KeyNum+1,fw);
+  fwrite(idx1, sizeof(gtab_idx1_t), KeyNum+1, fw);
 
   if (key64) {
     fwrite(itout64, sizeof(ITEM64), chno, fw);

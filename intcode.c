@@ -9,6 +9,7 @@
 static char inch[4];
 static int cin;
 
+void create_win_intcode();
 void init_inter_code(int usenow)
 {
   cin=0;
@@ -27,7 +28,10 @@ void disp_int(int index, char *intcode);
 int feedkey_intcode(KeySym key)
 {
   int i;
-
+#if 0
+  if (key <= XK_KP_9 && key >= XK_KP_0)
+    key -= XK_KP_0 - '0';
+#endif
   key=toupper(key);
   if (key==XK_BackSpace||key==XK_Delete) {
     if (cin)

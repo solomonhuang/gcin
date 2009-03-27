@@ -1,3 +1,10 @@
+0.7.5:
+- 選字視窗不會自動關起來的問題。
+
+0.7.4:
+- 由於 Fedora 沒有把 /sbin 加入 PATH中，所以 ldconfig 會失敗。
+- IM server & client 如果是不同的 endian，則會 connect 失敗。
+
 0.7.3:
 - Thanks to swyear for the install script for SUSE 9.1 and 9.2.
 - 注音第幾聲會多送字母的問題。

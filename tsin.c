@@ -1329,6 +1329,7 @@ change_char:
            prbuf();
            current_page=sel_pho=ityp3_pho=0;
            if (len == CH_SZ) {
+             hide_selections_win();
              ph_sta = -1;
              goto restart;
            }

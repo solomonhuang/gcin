@@ -44,25 +44,25 @@ gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
 	ln -sf $@ $@.test
 
 tslearn:        $(OBJS_TSLEARN)
-	cc -o $@ $(OBJS_TSLEARN) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_TSLEARN) $(LDFLAGS)
 
 gcin-setup:     $(OBJS_gcin_steup)
-	cc -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
 
 phoa2d: $(OBJS_phoa2d)
-	cc -o $@ $(OBJS_phoa2d) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_phoa2d) $(LDFLAGS)
 
 phod2a: $(OBJS_phod2a)
-	cc -o $@ $(OBJS_phod2a) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_phod2a) $(LDFLAGS)
 
 tsa2d:  $(OBJS_tsa2d)
-	cc -o $@ $(OBJS_tsa2d) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_tsa2d) $(LDFLAGS)
 
 tsd2a:  $(OBJS_tsd2a)
-	cc -o $@ $(OBJS_tsd2a) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_tsd2a) $(LDFLAGS)
 
 gcin2tab:  $(OBJS_gcin2tab)
-	cc -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
 
 kbmcv:  $(OBJS_kbmcv)
 	$(CC) -o $@ $(OBJS_kbmcv) $(LDFLAGS)

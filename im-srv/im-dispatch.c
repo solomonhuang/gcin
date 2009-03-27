@@ -125,7 +125,8 @@ void process_client_req(int fd)
         reply.flag |= GCIN_reply_key_processed;
       }
 
-      reply.datalen = output_bufferN ? output_bufferN + 1 : 0; // include '\0'
+      int datalen = reply.datalen =
+        output_bufferN ? output_bufferN + 1 : 0; // include '\0'
       to_gcin_endian_4(&reply.flag);
       to_gcin_endian_4(&reply.datalen);
       write_enc(fd, &reply, sizeof(reply));
@@ -133,7 +134,7 @@ void process_client_req(int fd)
 //      dbg("server reply.flag %x\n", reply.flag);
 
       if (output_bufferN) {
-        write_enc(fd, output_buffer, reply.datalen);
+        write_enc(fd, output_buffer, datalen);
         output_buffer[0] = 0;
         output_bufferN = 0;
       }
