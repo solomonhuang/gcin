@@ -70,14 +70,14 @@ typedef struct {
   time_t file_modify_time;
   gboolean key64;        // db is 64 bit-long key
   int max_keyN;
-  char endkey[16];       // only pinin use it
+  char endkey[16];       // only pinin/ar30 use it
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 typedef enum {
   GTAB_space_auto_first_any=1,    // boshiamy
-  GTAB_space_auto_first_full=2,   // default behavior (cj, gcin's ar30)
+  GTAB_space_auto_first_full=2,   // default behavior (cj, dayi)
   GTAB_space_auto_first_nofull=4  // windows ar30
 } GTAB_space_pressed_E;
 

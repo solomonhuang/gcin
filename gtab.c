@@ -912,6 +912,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
           return 0;
       }
 
+      // for array30
+      if (!ci && cur_inmd->endkey[0] && strchr(cur_inmd->endkey, key))
+        return 0;
+
       pselkey=ptr_selkey(key);
 
 #if 1 // for dayi, testcase :  6 space keypad6
