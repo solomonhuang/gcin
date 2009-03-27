@@ -1,0 +1,65 @@
+prefix="/usr/local"
+
+for opt do
+  case "$opt" in
+  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  esac
+done
+
+echo "prefix: $prefix"
+
+
+GTK=gtk+-2.0
+
+echo -n ".... Testing $GTK : "
+
+GTKINC=`pkg-config --cflags $GTK`
+
+if [ $? != 0 ]; then
+  echo "$GTK or above required --cflags"
+  rm -f config.mak
+  exit -1;
+fi
+
+GTKLDFLAGS=`pkg-config --libs $GTK`
+
+if [ $? != 0 ]; then
+  echo "$GTK or above required --libs"
+  rm -f config.mak
+  exit -1;
+else
+  echo " found."
+fi
+
+bindir=$prefix/bin
+datadir=$prefix/share
+libdir=$prefix/lib
+GCIN_VERSION=`cat VERSION.gcin`
+sed -e "s/__gcin_version__/$GCIN_VERSION/" < gcin.spec.in > gcin.spec
+
+OPTFLAGS="-g"
+if [ $prefix = /usr ]; then
+  OPTFLAGS="-O"
+fi
+
+echo "GTKINC=$GTKINC" > config.mak
+echo "prefix=$prefix" >> config.mak
+echo "bindir=$bindir" >> config.mak
+echo "datadir=$datadir" >> config.mak
+echo "libdir=$libdir" >> config.mak
+echo "LDFLAGS=$GTKLDFLAGS" >> config.mak
+echo "GCIN_VERSION=$GCIN_VERSION" >> config.mak
+echo "GCIN_TABLE_DIR=\$(datadir)/gcin/table" >> config.mak
+echo "OPTFLAGS=$OPTFLAGS" >> config.mak
+echo "DOC_DIR=$datadir/doc/gcin-$GCIN_VERSION" >> config.mak
+echo "GCIN_ICON_DIR=\$(datadir)/icons/gcin" >> config.mak
+
+if [ $bindir = /usr/bin ]; then
+  cd menu
+  for i in *
+  do
+    sed -e "s~/usr/local/bin~/usr/bin~" < $i > tmp
+    mv tmp $i
+  done
+fi

@@ -1,0 +1,55 @@
+0.1.9:
+- Delete 鍵現在可以用了。
+- gcin 在輸入文字後，現在必要時會移動視窗以避免超出範圍無法顯示。
+- 輸入視窗長到很寬的時候有時候會當掉的問題。
+- Thanks to statue.bbs@bbs.sayya.org for the configure bug fix.
+- Tooltip on 注音輸入 button 指示使用者按鍵。
+- 選字時，相鄰的字會變來變去的問題。
+- rpm -e 時不會還原 /etc/X11/xinit/XIM 以避免 Mandrake urpmi 直接 upgrade 的問題。
+
+0.1.8:
+Thanks to  garychang.bbs@bbs.ee.ttu.edu.tw for reporting the following two bugs.
+- 輸入 "測試" 後按 shift + 1 (無論是否有用 shift + space 切換全半形)，
+  第一下都出不來，要按到第二次 shift + 1 才會出來。
+- 輸入 "哈哈" 後按 enter ，再按 shift + 1 ，會跳出一些東西來。 (換成 "測試" 也
+  會)
+
+Thanks to xacid.bbs@wretch.twbbs.org for the suggestions
+- ctrl-u doesn't compact the window size.
+- 符號視窗 symbol table 改成 ~/.gcin/symbol-table。 gcin 會偵測 file 是否有改
+  變，自動 reload 檔案
+- Ctrl- Alt- 不能用的問題。
+- Redhat install scripts
+
+
+0.1.7:
+  - 刪除半形的英文字時視窗會變大的問題，這一次真的完全 fixed 了。
+  - 你可以按輸入視窗中的圖釘來固定或解除固定視窗。
+  
+0.1.6:
+  - 執行 phoa2d 後會叫 gcin 重新 load 注音的資料
+  - 刪除半形的英文字時視窗會變大的問題。
+
+0.1.5:
+  - 有時候會當掉，特別是mozilla，希望這一版有修正這個問題。
+
+0.1.4:
+  - 主輸入視窗改成用 gtk2, 所以背景顏色會隨 theme 變換顏色，看起來更一致。
+    也有使用者介面來修改字體的大小。
+  - 英文模式下不應該用酷音的標點符號輸入方式
+  - 修正了 xacid.bbs@wretch.twbbs.org report 的一些 bugs
+  - 新增詞庫編輯的功能
+
+0.1.3:
+  - bugfix 酷音標點符號輸入 '；：' 位置弄反了
+  - 滑鼠指標移到 gcin 的視窗時會把改成手的圖案提示 user 可以按此
+
+0.1.2:
+  - 詞音現在也可以用向上鍵把選注音字詞的視窗往回捲一頁
+  - 中英切換時游標會改變大小以顯示目前的狀態
+
+0.1.1:
+  - 字形 vga8x16 改成用 8x16. 感謝 (jserv.bbs@ofo.csie.ntu.edu.tw)
+  - 新增酷音的標點符號的輸入方式  Thanks to d2207197.bbs@bbs.sayya.org
+  - bugfix : 符號視窗有時候會開不起來.
+

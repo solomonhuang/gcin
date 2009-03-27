@@ -1,0 +1,10 @@
+pkill gcin.test
+export LC_ALL=zh_TW.Big5
+export GCIN_TEST=
+export XMODIFIERS=@im=gcin
+./gcin.test &
+sleep 1
+gedit &
+crxvt &
+/usr/local/mozilla.good/mozilla
+pkill pcin.test

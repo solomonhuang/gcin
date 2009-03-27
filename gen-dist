@@ -1,0 +1,21 @@
+cp ~/.gcin/tsin.src data
+
+GCIN_VERSION="gcin-`cat VERSION.gcin`"
+rm -f tags core.*
+make clean
+cd ..
+rm -fr $GCIN_VERSION
+cp -a gcin $GCIN_VERSION
+tar cvfj $GCIN_VERSION.tar.bz2 $GCIN_VERSION
+
+cd gcin; make gcin.spec
+
+cd ~/rpm/SOURCES
+
+if [ ! -f $GCIN_VERSION.tar.bz2 ]; then
+  ln -sf ~/$GCIN_VERSION.tar.bz2 .
+fi
+
+cd
+
+rpm -ba gcin.spec

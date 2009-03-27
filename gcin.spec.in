@@ -1,0 +1,97 @@
+%define release liu_mdk
+%define prefix  /usr
+%define name	gcin
+%define version __gcin_version__
+
+
+Summary:	gcin :  big5 chinese input method server
+Name:		%{name}
+Version:	%{version}
+Release:	%{release}
+License: 	LGPL
+Vendor:		Edward Liu
+URL: 		http://gcin.sf.net
+Group: 		Applications/System
+Source0:	%{name}-%{version}.tar.bz2
+Packager:       Edward Liu <cp76@csie.nctu.edu.tw>
+BuildRoot:	%{_builddir}/%{name}-%{version}-root
+
+BuildRequires: libgtk+2.0_0-devel >= 2.2.4
+Requires: gtk+2.0 >= 2.2.4
+
+Docdir:         %{prefix}/share/doc
+
+%description
+gcin is a Chinese input method server for big5 traditional Chinese. It features
+a better GTK user interface.
+
+%prep
+%setup
+
+%build
+
+%configure
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%makeinstall
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+%files
+%defattr(-,root,root,0755)
+%doc README
+%{_bindir}/*
+%{_datadir}/gcin/*
+%{_datadir}/icons/*
+%{_libdir}/menu/*
+
+%post
+xinitdir=/etc/X11/xinit
+ximorig=XIM.orig.gcin
+if  [ -d $xinitdir ]; then
+  cd $xinitdir
+  if [ -f XIM ]; then
+    if [ ! -f $ximorig ]; then
+      mv XIM $ximorig
+    fi
+    sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < $ximorig > XIM
+    chmod 755 XIM
+  # RH9, contributed by xacid.bbs@wretch.twbbs.org
+  elif [ -f xinitrc.d/xinput ]; then
+    cd xinitrc.d
+    if [ ! -f xinput.orig.gcin ]; then
+      mv xinput xinput.orig.gcin
+    fi
+    sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < xinput.orig.gcin > \
+      xinput
+    chmod 755 xinput
+  # others
+  else
+    echo "Please modify your XIM settings manually"
+  fi
+else
+  echo "Directory $xinitdir does not exist"
+fi
+%update_menus
+
+%postun
+xinitdir=/etc/X11/xinit
+ximorig=XIM.orig.gcin
+cd /etc/X11/xinit
+#if [ -f XIM.orig.gcin ]; then
+#  mv XIM.orig.gcin XIM
+#elif [ -f xinitrc.d/xinput ]; then
+# cd xinitrc.d
+# if [ ! -f xinput.orig.gcin ]; then
+#    mv xinput.orig.gcin xinput
+# fi
+#else
+# echo "Please restore your XIM settings manually"
+#fi
+%clean_menus
+
+%changelog

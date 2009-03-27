@@ -1,0 +1,26 @@
+xinitdir=/etc/X11/xinit
+ximorig=XIM.orig.gcin
+if  [ -d $xinitdir ]; then
+  cd $xinitdir
+  if [ -f XIM ]; then
+    if [ ! -f $ximorig ]; then
+      mv XIM $ximorig
+    fi
+    sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < $ximorig > XIM
+    chmod 755 XIM
+  # RH9, contributed by xacid.bbs@wretch.twbbs.org
+  elif [ -f xinitrc.d/xinput ]; then
+    cd xinitrc.d
+    if [ ! -f xinput.orig.gcin ]; then
+      mv xinput xinput.orig.gcin
+    fi
+    sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < xinput.orig.gcin > \
+      xinput
+    chmod 755 xinput
+  # others
+  else
+    echo "Please modify your XIM settings manually"
+  fi
+else
+  echo "Directory $xinitdir does not exist"
+fi
