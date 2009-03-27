@@ -134,14 +134,12 @@ void move_win_sym()
   if (!gwin_sym)
     return;
 
-  int winsym_xl, winsym_yl;
-  GtkRequisition sz;
 
 //  dbg("win_y: %d  %d\n", win_y, win_yl);
   update_active_in_win_geom();
 
-  gtk_widget_size_request(gwin_sym, &sz);
-  winsym_xl = sz.width;  winsym_yl = sz.height;
+  int winsym_xl, winsym_yl;
+  get_win_size(gwin_sym, &winsym_xl, &winsym_yl);
 
   int wx = win_x, wy = win_y + win_yl;
 

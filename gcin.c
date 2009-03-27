@@ -414,6 +414,7 @@ static void exec_setup_scripts()
 char *get_gcin_xim_name();
 void load_phrase(), init_TableDir(),  load_gtab_list();
 void init_im_serv();
+void init_gcin_im_serv(Window win);
 
 int main(int argc, char **argv)
 {
@@ -435,8 +436,8 @@ int main(int argc, char **argv)
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
   strcpy(xim_arr[1].xim_server_name, xim_server_name);
 
-  if ((lc_ctype && !strcmp(lc_ctype, "zh_TW.UTF-8")) || (lc_all && !strcmp(lc_all, "zh_TW.UTF-8")) ||
-       (lang && !strcmp(lang, "zh_TW.UTF-8"))) {
+  if ((lc_ctype && !strcasecmp(lc_ctype, "zh_TW.UTF-8")) || (lc_all && !strcasecmp(lc_all, "zh_TW.UTF-8")) ||
+       (lang && !strcasecmp(lang, "zh_TW.UTF-8"))) {
     xim_arr[0].b_send_utf8_str = TRUE;
     xim_arr[1].b_send_utf8_str = FALSE;
     xim_arr[1].server_locale = "zh_TW.Big5";

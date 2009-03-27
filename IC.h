@@ -59,7 +59,7 @@ typedef struct {
     gboolean    b_gcin_protocol; // TRUE : gcin    FALSE: XIM
     int         fixed_x, fixed_y;
     int         in_method;
-    XPoint	spot_location;	/* spot location */
+    XPoint	spot_location;	/* spot location, relative to client window */
 } ClientState;
 
 

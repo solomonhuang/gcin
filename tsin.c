@@ -610,14 +610,22 @@ static void extract_pho(int chpho_idx, int plen, phokey_t *pho)
 
 
 gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi);
+void mask_key_typ_pho(phokey_t *key);
 
-static u_char scanphr(int chpho_idx, int plen)
+static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 {
   if (plen >= MAX_PHRASE_LEN)
     return 0;
 
+  phokey_t tailpho;
 
-  phokey_t pp[MAX_PHRASE_LEN];
+  if (pho_incr) {
+    tailpho = pho2key(typ_pho);
+    if (!tailpho)
+      pho_incr = FALSE;
+  }
+
+  phokey_t pp[MAX_PHRASE_LEN + 1];
   extract_pho(chpho_idx, plen, pp);
   int sti, edi;
 
@@ -647,11 +655,12 @@ static u_char scanphr(int chpho_idx, int plen)
 
 
     sti++;
-    if (plen > match_len) {
+    if (plen > match_len || (pho_incr && plen==match_len)) {
       continue;
     }
 
     int i;
+
     for(i=0;i < plen;i++) {
       if (mtk[i]!=pp[i])
         break;
@@ -659,6 +668,14 @@ static u_char scanphr(int chpho_idx, int plen)
 
     if (i < plen)
       continue;
+
+    if (pho_incr) {
+      phokey_t last_m = mtk[plen];
+      mask_key_typ_pho(&last_m);
+      if (last_m != tailpho)
+        continue;
+    }
+
 
 #define VOID_PHRASE_N -1
 
@@ -1261,7 +1278,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
             k++;
 
           match_len= c_idx - k;
-          if (!(match_len=scanphr(k, match_len)))
+          if (!(match_len=scanphr(k, match_len, FALSE)))
             ph_sta=-1;
           else
             ph_sta=k;
@@ -1283,6 +1300,10 @@ int feedkey_pp(KeySym xkey, int kbstate)
             typ_pho[j]=0;
             inph[j]=0;
             disp_in_area_pho_tsin();
+
+            if (pre_selN > 1 && scanphr(ph_sta, c_idx - ph_sta, TRUE)) {
+              disp_pre_sel_page();
+            }
             return 1;
           }
 
@@ -1318,7 +1339,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
             k++;
 
           match_len= c_idx - k;
-          if (!(match_len=scanphr(k, match_len)))
+          if (!(match_len=scanphr(k, match_len, FALSE)))
             ph_sta=-1;
           else
             ph_sta=k;
@@ -1575,6 +1596,10 @@ llll2:
 
      disp_in_area_pho_tsin();
 
+     if (pre_selN && scanphr(ph_sta, c_idx - ph_sta, TRUE)) {
+       disp_pre_sel_page();
+     }
+
      key = pho2key(typ_pho);
 
      int vv=hash_pho[typ_pho[0]];
@@ -1630,7 +1655,7 @@ llll2:
 
    if (ph_sta < 0) {
 restart:
-     if ((match_len=scanphr(c_idx-1,1)))
+     if ((match_len=scanphr(c_idx-1,1, FALSE)))
        ph_sta=c_idx-1;
 
 //     dbg("scanphr c_idx:%d match_len:%d\n", c_idx, match_len);
@@ -1646,7 +1671,7 @@ restart:
 
      while (ph_sta < c_idx) {
 //       dbg("ph_sta:%d\n", ph_sta);
-       if ((max_match_phrase_len = scanphr(ph_sta, c_idx - ph_sta))) {
+       if ((max_match_phrase_len = scanphr(ph_sta, c_idx - ph_sta, FALSE))) {
 //         dbg("max_match_phrase_len: %d\n", max_match_phrase_len);
          break;
        } else

@@ -99,7 +99,6 @@ void export_text_xim()
 }
 
 
-
 static void bounce_back_key()
 {
     IMForwardEventStruct forward_ev = *(current_forward_eve);
@@ -110,6 +109,13 @@ void hide_win0();
 void hide_win_gtab();
 void hide_win_int();
 void hide_win_pho();
+
+static int current_in_win_x = -1, current_in_win_y = -1;
+
+void reset_current_in_win_xy()
+{
+  current_in_win_x = current_in_win_y = -1;
+}
 
 void hide_in_win(ClientState *cs)
 {
@@ -122,7 +128,7 @@ void hide_in_win(ClientState *cs)
 #if 0
   dbg("hide_in_win %d\n", ic->in_method);
 #endif
-//  dbg("hide_in_win\n");
+
   switch (cs->in_method) {
     case 3:
       hide_win_pho();
@@ -137,6 +143,8 @@ void hide_in_win(ClientState *cs)
     default:
       hide_win_gtab();
   }
+
+  reset_current_in_win_xy();
 }
 
 void show_win_pho();
@@ -173,12 +181,6 @@ void move_win_int(int x, int y);
 void move_win0(int x, int y);
 void move_win_pho(int x, int y);
 
-static int current_in_win_x = -1, current_in_win_y = -1;
-
-void reset_current_in_win_xy()
-{
-  current_in_win_x = -1; current_in_win_y = -1;
-}
 
 void move_in_win(ClientState *cs, int x, int y)
 {
@@ -220,7 +222,7 @@ void move_IC_in_win(ClientState *rec);
 void update_in_win_pos()
 {
 //  dbg("update_in_win_pos %d\n", current_CS->input_style);
-  if (current_CS && current_CS->input_style == InputStyleRoot) {
+  if (current_CS->input_style == InputStyleRoot) {
     Window r_root, r_child;
     int winx, winy, rootx, rooty;
     u_int mask;
@@ -230,26 +232,23 @@ void update_in_win_pos()
 
     winx++; winy++;
 
-    if (current_CS) {
-      Window inpwin = current_CS->client_win;
+    Window inpwin = current_CS->client_win;
 #if DEBUG
-      dbg("update_in_win_pos\n");
+    dbg("update_in_win_pos\n");
 #endif
-      if (inpwin) {
-        int tx, ty;
-        Window ow;
+    if (inpwin) {
+      int tx, ty;
+      Window ow;
 
-        XTranslateCoordinates(dpy, root, inpwin, winx, winy, &tx, &ty, &ow);
+      XTranslateCoordinates(dpy, root, inpwin, winx, winy, &tx, &ty, &ow);
 
-        current_CS->spot_location.x = tx;
-        current_CS->spot_location.y = ty;
-      }
+      current_CS->spot_location.x = tx;
+      current_CS->spot_location.y = ty;
     }
 
     move_in_win(current_CS, winx, winy);
   } else {
-    if (current_CS)
-      move_IC_in_win(current_CS);
+    move_IC_in_win(current_CS);
   }
 }
 
@@ -304,7 +303,6 @@ void toggle_im_enabled(u_int kev_state)
 
       hide_in_win(current_CS);
       current_CS->im_state = GCIN_STATE_DISABLED;
-      reset_current_in_win_xy();
     } else {
       current_CS->im_state = GCIN_STATE_CHINESE;
       orig_caps_state = kev_state & LockMask;
@@ -382,8 +380,14 @@ void init_tab_pho();
 
 void check_CS()
 {
-  if (!current_CS)
+  if (!current_CS) {
     current_CS = &temp_CS;
+
+    if (!temp_CS.input_style)
+      temp_CS.input_style = InputStyleOverSpot;
+  }
+  else
+    temp_CS = *current_CS;
 }
 
 
@@ -609,6 +613,8 @@ int gcin_FocusIn(ClientState *cs)
 {
   Window win = cs->client_win;
 
+  reset_current_in_win_xy();
+
   if (cs) {
     Window win = cs->client_win;
 
@@ -663,6 +669,7 @@ int gcin_FocusOut(ClientState *cs)
     dbg("focus out %x %x\n", cs, current_CS);
 #endif
     focus_win = 0;
+    reset_current_in_win_xy();
 
     if (cs == current_CS)
       temp_CS = *current_CS;

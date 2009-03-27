@@ -43,9 +43,9 @@ static void gen_passwd_idx()
 static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition condition)
 {
   Connection_type type=(Connection_type) GPOINTER_TO_INT(data);
-
+#if 0
   dbg("im-srv: cb_new_gcin_client %s\n", type==Connection_type_unix ? "unix":"tcp");
-
+#endif
   int newsockfd, clilen;
 
   if (type==Connection_type_unix) {

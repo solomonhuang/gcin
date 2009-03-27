@@ -22,7 +22,9 @@ Mandrake
 Fedora rpms
 
 ftp://cle.linux.org.tw/apt/heidelberg/Fedora/RPMS.cle/
-
+-------------------
+gcin 論壇
+http://cle.linux.org.tw/gcin
 -------------------
 如果使用 .tar.bz2 安裝者， table path 是 /usr/local/share/gcin/table，而不是 /usr/share/gcin/table
 選擇 .tar.bz2 者，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)，不過 compile 出來的可執行檔的大小大很多，如果不喜歡，可以在 ./configure 後修改 config.mak，把 OPTFLAGS=-g 改成 OPTFLAGS=-O
@@ -137,10 +139,17 @@ http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
 mozilla gtk2-ft 有什麼優點，用 GTK2 的優點就是與系統的主題(theme) 完全整合，比較漂亮，
 而且 GTK1 完全不用了之後，比較節省 memory。
 
-Firefox over-the-spot 支援可以看下面的 link download .so
+Firefox & Thunderbird over-the-spot 支援可以看下面的 link download .so
 http://moto.debian.org.tw/viewtopic.php?t=5311
-由於 firefox 現在是 把 libwidget_gtk2.so link 進去，所以沒有辦法取代，還是用 mozilla 吧！
 
+如果是用 Mandrake 10.2 cooker ，libwidget_gtk2.so 是分開 compiled 的，你可以在這邊找到 .so
+http://www.csie.nctu.edu.tw/~cp76/linux/mozilla/mdk-firefox-thunderbird-1.0.2
+official firefox 現在是 把 libwidget_gtk2.so link 進去，所以沒有辦法取代。
+
+這個 patch 早就送交 mozilla bugzilla，但一直沒有進去，需要多一些人關切，請參考底下的link，
+  https://bugzilla.mozilla.org/show_bug.cgi?id=271815
+你可以用這個 link 來投票，
+  https://bugzilla.mozilla.org/votes.cgi?action=show_user&bug_id=271815
 ----------------------------
 在詞音中按 control-u 可以把整個編輯區的內容清除。
 -----------------------------------
@@ -446,8 +455,10 @@ rpmbuild -ba gcin.spec
 看到你的 .rpm
 ----------------------------------------------------------------------------------------------------------
  現在可以用注音輸入半/全形 數字 (0..9 及減(-)) 及 用 [] 鍵輸入'()[]{}'，現在也可以加入含有數字的詞，譬如 
-「7月, 5點, 3個」。另外，你也可以用這來儲存電話的號碼，只要用注音輸入電話的前兩碼然後用 shift 選就可以了。
+「7月, 5點, 3個」。另外，你也可以用這來儲存電話號碼，只要用注音輸入電話的前兩碼然後用 shift 選就可以了。
 ----------------------------------------------------------------------------------------------------------
 如果你因為 install 其他的輸入法把 gcin 的設定弄亂，可以用 root 執行看看
 /usr/share/gcin/script/modify-XIM
+----------------------------------------------------------------------------------------------------------
+tsd2a 新增 "-nousecount" 的參數。由於現在 gcin 會統計詞的使用頻率，dump出來的 file 會有 usecount，如果你要比較兩個詞庫時會造成困擾，這時候就可以用這個參數。
 ----------------------------------------------------------------------------------------------------------

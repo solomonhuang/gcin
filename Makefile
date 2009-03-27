@@ -92,7 +92,7 @@ install:
 	   install -m 644 README Changelog $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
 	else \
-	   install -d $(DOC_DIR); \
+	   install -d $(DOC_DIR_i); \
 	   install -m 644 README Changelog $(DOC_DIR_i); \
 	   install -s $(PROGS) $(bindir); \
 	fi

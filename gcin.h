@@ -27,7 +27,7 @@ typedef enum {
 #define zmalloc __gcin_zmalloc
 #endif
 
-#define CH_SZ (3) // big5 size ( 2 bytes), will be changed to 3 if unicode is used
+#define CH_SZ (3) // gcin only supports up to 3 bytes
 
 #define tmalloc(type,n)  (type*)malloc(sizeof(type) * (n))
 void *zmalloc(int n);
@@ -119,5 +119,7 @@ void bell();
 void set_label_font_size(GtkWidget *label, int size);
 void send_gcin_message(Display *dpy, char *s);
 void check_CS();
+void get_win_size(GtkWidget *win, int *width, int *height);
+
 
 #define BITON(flag, bit) ((flag) & (bit))

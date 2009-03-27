@@ -19,9 +19,33 @@ void disp_pho(int index, char *phochar)
   gtk_label_set_text(GTK_LABEL(labels_pho[index]), tt);
 }
 
+
+void move_win_pho(int x, int y);
+
+void get_win_size(GtkWidget *win, int *width, int *height)
+{
+  GtkRequisition sz;
+  gtk_widget_size_request(GTK_WIDGET(win), &sz);
+  *width = sz.width;
+  *height = sz.height;
+}
+
+gboolean win_size_exceed(GtkWidget *win)
+{
+  int width, height;
+
+  get_win_size(win, &width, &height);
+
+  return (width + win_x > dpy_xl);
+}
+
+
 void disp_pho_sel(char *s)
 {
   gtk_label_set_text(GTK_LABEL(label_pho_sele), s);
+
+  if (win_size_exceed(gwin_pho))
+    move_win_pho(win_x, win_y);
 }
 
 
@@ -35,12 +59,15 @@ void set_key_codes_label_pho(char *s)
 
 
 
-
 void move_win_pho(int x, int y)
 {
   int twin_xl, twin_yl;
 
+#if 1
+  get_win_size(gwin_pho, &twin_xl, &twin_yl);
+#else
   gtk_window_get_size(GTK_WINDOW(gwin_pho), &twin_xl, &twin_yl);
+#endif
 
   if (x + twin_xl > dpy_xl)
     x = dpy_xl - twin_xl;
@@ -122,6 +149,7 @@ void create_win_pho_gui()
   }
 
   label_key_codes  = gtk_label_new(NULL);
+  gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);
   gtk_box_pack_start (GTK_BOX (hbox), label_key_codes, FALSE, FALSE, 2);
 
   gtk_widget_show_all (gwin_pho);

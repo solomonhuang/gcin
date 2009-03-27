@@ -265,10 +265,9 @@ void move_win_char_index(GtkWidget *win1, int index)
 
   get_char_index_xy(index, &x, &y);
 
-  GtkRequisition sz;
 
-  gtk_widget_size_request(win1, &sz);
-  int win1_xl = sz.width;  int win1_yl = sz.height;
+  int win1_xl, win1_yl;
+  get_win_size(win1, &win1_xl, &win1_yl);
 
   if (x + win1_xl > dpy_xl)
 
@@ -281,6 +280,12 @@ void move_win_char_index(GtkWidget *win1, int index)
 
 #define MIN_X_SIZE 16
 
+static int best_win_x, best_win_y;
+
+static void raw_move(int x, int y)
+{
+  gtk_window_move(GTK_WINDOW(gwin0), x, y);
+}
 
 void compact_win0_x()
 {
@@ -291,12 +296,14 @@ void compact_win0_x()
     max_yl = win_yl;
 
   gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, max_yl);
+  raw_move(best_win_x, best_win_y);
 }
 
 void compact_win0()
 {
   max_yl = 0;
   gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
+  raw_move(best_win_x, best_win_y);
 }
 
 
@@ -306,6 +313,9 @@ void move_win0(int x, int y)
     x = current_CS->fixed_x;
     y = current_CS->fixed_y;
   }
+
+  best_win_x = x;
+  best_win_y = y;
 
   gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
 
@@ -542,10 +552,7 @@ void get_win0_geom()
 {
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
 
-  GtkRequisition sz;
-  // the value of gtk_window_get_size is old
-  gtk_widget_size_request(gwin0, &sz);
-  win_xl = sz.width;  win_yl = sz.height;
+  get_win_size(gwin0, &win_xl, &win_yl);
 }
 
 void show_win0()

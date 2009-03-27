@@ -75,6 +75,8 @@ void change_gtab_font_size()
   set_disp_im_name();
 }
 
+void move_win_gtab(int x, int y);
+gboolean win_size_exceed(GtkWidget *win);
 
 void disp_gtab_sel(char *s)
 {
@@ -86,6 +88,9 @@ void disp_gtab_sel(char *s)
 #else
   gtk_label_set_markup(GTK_LABEL(label_gtab_sele), s);
 #endif
+
+  if (win_size_exceed(gwin_gtab))
+    move_win_gtab(win_x, win_y);
 }
 
 
@@ -108,7 +113,11 @@ void move_win_gtab(int x, int y)
     y = current_CS->fixed_y;
   }
 
+#if 1
+  get_win_size(gwin_gtab, &win_xl, &win_yl);
+#else
   gtk_window_get_size(GTK_WINDOW(gwin_gtab), &win_xl, &win_yl);
+#endif
 
   if (x + win_xl > dpy_xl)
     x = dpy_xl - win_xl;
@@ -349,6 +358,8 @@ void create_win_gtab_gui_simple()
 
 
   label_key_codes  = gtk_label_new(NULL);
+  gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);
+
   gtk_box_pack_start (GTK_BOX (hbox), label_key_codes, FALSE, FALSE, 2);
 
   change_gtab_font_size();
@@ -434,10 +445,7 @@ void get_win_gtab_geom()
 
   gtk_window_get_position(GTK_WINDOW(gwin_gtab), &win_x, &win_y);
 
-  GtkRequisition sz;
-  // the value of gtk_window_get_size is old
-  gtk_widget_size_request(gwin_gtab, &sz);
-  win_xl = sz.width;  win_yl = sz.height;
+  get_win_size(gwin_gtab, &win_xl, &win_yl);
 }
 
 static void set_disp_im_name()
