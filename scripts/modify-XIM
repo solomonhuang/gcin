@@ -7,7 +7,7 @@ if  [ -d $xinitdir ]; then
   if [ -f XIM ]; then
     [ -f $ximorig ] || mv XIM $ximorig
 
-    sed -e "s/xcin/gcin/" < $ximorig | sed -e "s/scim/gcin/" > XIM
+    sed -e "s/xcin/gcin/g" < $ximorig | sed -e "s/scim/gcin/g" > XIM
     chmod 755 XIM
   # RH9, contributed by xacid.bbs@wretch.twbbs.org
   elif [ -f xinitrc.d/xinput ]; then
@@ -52,19 +52,28 @@ if [ $? = 0 ]; then
   sed -e "s/QT_IM_MODULE=scim/QT_IM_MODULE=xim/" > i18n
 fi
 
+
 #add GTK_IM_MODULE=gcin if necessary
 egrep '^GTK_IM_MODULE=gcin' i18n >& /dev/null
 if [ $? != 0 ]; then
-  echo -e "\nGTK_IM_MODULE=gcin" >> i18n
+  echo "GTK_IM_MODULE=gcin" >> i18n
 fi
 
 egrep '^XIM_PROGRAM=gcin' i18n >& /dev/null
 if [ $? != 0 ]; then
-  echo -e "\nXIM_PROGRAM=gcin" >> i18n
+  echo "XIM_PROGRAM=gcin" >> i18n
 fi
 
-sed -e 's/\n\n/\n/g' < i18n > i18n.tmp
-mv i18n.tmp i18n
+#egrep '^XIM=gcin' i18n >& /dev/null
+#if [ $? != 0 ]; then
+#  echo "XIM=gcin" >> i18n
+#fi
+
+#egrep '^XMODIFIERS=@im=gcin' i18n >& /dev/null
+#if [ $? != 0 ]; then
+#  echo "XMODIFIERS=@im=gcin" >> i18n
+#fi
+
 
 cd /usr/X11R6/bin
 grep -i scim crxvt >& /dev/null
@@ -80,7 +89,7 @@ grep xcin-zh_TW crxvt >& /dev/null
 if [ $? = 0 ]; then
   [ -f crxvt.orig.cin ] || mv crxvt crxvt.orig.cin
 
-  sed -e "s/XIM=xcin-zh_TW/#XIM=xim/" < crxvt.orig.cin > crxvt
+  sed -e "s/XIM=xcin-zh_TW/#XIM=xcin/" < crxvt.orig.cin > crxvt
   chmod 755 crxvt
 fi
 

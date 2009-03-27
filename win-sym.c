@@ -50,7 +50,6 @@ FILE *watch_fopen(char *filename, time_t *pfile_modify_time)
 static gboolean read_syms()
 {
   FILE *fp;
-  char fname[256];
   static char symbol_table[] = "symbol-table";
   static time_t file_modify_time;
 
@@ -116,8 +115,6 @@ void send_text_call_back(char *text);
 static void cb_button_sym(GtkButton *button, char *str)
 {
   phokey_t pho[256];
-  int len = strlen(str);
-
   bzero(pho, sizeof(pho));
 
   if (current_CS->in_method == 6)
@@ -183,7 +180,7 @@ void show_win_sym()
 
   gwin_sym = win_syms[current_CS->in_method];
 
-  if (!gwin_sym || !win_sym_enabled || !current_CS->b_im_enabled)
+  if (!gwin_sym || !win_sym_enabled || current_CS->im_state == GCIN_STATE_DISABLED)
     return;
 
   gtk_widget_show_all(gwin_sym);

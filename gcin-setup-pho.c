@@ -19,7 +19,8 @@ static struct {
 static GtkWidget *check_button_phrase_pre_select,
                  *check_button_phrase_pre_select,
                  *check_button_phonetic_char_dynamic_sequence,
-                 *check_button_tsin_disp_status_row;
+                 *check_button_tsin_disp_status_row,
+                 *check_button_phonetic_huge_tab;
 
 static struct {
   char *name;
@@ -68,6 +69,9 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(TSIN_DISP_STATUS_ROW,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_disp_status_row)));
+
+  save_gcin_conf_int(PHONETIC_HUGE_TAB,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_huge_tab)));
 
   send_gcin_message(GDK_DISPLAY(), "reload kbm");
 
@@ -261,7 +265,7 @@ void create_kbm_window()
        GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence),
        phonetic_char_dynamic_sequence);
 
-    GtkWidget *frame_tsin_disp_status_row = gtk_frame_new("詞音顯示狀態列");
+    GtkWidget *frame_tsin_disp_status_row = gtk_frame_new("詞音顯示狀態列(較小視窗)");
     gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_disp_status_row , TRUE, TRUE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_disp_status_row), 3);
     check_button_tsin_disp_status_row = gtk_check_button_new ();
@@ -270,6 +274,16 @@ void create_kbm_window()
     gtk_toggle_button_set_active(
        GTK_TOGGLE_BUTTON(check_button_tsin_disp_status_row),
        tsin_disp_status_row);
+
+    GtkWidget *frame_phonetic_huge_tab = gtk_frame_new("使用巨大 UTF-8 字集");
+    gtk_box_pack_start (GTK_BOX (vbox_top), frame_phonetic_huge_tab , TRUE, TRUE, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (frame_phonetic_huge_tab), 3);
+    check_button_phonetic_huge_tab = gtk_check_button_new ();
+    gtk_container_add (GTK_CONTAINER (frame_phonetic_huge_tab),
+        check_button_phonetic_huge_tab);
+    gtk_toggle_button_set_active(
+       GTK_TOGGLE_BUTTON(check_button_phonetic_huge_tab),
+       phonetic_huge_tab);
 
 
     GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

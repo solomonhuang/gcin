@@ -18,7 +18,8 @@ static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
 static GtkWidget *button;
-static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client;
+static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
+       *check_button_gcin_shift_space_eng_full;
 
 typedef struct
 {
@@ -154,6 +155,8 @@ static void cb_ok (GtkWidget *button, gpointer data)
   save_gcin_conf_int(GCIN_FLAGS_IM_ENABLED, gcin_flags_im_enabled);
   save_gcin_conf_int(GCIN_REMOTE_CLIENT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
+  save_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full)));
 
   gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 
@@ -273,7 +276,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "使用",
+                                               -1, "Ctrl-Shift 循環",
                                                renderer,
                                                "active", COLUMN_USE,
                                                NULL);
@@ -413,9 +416,19 @@ void create_gtablist_window (void)
   gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client), label_gcin_remote_client,  FALSE, FALSE, 0);
   check_button_gcin_remote_client = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client),check_button_gcin_remote_client,  FALSE, FALSE, 0);
-
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client),
      gcin_remote_client);
+
+
+  GtkWidget *hbox_gcin_shift_space_eng_full = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_shift_space_eng_full, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_shift_space_eng_full = gtk_label_new("shift-space 進入全形英文模式");
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_shift_space_eng_full), label_gcin_shift_space_eng_full,  FALSE, FALSE, 0);
+  check_button_gcin_shift_space_eng_full = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_shift_space_eng_full),check_button_gcin_shift_space_eng_full,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full),
+     gcin_shift_space_eng_full);
+
 
   /* some buttons */
   hbox = gtk_hbox_new (TRUE, 4);
@@ -431,7 +444,7 @@ void create_gtablist_window (void)
                     G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 450, 350);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 550, 450);
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);

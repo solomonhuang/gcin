@@ -63,12 +63,12 @@ void load_tsin_db()
 
 void free_tsin()
 {
-  if (phidx) {
-    free(phidx); phidx = NULL;
-  }
-
   if (fph) {
     fclose(fph); fph = NULL;
+  }
+
+  if (phidx) {
+    free(phidx); phidx = NULL;
   }
 }
 
@@ -98,10 +98,10 @@ static int phseq(u_char *a, u_char *b)
   return 0;
 }
 
+void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec);
 
 
-
-gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
+gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecount)
 {
   int mid, ord = 0, ph_ofs, hashno, i;
   FILE *fw;
@@ -109,13 +109,14 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
          sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2];
 
   tbuf[0]=len;
-  tbuf[1]=0;  // usecount
+  tbuf[1]=usecount;  // usecount
   int tlen = utf8_tlen(utf8str, len);
+#if 0
   dbg("tlen %d  '", tlen);
   for(i=0; i < tlen; i++)
     putchar(utf8str[i]);
   dbg("'\n");
-
+#endif
 
   memcpy(&tbuf[2], phkeys, sizeof(phokey_t) * len);
   memcpy(&tbuf[sizeof(phokey_t)*len + 2], utf8str, tlen);
@@ -140,6 +141,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len)
   if (!ord && !memcmp(&sbuf[sbuf[0]*sizeof(phokey_t)+1+1], utf8str, tlen)) {
 //    bell();
     dbg("Phrase already exists\n");
+    inc_dec_tsin_use_count(phkeys, utf8str, len, FALSE);
     return FALSE;
   }
 
@@ -187,7 +189,8 @@ int ts_gtabN;
 
 int read_tsin_phrase(char *str)
 {
-  u_char len, usecount;
+  u_char len;
+  char usecount;
   u_char pho[sizeof(phokey_t) * MAX_PHRASE_LEN];
   len = 0;
 
@@ -354,4 +357,168 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
 
 //  dbg("%d %d\n", bottom, top);
   return 0;
+}
+
+
+void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
+                    u_char *ch)
+{
+  if (idx >= phcount) {
+    load_tsin_db(); // probably db changed, reload;
+    *len = 0;
+    return;
+  }
+
+  int ph_ofs=phidx[idx];
+
+  fseek(fph, ph_ofs, SEEK_SET);
+  fread(len, 1, 1, fph);
+
+  if (*len >= MAX_PHRASE_LEN) {
+    load_tsin_db(); // probably db changed, reload;
+    *len = 0;
+    return;
+  }
+
+  fread(usecount, 1, 1,fph); // use count
+  fread(pho, sizeof(phokey_t), (int)(*len), fph);
+  if (ch)
+    fread(ch, CH_SZ, (int)(*len), fph);
+}
+
+
+int phokey_t_seq(phokey_t *a, phokey_t *b, int len)
+{
+  int i;
+
+  for (i=0;i<len;i++) {
+    if (a[i] > b[i]) return 1;
+    else
+    if (a[i] < b[i]) return -1;
+  }
+
+  return 0;
+}
+
+
+gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
+{
+  int mid, cmp;
+  phokey_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
+  u_char len, mlen, stch[MAX_PHRASE_LEN * CH_SZ];
+  char usecount;
+  int sti, edi;
+  int i= *pho >> TSIN_HASH_SHIFT;
+
+  if (i >= TSIN_HASH_N)
+    return FALSE;
+
+  int top=hashidx[i];
+  int bot=edi=hashidx[i+1];
+
+  while (top <= bot) {
+    mid=(top+bot)/ 2;
+    sti++;
+    load_tsin_entry(mid, &len, &usecount, ss, stch);
+
+    if (len > plen)
+      mlen=plen;
+    else
+      mlen=len;
+
+    cmp=phokey_t_seq(ss, pho, mlen);
+
+    if (!cmp && len < plen)
+      cmp=-2;
+
+    if (cmp>0)
+      bot=mid-1;
+    else
+    if (cmp<0)
+      top=mid+1;
+    else
+      break;
+  }
+
+  if (cmp) {
+//    dbg("no match %d\n", cmp);
+    return FALSE;
+  }
+
+  // seek to the first match because binary search is used
+  for(;mid>=0;mid--) {
+    load_tsin_entry(mid, &len, &usecount, stk, stch);
+
+    if (len >= plen && !phokey_t_seq(stk, pho, plen))
+      continue;
+    break;
+  }
+
+  mid++;
+  sti = mid;
+
+  *r_sti = sti;
+  *r_edi = edi;
+
+  return TRUE;
+}
+
+// och : orginal och;
+void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
+{
+  int sti, edi;
+
+  if (!tsin_seek(pho, N, &sti, &edi))
+    return;
+
+  int idx;
+  int tlen = utf8_tlen(ch, N);
+
+#if 0
+  dbg("otlen %d\n", tlen);
+  int i;
+  for(i=0; i < tlen; i++)
+    putchar(ch[i]);
+  puts("");
+#endif
+
+
+  for(idx=sti; idx < edi; idx++) {
+    char len, usecount, n_usecount;
+    phokey_t phi[MAX_PHRASE_LEN];
+    char stch[MAX_PHRASE_LEN * CH_SZ];
+
+    load_tsin_entry(idx, &len, &usecount, phi, stch);
+    n_usecount = usecount;
+
+    if (len!=N || phokey_t_seq(phi, pho, N))
+      break;
+#if 0
+    for(i=0; i < tlen; i++)
+      putchar(stch[i]);
+    dbg(" ppp\n");
+#endif
+    if (!utf8_str_eq(stch, ch, N))
+      continue;
+#if 0
+    dbg("found match ");
+#endif
+    int ph_ofs=phidx[idx];
+    fseek(fph, ph_ofs + 1, SEEK_SET);
+
+    if (b_dec) {
+      if (usecount > -127)
+        n_usecount--;
+//      dbg("dec %d\n", n_usecount);
+    } else {
+      if (usecount < 126)
+        n_usecount++;
+//      dbg("inc %d\n", n_usecount);
+    }
+
+    if (n_usecount != usecount) {
+      fwrite(&n_usecount, 1, 1, fph); // use count
+      fflush(fph);
+    }
+  }
 }

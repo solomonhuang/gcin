@@ -8,15 +8,10 @@
 #include "gcin.h"
 #include "pho.h"
 
-typedef struct {
-	u_char ch[CH_SZ];
-	u_short ph;
-} ITEM;
-
 
 int *phidx, *sidx, phcount;
 int bfsize, phidxsize;
-u_char *bf;
+char *bf;
 u_char *sf;
 
 static int qcmp(const void *a, const void *b)
@@ -58,6 +53,49 @@ static int qcmp(const void *a, const void *b)
 
   return memcmp(&bf[cha], &bf[chb], tlena);
 }
+
+
+static int qcmp_usecount(const void *a, const void *b)
+{
+  int idxa=*((int *)a);
+  int idxb=*((int *)b);
+  u_char lena,lenb, len;
+  int cha, chb;
+  int i;
+  u_short ka,kb;
+  char usecounta, usecountb;
+
+  lena=sf[idxa++]; usecounta = sf[idxa++];
+  lenb=sf[idxb++]; usecountb = sf[idxb++];
+  cha=idxa + lena * sizeof(phokey_t);
+  chb=idxb + lenb * sizeof(phokey_t);
+  len=Min(lena,lenb);
+
+  for(i=0;i<len;i++) {
+    memcpy(&ka, &sf[idxa], sizeof(phokey_t));
+    memcpy(&kb, &sf[idxb], sizeof(phokey_t));
+    if (ka > kb) return 1;
+    if (kb > ka) return -1;
+    idxa+=2;
+    idxb+=2;
+  }
+
+  if (lena > lenb)
+    return 1;
+  if (lena < lenb)
+    return -1;
+
+  int tlena = utf8_tlen(&sf[cha], lena);
+  int tlenb = utf8_tlen(&sf[chb], lenb);
+
+  if (tlena > tlenb)
+    return 1;
+  if (tlena < tlenb)
+    return -1;
+
+  return usecountb - usecounta;
+}
+
 
 static int shiftb[]={9,7,3,0};
 
@@ -115,7 +153,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  phidxsize=18000;
+  phidxsize=30000;
   if (!(phidx=(int *)malloc(phidxsize*4))) {
     puts("malloc err");
     exit(1);
@@ -231,7 +269,6 @@ int main(int argc, char **argv)
   // delete duplicate
   ofs=0;
   j=0;
-  bzero(s,sizeof(s));
   for(i=0;i<phcount;i++) {
     idx = phidx[i];
     sidx[j]=ofs;
@@ -239,18 +276,19 @@ int main(int argc, char **argv)
     int tlen = utf8_tlen(&bf[idx + 1 + 1 + sizeof(phokey_t)*len], len);
     clen=sizeof(phokey_t)*len + tlen + 1 + 1;
 
-    if (memcmp(s, &bf[idx], clen)) {
-      memcpy(&sf[ofs], &bf[idx], clen);
-      memcpy(s, &bf[idx], clen);
-    } else
+    if (i && !qcmp(&phidx[i-1], &phidx[i]))
       continue;
 
+    memcpy(&sf[ofs], &bf[idx], clen);
     j++;
     ofs+=clen;
   }
 
   phcount=j;
-
+#if 1
+  puts("Sorting by usecount ....");
+  qsort(sidx, phcount, 4, qcmp_usecount);
+#endif
 
   for(i=0;i<256;i++)
     hashidx[i]=-1;

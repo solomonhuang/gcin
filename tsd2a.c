@@ -12,13 +12,24 @@ int main(int argc, char **argv)
   FILE *fp;
   phokey_t phbuf[MAX_PHRASE_LEN];
   int i;
-  u_char clen, usecount;
+  u_char clen;
+  char usecount;
+  gboolean pr_usecount = TRUE;
+  char *fname;
 
   if (argc <= 1) {
     printf("%s: file name expected\n", argv[0]);
     exit(1);
   }
-  if ((fp=fopen(argv[1],"r"))==NULL) {
+
+  fname = argv[1];
+  if (!strcmp(argv[1], "-nousecount")) {
+    fname = argv[2];
+    pr_usecount = FALSE;
+  }
+
+
+  if ((fp=fopen(fname,"r"))==NULL) {
     printf("Cannot open %s", argv[1]);
     exit(-1);
   }
@@ -26,9 +37,10 @@ int main(int argc, char **argv)
   while (!feof(fp)) {
     fread(&clen,1,1,fp);
     fread(&usecount,1,1,fp);
-    fread(phbuf,sizeof(phokey_t), clen, fp);
+    if (!pr_usecount)
+      usecount = 0;
 
-    int tlen = 0;
+    fread(phbuf,sizeof(phokey_t), clen, fp);
 
     for(i=0;i<clen;i++) {
       char ch[CH_SZ];

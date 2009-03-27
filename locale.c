@@ -92,7 +92,6 @@ int u8cpy(char *t, char *s)
 
 int utf8_tlen(char *s, int N)
 {
-  int ofs=0;
   int i;
   char *p = s;
 
@@ -104,3 +103,23 @@ int utf8_tlen(char *s, int N)
   return p - s;
 }
 
+void utf8_putchar(char *s)
+{
+  int i;
+  int len = utf8_sz(s);
+
+  for(i=0;i<len;i++)
+    putchar(s[i]);
+}
+
+
+gboolean utf8_str_eq(char *a, char *b, int len)
+{
+  int ta = utf8_tlen(a, len);
+  int tb = utf8_tlen(b, len);
+
+  if (ta != tb)
+    return FALSE;
+
+  return !memcmp(a, b, ta);
+}

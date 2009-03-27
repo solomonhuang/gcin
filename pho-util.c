@@ -11,26 +11,27 @@ PHO_IDX idx_pho[1403];
 int ch_pho_ofs;
 PHO_ITEM *ch_pho;
 int ch_phoN;
-static char pho_tab[]="pho.tab";
+static char pho_normal_tab[]="pho.tab";
+static char pho_huge_tab[]="pho-huge.tab";
 void update_table_file(char *name, int version);
 
 void pho_load()
 {
-  if (!phofname[0]) {
-    if (!getenv("GCIN_TABLE_DIR") && phonetic_char_dynamic_sequence) {
-      get_gcin_user_fname(pho_tab, phofname);
+  char *pho_tab = phonetic_huge_tab ? pho_huge_tab:pho_normal_tab;
 
-      if (access(phofname, W_OK) < 0){
-        char sys_file[256], vv[256];
+  if (!getenv("GCIN_TABLE_DIR") && phonetic_char_dynamic_sequence) {
+    get_gcin_user_fname(pho_tab, phofname);
 
-        get_sys_table_file_name(sys_file, pho_tab);
-        sprintf(vv,"cp %s %s\n", sys_file, phofname);
-        system(vv);
-      }
-    } else {
-      get_sys_table_file_name(pho_tab, phofname);
-      dbg("use system's pho, no dynamic adj\n");
+    if (access(phofname, W_OK) < 0){
+      char sys_file[256], vv[256];
+
+      get_sys_table_file_name(sys_file, pho_tab);
+      sprintf(vv,"cp %s %s\n", sys_file, phofname);
+      system(vv);
     }
+  } else {
+    get_sys_table_file_name(pho_tab, phofname);
+    dbg("use system's pho, no dynamic adj\n");
   }
 
   update_table_file(pho_tab, 3);

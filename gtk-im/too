@@ -1,0 +1,7 @@
+export GCIN_XIM=gcin_test
+export LC_ALL=zh_TW.Big5
+export XMODIFIERS=@im=$GCIN_XIM
+export LD_LIBRARY_PATH="../im-client"
+
+export LD_PRELOAD=~/gcin/gtk-im/im-gcin.so
+/opt/openoffice.org1.9.79/program/soffice ~/t.sxi

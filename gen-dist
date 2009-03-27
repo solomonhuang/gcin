@@ -1,4 +1,4 @@
-cp -f ~/.gcin/tsin.src data
+#cp -f ~/.gcin/tsin.src data
 
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
 rm -f tags core.*
@@ -8,6 +8,8 @@ cp -a gcin $GCIN_VERSION
 cd $GCIN_VERSION
 make clean
 cd ..
+
+~/gcin/tsd2a -nousecount ~/.gcin/tsin > $GCIN_VERSION/data/tsin.src
 tar cvfj $GCIN_VERSION.tar.bz2 $GCIN_VERSION
 
 cd gcin; make gcin.spec

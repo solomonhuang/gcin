@@ -27,10 +27,14 @@ int main(int argc, char **argv)
 
     int j;
     for(j=frm; j < to; j++) {
-
       prph(key);
-      dbg(" %c%c%c %d\n", ch_pho[j].ch[0], ch_pho[j].ch[1], ch_pho[j].ch[2],
-        ch_pho[j].count);
+
+      int len = utf8_sz(ch_pho[j].ch);
+      int k;
+      dbg(" ");
+      for(k=0; k < len; k++)
+        dbg("%c", ch_pho[j].ch[k]);
+      dbg(" %d\n", ch_pho[j].count);
     }
   }
 

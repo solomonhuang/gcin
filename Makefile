@@ -15,7 +15,7 @@ OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
-OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o
+OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o gcin-setup-list.o \
 locale.o gcin-setup-pho.o about.o
 WALL=-Wall
@@ -74,6 +74,9 @@ $(IMdkitLIB):
 $(im-srv):
 	$(MAKE) -C im-srv
 
+ibin:
+	   install $(PROGS) $(bindir)
+
 install:
 	install -d $(datadir)/icons
 	install gcin.png $(datadir)/icons
@@ -86,9 +89,11 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
 	   install -d $(DOC_DIR); \
-	   install -m 644 README $(DOC_DIR); \
+	   install -m 644 README Changelog $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
 	else \
+	   install -d $(DOC_DIR); \
+	   install -m 644 README Changelog $(DOC_DIR_i); \
 	   install -s $(PROGS) $(bindir); \
 	fi
 	$(MAKE) -C scripts install

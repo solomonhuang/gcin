@@ -45,6 +45,8 @@ char *phokey_to_str(phokey_t kk);
 int utf8_pho_keys(char *big5, phokey_t *phkeys);
 void prph(phokey_t kk);
 phokey_t pho2key(char typ_pho[]);
+gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecount);
+
 
 #define MAX_PH_BF (90)
 

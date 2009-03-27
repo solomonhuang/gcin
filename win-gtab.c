@@ -11,6 +11,7 @@ static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64];
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
 static GtkWidget *image_pin;
+static GtkWidget *box_gtab_im_name;
 
 Window xwin_gtab;
 void set_label_space(GtkWidget *label);
@@ -57,13 +58,7 @@ void clear_gtab_in_area()
 }
 
 
-void disp_gtab_half_full(gboolean hf)
-{
-  if (hf)
-    gtk_label_set_text(GTK_LABEL(label_input_method_name), "全形英數");
-  else
-    gtk_label_set_text(GTK_LABEL(label_input_method_name), cur_inmd->cname);
-}
+static void set_disp_im_name();
 
 void change_gtab_font_size()
 {
@@ -76,6 +71,8 @@ void change_gtab_font_size()
   for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
     set_label_font_size(labels_gtab[i], gcin_font_size);
   }
+
+  set_disp_im_name();
 }
 
 
@@ -83,6 +80,7 @@ void disp_gtab_sel(char *s)
 {
   if (!label_gtab_sele)
     return;
+
 #if 0
   gtk_label_set_text(GTK_LABEL(label_gtab_sele), s);
 #else
@@ -161,6 +159,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 //      send_fake_key_eve();
       break;
     case 2:
+      inmd_switch_popup_handler(widget, (GdkEvent *)event);
       break;
     case 3:
       exec_gcin_setup();
@@ -239,6 +238,8 @@ void create_win_gtab_gui_full()
   gtk_container_set_border_width (GTK_CONTAINER (button_input_method_name), 0);
   gtk_box_pack_start (GTK_BOX (hbox), button_input_method_name, FALSE, FALSE, 0);
 
+  box_gtab_im_name = button_input_method_name;
+
 
   GtkWidget *button_gtab = gtk_button_new();
   gtk_container_set_border_width (GTK_CONTAINER (button_gtab), 0);
@@ -275,7 +276,10 @@ void create_win_gtab_gui_full()
   change_gtab_font_size();
 
   gtk_widget_show_all (gwin_gtab);
+
+  set_disp_im_name();
 }
+
 
 
 void create_win_gtab_gui_simple()
@@ -314,6 +318,7 @@ void create_win_gtab_gui_simple()
   g_signal_connect_swapped (GTK_OBJECT (event_box_input_method_name), "button-press-event",
         G_CALLBACK (inmd_switch_popup_handler), NULL);
 
+  box_gtab_im_name = event_box_input_method_name;
 
   GtkWidget *event_box_gtab = gtk_event_box_new();
   gtk_container_set_border_width (GTK_CONTAINER (event_box_gtab), 0);
@@ -339,7 +344,7 @@ void create_win_gtab_gui_simple()
     GtkWidget *label = gtk_label_new(NULL);
     labels_gtab[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_gtab), label, FALSE, FALSE, 0);
-    set_label_font_family(label, "serif");
+//    set_label_font_family(label, "serif");
   }
 
 
@@ -349,6 +354,8 @@ void create_win_gtab_gui_simple()
   change_gtab_font_size();
 
   gtk_widget_show_all (gwin_gtab);
+
+  set_disp_im_name();
 }
 
 
@@ -433,3 +440,41 @@ void get_win_gtab_geom()
   win_xl = sz.width;  win_yl = sz.height;
 }
 
+static void set_disp_im_name()
+{
+  if (!box_gtab_im_name)
+    return;
+
+  if (gtab_disp_im_name)
+    gtk_widget_show(box_gtab_im_name);
+  else
+    gtk_widget_hide(box_gtab_im_name);
+}
+
+char *get_full_str()
+{
+  static char eng_full_str[]="英/全";
+  static char ch_full_str[]="中/全";
+
+  switch (current_CS->im_state) {
+    case GCIN_STATE_ENG_FULL:
+      return eng_full_str;
+    case GCIN_STATE_CH_ENG_FULL:
+      return ch_full_str;
+    default:
+      return "　";
+  }
+}
+
+void win_gtab_disp_half_full()
+{
+  gtk_label_set_text(GTK_LABEL(labels_gtab[0]), get_full_str());
+  int i;
+
+  for(i=1; i < MAX_TAB_KEY_NUM64; i++) {
+    if (!labels_gtab[i])
+      continue;
+    gtk_widget_hide(labels_gtab[i]);
+  }
+  minimize_win_gtab();
+}

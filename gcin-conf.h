@@ -10,6 +10,8 @@
 #define GCIN_CHARS_BIG5_ONLY "gcin-chars-big5-only"
 #define GCIN_FLAGS_IM_ENABLED "gcin-flags-im-enabled"
 #define GCIN_REMOTE_CLIENT "gcin-remote-client"
+#define GCIN_SHIFT_SPACE_ENG_FULL "gcin-shift-space-eng-full"
+
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
 #define GTAB_SPACE_AUTO_FIRST "gtab-space-auto-first"
@@ -19,6 +21,7 @@
 #define GTAB_DISP_PARTIAL_MATCH "gtab-disp-partial-match"
 #define GTAB_SIMPLE_WIN "gtab-simple-win"
 #define GTAB_DISP_KEY_CODES "gtab-disp-key-codes"
+#define GTAB_DISP_IM_NAME "gtab-disp-im-name"
 
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
 #define TSIN_CHINESE_ENGLISH_TOGGLE_KEY "tsin-chinese-english-toggle_key"
@@ -29,12 +32,13 @@
 
 #define PHONETIC_KEYBOARD "phonetic-keyboard"
 #define PHONETIC_CHAR_DYNAMIC_SEQUENCE "phonetic-char-dynamic-sequence"
+#define PHONETIC_HUGE_TAB "phonetic-huge-tab"
 
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_chars_big5_only,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
-           gtab_disp_key_codes;
+           gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full;
 
 extern int default_input_method;
 extern int left_right_button_tips;
@@ -52,6 +56,7 @@ extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;
 
 extern int phonetic_char_dynamic_sequence;
+extern int phonetic_huge_tab;
 extern int tsin_space_opt;
 
 

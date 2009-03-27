@@ -12,7 +12,6 @@ static IMForwardEventStruct *current_forward_eve;
 static char callback_str_buffer[32];
 Window focus_win;
 
-
 static void send_fake_key_eve()
 {
   KeyCode kc_shift_l = XKeysymToKeycode(dpy, XK_Shift_L);
@@ -254,7 +253,22 @@ void update_in_win_pos()
   }
 }
 
-IC *findIC();
+
+void disp_im_half_full()
+{
+    switch (current_CS->in_method) {
+      case 3:
+        win_pho_disp_half_full();
+        break;
+      case 6:
+        win_tsin_disp_half_full();
+        break;
+      default:
+        win_gtab_disp_half_full();
+        break;
+    }
+}
+
 gboolean flush_tsin_buffer();
 void reset_gtab_all();
 
@@ -268,12 +282,18 @@ void toggle_im_enabled(u_int kev_state)
 
     static u_int orig_caps_state;
 
-    if (current_CS->b_im_enabled) {
+    if (current_CS->im_state != GCIN_STATE_DISABLED) {
       if (current_CS->in_method== 6 && (kev_state & LockMask) != orig_caps_state &&
           tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
         KeyCode caps = XKeysymToKeycode(dpy, XK_Caps_Lock);
         XTestFakeKeyEvent(dpy, caps, True, CurrentTime);
         XTestFakeKeyEvent(dpy, caps, False, CurrentTime);
+      }
+
+      if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
+        current_CS->im_state = GCIN_STATE_CHINESE;
+        disp_im_half_full();
+        return;
       }
 
       if (current_CS->in_method == 6)
@@ -283,15 +303,16 @@ void toggle_im_enabled(u_int kev_state)
       }
 
       hide_in_win(current_CS);
-      current_CS->b_im_enabled = FALSE;
+      current_CS->im_state = GCIN_STATE_DISABLED;
       reset_current_in_win_xy();
     } else {
-      current_CS->b_im_enabled = TRUE;
+      current_CS->im_state = GCIN_STATE_CHINESE;
       orig_caps_state = kev_state & LockMask;
 
       if (!current_CS->in_method) {
         init_in_method(default_input_method);
       }
+
 
       update_in_win_pos();
 
@@ -323,14 +344,33 @@ void update_active_in_win_geom()
 void disp_gtab_half_full(gboolean hf);
 void tsin_toggle_half_full();
 
-void toggle_half_full_char()
+
+void toggle_half_full_char(u_int kev_state)
 {
 
-  if (current_CS->in_method == 6)
+  if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
     tsin_toggle_half_full();
+  }
   else {
-    current_CS->b_half_full_char ^= 1;
-    disp_gtab_half_full(current_CS->b_half_full_char);
+    if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
+      current_CS->im_state = GCIN_STATE_DISABLED;
+      hide_in_win(current_CS);
+      disp_im_half_full();
+      return;
+    } else
+    if (current_CS->im_state == GCIN_STATE_DISABLED && gcin_shift_space_eng_full) {
+      toggle_im_enabled(kev_state);
+      current_CS->im_state = GCIN_STATE_ENG_FULL;
+    } else
+    if (current_CS->im_state == GCIN_STATE_CHINESE) {
+      current_CS->im_state = GCIN_STATE_CH_ENG_FULL;
+    } else
+    if (current_CS->im_state == GCIN_STATE_CH_ENG_FULL) {
+      current_CS->im_state = GCIN_STATE_CHINESE;
+    }
+
+//    dbg("current_CS->in_method %d\n", current_CS->in_method);
+    disp_im_half_full();
   }
 //  dbg("half full toggle\n");
 }
@@ -365,6 +405,7 @@ gboolean init_in_method(int in_no)
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
   current_CS->in_method = in_no;
+
 
   switch (in_no) {
     case 3:
@@ -411,6 +452,7 @@ int feedkey_gtab(KeySym key, int kbstate);
 int feed_phrase(KeySym ksym);
 int feedkey_intcode(KeySym key);
 void tsin_set_eng_ch(int nmod);
+static KeySym last_keysym;
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
@@ -446,14 +488,44 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     }
   }
 
-  if (!current_CS->b_im_enabled) {
+  if (keysym == XK_space && (kev_state & ShiftMask)) {
+    if (last_keysym != XK_Shift_L && last_keysym != XK_Shift_R)
+      return FALSE;
+
+    toggle_half_full_char(kev_state);
+
+    return TRUE;
+  }
+
+//  dbg("state %x\n", kev_state);
+  if ((current_CS->im_state & (GCIN_STATE_ENG_FULL|GCIN_STATE_CH_ENG_FULL))) {
+     char *s = half_char_to_full_char(keysym);
+     if (!s)
+       return 0;
+     char tt[CH_SZ+1];
+
+     memcpy(tt, s, CH_SZ); tt[CH_SZ]=0;
+     send_text(tt);
+     return 1;
+  }
+
+
+  if ((kev_state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
+    return feed_phrase(keysym);
+  }
+
+  if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
+    current_CS->im_state = GCIN_STATE_CHINESE;
+    init_in_method(keysym- XK_0);
+    return TRUE;
+  }
+
+  last_keysym = keysym;
+
+  if (current_CS->im_state == GCIN_STATE_DISABLED) {
     return FALSE;
   }
 
-  if (keysym == XK_space && (kev_state & ShiftMask)) {
-    toggle_half_full_char();
-    return TRUE;
-  }
 
   if (((keysym == XK_Control_L || keysym == XK_Control_R)
                    && (kev_state & ShiftMask)) ||
@@ -463,14 +535,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
      return TRUE;
   }
 
-  if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
-    init_in_method(keysym- XK_0);
-    return TRUE;
-  }
-
-  if ((kev_state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
-    return feed_phrase(keysym);
-  }
 
 
   switch(current_CS->in_method) {
@@ -495,7 +559,7 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 {
   check_CS();
 
-  if (!current_CS->b_im_enabled)
+  if (current_CS->im_state == GCIN_STATE_DISABLED)
     return FALSE;
 #if 0
   if (current_CS->client_win)
@@ -557,7 +621,7 @@ int gcin_FocusIn(ClientState *cs)
   current_CS = cs;
 
   if (win == focus_win) {
-    if (cs->b_im_enabled) {
+    if (cs->im_state != GCIN_STATE_DISABLED) {
       move_IC_in_win(cs);
       show_in_win(cs);
     } else

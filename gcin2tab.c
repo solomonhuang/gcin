@@ -365,6 +365,10 @@ int main(int argc, char **argv)
 
     if ((len=strlen(arg)) <= CH_SZ && (arg[0] & 0x80)) {
       char out[CH_SZ+1];
+      int u8len = utf8_sz(arg);
+
+      if (u8len > 3)
+        p_err("error found");
 
       bzero(out, sizeof(out));
       memcpy(out, arg, len);
@@ -376,11 +380,9 @@ int main(int argc, char **argv)
 
 //      printf("uuu %x %c%c\n", kk, out[0], out[1]);
 
-#define MAX_16_PHRASE 32767
 
     } else {
       if (key64) {
-        if (chno < MAX_16_PHRASE)
 #if LARGE_GTAB
           itar64[chno].ch[0]=phr_cou>>16;
           itar64[chno].ch[1]=(phr_cou >> 8) & 0xff;

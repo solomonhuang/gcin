@@ -53,7 +53,7 @@ typedef struct {
 typedef struct {
     Window	client_win;	/* client window */
     INT32	input_style;	/* input style */
-    gboolean    b_im_enabled;
+    GCIN_STATE_E im_state;
     gboolean    b_half_full_char;
     gboolean    fixed_pos;
     gboolean    b_gcin_protocol; // TRUE : gcin    FALSE: XIM

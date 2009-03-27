@@ -10,6 +10,10 @@ void p_err(char *fmt,...)
   vfprintf(stderr, fmt, args);
   va_end(args);
   fprintf(stderr,"\n");
+
+  if (getenv("GCIN_ERR_COREDUMP"))
+    abort();
+
   exit(-1);
 }
 

@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 
-#define MAX_CHS (15000)
+#define MAX_CHS (35000)
 
 typedef struct {
   u_short key;
@@ -91,6 +91,9 @@ int main(int argc, char **argv)
   if (reload)
     gtk_init(&argc, &argv);
 
+  if (argc > 1)
+    fname = argv[1];
+
   if ((fp=fopen(fname,"r"))==NULL)
     p_err("cannot open %s\n", fname);
 
@@ -165,7 +168,12 @@ int main(int argc, char **argv)
     i = j;
   }
 
-  char *fname_out = "pho.tab";
+  char *tp = strstr(fname, ".src");
+  if (!tp)
+    p_err("file name should be *.tab.src");
+  *tp=0;
+
+  char *fname_out = fname;
 
   if ((fp=fopen(fname_out,"w"))==NULL)
     p_err("cannot create %s\n", fname_out);

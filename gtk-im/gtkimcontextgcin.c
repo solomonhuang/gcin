@@ -60,7 +60,6 @@ struct _GtkGCINInfo
   gulong status_set;
   gulong preedit_set;
 
-  guint reconnecting :1;
 };
 
 
@@ -154,9 +153,6 @@ get_im (GtkIMContextGCIN *context_xim)
   info->settings = NULL;
   info->preedit_set = 0;
   info->status_set = 0;
-//  info->ics = NULL;
-  info->reconnecting = FALSE;
-//  info->im = NULL;
 
   if (!context_xim->gcin_ch) {
     if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
@@ -371,8 +367,24 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   if (xevent.type == KeyPress) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
+#if 0
+    if (rstr) {
+      printf("yyyyyyyyy %x len:%d %d num_bytes:%d %x\n",
+        rstr, strlen(rstr), result, num_bytes, buffer[0]);
+      char *p = rstr;
 
-//    dbg("yyyyyyyyy %d %d num_bytes:%d %x\n", rstr, result, num_bytes, buffer[0]);
+      while (*p) {
+        putchar(*p);
+        p++;
+      }
+#if 0
+      rstr = strdup("測 ");
+#else
+      rstr = strdup("ㄙㄙ");
+#endif
+    }
+#endif
+
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f) {
 //      dbg("buffer %c\n", buffer[0]);
       rstr = (char *)malloc(num_bytes + 1);
@@ -389,7 +401,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 //  printf("event->type:%d iiiii %d\n", event->type, result);
 
   if (rstr) {
-//    dbg("emit %s\n", rstr);
+//    printf("emit %s\n", rstr);
     g_signal_emit_by_name (context, "commit", rstr);
     free(rstr);
   }

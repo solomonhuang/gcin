@@ -196,7 +196,7 @@ static void cb_button_ok(GtkButton *button, gpointer user_data)
     pharr[i] = bigpho[i].phokeys[idx];
   }
 
-  save_phrase_to_db(pharr, current_str, bigphoN);
+  save_phrase_to_db(pharr, current_str, bigphoN, 0);
 
   destroy_pho_sel_area();
 

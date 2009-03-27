@@ -12,15 +12,17 @@ struct keystruc {
   KeySym ksym;
   char *str;
 } tran[]={
+  {"`", '~'},
   {"0", ')'}, {"1", '!'}, {"2", '@'}, {"3", '#'}, {"4", '$'}, {"5", '%'},
   {"6", '^'}, {"7", '&'}, {"8", '*'}, {"9", '('},
-  {"a", 'a'}, {"b", 'b'}, {"c", 'c'}, {"d", 'd'}, {"e", 'e'}, {"f", 'f'},
-  {"g", 'g'}, {"h", 'h'}, {"i", 'i'}, {"j", 'j'}, {"k", 'k'}, {"l", 'l'},
-  {"m", 'm'}, {"n", 'n'}, {"o", 'o'}, {"p", 'p'}, {"q", 'q'}, {"r", 'r'},
-  {"s", 's'}, {"t", 't'}, {"u", 'u'}, {"v", 'v'}, {"w", 'w'}, {"x", 'x'},
-  {"y", 'y'}, {"z", 'z'},
-  {",", '<'}, {".", '>'}, {";", ':'}, {"/", '?'},
-  {"[", '{'}, {"]", '}'},
+  {"a", 'A'}, {"b", 'B'}, {"c", 'C'}, {"d", 'D'}, {"e", 'E'}, {"f", 'F'},
+  {"g", 'G'}, {"h", 'H'}, {"i", 'I'}, {"j", 'J'}, {"k", 'K'}, {"l", 'L'},
+  {"m", 'M'}, {"n", 'N'}, {"o", 'O'}, {"p", 'P'}, {"q", 'Q'}, {"r", 'R'},
+  {"s", 'S'}, {"t", 'T'}, {"u", 'U'}, {"v", 'V'}, {"w", 'W'}, {"x", 'X'},
+  {"y", 'Y'}, {"z", 'Z'},
+  {",", '<'}, {".", '>'}, {";", ':'}, {"'", '"'}, {"/", '?'},
+  {"[", '{'}, {"]", '}'}, {"\\", '|'},
+  {"-", '_'}, {"=", '+'},
   {"f1",XK_F1},{"f2",XK_F2},{"f3",XK_F3},{"f4",XK_F4},{"f5",XK_F5},{"f6",XK_F6},
   {"f7",XK_F7},{"f8",XK_F8},{"f9",XK_F9},{"f10",XK_F10},{"f11",XK_F11},
   {"f12",XK_F12},
@@ -104,20 +106,16 @@ gboolean feed_phrase(KeySym ksym)
 {
   int i;
 
-//  dbg("ksym:%x\n", ksym);
+//  dbg("ksym:%x %c\n", ksym, ksym);
   load_phrase();
-
-  if (ksym>='A' && ksym <= 'Z')
-    ksym += 0x20;
 
   for(i=0; i < tranN; i++) {
     if (tran[i].ksym!= ksym)
       continue;
 
     if (tran[i].str) {
-      if (current_CS->in_method == 6) {
+      if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)
         add_to_tsin_buf_str(tran[i].str);
-      }
       else
         send_text(tran[i].str);
     }

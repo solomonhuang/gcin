@@ -10,6 +10,15 @@
 #include <string.h>
 #include "IMdkit.h"
 #include "Xi18n.h"
+
+typedef enum {
+  GCIN_STATE_DISABLED = 0,
+  GCIN_STATE_ENG_FULL = 1,
+  GCIN_STATE_CH_ENG_FULL = 2,
+  GCIN_STATE_CHINESE = 4
+} GCIN_STATE_E;
+
+
 #include "IC.h"
 
 #if CLIENT_LIB
@@ -49,13 +58,13 @@ typedef enum {
   InputStyleOnSpot = 4
 } InputStyle_E;
 
-
 enum {
   Control_Space=0,
   Shift_Space=1,
   Alt_Space=2,
   Windows_Space=3,
 } IM_TOGGLE_KEYS;
+
 
 
 enum {
@@ -97,6 +106,8 @@ int utf8_sz(char *s);
 void utf8cpy(char *t, char *s);
 int u8cpy(char *t, char *s);
 int utf8_tlen(char *s, int N);
+void utf8_putchar(char *s);
+gboolean utf8_str_eq(char *a, char *b, int len);
 
 void get_gcin_dir(char *tt);
 Atom get_gcin_atom(Display *dpy);

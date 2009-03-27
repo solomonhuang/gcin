@@ -4,7 +4,6 @@ static GtkWidget *gwin_pho;
 static GtkWidget *frame;
 Window xwin_pho;
 static GtkWidget *label_pho_sele;
-static GtkWidget *button_pho;
 static GtkWidget *labels_pho[4];
 static GtkWidget *label_key_codes;
 
@@ -147,9 +146,20 @@ void hide_win_pho()
 }
 
 
+void init_tab_pho();
+void get_win_gtab_geom();
+
 void init_gtab_pho_query_win()
 {
   init_tab_pho();
   get_win_gtab_geom();
   move_win_pho(win_x, win_y + win_yl);
+}
+
+char *get_full_str();
+
+void win_pho_disp_half_full()
+{
+  gtk_label_set_text(GTK_LABEL(labels_pho[0]), get_full_str());
+  minimize_win_pho();
 }

@@ -200,10 +200,10 @@ void load_IC(IC *rec)
      current_CS = cs;
 
    if (win == focus_win) {
-     if (!cs->b_im_enabled)
+     if (cs->im_state == GCIN_STATE_DISABLED)
        hide_in_win(cs);
      else
-     if (cs->b_im_enabled)
+     if (cs->im_state != GCIN_STATE_DISABLED)
        show_in_win(cs);
    }
 #endif
@@ -215,7 +215,7 @@ void load_IC(IC *rec)
 #endif
    } else
    if (cs->input_style & InputStyleOverSpot) {
-     if (cs->b_im_enabled)
+     if (cs->im_state != GCIN_STATE_DISABLED)
        move_IC_in_win(cs);
    } else
    if (cs->input_style & InputStyleRoot) {

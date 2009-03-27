@@ -363,7 +363,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
       create_win_sym();
       break;
     case 2:
-      inmd_switch_popup_handler(widget, event);
+      inmd_switch_popup_handler(widget, (GdkEvent *)event);
       break;
     case 3:
       exec_gcin_setup();
@@ -614,4 +614,13 @@ void show_button_pho(gboolean bshow)
     gtk_widget_hide(button_pho);
     compact_win0();
   }
+}
+
+char *get_full_str();
+
+void win_tsin_disp_half_full()
+{
+  gtk_label_set_text(GTK_LABEL(labels_pho[0]), get_full_str());
+
+  compact_win0();
 }

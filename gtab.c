@@ -3,11 +3,11 @@
 */
 
 #include <sys/stat.h>
+#include <regex.h>
 #include "gcin.h"
 #include "gtab.h"
 #include "pho.h"
 #include "gcin-conf.h"
-#include <regex.h>
 
 typedef enum {
   SAME_PHO_QUERY_none = 0,
@@ -851,7 +851,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (same_pho_query_state == SAME_PHO_QUERY_pho_select)
     return feedkey_pho(key);
-
+#if 0
   if (current_CS->b_half_full_char) {
      char *s = half_char_to_full_char(key);
      if (!s)
@@ -862,7 +862,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
      send_text(tt);
      return 1;
   }
-
+#endif
   if ((kbstate & ShiftMask) && key!='*' && key!='?') {
     char tt[2];
 
