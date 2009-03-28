@@ -333,10 +333,14 @@ void toggle_im_enabled(u_int kev_state)
         init_in_method(default_input_method);
       }
 
-
-      update_in_win_pos();
-
+      reset_current_in_win_xy();
+#if 1
       show_in_win(current_CS);
+      update_in_win_pos();
+#else
+      update_in_win_pos();
+      show_in_win(current_CS);
+#endif
     }
 }
 
@@ -549,7 +553,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
 
   if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
-    if (keysym == 'g') {
+    if (keysym == 'g' || keysym == 'r') {
       send_output_buffer_bak();
       return TRUE;
     }
@@ -663,8 +667,16 @@ int gcin_FocusIn(ClientState *cs)
 
   if (win == focus_win) {
     if (cs->im_state != GCIN_STATE_DISABLED) {
+#if 0
+      /* something changed in gtk or X11, it is not possible to move window if the window
+         is not visible
+       */
       move_IC_in_win(cs);
       show_in_win(cs);
+#else
+      show_in_win(cs);
+      move_IC_in_win(cs);
+#endif
     } else
       hide_in_win(cs);
   }

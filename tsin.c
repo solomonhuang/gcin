@@ -1594,8 +1594,14 @@ llll1:
      jj=0;
      kk=1;
 llll2:
-     if (ctyp==3)
+     if (ctyp==3) {
        ityp3_pho=1;  /* last key is entered */
+
+       if (!tsin_tone_char_input && !typ_pho[0] && !typ_pho[1] && !typ_pho[2]) {
+         clrin_pho();
+         return TRUE;
+       }
+     }
 
      disp_in_area_pho_tsin();
 

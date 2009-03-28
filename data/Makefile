@@ -5,7 +5,7 @@ include ../config.mak
 DATA=pho.tab tsin.idx \
      cj.gtab ar30.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
-     ibm.kbm tsin hsu.kbm pho-huge.tab simplex.gtab nippon.gtab greek.gtab
+     ibm.kbm tsin hsu.kbm pho-huge.tab simplex.gtab kana-nippon.gtab greek.gtab
 DATAKEEP=symbol-table gtab.list phrase.table
 
 all:	$(DATA)

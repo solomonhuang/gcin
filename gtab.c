@@ -1271,8 +1271,10 @@ YYYY:
         invalid_spc = TRUE;
 //        dbg("invalid_spc\n");
       }
-      else
+      else {
+        seltab[0][0]=0;
         ClrSelArea();
+      }
     } else {
       if (gtab_dup_select_bell)
         bell();
@@ -1381,6 +1383,7 @@ next_pg:
 
       if (gtab_invalid_key_in) {
         invalid_spc = TRUE;
+        dbg("uuuu\n");
         return TRUE;
       }
       goto refill;

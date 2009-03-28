@@ -21,6 +21,7 @@ static GtkWidget *check_button_phrase_pre_select,
                  *check_button_phonetic_char_dynamic_sequence,
                  *check_button_pho_simple_win,
                  *check_button_phonetic_huge_tab,
+                 *check_button_tsin_tone_char_input,
                  *spinner_tsin_buffer_size;
 
 
@@ -75,6 +76,9 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(PHONETIC_HUGE_TAB,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_huge_tab)));
+
+  save_gcin_conf_int(TSIN_TONE_CHAR_INPUT,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input)));
 
   tsin_buffer_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_buffer_size));
   save_gcin_conf_int(TSIN_BUFFER_SIZE, tsin_buffer_size);
@@ -359,6 +363,16 @@ void create_kbm_window()
   gtk_widget_set_size_request(da, 16, 2);
   gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
 
+
+  GtkWidget *frame_tsin_tone_char_input = gtk_frame_new("詞音輸入注音聲調符號");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_tone_char_input , TRUE, TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_tone_char_input), 1);
+  check_button_tsin_tone_char_input = gtk_check_button_new ();
+  gtk_container_add (GTK_CONTAINER (frame_tsin_tone_char_input),
+      check_button_tsin_tone_char_input);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input),
+     tsin_tone_char_input);
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

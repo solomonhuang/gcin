@@ -69,7 +69,7 @@
 /* Most machines will be happy with int or void.  IRIX requires '...' */
 /* #undef SIGNAL_ARG_TYPE */
 
-#define GETTEXT_PACKAGE "gtk20"
+#define GETTEXT_PACKAGE "gcin"
 
 /* #undef PACKAGE */
 /* #undef VERSION */

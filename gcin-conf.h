@@ -33,6 +33,7 @@
 #define TSIN_SPACE_OPT "tsin-space-opt"
 #define TSIN_BUFFER_SIZE "tsin-buffer-size"
 #define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
+#define TSIN_TONE_CHAR_INPUT "tsin-tone-char-input"
 
 
 #define PHONETIC_KEYBOARD "phonetic-keyboard"
@@ -64,7 +65,7 @@ extern int tsin_chinese_english_toggle_key;
 
 extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;
-extern int tsin_space_opt;
+extern int tsin_space_opt, tsin_tone_char_input;
 
 extern char tsin_phrase_line_color[];
 

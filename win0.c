@@ -577,11 +577,12 @@ void show_win0()
   create_win0();
   create_win0_gui();
   set_currenet_IC_pin_image_pin();
-
+#if 0
   if (current_CS) {
     if (current_CS->fixed_pos)
       move_win0(0,0);
   }
+#endif
 #if 0
   else
     dbg("show_win0 current_CS is null");
