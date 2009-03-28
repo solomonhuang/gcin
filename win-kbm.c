@@ -186,6 +186,10 @@ void show_win_kbm()
   move_win_kbm();
 }
 
+static char   shift_chars[]="~!@#$%^&*()_+{}|:\"<>?";
+static char shift_chars_o[]="`1234567890-=[]\\;',./";
+
+
 #include "pho.h"
 
 static void set_kbm_key(KeySym keysym, char *str)
@@ -194,8 +198,13 @@ static void set_kbm_key(KeySym keysym, char *str)
   for(i=0;i<keysN;i++) {
     int j;
     for(j=0;j<COLN;j++) {
+      char *p;
       if (keysym >='A' && keysym<='Z')
         keysym += 0x20;
+      else
+      if (p=strchr(shift_chars, keysym)) {
+        keysym = shift_chars_o[p - shift_chars];
+      }
 
       if (keys[i][j].keysym!=keysym)
         continue;
@@ -233,6 +242,7 @@ void update_win_kbm()
     return;
 
   clear_kbm();
+
   int i;
   switch (current_CS->in_method) {
     case 3:
@@ -261,7 +271,9 @@ void update_win_kbm()
     default:
       if (!cur_inmd || !cur_inmd->DefChars)
         return;
-      for(i=0; i < 128; i++) {
+
+      char *keyname = &cur_inmd->keyname[1 * CH_SZ];
+      for(i=127; i > 0; i--) {
         char k=cur_inmd->keymap[i];
         if (!k)
           continue;
@@ -270,12 +282,12 @@ void update_win_kbm()
         if (!keyname)
           continue;
 
-
         char tt[64];
 
         if (keyname[0] & 128)
           utf8cpy(tt, keyname);
         else {
+          tt[1]=0;
           memcpy(tt, keyname, 2);
           tt[2]=0;
         }
@@ -293,5 +305,7 @@ void update_win_kbm()
 
 void hide_win_kbm()
 {
+  if (!gwin_kbm)
+    return;
   gtk_widget_hide(gwin_kbm);
 }

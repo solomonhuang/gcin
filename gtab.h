@@ -27,7 +27,8 @@ typedef struct {
 
 
 enum {
-  FLAG_KEEP_KEY_CASE=1
+  FLAG_KEEP_KEY_CASE=1,
+  FLAG_GTAB_SYM_KBM=2, // auto close, auto switch to default input method
 };
 
 struct TableHead {
@@ -44,7 +45,7 @@ struct TableHead {
 
   union {
     struct {
-      char endkey[64];
+      char endkey[99];
       char keybits;
     };
 
@@ -53,14 +54,14 @@ struct TableHead {
 };
 
 
-#define KeyBits (6)
+#define KeyBits (cur_inmd->keybits)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
 #define MAX_GTAB_NUM_KEY (16)
 #define MAX_SELKEY 16
 
-#define MAX_TAB_KEY_NUM 5
-#define MAX_TAB_KEY_NUM64 10
+#define MAX_TAB_KEY_NUM (32/KeyBits)
+#define MAX_TAB_KEY_NUM64 (64/KeyBits)
 
 
 typedef u_int gtab_idx1_t;
@@ -77,7 +78,7 @@ typedef struct {
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:5  changjei:5 */
   int DefChars;           /* defined chars */
-  u_char keyname[(MAX_GTAB_KEYS+2) * CH_SZ]; // including ?*
+  u_char *keyname; // including ?*
   u_char *keyname_lookup; // used by boshiamy only
   gtab_idx1_t *idx1;
   u_char *keymap;
@@ -94,7 +95,7 @@ typedef struct {
   char *endkey;       // only pinin/ar30 use it
   GTAB_space_pressed_E space_style;
   char *icon;
-  u_char kmask, keybits;
+  u_char kmask, keybits, last_k_bitn;
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
@@ -103,7 +104,7 @@ u_int64_t CONVT2(INMD *inmd, int i);
 extern INMD *cur_inmd;
 void load_gtab_list();
 
-#define LAST_K_bitN (cur_inmd->key64 ? 54:24)
+#define LAST_K_bitN (cur_inmd->last_k_bitn)
 
 #define GTAB_LIST "gtab.list"
 

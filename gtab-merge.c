@@ -191,6 +191,7 @@ int main(int argc, char **argv)
   fread(&th,1, sizeof(th), fr);
   KeyNum = th.KeyS;
   dbg("keys %d\n",KeyNum);
+  cur_inmd->keybits = th.keybits;
 
   fread(keymap, 1, th.KeyS, fr);
   fread(kname, CH_SZ, th.KeyS, fr);
@@ -269,7 +270,7 @@ int main(int argc, char **argv)
         cmd[i] : mtolower(cmd[i]);
 
       k=kno[key];
-      kk|=(u_int64_t)k << ( LAST_K_bitN - i*6);
+      kk|=(u_int64_t)k << ( LAST_K_bitN - i*cur_inmd->keybits);
     }
 
     if (key64) {

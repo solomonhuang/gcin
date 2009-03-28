@@ -327,7 +327,7 @@ void cb_trad_sim_toggle()
 #endif
 }
 void execute_message(char *message);
-static int b_show_win_kbm=0;
+int b_show_win_kbm=0;
 void kbm_toggle()
 {
   win_kbm_inited = 1;

@@ -17,6 +17,7 @@
 
 FILE *fr, *fw;
 int lineno;
+char tt[512];
 
 
 char *skip_spc(char *s)
@@ -47,9 +48,10 @@ void del_nl_spc(char *s)
 }
 
 
-void get_line(char *tt)
+void get_line()
 {
   while (!feof(fr)) {
+    bzero(tt, sizeof(tt));
     fgets((char *)tt, 512, fr);
     lineno++;
 
@@ -64,11 +66,12 @@ void get_line(char *tt)
   }
 }
 
-void cmd_arg(char *s, char **cmd, char **arg)
+void cmd_arg(u_char **cmd, u_char **arg)
 {
   char *t;
 
-  get_line(s);
+  get_line();
+  char *s=tt;
 
   if (!*s) {
     *cmd=*arg=s;
@@ -155,12 +158,11 @@ int main(int argc, char **argv)
   char fname[64];
   char fname_cin[64];
   char fname_tab[64];
-  char tt[512];
   u_char *cmd, *arg;
   struct TableHead th;
   int KeyNum;
   char kname[128][CH_SZ];
-  char keymap[64];
+  char keymap[128];
   int chno;
   gtab_idx1_t idx1[256];
   char def1[256];
@@ -204,10 +206,10 @@ int main(int argc, char **argv)
   bzero(itar64,sizeof(itar64));
   bzero(itout64,sizeof(itout64));
 
-  cmd_arg(tt, &cmd, &arg);
+  cmd_arg(&cmd, &arg);
   if (sequ(cmd, "%gen_inp") || sequ(cmd, "%encoding")) {
     dbg("skip gen_inp\n");
-    cmd_arg(tt, &cmd, &arg);
+    cmd_arg(&cmd, &arg);
   }
 
   if (!sequ(cmd,"%ename") || !(*arg) )
@@ -215,40 +217,46 @@ int main(int argc, char **argv)
   arg[15]=0;
 //  strcpy(th.ename,arg);
 
-  cmd_arg(tt, &cmd, &arg);
+  cmd_arg(&cmd, &arg);
   if (!(sequ(cmd,"%prompt") || sequ(cmd,"%cname")) || !(*arg) )
     p_err("%d:  %%prompt prompt_name  expected", lineno);
   strncpy(th.cname, arg, MAX_CNAME);
   printf("cname %s\n", th.cname);
 
-  cmd_arg(tt,&cmd, &arg);
+  cmd_arg(&cmd, &arg);
   if (!sequ(cmd,"%selkey") || !(*arg) )
     p_err("%d:  %%selkey select_key_list expected", lineno);
   strcpy(th.selkey,arg);
 
-  cmd_arg(tt,&cmd, &arg);
+  cmd_arg(&cmd, &arg);
   if (!sequ(cmd,"%dupsel") || !(*arg) ) {
     th.M_DUP_SEL = strlen(th.selkey);
   }
   else {
     th.M_DUP_SEL=atoi(arg);
-    cmd_arg(tt,&cmd, &arg);
+    cmd_arg(&cmd, &arg);
   }
 
   if (sequ(cmd,"%endkey")) {
     strcpy(th.endkey, arg);
-    cmd_arg(tt,&cmd, &arg);
+    cmd_arg(&cmd, &arg);
   }
 
   if (sequ(cmd,"%space_style")) {
     th.space_style = atoi(arg);
-    cmd_arg(tt,&cmd, &arg);
+    cmd_arg(&cmd, &arg);
   }
 
   if (sequ(cmd,"%keep_key_case")) {
     th.flag |= FLAG_KEEP_KEY_CASE;
-    cmd_arg(tt,&cmd, &arg);
+    cmd_arg(&cmd, &arg);
   }
+
+  if (sequ(cmd,"%symbol_kbm")) {
+    th.flag |= FLAG_GTAB_SYM_KBM;
+    cmd_arg(&cmd, &arg);
+  }
+
 
   if (!sequ(cmd,"%keyname") || !sequ(arg,"begin")) {
     p_err("%d:  %%keyname begin   expected, instead of %s %s", lineno, cmd, arg);
@@ -257,7 +265,7 @@ int main(int argc, char **argv)
   for(KeyNum=0;;) {
     char k;
 
-    cmd_arg(tt,&cmd, &arg);
+    cmd_arg(&cmd, &arg);
     if (sequ(cmd,"%keyname")) break;
     if (BITON(th.flag, FLAG_KEEP_KEY_CASE))
       k=cmd[0];
@@ -276,7 +284,7 @@ int main(int argc, char **argv)
   KeyNum++;
   th.KeyS=KeyNum;    /* include space */
 
-  cmd_arg(tt,&cmd, &arg);
+  cmd_arg(&cmd, &arg);
 
   if (sequ(cmd,"%quick") && sequ(arg,"begin")) {
     dbg(".. quick keys defined\n");
@@ -284,7 +292,7 @@ int main(int argc, char **argv)
       char k;
       int len;
 
-      cmd_arg(tt,&cmd, &arg);
+      cmd_arg(&cmd, &arg);
       if (sequ(cmd,"%quick")) break;
       k=kno[mtolower(cmd[0])]-1;
 
@@ -323,7 +331,7 @@ int main(int argc, char **argv)
   while (!feof(fr)) {
     int len;
 
-    cmd_arg(tt,&cmd,&arg);
+    cmd_arg(&cmd,&arg);
     if (!cmd[0] || !arg[0])
       continue;
 
@@ -352,6 +360,17 @@ int main(int argc, char **argv)
   cur_inmd->tbl64 = itout64;
   cur_inmd->tbl = itout;
 
+  if (KeyNum < 64)
+    cur_inmd->keybits = 6;
+  else
+    cur_inmd->keybits = 7;
+
+  dbg("KeyNum:%d keybits:%d\n", KeyNum, cur_inmd->keybits);
+
+  th.keybits = cur_inmd->keybits;
+  cur_inmd->last_k_bitn = (((cur_inmd->key64 ? 64:32) / cur_inmd->keybits) - 1) * cur_inmd->keybits;
+
+
   puts("char def");
   chno=0;
   while (!feof(fr)) {
@@ -359,7 +378,7 @@ int main(int argc, char **argv)
     u_int64_t kk;
     int k;
 
-    cmd_arg(tt, &cmd, &arg);
+    cmd_arg(&cmd, &arg);
     if (!cmd[0] || !arg[0])
       continue;
 
@@ -389,7 +408,7 @@ int main(int argc, char **argv)
       if (!k)
         p_err("%d: key undefined in keyname '%c'\n", lineno, cmd[i]);
 
-      kk|=(u_int64_t)k << ( LAST_K_bitN - i*6);
+      kk|=(u_int64_t)k << ( LAST_K_bitN - i*th.keybits);
     }
 
     if (key64) {
@@ -499,6 +518,7 @@ int main(int argc, char **argv)
   fwrite(&th,1,sizeof(th),fw);
   fwrite(keymap, 1, KeyNum, fw);
   fwrite(kname, CH_SZ, KeyNum, fw);
+
   fwrite(idx1, sizeof(gtab_idx1_t), KeyNum+1, fw);
 
   if (key64) {

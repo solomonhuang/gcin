@@ -11,7 +11,7 @@ static int current_gtab_vertical_select;
 GtkWidget *gwin_gtab;
 static GtkWidget *top_bin;
 static GtkWidget *label_full, *label_gtab_sele;
-static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64];
+static GtkWidget *labels_gtab[10];
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
 static GtkWidget *image_pin;

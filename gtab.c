@@ -25,7 +25,7 @@ INMD *cur_inmd;
 static gboolean last_full, more_pg, wild_mode, spc_pressed, invalid_spc;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
 static short defselN, exa_match;
-static KeySym inch[MAX_TAB_KEY_NUM64];
+static KeySym inch[10];
 static int ci;
 static int last_idx, pg_idx;
 static int wild_page;
@@ -347,6 +347,8 @@ time_t file_mtime(char *fname)
   return st.st_mtime;
 }
 
+static char WILD_QUES, WILD_STAR;
+
 void init_gtab(int inmdno)
 {
   FILE *fp;
@@ -427,6 +429,12 @@ void init_gtab(int inmdno)
 
   fread(&th,1,sizeof(th),fp);
 
+  if (th.keybits<6 || th.keybits>7)
+    th.keybits = 6;
+
+  inp->keybits = th.keybits;
+  dbg("keybits:%d\n", th.keybits);
+
 #if NEED_SWAP
   swap_byte_4(&th.version);
   swap_byte_4(&th.flag);
@@ -448,19 +456,28 @@ void init_gtab(int inmdno)
   free(inp->endkey);
   inp->endkey = strdup(th.endkey);
 
+  if (th.flag & FLAG_GTAB_SYM_KBM)
+    dbg("symbol kbm\n");
+
   fread(ttt, 1, th.KeyS, fp);
   dbg("KeyS %d\n", th.KeyS);
 
+  if (inp->keyname)
+    free(inp->keyname);
+  inp->keyname = tmalloc(char, (th.KeyS + 3) * CH_SZ);
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
-#define WILD_QUES 64
-#define WILD_STAR 65
+  WILD_QUES=th.KeyS+1;
+  WILD_STAR=th.KeyS+2;
   utf8cpy(&inp->keyname[WILD_QUES*CH_SZ], "？");  /* for wild card */
   utf8cpy(&inp->keyname[WILD_STAR*CH_SZ], "＊");
+
+  char *keyname = &inp->keyname[1 * CH_SZ];
+
 
   // for boshiamy
   extern u_char *fullchar[];
   gboolean all_full_ascii = TRUE;
-  char keyname_lookup[MAX_GTAB_KEYS];
+  char keyname_lookup[256];
 
   bzero(keyname_lookup, sizeof(keyname_lookup));
   for(i=1; i < th.KeyS; i++) {
@@ -511,18 +528,22 @@ void init_gtab(int inmdno)
   free(inp->keymap);
   inp->keymap = tzmalloc(char, 128);
 
+  if (!(th.flag & FLAG_GTAB_SYM_KBM)) {
+    inp->keymap[(int)'?']=WILD_QUES;
+    if (!strchr(th.selkey, '*'))
+      inp->keymap[(int)'*']=WILD_STAR;
+  }
+
   free(inp->keycol);
   inp->keycol=tzmalloc(char, th.KeyS+1);
   for(i=0;i<th.KeyS;i++) {
     inp->keymap[(int)ttt[i]]=i;
+//    dbg("%d %d %c\n", i, inp->keymap[(int)ttt[i]], ttt[i]);
     if (!BITON(inp->flag, FLAG_KEEP_KEY_CASE))
       inp->keymap[toupper(ttt[i])]=i;
     inp->keycol[i]=key_col(ttt[i]);
   }
 
-  inp->keymap[(int)'?']=WILD_QUES;
-  if (!strchr(th.selkey, '*'))
-    inp->keymap[(int)'*']=WILD_STAR;
 
   free(inp->idx1);
   inp->idx1 = tmalloc(gtab_idx1_t, th.KeyS+1);
@@ -617,12 +638,9 @@ void init_gtab(int inmdno)
   else
     _gtab_space_auto_first = gtab_space_auto_first;
 
-
-  if (th.keybits==0)
-    th.keybits = 6;
-
-  inp->keybits = th.keybits;
+  inp->last_k_bitn = (((cur_inmd->key64 ? 64:32) / inp->keybits) - 1) * inp->keybits;
   inp->kmask = (1 << th.keybits) - 1;
+
 
 #if 0
   for(i='A'; i < 127; i++)
@@ -658,11 +676,18 @@ static void putstr_inp(u_char *p)
 
   char_play(p);
 
+  int to_tsin = (cur_inmd->flag & FLAG_GTAB_SYM_KBM) && default_input_method==6;
+
   if (utf8_str_N(p) > 1  || p[0] < 128) {
     if (gtab_disp_key_codes && !gtab_hide_row2 || wild_mode)
       lookup_gtabn(p, NULL);
-
-    send_text(p);
+#if USE_TSIN
+    if (to_tsin) {
+      add_to_tsin_buf_str(p);
+    }
+    else
+#endif
+      send_text(p);
   }
   else {
     if (same_pho_query_state == SAME_PHO_QUERY_gtab_input) {
@@ -677,7 +702,10 @@ static void putstr_inp(u_char *p)
     if (gtab_disp_key_codes && !gtab_hide_row2 || wild_mode)
       lookup_gtab(p);
 
-    sendkey_b5(p);
+    if (to_tsin)
+      add_to_tsin_buf_str(p);
+    else
+      sendkey_b5(p);
 
     if (gtab_auto_select_by_phrase && !(_gtab_space_auto_first & GTAB_space_auto_first_any)) {
       if (part_matched_len < strlen(match_phrase) &&
@@ -718,6 +746,13 @@ static void putstr_inp(u_char *p)
 
   ClrIn();
   ClrSelArea();
+
+  if ((cur_inmd->flag & FLAG_GTAB_SYM_KBM)) {
+    extern int win_kbm_inited, b_show_win_kbm;
+    init_in_method(default_input_method);
+    if (win_kbm_inited && !b_show_win_kbm)
+      hide_win_kbm();
+  }
 }
 
 
@@ -770,6 +805,15 @@ static u_int vmask[]=
  (0x3f<<24)|(0x3f<<18)|(0x3f<<12)|(0x3f<<6)|0x3f
 };
 
+
+static u_int vmask_7[]=
+{ 0,
+ (0x7f<<21),
+ (0x7f<<21)|(0x7f<<14),
+ (0x7f<<21)|(0x7f<<14)|(0x7f<<7),
+ (0x7f<<21)|(0x7f<<14)|(0x7f<<7)|0x7f,
+};
+
 #define KKK ((u_int64_t)0x3f)
 
 
@@ -786,6 +830,23 @@ static u_int64_t vmask64[]=
   (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18)|(KKK<<12)|(KKK<<6),
   (KKK<<54)|(KKK<<48)|(KKK<<42)|(KKK<<36)|(KKK<<30)|(KKK<<24)|(KKK<<18)|(KKK<<12)|(KKK<<6)|KKK
 };
+
+
+#define KKK7 ((u_int64_t)0x7f)
+
+static u_int64_t vmask64_7[]=
+{ 0,
+ (KKK7<<56),
+ (KKK7<<56)|(KKK7<<49),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42)|(KKK7<<35),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42)|(KKK7<<35)|(KKK7<<28),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42)|(KKK7<<35)|(KKK7<<28)|(KKK7<<21),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42)|(KKK7<<35)|(KKK7<<28)|(KKK7<<21)|(KKK7<<14),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42)|(KKK7<<35)|(KKK7<<28)|(KKK7<<21)|(KKK7<<14)|(KKK7<<7),
+ (KKK7<<56)|(KKK7<<49)|(KKK7<<42)|(KKK7<<35)|(KKK7<<28)|(KKK7<<21)|(KKK7<<14)|(KKK7<<7)|KKK7,
+};
+
 
 #define KEY_N (cur_inmd->max_keyN)
 
@@ -820,7 +881,7 @@ gboolean cmp_inmd_idx(regex_t *reg, int idx)
 
   int i;
   for(i=0; i < KEY_N; i++) {
-    char c = (kk >> (LAST_K_bitN - i*6)) & cur_inmd->kmask;
+    char c = (kk >> (LAST_K_bitN - i*cur_inmd->keybits)) & cur_inmd->kmask;
     if (!c)
       break;
     ts[tsN++] = c + '0';
@@ -1356,10 +1417,12 @@ direct_select:
       if (!gtab_que_wild_card)
         return 0;
     case '*':
-      if (cur_inmd->keymap[key] || ptr_selkey(key))
+      inkey=cur_inmd->keymap[key];
+      if ((inkey && (inkey!=WILD_STAR && inkey!=WILD_QUES)) || ptr_selkey(key)) {
+        dbg("%d %d\n", inkey, WILD_STAR);
         goto next;
+      }
       if (ci< cur_inmd->MaxPress) {
-        inkey=cur_inmd->keymap[key];
         inch[ci++]=inkey;
         DispInArea();
 
@@ -1509,7 +1572,7 @@ next:
 
       if (inkey) {
         for(i=0; i < MAX_TAB_KEY_NUM64; i++)
-          if (inch[i]>60) {
+          if (inch[i]>=WILD_QUES) {
             DispInArea();
             if (ci==cur_inmd->MaxPress) {
               wild_mode=1;
@@ -1560,7 +1623,11 @@ next:
     S1=cur_inmd->idx1[inch[0]];
 
   int oE1=cur_inmd->idx1[inch[0]+1];
-  u_int64_t vmaskci = cur_inmd->key64 ? vmask64[ci]:vmask[ci];
+  u_int64_t vmaskci;
+  if (cur_inmd->keybits==6)
+    vmaskci = cur_inmd->key64 ? vmask64[ci]:vmask[ci];
+  else
+    vmaskci = cur_inmd->key64 ? vmask64_7[ci]:vmask_7[ci];
 
   while ((CONVT2(cur_inmd, S1) & vmaskci) != val &&
           CONVT2(cur_inmd, S1) < val &&  S1<oE1)

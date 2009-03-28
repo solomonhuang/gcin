@@ -383,28 +383,24 @@ static void dump_tsidx_all()
 void load_tab_pho_file();
 void show_win0();
 
-void init_tab_pp()
+void init_tab_pp(gboolean init)
 {
   if (!ch_pho)
     load_tab_pho_file();
 
-  if (phcount && gwin0) {
-disp_prom:
-    show_stat();
-    clear_ch_buf_sel_area();
-    if (!gcin_pop_up_win)
-      show_win0();
-
-    return;
+  if (!phcount) {
+    load_tsin_db();
+    if (init)
+      clr_ch_buf();
+//    show_win0();
   }
 
-  load_tsin_db();
+  show_stat();
+  if (init)
+    clear_ch_buf_sel_area();
 
-  clr_ch_buf();
-  show_win0();
-
-//  dump_tsidx_all();
-  goto disp_prom;
+  if (!gcin_pop_up_win)
+    show_win0();
 }
 
 gboolean save_phrase_to_db2(CHPHO *chph, int len);

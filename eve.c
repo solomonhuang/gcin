@@ -621,6 +621,7 @@ void init_inter_code();
 void init_tab_pp();
 void init_tab_pho();
 
+
 void check_CS()
 {
   if (!current_CS) {
@@ -632,10 +633,14 @@ void check_CS()
     temp_CS = *current_CS;
 }
 
+extern int b_show_win_kbm;
 
 void load_tray_icon();
+extern gboolean win_sym_enabled;
 gboolean init_in_method(int in_no)
 {
+  gboolean init_im = !(cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM));
+
   if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
     return FALSE;
 
@@ -643,20 +648,20 @@ gboolean init_in_method(int in_no)
 
 
   if (current_CS->in_method != in_no) {
-    if (current_CS->in_method == 6) {
+    if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM)) {
+      if (current_CS->in_method == 6) {
 #if USE_TSIN
       flush_tsin_buffer();
 #endif
+      }
+
+      hide_in_win(current_CS);
     }
-
-    hide_in_win(current_CS);
-
   }
 
   reset_current_in_win_xy();
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
-
 
   switch (in_no) {
     case 3:
@@ -666,7 +671,7 @@ gboolean init_in_method(int in_no)
 #if USE_TSIN
     case 6:
       current_CS->in_method = in_no;
-      init_tab_pp();
+      init_tab_pp(init_im);
       break;
 #endif
     case 10:
@@ -678,7 +683,12 @@ gboolean init_in_method(int in_no)
       if (!inmd[in_no].DefChars)
         return FALSE;
       current_CS->in_method = in_no;
-      show_win_gtab();
+      if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM))
+        show_win_gtab();
+      else {
+        win_kbm_inited = 1;
+        show_win_kbm();
+      }
       break;
   }
 
@@ -816,7 +826,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     }
 
     if (keysym == ',') {
-      extern gboolean win_sym_enabled;
 
       if (current_CS->im_state == GCIN_STATE_CHINESE) {
         if (!win_is_visible())
