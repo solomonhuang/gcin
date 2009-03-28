@@ -12,7 +12,7 @@ GCIN_SO= gcin1.so gcin2.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o \
-     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o tsin-char.o
+     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o
@@ -161,7 +161,8 @@ gcin-message:	$(OBJS_gcin_message)
 pin-juyin:	$(OBJS_pin_juyin)
 	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
 
-gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico
+gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico \
+win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico tsin-char.o
 gcin1.so: $(gcin1_so)
 	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
 

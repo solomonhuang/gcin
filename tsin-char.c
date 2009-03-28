@@ -26,7 +26,7 @@ static CH_ENT *find(char *ch)
 
   u8cpy(t, ch);
   int bottom = 0;
-  int top = chsN;
+  int top = chsN-1;
 
   do {
     int mid = (bottom + top) /2;

@@ -1290,6 +1290,7 @@ shift_proc:
       if (gtab_buf_select) {
         gtab_buf_select = 0;
         ClrSelArea();
+        return 1;
       }
 
       close_gtab_pho_win();
