@@ -315,7 +315,7 @@ int main(int argc, char **argv)
   dpy = GDK_DISPLAY();
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size(GTK_WINDOW (mainwin), 640, 220);
+  gtk_window_set_default_size(GTK_WINDOW (mainwin), 640, 520);
   gtk_window_set_icon_from_file(GTK_WINDOW(mainwin), SYS_ICON_DIR"/gcin.png", NULL);
 
   GtkWidget *sw = gtk_scrolled_window_new (NULL, NULL);
@@ -346,15 +346,21 @@ int main(int argc, char **argv)
   hbox_buttons = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_buttons, FALSE, FALSE, 0);
 
-  GtkWidget *button_parse = gtk_button_new_with_label("標示詞");
+  GtkWidget *button_parse = gtk_button_new_with_label("標示已知詞");
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_parse, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_parse), "clicked",
      G_CALLBACK (cb_button_parse), NULL);
 
   GtkWidget *button_add = gtk_button_new_with_label("新增詞");
-  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_add, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_add, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_add), "clicked",
      G_CALLBACK (cb_button_add), NULL);
+
+
+  GtkWidget *button_quit = gtk_button_new_with_label("離開 tslearn");
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_quit, FALSE, FALSE, 0);
+  g_signal_connect (G_OBJECT (button_quit), "clicked",
+     G_CALLBACK (do_exit), NULL);
 
 
   g_signal_connect (G_OBJECT (mainwin), "delete_event",

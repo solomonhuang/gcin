@@ -377,7 +377,8 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     if (context_xim->is_mozilla && (rstr || !result))
       add_cursor_timeout(context_xim);
 #endif
-    if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f) {
+    if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f
+        && !(xevent.state & (Mod1Mask|ControlMask))) {
       rstr = (char *)malloc(num_bytes + 1);
       memcpy(rstr, buffer, num_bytes);
       rstr[num_bytes] = 0;

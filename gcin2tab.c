@@ -223,11 +223,11 @@ int main(int argc, char **argv)
 
   bzero(itar,sizeof(itar));
   bzero(itout,sizeof(itout));
-  bzero(itar64,sizeof(itar));
+  bzero(itar64,sizeof(itar64));
   bzero(itout64,sizeof(itout64));
 
   cmd_arg(tt, &cmd, &arg);
-  if (sequ(cmd, "%gen_inp")) {
+  if (sequ(cmd, "%gen_inp") || sequ(cmd, "%encoding")) {
     dbg("skip gen_inp\n");
     cmd_arg(tt, &cmd, &arg);
   }

@@ -33,4 +33,4 @@ install:
                 install -m 755 libqgcin.so $(IMMODULES); \
 	fi
 clean:
-	rm -f $(OBJS) libqgcin.so *~ core.*
+	rm -f $(OBJS) libqgcin.so *~ core.* *moc*.cpp

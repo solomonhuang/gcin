@@ -484,7 +484,6 @@ int main(int argc, char **argv)
     lc_utf8 = "zh_TW.UTF-8";
   }
 
-
   xim_arr[0].server_locale = lc;
   char *xim_server_name = get_gcin_xim_name();
 

@@ -538,7 +538,10 @@ mozilla firefox 中 coredump，想看是不是 gtk-im module 造成的。
     gdb /usr/lib/mozilla-firefox-1.0.7/mozilla-firefox-bin core.xxxx
     這邊這個可執行檔是要真正的那一個，不是 shell script。 core.xxxx 是 coredump 的 file。
     這樣就可以看到 coredump 在那邊發生。
+----------------------------------------------------------------------
+與 caleb 討論，所想到如何避免 flash player plugin open XIM，由於 flash player XIM 寫的有問題，有時候會造成 firefox coredump。gcin 是可以 compile 成不支援 XIM，但有時候又需要用(wine, rxvt-unicode)
 
+其實很簡單，修改 /usr/bin/mozilla-firefox or /usr/bin/firefox 執行的 script 
+加入  unset XMODIFIERS。原理是 gcin 如果沒有設定 XMODIFIERS 內定的 XIM name 就是 gcin，
+把 XMODIFIERS unset 後，gcin 用 GTK_IM_MODULE=gcin 仍然可以輸入，但是 XIM 需要 XMODIFIERS 才能，這樣就達到防止 flash player open XIM。
 
-
-   

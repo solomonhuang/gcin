@@ -799,7 +799,8 @@ static void cb_gb_translate_toggle()
 
 static void cb_juying_learn()
 {
-  system(GCIN_BIN_DIR"/juyin-learn&");
+  system(GCIN_BIN_DIR"/juyin-learn &");
+  exit(0);
 }
 
 
