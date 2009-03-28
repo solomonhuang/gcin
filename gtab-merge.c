@@ -201,14 +201,14 @@ int main(int argc, char **argv)
     kno[keymap[i]] = i;
   }
 
-  if (th.MaxPress > 5) {
-    inp->max_keyN = 10;
-    key64 = inp->key64 = TRUE;
+  if (th.MaxPress*th.keybits > 32) {
+    inp->max_keyN = 64 / th.keybits;
+    inp->key64 = TRUE;
     dbg("it's a 64-bit .gtab\n");
   } else {
-    inp->max_keyN = 5;
-    key64 = inp->key64 = FALSE;
+    inp->max_keyN = 32 / th.keybits;
   }
+
 
   for(i=0; i < th.DefC; i++) {
     ITEM it;

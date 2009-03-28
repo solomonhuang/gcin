@@ -445,12 +445,12 @@ void init_gtab(int inmdno)
   swap_byte_4(&th.DefC);
 #endif
 
-  if (th.MaxPress > 5) {
-    inp->max_keyN = 10;
+  if (th.MaxPress*th.keybits > 32) {
+    inp->max_keyN = 64 / th.keybits;
     inp->key64 = TRUE;
     dbg("it's a 64-bit .gtab\n");
   } else {
-    inp->max_keyN = 5;
+    inp->max_keyN = 32 / th.keybits;
   }
 
   free(inp->endkey);
@@ -508,10 +508,10 @@ void init_gtab(int inmdno)
 
 
   if (all_full_ascii) {
-    int mkeyn = 1 <<  th.keybits;
+    int mkeys = 1<< th.keybits;
     free(inp->keyname_lookup);
-    inp->keyname_lookup = malloc(sizeof(char) * mkeyn);
-    memcpy(inp->keyname_lookup, keyname_lookup, mkeyn);
+    inp->keyname_lookup = malloc(sizeof(char) * mkeys);
+    memcpy(inp->keyname_lookup, keyname_lookup, mkeys);
   }
 
   inp->KeyS=th.KeyS;
@@ -1230,13 +1230,14 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 
   if (gtab_capslock_in_eng && (kbstate&LockMask)) {
+    if (key < 0x20 || key>=0x7f)
+      return 0;
+
     if (gcin_capslock_lower) {
       case_inverse(&key, shift_m);
       send_ascii(key);
       return 1;
     }
-
-    return 0;
   }
 
 
