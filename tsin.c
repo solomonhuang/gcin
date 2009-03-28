@@ -30,7 +30,7 @@ int c_idx;
 extern int c_len;
 int ph_sta=-1, ph_sta_last=-1;  // phrase start
 static int sel_pho;
-static gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
+gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
 static int save_frm, save_to;
 static int current_page;
 static int startf;
@@ -325,11 +325,11 @@ void disp_tsin_eng_pho(int eng_pho);
 
 void show_stat()
 {
+  load_tray_icon();
   disp_tsin_eng_pho(eng_ph);
 }
 
 void load_tsin_db();
-
 
 #if 0
 void nputs(u_char *s, u_char len)
@@ -873,8 +873,10 @@ void tsin_set_eng_ch(int nmod)
   drawcursor();
 
   show_button_pho(eng_ph);
-
+  load_tray_icon();
+#if 0
   show_win0();
+#endif
 }
 
 void tsin_toggle_eng_ch()
@@ -1326,6 +1328,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
      return 0;
    }
 
+   if (xkey==XK_Shift_L||xkey==XK_Shift_R)
+      key_press_time = current_time();
+
+   if (!eng_ph && !c_len && gcin_pop_up_win) {
+     hide_win0();
+     return 0;
+   }
+
    int o_sel_pho = sel_pho;
    close_win_pho_near();
 
@@ -1407,10 +1417,6 @@ tab_phrase_end:
           }
         }
         return 0;
-     case XK_Shift_L:
-     case XK_Shift_R:
-        key_press_time = current_time();
-        return 1;
      case XK_Delete:
         return cursor_delete();
      case XK_BackSpace:

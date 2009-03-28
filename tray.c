@@ -24,6 +24,9 @@ static void get_text_w_h(char *s, int *w, int *h)
   pango_layout_get_pixel_size(pango, w, h);
 }
 
+#if USE_TSIN
+extern gboolean eng_ph;
+#endif
 
 static void draw_icon()
 {
@@ -61,10 +64,20 @@ static void draw_icon()
     }
 
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
-      static char efull[] = "英全";
+      static char efull[] = "A全";
       get_text_w_h(efull,  &w, &h);
       gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
     }
+#if USE_TSIN
+    if (current_CS->in_method==6 && current_CS->im_state == GCIN_STATE_CHINESE && !eng_ph) {
+      static char efull[] = "ABC";
+      gdk_color_parse("blue", &color_fg);
+      gdk_gc_set_rgb_fg_color(gc, &color_fg);
+
+      get_text_w_h(efull,  &w, &h);
+      gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
+    }
+#endif
   }
 
   gdk_color_parse("red", &color_fg);

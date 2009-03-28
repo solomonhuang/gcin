@@ -189,9 +189,22 @@ int main(int argc, char **argv)
 
 
   fread(&th,1, sizeof(th), fr);
+#if NEED_SWAP
+  swap_byte_4(&th.version);
+  swap_byte_4(&th.flag);
+  swap_byte_4(&th.space_style);
+  swap_byte_4(&th.KeyS);
+  swap_byte_4(&th.MaxPress);
+  swap_byte_4(&th.M_DUP_SEL);
+  swap_byte_4(&th.DefC);
+  for(i=0; i <= KeyNum; i++)
+    swap_byte_4(&idx1[i]);
+#endif
   KeyNum = th.KeyS;
   dbg("keys %d\n",KeyNum);
   cur_inmd->keybits = th.keybits;
+  cur_inmd->last_k_bitn = (((cur_inmd->key64 ? 64:32) / cur_inmd->keybits) - 1) * cur_inmd->keybits;
+
 
   fread(keymap, 1, th.KeyS, fr);
   fread(kname, CH_SZ, th.KeyS, fr);

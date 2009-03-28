@@ -1654,8 +1654,6 @@ next:
       (pselkey && ( pendkey || spc_pressed)) ) ) {
 YYYY:
 
-    dbg("kkkkk\n");
-
     if ((pselkey || wild_mode) && defselN) {
       int vv = pselkey - cur_inmd->selkey;
 
@@ -1687,8 +1685,6 @@ YYYY:
     } else {
       if (gtab_dup_select_bell)
         bell();
-
-      dbg("hhhhh\n");
 
       if (ci>0)
         inch[--ci]=0;
@@ -1736,7 +1732,6 @@ refill:
       defselN--;
 
     int shiftb=(KEY_N - 1 -ci) * KeyBits;
-    dbg("shiftb %d\n", shiftb);
 
 //    if (gtab_disp_partial_match)
     while((CONVT2(cur_inmd, j) & vmaskci)==val && j<oE1) {
