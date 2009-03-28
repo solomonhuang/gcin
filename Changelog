@@ -2,6 +2,8 @@
 1.4.0:
 - 按 keypad . 現在可以輸入 '. '了 。感謝jackblackevo的建議。
 - ctrl-alt-, 有時候需要按兩次才會出現的問題。
+- tray panel 如果放在最上面，小鍵盤位置會蓋掉 tray 的問題。
+- 詞音在某些情況 coredump 的 bug。
 
 1.3.9:
 - 改用自己的简←→正體字轉換，這樣 sim2trad 就不會有掉字的情形。感謝 LGJ 的協助。

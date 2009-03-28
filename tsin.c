@@ -1610,25 +1610,19 @@ other_keys:
 
          if (len > 1) {
            int cpsta = chpho[c_idx].psta;
-           if (cpsta >= 0) {
-#if 0
-             chpho[cpsta].flag |= FLAG_CHPHO_PHRASE_VOID;
-#endif
+           if (cpsta >= 0)
              set_chpho_ch(&chpho[c_idx], sel_text, len);
-           } else
+           else
              set_chpho_ch2(&chpho[c_idx], sel_text, len);
 
            chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
-#if 0
-           set_phrase_link(c_idx, len);
-#endif
            set_fixed(c_idx, len);
 
            call_tsin_parse();
 
            if (c_idx + len == c_len) {
              ph_sta = -1;
-             draw_ul(i, c_len);
+             draw_ul(c_idx, c_len);
            }
          } else
          if (len == 1) { // single chinese char
