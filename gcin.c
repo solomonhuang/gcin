@@ -303,7 +303,7 @@ static void reload_data()
   load_tsin_db();
   disp_hide_tsin_status_row();
   load_tab_pho_file();
-  change_tsin_line_color();
+  change_tsin_color();
 }
 
 void change_tsin_font_size();

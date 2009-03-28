@@ -77,20 +77,16 @@ static void create_char(int index)
   set_label_font_size(label, gcin_font_size);
 
   chars[index].label = label;
-#if 0
-  GtkWidget *separator = gtk_hseparator_new ();
-#else
   GtkWidget *separator =  gtk_drawing_area_new();
   GdkColor color_bg;
   gdk_color_parse(tsin_phrase_line_color, &color_bg);
   gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
   gtk_widget_set_size_request(separator, 8, 2);
-#endif
   gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
   chars[index].line = separator;
 }
 
-void change_tsin_line_color()
+static void change_tsin_line_color()
 {
   int i;
 
@@ -102,6 +98,8 @@ void change_tsin_line_color()
     gtk_widget_modify_bg(chars[i].line, GTK_STATE_NORMAL, &color_bg);
   }
 }
+
+
 
 gboolean b_use_full_space = TRUE;
 
@@ -452,8 +450,35 @@ void create_win0()
 }
 
 
-#define PHO_IN_AREA_FONT_SIZE_DELTA 6
+
+
 void create_win1();
+
+static void create_cursor_attr()
+{
+  if (attr_list)
+    pango_attr_list_unref(attr_list);
+
+  GdkColor color_bg, color_fg;
+  gdk_color_parse(tsin_cursor_color, &color_bg);
+  gdk_color_parse("white", &color_fg);
+
+  attr_list = pango_attr_list_new ();
+  attr_list_blank = pango_attr_list_new ();
+
+  PangoAttribute *blue_bg = pango_attr_background_new(
+    color_bg.red, color_bg.green, color_bg.blue);
+  blue_bg->start_index = 0;
+  blue_bg->end_index = 128;
+  pango_attr_list_insert (attr_list, blue_bg);
+
+  PangoAttribute *white_fg = pango_attr_foreground_new(
+    color_fg.red, color_fg.green, color_fg.blue);
+  white_fg->start_index = 0;
+  white_fg->end_index = 128;
+  pango_attr_list_insert (attr_list, white_fg);
+}
+
 
 void create_win0_gui()
 {
@@ -479,25 +504,8 @@ void create_win0_gui()
   /* This packs the button into the gwin0 (a gtk container). */
   gtk_box_pack_start (GTK_BOX (hbox_row1), hbox_edit, FALSE, FALSE, 0);
 
-  GdkColor color_bg, color_fg;
-  gdk_color_parse("blue", &color_bg);
-  gdk_color_parse("white", &color_fg);
 
-  attr_list = pango_attr_list_new ();
-  attr_list_blank = pango_attr_list_new ();
-
-  PangoAttribute *blue_bg = pango_attr_background_new(
-    color_bg.red, color_bg.green, color_bg.blue);
-  blue_bg->start_index = 0;
-  blue_bg->end_index = 128;
-  pango_attr_list_insert (attr_list, blue_bg);
-
-  PangoAttribute *white_fg = pango_attr_foreground_new(
-    color_fg.red, color_fg.green, color_fg.blue);
-  white_fg->start_index = 0;
-  white_fg->end_index = 128;
-  pango_attr_list_insert (attr_list, white_fg);
-
+  create_cursor_attr();
 
   button_pho = gtk_button_new();
   gtk_container_set_border_width (GTK_CONTAINER (button_pho), 0);
@@ -648,4 +656,16 @@ void win_tsin_disp_half_full()
   gtk_label_set_text(GTK_LABEL(labels_pho[0]), get_full_str());
 
   compact_win0();
+}
+
+
+void drawcursor();
+
+void change_tsin_color()
+{
+  change_tsin_line_color();
+  create_cursor_attr();
+  extern int c_idx;
+
+  drawcursor();
 }

@@ -85,7 +85,7 @@ static void clrcursor()
 static int last_cursor_idx=0;
 void set_cursor_tsin(int index);
 
-static void drawcursor()
+void drawcursor()
 {
   clr_tsin_cursor(last_cursor_idx);
   last_cursor_idx = c_idx;

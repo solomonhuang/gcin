@@ -25,7 +25,7 @@ void gcin_im_client_focus_out(GCIN_client_handle *handle);
 void gcin_im_client_set_window(GCIN_client_handle *handle, Window win);
 void gcin_im_client_set_cursor_location(GCIN_client_handle *handle,
                                         int x, int y);
-/*  rstr returns UTF-8 encoding string, you should use 'free()' to free the
+/*  rstr returns UTF-8 encoded string, you should use 'free()' to free the
     memory.
 
     reutrn boolean:

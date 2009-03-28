@@ -14,6 +14,7 @@ static struct {
  {"倚天 26 鍵,使用 asdf 選擇", "et26-asdf"},
  {"許氏(國音,自然)", "hsu"},
  {"IBM", "ibm"},
+ {NULL, NULL}
 };
 
 static GtkWidget *check_button_phrase_pre_select,
@@ -23,6 +24,8 @@ static GtkWidget *check_button_phrase_pre_select,
                  *check_button_phonetic_huge_tab,
                  *check_button_tsin_tone_char_input,
                  *spinner_tsin_buffer_size;
+
+static GtkWidget *opt_kbm_opts;
 
 
 static struct {
@@ -46,19 +49,21 @@ static struct {
 int tsin_space_optionsN = sizeof(tsin_space_options) / sizeof(tsin_space_options[0]);
 
 
-static int kbm_selN = sizeof(kbm_sel) / sizeof(kbm_sel[0]);
 
 static GtkWidget *gcin_kbm_window = NULL;
 
 static int new_select_idx, new_select_idx_tsin_sw, new_select_idx_tsin_space_opt;
-static GdkColor tsin_phrase_line_gcolor;
+static GdkColor tsin_phrase_line_gcolor, tsin_cursor_gcolor;
 
 
 static gboolean cb_ok( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
-  save_gcin_conf_str(PHONETIC_KEYBOARD, kbm_sel[new_select_idx].kbm);
+  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_kbm_opts));
+
+  save_gcin_conf_str(PHONETIC_KEYBOARD, kbm_sel[idx].kbm);
+
   save_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
                      tsin_eng_ch_sw[new_select_idx_tsin_sw].key);
 
@@ -88,17 +93,17 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, cstr);
   g_free(cstr);
 
+
+  cstr = gtk_color_selection_palette_to_string(&tsin_cursor_gcolor, 1);
+  dbg("color %s\n", cstr);
+  save_gcin_conf_str(TSIN_CURSOR_COLOR, cstr);
+  g_free(cstr);
+
   send_gcin_message(GDK_DISPLAY(), "reload kbm");
 
   gtk_widget_destroy(gcin_kbm_window); gcin_kbm_window = NULL;
 
   return TRUE;
-}
-
-
-static void callback_button_clicked( GtkWidget *widget, gpointer data)
-{
-  new_select_idx = (int) data;
 }
 
 
@@ -120,7 +125,7 @@ static int get_current_kbm_idx()
   get_gcin_conf_str("phonetic-keyboard", kbm_str, "zo");
 
   int i;
-  for(i=0; i < kbm_selN; i++)
+  for(i=0; kbm_sel[i].kbm; i++)
     if (!strcmp(kbm_sel[i].kbm, kbm_str))
       return i;
 
@@ -200,6 +205,71 @@ static gboolean cb_tsin_phrase_line_color( GtkWidget *widget,
 }
 
 
+static void cb_save_tsin_cursor_color(GtkWidget *widget, gpointer user_data)
+{
+  GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
+  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &tsin_cursor_gcolor);
+
+  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+}
+
+
+static gboolean cb_tsin_cursor_color( GtkWidget *widget,
+                                   gpointer   data )
+{
+   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)gtk_color_selection_dialog_new ("詞音標示詞的底線顏色");
+
+   gtk_color_selection_set_current_color(
+           GTK_COLOR_SELECTION(color_selector->colorsel),
+           &tsin_cursor_gcolor);
+
+
+   g_signal_connect (GTK_OBJECT (color_selector->ok_button),
+                     "clicked",
+                     G_CALLBACK (cb_save_tsin_cursor_color),
+                     (gpointer) color_selector);
+#if 1
+   g_signal_connect_swapped (GTK_OBJECT (color_selector->ok_button),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             (gpointer) color_selector);
+#endif
+   g_signal_connect_swapped (GTK_OBJECT (color_selector->cancel_button),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             (gpointer) color_selector);
+
+   gtk_widget_show((GtkWidget*)color_selector);
+   return TRUE;
+}
+
+
+
+static GtkWidget *create_kbm_opts()
+{
+
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+
+  opt_kbm_opts = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_kbm_opts, FALSE, FALSE, 0);
+  GtkWidget *menu_kbm_opts = gtk_menu_new ();
+
+  int i;
+  int current_idx = get_current_kbm_idx();
+
+  for(i=0; kbm_sel[i].name; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (kbm_sel[i].name);
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_kbm_opts), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_kbm_opts), menu_kbm_opts);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_kbm_opts), current_idx);
+
+  return hbox;
+}
+
+
 void load_setttings();
 
 void create_kbm_window()
@@ -227,27 +297,8 @@ void create_kbm_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_kbm, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_kbm), 1);
 
-  GtkWidget *box_kbm = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame_kbm), box_kbm);
-  gtk_container_set_border_width (GTK_CONTAINER (box_kbm), 1);
+  gtk_container_add (GTK_CONTAINER (frame_kbm), create_kbm_opts());
 
-  int i;
-  GSList *group_kbm = NULL;
-  int current_idx = get_current_kbm_idx();
-  new_select_idx = current_idx;
-
-  for(i=0; i<kbm_selN; i++) {
-    GtkWidget *button = gtk_radio_button_new_with_label (group_kbm, kbm_sel[i].name);
-    gtk_box_pack_start (GTK_BOX (box_kbm), button, TRUE, TRUE, 0);
-
-    group_kbm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
-
-    g_signal_connect (G_OBJECT (button), "clicked",
-       G_CALLBACK (callback_button_clicked), (gpointer) i);
-
-    if (i==current_idx)
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button), TRUE);
-  }
 
   GtkWidget *frame_tsin_sw = gtk_frame_new("詞音輸入[中/英]切換");
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_sw, TRUE, TRUE, 0);
@@ -258,9 +309,10 @@ void create_kbm_window()
   gtk_container_set_border_width (GTK_CONTAINER (box_tsin_sw), 1);
 
   GSList *group_tsin_sw = NULL;
-  current_idx = get_currnet_eng_ch_sw_idx();
+  int current_idx = get_currnet_eng_ch_sw_idx();
   new_select_idx_tsin_sw = current_idx;
 
+  int i;
   for(i=0; i< tsin_eng_ch_swN; i++) {
     GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_sw, tsin_eng_ch_sw[i].name);
     gtk_box_pack_start (GTK_BOX (box_tsin_sw), button, TRUE, TRUE, 0);
@@ -362,6 +414,19 @@ void create_kbm_window()
   gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
   gtk_widget_set_size_request(da, 16, 2);
   gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
+
+  GtkWidget *frame_tsin_cursor_color = gtk_frame_new("詞音游標的顏色");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_cursor_color, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_cursor_color), 1);
+  GtkWidget *button_tsin_cursor_color = gtk_button_new();
+  g_signal_connect (G_OBJECT (button_tsin_cursor_color), "clicked",
+                    G_CALLBACK (cb_tsin_cursor_color), G_OBJECT (gcin_kbm_window));
+  da =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_cursor_color), da);
+  gdk_color_parse(tsin_cursor_color, &tsin_cursor_gcolor);
+  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+  gtk_widget_set_size_request(da, 16, 2);
+  gtk_container_add (GTK_CONTAINER (frame_tsin_cursor_color), button_tsin_cursor_color);
 
 
   GtkWidget *frame_tsin_tone_char_input = gtk_frame_new("詞音輸入注音聲調符號");

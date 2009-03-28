@@ -17,6 +17,8 @@ int gtab_simple_win;
 int gtab_disp_key_codes;
 int gtab_disp_im_name;
 int gtab_invalid_key_in;
+int gtab_shift_phrase_key;
+
 
 int tsin_phrase_pre_select, tsin_tone_char_input;
 int phonetic_char_dynamic_sequence;
@@ -30,6 +32,7 @@ int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
 char tsin_phrase_line_color[16];
+char tsin_cursor_color[16];
 
 int get_gcin_conf_int(char *name, int default_value);
 
@@ -60,6 +63,7 @@ void load_setttings()
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
   gtab_disp_im_name = get_gcin_conf_int(GTAB_DISP_IM_NAME, 1);
   gtab_invalid_key_in = get_gcin_conf_int(GTAB_INVALID_KEY_IN, 0);
+  gtab_shift_phrase_key = get_gcin_conf_int(GTAB_SHIFT_PHRASE_KEY, 0);
 
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
@@ -74,4 +78,5 @@ void load_setttings()
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);
 
   get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, tsin_phrase_line_color, "blue");
+  get_gcin_conf_str(TSIN_CURSOR_COLOR, tsin_cursor_color, "blue");
 }

@@ -49,6 +49,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gcin/*
 %{_datadir}/man/man1/*
 %{_datadir}/icons/*
+%{_datadir}/applications/*
+%{_datadir}/control-center-2.0/capplets/*
 %{_libdir}/menu/*
 %{_libdir}/gtk-2.0/*
 %{_libdir}/lib*
@@ -59,19 +61,7 @@ ldconfig
 %update_menus
 
 %postun
-xinitdir=/etc/X11/xinit
-ximorig=XIM.orig.gcin
-cd /etc/X11/xinit
-#if [ -f XIM.orig.gcin ]; then
-#  mv XIM.orig.gcin XIM
-#elif [ -f xinitrc.d/xinput ]; then
-# cd xinitrc.d
-# if [ ! -f xinput.orig.gcin ]; then
-#    mv xinput.orig.gcin xinput
-# fi
-#else
-# echo "Please restore your XIM settings manually"
-#fi
+
 %clean_menus
 
 %changelog

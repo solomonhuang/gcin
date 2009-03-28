@@ -254,8 +254,12 @@ void load_gtab_list()
     int keyidx = gcin_switch_keys_lookup(key[0]);
     if (keyidx < 0)
       p_err("bad key value %s in %s\n", key, ttt);
-    strcpy(inmd[keyidx].filename, file);
-    strcpy(inmd[keyidx].cname, name);
+
+    free(inmd[keyidx].filename);
+    inmd[keyidx].filename = strdup(file);
+
+    free(inmd[keyidx].cname);
+    inmd[keyidx].cname = strdup(name);
   }
 
   fclose(fp);
@@ -912,7 +916,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   }
 #endif
   if ((kbstate & ShiftMask) && key!='*' && key!='?') {
-    return shift_char_proc(key, kbstate);
+    if (gtab_shift_phrase_key)
+      return feed_phrase(key);
+    else
+      return shift_char_proc(key, kbstate);
   }
 
   gboolean has_wild = FALSE;
@@ -935,6 +942,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 
       wild_mode=spc_pressed=0;
+      invalid_spc = FALSE;
       if (ci==1 && cur_inmd->use_quick) {
         int i;
 
@@ -1383,7 +1391,6 @@ next_pg:
 
       if (gtab_invalid_key_in) {
         invalid_spc = TRUE;
-        dbg("uuuu\n");
         return TRUE;
       }
       goto refill;

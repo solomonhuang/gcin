@@ -1,0 +1,16 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=gcin Setup
+Name[ja]=gcin入力メソッドの設定
+Name[zh_CN]=gcin 输入法设置
+Name[zh_TW]=gcin 輸入法設定
+Comment=Setup utility for gcin input method
+Comment[ja]= gcin
+Comment[zh_CN]= gcin 设置工具
+Comment[zh_TW]= gcin 設定工具
+Exec=gcin-setup
+Icon=gcin.png
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Applications;Settings;

@@ -25,6 +25,7 @@
 #define GTAB_DISP_KEY_CODES "gtab-disp-key-codes"
 #define GTAB_DISP_IM_NAME "gtab-disp-im-name"
 #define GTAB_INVALID_KEY_IN "gtab-invalid-key-in"
+#define GTAB_SHIFT_PHRASE_KEY "gtab-shift-phrase-key"
 
 #define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
@@ -33,6 +34,7 @@
 #define TSIN_SPACE_OPT "tsin-space-opt"
 #define TSIN_BUFFER_SIZE "tsin-buffer-size"
 #define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
+#define TSIN_CURSOR_COLOR "tsin-cursor-color"
 #define TSIN_TONE_CHAR_INPUT "tsin-tone-char-input"
 
 
@@ -57,6 +59,7 @@ extern int gcin_im_toggle_keys;
 extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
+extern int gtab_shift_phrase_key;
 extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
 
@@ -67,7 +70,7 @@ extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;
 extern int tsin_space_opt, tsin_tone_char_input;
 
-extern char tsin_phrase_line_color[];
+extern char tsin_phrase_line_color[], tsin_cursor_color[];
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char rstr[], char *default_str);

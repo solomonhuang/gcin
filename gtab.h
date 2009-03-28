@@ -70,7 +70,7 @@ typedef struct {
   int use_quick;
   u_int flag;
 #define MAX_CNAME (4*CH_SZ+1)
-  char cname[MAX_CNAME];
+  char *cname;
   u_char keycol[50];
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:5  changjei:5 */
@@ -85,7 +85,7 @@ typedef struct {
   int phrnum;
   int *phridx;
   char *phrbuf;
-  char filename[16];
+  char *filename;
   time_t file_modify_time;
   gboolean key64;        // db is 64 bit-long key
   int max_keyN;
@@ -95,10 +95,7 @@ typedef struct {
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
 
-
-
 u_int64_t CONVT2(INMD *inmd, int i);
-extern char gtab64_header[], gtab32_ver2_header[];
 extern INMD *cur_inmd;
 
 #define LAST_K_bitN (cur_inmd->key64 ? 54:24)

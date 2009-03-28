@@ -235,9 +235,10 @@ gcin-setup -> 輸入法開啟關閉->使用 (選 注音 & 行列) ,   第一次�
 以下的 嘸蝦米 table 僅供測試用，如果有長期使用，請購買合法版權。
 download 
 http://edt1023.sayya.org/misc/noseeing-2.tar.gz (正體中文)
-http://edt1023.sayya.org/misc/noseeing-3.tar.gz (正/簡體中文 & 日文 綜合版)
+(因為 .gtab format 有變，裏面的 .gtab 無法直接使用，必須執行 gcin2tab noseeing 重新產生 noseeing.gtab)
+http://edt1023.sayya.org/misc/noseeing-6.tar.gz (正/簡體中文 & 日文 綜合版)
 
-tar xvfz noseeing-2.tar.gz
+tar xvfz noseeing-6.tar.gz
 cp noseeing.gtab /usr/share/gcin/table
 
 logout & login 按 ctrl-alt-9 就可以開始用。
@@ -509,3 +510,10 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
 	%keep_key_case          <---------------------------
 	%keyname begin
 --------------------------------------------------------------------
+如何確定目前是使用 gcin 自己的 gtk im module。
+1. 可以先用 gedit 測試，在編輯區按 mouse 右鍵，menu 裏選輸入法，會顯示出目前正在使用的輸入法，如果是
+ 'gcin Input Method' 就是對的，其他的是錯的。
+2. 在terminal 用 export GCIN_CONNECT_MSG_ON=， 再執行自己要的測試程式，
+terminal (console) 會出現以下 message 
+   connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin
+
