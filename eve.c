@@ -742,7 +742,7 @@ gboolean control_punc(KeySym keysym)
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
 #if 0
-  dbg_time("key press %x %x", keysym, kev_state);
+  dbg_time("key press %x %x\n", keysym, kev_state);
 #endif
   check_CS();
 
@@ -826,12 +826,14 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   }
 
 
+  if (!current_CS->b_gcin_protocol) {
   if (((keysym == XK_Control_L || keysym == XK_Control_R)
                    && (kev_state & ShiftMask)) ||
       ((keysym == XK_Shift_L || keysym == XK_Shift_R)
                    && (kev_state & ControlMask))) {
      cycle_next_in_method();
      return TRUE;
+  }
   }
 
   if (current_CS->b_raise_window && keysym>=' ' && keysym < 127) {
@@ -868,9 +870,26 @@ int feedkey_pp_release(KeySym xkey, int kbstate);
 gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 {
   check_CS();
+#if 0
+  dbg_time("key release %x %x\n", keysym, kev_state);
+#endif
 
   if (current_CS->im_state == GCIN_STATE_DISABLED)
     return FALSE;
+
+#if 1
+  if (current_CS->b_gcin_protocol && (last_keysym == XK_Shift_L ||
+  last_keysym == XK_Shift_R || last_keysym == XK_Control_L || last_keysym == XK_Control_R)) {
+    if (((keysym == XK_Control_L || keysym == XK_Control_R)
+          && (kev_state & ShiftMask)) ||
+        ((keysym == XK_Shift_L || keysym == XK_Shift_R)
+          && (kev_state & ControlMask))) {
+       cycle_next_in_method();
+       return TRUE;
+    }
+  }
+#endif
+
 
 #if USE_TSIN
   switch(current_CS->in_method) {

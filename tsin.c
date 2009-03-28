@@ -1412,6 +1412,9 @@ tab_phrase_end:
             if (pre_selN > 1 && scanphr(ph_sta, c_idx - ph_sta, TRUE)) {
               disp_pre_sel_page();
             }
+
+            if (!c_len && gcin_pop_up_win && !j)
+              hide_win0();
             return 1;
           }
 
@@ -1633,6 +1636,7 @@ other_keys:
 asc_char:
         if (shift_m) {
           if (pre_sel_handler(xkey)) {
+            call_tsin_parse();
             return 1;
           }
 
