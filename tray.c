@@ -27,10 +27,22 @@ static void get_text_w_h(char *s, int *w, int *h)
 
 static void draw_icon()
 {
+#if 0
+  return;
+#endif
 
   GdkPixbuf *pix =  !current_CS ||
     (current_CS->im_state == GCIN_STATE_DISABLED||current_CS->im_state == GCIN_STATE_ENG_FULL) ?
     pixbuf : pixbuf_ch;
+
+#if 0
+  GdkPixmap *pixmap_return;
+  GdkBitmap *mask_return;
+  gdk_pixbuf_render_pixmap_and_mask(pix,  &pixmap_return, &mask_return, 1);
+  gdk_window_shape_combine_mask(da->window, mask_return, 0, 0);
+//  gdk_window_set_back_pixmap (da->window, pixmap_return, FALSE);
+//  g_free(pixmap_return); g_free(mask_return);
+#endif
 
   int dw = da->allocation.width, dh = da->allocation.height;
   int w, h;
@@ -71,35 +83,35 @@ static void draw_icon()
     get_text_w_h(sim,  &w, &h);
     gdk_draw_layout(tray_da_win, gc, 0, dh - h, pango);
   }
+
 }
 
 void update_tray_icon()
 {
+#if 0
+  gtk_widget_hide(da);
+  gtk_widget_show(da);
+#else
   gtk_widget_queue_draw(da);
+#endif
 }
 
+void get_icon_path(char *iconame, char fname[]);
 
 void load_tray_icon()
 {
   char *iconame = inmd[current_CS->in_method].icon;
-  char *fname = NULL;
-  char tt[128];
+  char fname[128];
 
-  if (iconame) {
-    get_gcin_user_fname(iconame, tt);
+  fname[0]=0;
 
-    fname = tt;
-    if (access(tt, R_OK)) {
-      sprintf(tt, GCIN_ICON_DIR"/%s", iconame);
-      if (access(tt, R_OK))
-        fname = NULL;
-    }
-  }
+  if (iconame)
+    get_icon_path(iconame, fname);
 
 #if 0
   dbg("fname %x %s\n", fname, fname);
 #endif
-  if (!fname) {
+  if (!fname[0]) {
     if (pixbuf_ch)
       gdk_pixbuf_unref(pixbuf_ch);
 
@@ -203,6 +215,8 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
 gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
 {
   draw_icon();
+
+  return FALSE;
 }
 
 
@@ -210,7 +224,6 @@ void create_tray()
 {
   EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
   GtkWidget *event_box = gtk_event_box_new ();
-
   GtkTooltips *tips = gtk_tooltips_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, "左:正/簡體 中:輸入法 右:選項", NULL);
 
@@ -221,45 +234,71 @@ void create_tray()
 
   GError *err = NULL;
 
-
-  char tt[128];
-  char *icon_fname = gcin_icon;
-  get_gcin_user_fname(GCIN_TRAY_PNG, tt);
-
-  if (access(tt, R_OK)==0)
-   icon_fname = tt;
+  char icon_fname[128];
+  get_icon_path(GCIN_TRAY_PNG, icon_fname);
 
   pixbuf = gdk_pixbuf_new_from_file(icon_fname, &err);
   int pwidth = gdk_pixbuf_get_width (pixbuf);
   int pheight = gdk_pixbuf_get_height (pixbuf);
 
   if (!pixbuf)
-    p_err("cannot load file");
+    p_err("cannot load file %s", icon_fname);
 
   da =  gtk_drawing_area_new();
 
+#if 0
+//  gtk_widget_set_double_buffered (da, FALSE);
+  gtk_widget_set_app_paintable(da, TRUE);
+#endif
   g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(cb_expose), NULL);
 
   gtk_container_add (GTK_CONTAINER (event_box), da);
 
   gtk_widget_set_size_request(tray_icon, pwidth, pheight);
 
-  pango = gtk_widget_create_pango_layout(da, " ");
 
   PangoContext *context=gtk_widget_get_pango_context(da);
+#if 1
   PangoFontDescription* desc=pango_context_get_font_description(context);
-#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 10
-  pango_font_description_set_size(desc, 12);
+#else
+  PangoFontDescription* desc=
+    pango_font_description_copy(pango_context_get_font_description(context));
 #endif
+
+//  dbg("zz %s %d\n",  pango_font_description_to_string(desc), PANGO_SCALE);
+
+  pango = gtk_widget_create_pango_layout(da, NULL);
+
   pango_layout_set_font_description(pango, desc);
-  // older pango need this
-#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION < 10
-  pango_font_description_set_size(desc, 12);
+#if 1
+  // strange bug, why do we need this ?
+  desc = pango_layout_get_font_description(pango);
 #endif
+  pango_font_description_set_size(desc, 9 * PANGO_SCALE);
+
+#if 0
+  dbg("aa %s\n",  pango_font_description_to_string(desc));
+  dbg("context %x %x\n", pango_layout_get_context(pango), context);
+  dbg("font %x %x\n",pango_layout_get_font_description(pango), desc);
+#endif
+//  pango_layout_context_changed(pango);
 
   gtk_widget_show_all (GTK_WIDGET (tray_icon));
 
   tray_da_win = da->window;
+#if 0
+  gdk_window_set_back_pixmap (da->window, NULL, FALSE);
+#endif
+
+#if 0
+  gtk_widget_set_double_buffered (event_box, FALSE);
+  gtk_widget_set_app_paintable(event_box, TRUE);
+#endif
+
+#if 0
+  gtk_widget_set_double_buffered (tray_icon, FALSE);
+  gtk_widget_set_app_paintable(tray_icon, TRUE);
+#endif
 
   gc = gdk_gc_new (tray_da_win);
 }

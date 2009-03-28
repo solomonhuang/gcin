@@ -43,7 +43,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,0755)
-%doc README Changelog
+%doc README Changelog AUTHORS
 %{_bindir}/*
 %{_includedir}/*
 %{_datadir}/gcin/*

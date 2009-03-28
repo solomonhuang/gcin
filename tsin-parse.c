@@ -36,6 +36,17 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
   int plen;
   float bestscore = 0;
 
+#if 0
+  /* if there is no phrase, out is not updated in the recursive parse,
+     so we need this */
+  int i;
+  for(i=0; i < c_len - start; i++) {
+    out[i].len = 1;
+    out[i].start = start + i;
+    utf8cpy(out[i].str, chpho[start + i].ch);
+  }
+#endif
+
   for(plen=1; start + plen <= c_len && plen <= MAX_PHRASE_LEN; plen++) {
     phokey_t pp[MAX_PHRASE_LEN + 1];
     int sti, edi;
@@ -49,7 +60,7 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
     pbest[0].start = start;
     utf8cpy(pbest[0].str, chpho[start].ch);
 #if 0
-    utf8_putchar(chpho[start].ch); dbg("\n");
+    dbg("hh "); utf8_putchar(chpho[start].ch); dbg("\n");
 #endif
 
     extract_pho(start, plen, pp);
@@ -89,18 +100,19 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
 
       score = plen;
       if (match_len > plen) {
+#if 0
         if (start + plen == c_len)
           pbest[0].flag |= FLAG_TSIN_PARSE_PARTIAL;
 
         if (pbestscore < score) {
-#if 0
+#if 1
           dbg("start:%d flag:%x %d part plen %d  sc:%d,%d ",
             start, pbest[0].flag, sti, plen, pbestscore, score);
           utf8_putchar(chpho[start].ch); dbg(" %d\n", pbest[0].len);
 #endif
-          pbestscore = score;
+//          pbestscore = score;
         }
-
+#endif
         continue;
       }
 
@@ -119,6 +131,14 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
         plen, pbestscore, score, usecount, start, sti);
 #endif
     }
+
+#if 0
+    // no match phrase was found
+    if (pbestscore == 0.0) {
+      if (plen > 1)
+        break;
+    }
+#endif
 
 next:
     remlen = c_len - (start + plen);

@@ -1,13 +1,38 @@
 ** UTF-8 encoding **
-1.2.8:
+1.3.0.1:
+- ~/.gcin/icons 不存在 tray icon 不會顯示的問題。
+- 改用新 icons。
+
+
+1.3.0:
+- gtab 使用 '*?' 萬用字元，當候選字小於選擇鍵的數量(10)，按空白鍵可以直接送出第一個字。Tetralet 的建議。
+- 標點倉頡候選字出現後按',.;' 會導致 coredump。
+- Kanru 提供的 Dvorak 注音鍵盤。
+- 修正詞音有時候會詞庫錯亂的問題。如果出現這種情形，可以做編輯詞庫，不做任何事，跳出 editor。就可以重組 db index。
+- 詞音在非結尾輸入的情形使用預選詞會產生覆蓋的情形。
+- 如果 ~/.gcin/gtab.list 存在，gcin-setup 應該優先去用。感謝 candyz 回報這個問題。
+- gcin-setup 現在可以顯示輸入法的 icon。
+
+1.2.9: (11/15/2006)
+- 使用者的 tray icons 改成放在 ~/.gcin/icons 以方便用 symbolic link 切換。
+- 改用某位熱心人士提供的 tray icons，仍然歡迎繼續貢獻。
+- 字重複的問題。例如輸入「怎麼走」會變成「怎走走」。
+- 用 root 執行 noseeing-inst 現在會 install X蝦米 到 /usr/share/gcin/table & /usr/local/share/gcin/table(如果目錄存在)。
+- 簡體字切換顯示在 FC6只能顯示紅點的問題。
+- 在某些 WM(fvwm1) 輸入視窗會閃個不停的問題有改善。由於 keyboard focus 會被不正常地轉移到 gcin 的 window，有時候可能要 click 要輸入的區域。這個問題的根本原因是因為 WM or X11 server 不應該把 focus 設給有設定 override_redirect 的 window。
+- FreeBSD /usr/bin/bash 的問題，在 ./configure 時會自動取代 /bin/bash -> /usr/bin/bash
+- libgcin-im-client.so 加上 soname，thanks to candyz
+
+
+1.2.8: (10/19/2006)
 - 注音只能依順序輸入的問題。例如輸入ㄅㄧㄠ，不行輸入ㄅㄠ後再加ㄧ。
 - gcin-message 不加任何參數去執行會導致 tray notification area coredump。現在會出現 usage。
 - gnome/gtk 的程式裏面，如果你用其他語系的鍵盤例如latin，現在可以用右邊的 Alt 輸入特殊字母了。
-- win-message 超出範圍的問題。
+- win-message 超出範圍的問題。Thanks to caleb.
 - libgcin-im-client.so 及 部份功能搬到 /usr/local/lib/gcin 裡的.so，這樣就變成有需要才會 load 進來。gtk-im 及 qt-im 已經指定 /usr/local/lib/gcin 為 linking path，不會受到任何影響。如果有直接使用 libgcin-im-client.so 的 mrxvt/crxvt，可以直接 cd /usr/local/lib; rm libgcin-im-client.so; ln -s gcin/libgcin-im-client.so .，這樣可以減少memory 的使用且以後比較不會有不相容的問題。
 - 如果用 gcin filter，ps 會看到很多殘留 zombie process 的問題。
    17424 tty3     00:00:00 gcin-filter <defunct>
-- 新增 /usr/share/gcin/script/noseeing-inst，執行後可以自動安裝 LGJ's noseeing(X蝦米)。
+- 新增 /usr/share/gcin/script/noseeing-inst，以一般使用者身份執行後可以自動安裝 LGJ's noseeing(X蝦米)。
 - gtab.list 新增內碼輸入法的 filename intcode.png
 - new gtk-im 加入 "seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape"
 

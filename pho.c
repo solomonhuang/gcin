@@ -47,7 +47,7 @@ phokey_t pho2key(char typ_pho[])
   return key;
 }
 
-void key_typ_pho(phokey_t phokey, char rtyp_pho[])
+void key_typ_pho(phokey_t phokey, u_char rtyp_pho[])
 {
   rtyp_pho[3] = phokey & 7;
   phokey >>= 3;
@@ -58,43 +58,6 @@ void key_typ_pho(phokey_t phokey, char rtyp_pho[])
   rtyp_pho[0] = phokey;
 }
 
-
-gboolean pin2juyin()
-{
-  int i;
-
-  char pin[7];
-  pin[7]=0;
-#if 0
-  for(i=0; i < pin_juyinN; i++) {
-    memcpy(pin,  pin_juyin[i].pinyin, sizeof(pin_juyin[0].pinyin));
-
-    if (!strcmp(pin, inph))
-      goto match;
-  }
-#endif
-  int inphN = strlen(inph);
-  for(i=0; i < pin_juyinN; i++) {
-    memcpy(pin,  pin_juyin[i].pinyin, sizeof(pin_juyin[0].pinyin));
-
-    int pinN = strlen(pin);
-
-    if (pinN < inphN)
-      continue;
-
-    if (!memcmp(pin, inph, inphN))
-      break;
-  }
-
-  if (i==pin_juyinN)
-    return FALSE;
-
-match:
-  bzero(typ_pho, sizeof(typ_pho));
-  key_typ_pho(pin_juyin[i].key, typ_pho);
-
-  return TRUE;
-}
 
 void mask_key_typ_pho(phokey_t *key)
 {
@@ -152,6 +115,7 @@ static void find_match_phos(u_char mtyp_pho[4], int *mcount, int newkey)
       }
 }
 
+gboolean inph_typ_pho_pinyin(int newkey);
 
 gboolean inph_typ_pho(int newkey)
 {
@@ -159,32 +123,7 @@ gboolean inph_typ_pho(int newkey)
   int insert = -1;
 
   if (pin_juyin) {
-    char num = phkbm.phokbm[(int)newkey][0].num;
-    int typ = phkbm.phokbm[(int)newkey][0].typ;
-
-    for(i=0; i < 7; i++)
-      if (!inph[i])
-        break;
-    if (i==7)
-      return FALSE;
-
-//    dbg("zzz %d\n", typ);
-    inph[i] = newkey;
-
-    if (typ==3) {
-      typ_pho[typ] = num;
-      return TRUE;
-    }
-
-    if (!pin2juyin()) {
-      if (newkey != ' ')
-        bell();
-
-      inph[i]=0;
-      return FALSE;
-    }
-
-    return TRUE;
+    return inph_typ_pho_pinyin(newkey);
   }
 
   int max_in_idx;
@@ -445,6 +384,7 @@ void putkey_pho(u_short key, int idx)
     set_gtab_target_displayed();
 }
 
+void load_pin_juyin();
 
 void load_tab_pho_file()
 {
@@ -482,19 +422,7 @@ void load_tab_pho_file()
   if (!strstr(phokbm_name, "pinyin")) {
     text_pho_N = 3;
   } else {
-    text_pho_N = 6;
-    char pinfname[128];
-
-    get_sys_table_file_name("pin-juyin.xlt", pinfname);
-    dbg("pinyin kbm %s\n", pinfname);
-
-    if ((fr=fopen(pinfname,"r"))==NULL)
-       p_err("Cannot open %s", pinfname);
-
-    fread(&pin_juyinN, sizeof(short), 1, fr);
-    pin_juyin = tmalloc(PIN_JUYIN, pin_juyinN);
-    fread(pin_juyin, sizeof(PIN_JUYIN), pin_juyinN, fr);
-    fclose(fr);
+    load_pin_juyin();
   }
 
   if (strcmp(phokbm_name, "hsu"))

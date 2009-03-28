@@ -1,4 +1,4 @@
-#!/bin/bash
+##!/bin/bash
 
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "** valid options:"
@@ -67,6 +67,16 @@ fi
 ## problem in MacOS
 if [ $MAC_OS = 1 ]; then
   GTKINC = "$GTKINC -I/sw/include"
+fi
+
+
+if [ -x /usr/bin/bash -a ! -x /bin/bash ]; then
+  echo "/bin/bash -> /usr/bin/bash"
+  for i in scripts/*
+  do
+    sed -e "s~/bin~/usr/bin~" < $i > $i.tmp
+    mv $i.tmp $i
+  done
 fi
 
 

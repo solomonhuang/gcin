@@ -4,13 +4,13 @@ include config.mak
 
 .SUFFIXES:	.c .o .E .pico
 
-gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o win-pho-near.o tsin-parse.o
+gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
 gcin_gtab_o = gtab.o win-gtab.o gtab-util.o
 
 GCIN_SO= gcin1.so
 
-OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o \
+OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o tray.o eggtrayicon.o $(GCIN_SO) \
      $(gcin_tsin_o) $(gcin_pho_o) $(gcin_gtab_o)
 
@@ -28,7 +28,8 @@ OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
-	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o
+	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
+	gcin-icon.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
@@ -124,7 +125,7 @@ gcin-message:	$(OBJS_gcin_message)
 pin-juyin:	$(OBJS_pin_juyin)
 	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
 
-gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico win-inmd-switch.pico
+gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico win-inmd-switch.pico pinyin.pico win-pho-near.pico
 gcin1.so: $(gcin1_so)
 	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
 
@@ -156,8 +157,7 @@ ibin:
 install:
 	install -d $(datadir)/icons
 	install gcin.png $(datadir)/icons
-	install -d $(GCIN_ICON_DIR_i)
-	install -m 644 icons/* $(GCIN_ICON_DIR_i)
+	$(MAKE) -C icons install
 	install -d $(gcinlibdir)
 	install $(GCIN_SO) $(gcinlibdir)
 	install -d $(bindir)

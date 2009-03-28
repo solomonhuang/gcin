@@ -1,5 +1,6 @@
 #include "gcin.h"
 #include "gcin-conf.h"
+#include "gtab.h"
 
 struct {
   char *keystr;
@@ -24,6 +25,7 @@ static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
 typedef struct
 {
   gchar *name;
+  GdkPixbuf *icon;
   gchar *key;
   gchar *file;
   gboolean used;
@@ -34,6 +36,7 @@ typedef struct
 enum
 {
   COLUMN_NAME,
+  COLUMN_ICON,
   COLUMN_KEY,
   COLUMN_FILE,
   COLUMN_USE,
@@ -53,6 +56,7 @@ static int qcmp_key(const void *aa, const void *bb)
 }
 
 extern char *TableDir;
+void get_icon_path(char *iconame, char fname[]);
 
 static void
 add_items (void)
@@ -64,17 +68,22 @@ add_items (void)
   char ttt[128];
   FILE *fp;
 
-  strcat(strcpy(ttt, TableDir),"/gtab.list");
+  get_gcin_user_fname(GTAB_LIST, ttt);
 
-  dbg("TableDir %s\n", TableDir);
+  if ((fp=fopen(ttt, "r"))==NULL) {
+    strcat(strcpy(ttt, TableDir),"/"GTAB_LIST);
 
-  if ((fp=fopen(ttt, "r"))==NULL)
-    exit(-1);
+    if ((fp=fopen(ttt, "r"))==NULL)
+      p_err("cannot open %s", ttt);
+  }
+
+  dbg("--> %s\n", ttt);
 
   while (!feof(fp)) {
     char name[32];
     char key[32];
     char file[32];
+    char icon[32];
 
     name[0]=0;
     key[0]=0;
@@ -83,7 +92,7 @@ add_items (void)
     char line[128];
 
     fgets(line, sizeof(line), fp);
-    sscanf(line, "%s %s %s", name, key, file);
+    sscanf(line, "%s %s %s %s", name, key, file, icon);
 
     if (strlen(name) < 1)
       break;
@@ -92,7 +101,12 @@ add_items (void)
       continue;
 
     foo.name = g_strdup(name);
+    char icon_path[128];
+    get_icon_path(icon, icon_path);
+    GError *err = NULL;
+    foo.icon = gdk_pixbuf_new_from_file(icon_path, &err);
     foo.key = g_strdup(key);
+
     int in_no = gcin_switch_keys_lookup(foo.key[0]);
     foo.file = g_strdup(file);
     foo.used = (gcin_flags_im_enabled & (1 << in_no)) != 0;
@@ -119,7 +133,8 @@ create_model (void)
   add_items ();
 
   /* create list store */
-  model = gtk_list_store_new (NUM_COLUMNS,G_TYPE_STRING, G_TYPE_STRING,
+  model = gtk_list_store_new (NUM_COLUMNS,G_TYPE_STRING, GDK_TYPE_PIXBUF,
+                              G_TYPE_STRING,
                               G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN,
                               G_TYPE_BOOLEAN);
 
@@ -130,6 +145,8 @@ create_model (void)
       gtk_list_store_set (model, &iter,
 			  COLUMN_NAME,
 			  g_array_index (articles, Item, i).name,
+			  COLUMN_ICON,
+			  g_array_index (articles, Item, i).icon,
 			  COLUMN_KEY,
 			  g_array_index (articles, Item, i).key,
 			  COLUMN_FILE,
@@ -250,25 +267,29 @@ add_columns (GtkTreeView *treeview)
 
   renderer = gtk_cell_renderer_text_new ();
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_NAME);
-
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
                                                -1, "名稱", renderer,
                                                "text", COLUMN_NAME,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
 
-  /* number column */
+  renderer = gtk_cell_renderer_pixbuf_new();
+  g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_ICON);
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
+                                               -1, "icon", renderer,
+                                               "pixbuf", COLUMN_ICON,
+//                                               "editable", COLUMN_EDITABLE,
+                                               NULL);
+
+
   renderer = gtk_cell_renderer_text_new ();
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_KEY);
-
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
                                                -1, "Ctrl-Alt-數字鍵", renderer,
                                                "text", COLUMN_KEY,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
-
-  /* frequency column */
 
   renderer = gtk_cell_renderer_text_new ();
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_FILE);

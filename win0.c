@@ -469,6 +469,9 @@ void create_win0()
   GdkWindow *gdkwin0 = gwin0->window;
   gdk_window_set_override_redirect(gdkwin0, TRUE);
   xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
+#if 1
+  gtk_window_set_accept_focus(gwin0, FALSE);
+#endif
 }
 
 

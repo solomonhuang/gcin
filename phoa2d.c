@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 
-#define MAX_CHS (35000)
+#define MAX_CHS (100000)
 
 typedef struct {
   u_short key;

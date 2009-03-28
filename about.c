@@ -30,8 +30,6 @@ void create_about_window()
       return;
     }
 
-    /* GtkWidget is the storage type for widgets */
-    GtkWidget *button;
     GtkWidget *vbox = gtk_vbox_new(FALSE,3);
     GtkWidget *hbox;
 
@@ -52,13 +50,6 @@ void create_about_window()
 
     align_with_ui_window(about_window);
 
-    /* Create a new button */
-    button = gtk_button_new ();
-
-    /* Connect the "clicked" signal of the button to our callback */
-    g_signal_connect (G_OBJECT (button), "clicked",
-		      G_CALLBACK (callback_close), (gpointer) "cool button");
-
     GtkWidget *label_version;
     GtkWidget *image;
 
@@ -71,24 +62,30 @@ void create_about_window()
     GtkWidget *separator = gtk_hseparator_new ();
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
-    GtkWidget *label_sf = gtk_label_new ("http://www.csie.nctu.edu.tw/~cp76/gcin\n討論區 http://cle.linux.org.tw/gcin");
+    GtkWidget *label_sf = gtk_label_new (
+"http://www.csie.nctu.edu.tw/~cp76/gcin\n"
+"bug tracking http://cle.linux.org.tw/gcin\n"
+"phpbb 討論區 http://cle.linux.org.tw/forum/viewforum.php?f=24");
+    gtk_label_set_selectable(GTK_LABEL(label_sf), TRUE);
+
     gtk_box_pack_start(GTK_BOX(vbox), label_sf, FALSE, FALSE, 0);
 
-
-    /* Now on to the image stuff */
     image = gtk_image_new_from_file (SYS_ICON_DIR"/gcin.png");
 
-    /* Create a label for the button */
     label_version = gtk_label_new ("version " GCIN_VERSION);
 
-    /* Pack the image and label into the box */
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 3);
     gtk_box_pack_start (GTK_BOX (hbox), label_version, FALSE, FALSE, 3);
 
 
-    gtk_container_add (GTK_CONTAINER (button), vbox);
+    gtk_container_add (GTK_CONTAINER (about_window), vbox);
 
-    gtk_container_add (GTK_CONTAINER (about_window), button);
+    /* Create a new button */
+    GtkWidget *button = gtk_button_new_with_label ("關閉");
+    gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 3);
+    /* Connect the "clicked" signal of the button to our callback */
+    g_signal_connect (G_OBJECT (button), "clicked",
+		      G_CALLBACK (callback_close), (gpointer) "cool button");
 
     gtk_widget_show_all (about_window);
 

@@ -252,7 +252,7 @@ static void DispInArea()
   }
 }
 
-char gtab_list[]="gtab.list";
+char gtab_list[]=GTAB_LIST;
 
 void load_gtab_list()
 {
@@ -1073,6 +1073,13 @@ shift_proc:
       has_wild = has_wild_card();
 
       if (wild_mode) {
+        // request from tetralet
+        dbg("zzz %d %d\n",wild_page, defselN);
+        if (!wild_page && defselN < cur_inmd->M_DUP_SEL) {
+          sel1st_i = 0;
+          goto direct_select;
+        }
+
         if (defselN == cur_inmd->M_DUP_SEL)
           wild_page+= cur_inmd->M_DUP_SEL;
         else
@@ -1108,6 +1115,7 @@ shift_proc:
         if (seltab[sel1st_i][0]) {
 //          dbg("last_full %d %d\n", last_full,spc_pressed);
           if (gtab_full_space_auto_first || spc_pressed) {
+direct_select:
             putstr_inp((u_char *)&seltab[sel1st_i]);  /* select 1st */
             return 1;
           }

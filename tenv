@@ -11,6 +11,6 @@ export GCIN_OUTPUT_FILTER=./gcin_filter
 gcinpid=$!
 sleep 1
 export LD_PRELOAD=./im-client/libgcin-im-client.so
-#gedit
-leafpad
+gedit
+#leafpad
 pkill gcin.test

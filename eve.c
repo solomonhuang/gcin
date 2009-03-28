@@ -38,7 +38,7 @@ gboolean init_in_method(int in_no);
 
 char *output_buffer;
 int output_bufferN;
-static *output_buffer_raw, *output_buffer_raw_bak;
+static char *output_buffer_raw, *output_buffer_raw_bak;
 static int output_buffer_rawN;
 
 void clear_output_buffer()
@@ -67,7 +67,7 @@ static void append_str(char **buf, int *bufN, char *text, int len)
 {
   int requiredN = len + 1 + *bufN;
   *buf = realloc(*buf, requiredN);
-  *buf[*bufN] = 0;
+  (*buf)[*bufN] = 0;
   strcat(*buf, text);
   *bufN += len;
 }
@@ -704,6 +704,7 @@ static KeySym last_keysym;
 
 gboolean timeout_raise_window()
 {
+//  dbg("timeout_raise_window\n");
   timeout_handle = 0;
   show_in_win(current_CS);
   return FALSE;
@@ -938,8 +939,23 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 
 extern Window xwin_pho, xwin0, xwin_gtab;
 
+gint64 current_time();
+
+static gint64 last_focus_out_time;
+static ClientState *last_cs;
+
 int gcin_FocusOut(ClientState *cs)
 {
+  gint64 t = current_time();
+
+  if (t - last_focus_out_time < 100000 && cs == last_cs) {
+    last_focus_out_time = t;
+    return;
+  }
+
+  last_focus_out_time = t;
+  last_cs = cs;
+
   if (cs == current_CS) {
     hide_in_win(cs);
   }
@@ -948,6 +964,10 @@ int gcin_FocusOut(ClientState *cs)
 
   if (cs == current_CS)
     temp_CS = *current_CS;
+
+#if 0
+  dbg("focus out\n");
+#endif
 
   return True;
 }

@@ -146,7 +146,6 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
 
 #define DEBUG 0
 
-
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
 //  dbg("gcin_ProtoHandler %x ims\n", ims);
@@ -351,7 +350,9 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
                                      gpointer data)
 {
    XEvent *xeve = (XEvent *)xevent;
-
+#if 0
+   dbg("a zzz %d\n", xeve->type);
+#endif
    if (xeve->type == PropertyNotify) {
      XPropertyEvent *xprop = &xeve->xproperty;
 
@@ -386,10 +387,20 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
        return GDK_FILTER_REMOVE;
      }
    }
+
+   // only very old WM will enter this
+   if (xeve->type == FocusIn || xeve->type == FocusOut) {
+#if 0
+     dbg("focus %s\n", xeve->type == FocusIn ? "in":"out");
+#endif
+     return GDK_FILTER_REMOVE;
+   }
+
 #if USE_XIM
    if (XFilterEvent(xeve, None) == True)
      return GDK_FILTER_REMOVE;
 #endif
+
    return GDK_FILTER_CONTINUE;
 }
 

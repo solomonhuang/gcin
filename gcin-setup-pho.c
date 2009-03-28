@@ -15,6 +15,7 @@ static struct {
  {"許氏(國音,自然)", "hsu"},
  {"聲調拼音", "pinyin"},
  {"聲調拼音, 使用 asdf 選擇", "pinyin-asdf"},
+{"Dvorak", "dvorak"},
  {"IBM", "ibm"},
  {NULL, NULL}
 };

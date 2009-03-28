@@ -161,7 +161,9 @@ int main(int argc, char **argv)
       charN++;
     }
 
-    i++;
+    while (i < len && s[i]==' ' || s[i]=='\t')
+      i++;
+
     int phbufN=0;
     while (i<len && phbufN < charN && s[i]!=' ') {
       kk=0;

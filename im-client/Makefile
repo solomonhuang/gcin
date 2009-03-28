@@ -1,5 +1,9 @@
 include ../config.mak
 
+
+SOFILE=libgcin-im-client.so
+SOFILEVER=libgcin-im-client.so.1.0.1
+
 .SUFFIXES:      .c .o .E
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) -I. -I.. -I../IMdkit/include $(GTKINC) \
@@ -14,16 +18,20 @@ OBJS = gcin-im-client.o im-addr.o gcin-conf.o util.o gcin-crypt.o
 .c.o:
 	$(CC) -c -fpic $(CFLAGS) -o $@ $<
 
-libgcin-im-client.so:   $(OBJS)
-	$(CC) $(SO_FLAGS) $(OBJS) -o $@
+$(SOFILEVER):   $(OBJS)
+	$(CC) $(SO_FLAGS) -Wl,-soname,libgcin-im-client.so.1 $(OBJS) -o $@
+	ln -sf $(SOFILEVER) $(SOFILE)
+	ln -sf $(SOFILEVER) $(SOFILE).1
 	$(MAKE) -C ../gtk-im
 
 LOCALLIB=/usr/local/$(LIB)
 
 install:
 	install -d $(gcinlibdir)
-	install -m 755 libgcin-im-client.so $(gcinlibdir)
-	install -d $(includedir); \
+	install -m 755 $(SOFILEVER) $(gcinlibdir)
+	cd $(gcinlibdir); rm -f $(SOFILE); ln -s $(SOFILEVER) $(SOFILE); \
+	ln -sf $(SOFILEVER) $(SOFILE).1
+	install -d $(includedir)
 	install -m 444 gcin-im-client.h $(includedir)
 
 gcin-conf.o: ../gcin-conf.c
@@ -36,7 +44,7 @@ im-addr.o: ../im-srv/im-addr.c
 	$(CC) -c -fpic $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o *.so *~ *.E *.db config.mak tags core.* .depend
+	rm -f *.o *.so *.so.* *~ *.E *.db config.mak tags core.* .depend
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@
