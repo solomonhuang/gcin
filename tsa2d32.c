@@ -169,7 +169,10 @@ int main(int argc, char **argv)
       kk=0;
 
       while (s[i]!=' ' && i<len) {
-        kk |= lookup(&s[i]);
+        if (kk==(BACK_QUOTE_NO << 9))
+          kk|=s[i];
+        else
+          kk |= lookup(&s[i]);
 
         i+=utf8_sz(&s[i]);
       }

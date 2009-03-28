@@ -4,6 +4,7 @@
 void prph(phokey_t kk)
 {
   u_int k[4];
+  phokey_t okk = kk;
 
   k[3]=(kk&7);
   kk>>=3;
@@ -13,15 +14,20 @@ void prph(phokey_t kk)
   kk>>=2;
   k[0]=(kk&31) * PHO_CHAR_LEN;
 
-  int i;
 
-  for(i=0; i < 3; i++) {
-    if (!k[i])
-      continue;
+  if (k[0]==BACK_QUOTE_NO*PHO_CHAR_LEN) {
+    utf8_putchar(&pho_chars[0][k[0]]);
+    printf("%c", okk & 0x7f);
+  } else {
+    int i;
+    for(i=0; i < 3; i++) {
+      if (!k[i])
+        continue;
 
-    utf8_putchar(&pho_chars[i][k[i]]);
+      utf8_putchar(&pho_chars[i][k[i]]);
+    }
+
+    if (k[3])
+      printf("%d", k[3]);
   }
-
-  if (k[3])
-    printf("%d", k[3]);
 }

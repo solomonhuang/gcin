@@ -91,10 +91,8 @@ int main(int argc, char **argv)
     int is_back_quote=0;
 
     while (*p && *p!=' ' && *p!=9) {
-      if (kk==(BACK_QUOTE_NO << 9)) {
+      if (kk==(BACK_QUOTE_NO << 9))
         kk|=*p;
-//        printf("kk %x\n", kk);
-      }
       else
         kk |= lookup(p);
 

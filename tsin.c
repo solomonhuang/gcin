@@ -1331,7 +1331,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
    if (xkey==XK_Shift_L||xkey==XK_Shift_R)
       key_press_time = current_time();
 
-   if (!eng_ph && !c_len && gcin_pop_up_win) {
+   if (!eng_ph && !c_len && gcin_pop_up_win && xkey!=XK_Caps_Lock) {
      hide_win0();
      return 0;
    }
