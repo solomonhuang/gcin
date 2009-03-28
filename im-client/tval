@@ -9,7 +9,8 @@ export LD_LIBRARY_PATH="../im-client"
 
 export XMODIFIERS=@im=$GCIN_XIM
 export LD_PRELOAD=../gtk-im/im-gcin.so
-valgrind --tool=memcheck gedit
+#valgrind --tool=memcheck gedit
+valgrind --tool=memcheck leafpad
 
 unset LD_PRELOAD
 pkill gcin.test

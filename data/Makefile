@@ -7,7 +7,8 @@ DATA=pho.tab tsin32.idx \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
      pinyin.kbm pinyin-asdf.kbm dvorak.kbm mitac.kbm \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab kana-nippon.gtab \
-     greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt
+     greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
+     t2s.dat s2t.dat
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 
 all:	$(DATA)
@@ -15,8 +16,7 @@ all:	$(DATA)
 tsin32:	tsin.src ../tsa2d32
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../tsa2d32 $<
 
-tsin32.idx:	tsin.src
-	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../tsa2d32 $<
+tsin32.idx:	tsin32
 
 pho.tab:	 pho.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
@@ -24,10 +24,17 @@ pho.tab:	 pho.tab.src ../phoa2d
 pho-huge.tab:	 pho-huge.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
 
+t2s.dat:	t2s-file Big5_to_GB2312.txt
+	./t2s-file
+s2t.dat:	t2s-file
+
 pin-juyin.xlt:	../pin-juyin pin-juyin.src
 	../pin-juyin
 
 extr1:	extr1.c
+	cc $< ../util.o ../locale.o -o $@ $(LDFLAGS)
+
+t2s-file:	t2s-file.c
 	cc $< ../util.o ../locale.o -o $@ $(LDFLAGS)
 
 tsin-1.src:	extr1

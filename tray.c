@@ -189,17 +189,6 @@ static void create_menu()
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 extern gboolean win_kbm_inited;
 
-static int b_show_win_kbm=0;
-void kbm_toggle()
-{
-  win_kbm_inited = 1;
-  b_show_win_kbm^=1;
-  if (b_show_win_kbm)
-    show_win_kbm();
-  else
-    hide_win_kbm();
-}
-
 gboolean
 tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer userdata)
 {

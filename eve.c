@@ -86,35 +86,8 @@ void send_text(char *text)
   char *utf8_gbtext = NULL;
 
   if (gb_output) {
-    u_int rn = 0 , wn = 0;
-    GError *err = NULL;
-    char *big5 = g_convert(text, len, "big5", "UTF-8", &rn, &wn, &err);
-
-    if (err) {
-      dbg("utf8 -> gb  convert error %d %d\n", rn, wn);
-      goto direct;
-    }
-
-    err = NULL;
-    char *gbtext = g_convert(big5, wn, "GB2312", "big5", &rn, &wn, &err);
-    g_free(big5);
-
-    if (err) {
-      dbg("big5 -> gb  convert error %d %d\n", rn, wn);
-      goto direct;
-    }
-
-    err = NULL;
-    utf8_gbtext = g_convert(gbtext, wn, "UTF-8", "GB2312", &rn, &wn, &err);
-    g_free(gbtext);
-
-    if (err) {
-      dbg("gb -> utf8  convert error %d %d\n", rn, wn);
-      goto direct;
-    }
-
+    len = trad2sim(text, len, &utf8_gbtext);
     text = utf8_gbtext;
-    len = wn;
   }
 
 direct:
@@ -169,7 +142,7 @@ next:
   if (len)
     append_str(&output_buffer, &output_bufferN, text, len);
 
-  g_free(utf8_gbtext);
+  free(utf8_gbtext);
 }
 
 void send_output_buffer_bak()

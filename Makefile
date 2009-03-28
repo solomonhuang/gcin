@@ -8,7 +8,7 @@ gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
 gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o
 
-GCIN_SO= gcin1.so
+GCIN_SO= gcin1.so gcin2.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o \
@@ -18,7 +18,7 @@ OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho
              table-update.o locale.o gcin-settings.o gcin-common.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
                  gcin-settings.o gcin-conf.o table-update.o pinyin.o
-OBJS_sim2trad=sim2trad.o util.o
+OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
 OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
@@ -107,6 +107,7 @@ juyin-learn:        $(OBJS_JUYIN_LEARN)
 	$(CC) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)
 	rm -f core.*
 sim2trad:        $(OBJS_sim2trad)
+	LD_RUN_PATH=.:$(gcinlibdir) \
 	$(CC) -o $@ $(OBJS_sim2trad) $(LDFLAGS)
 	rm -f core.*
 trad2sim:	sim2trad
@@ -163,6 +164,10 @@ pin-juyin:	$(OBJS_pin_juyin)
 gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico
 gcin1.so: $(gcin1_so)
 	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
+
+gcin2_so= t2s-lookup.pico
+gcin2.so: $(gcin2_so)
+	$(CC) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
 
 ### making the following as .so actuall makes the RSS larger
 gcin_gtab_so = gtab.pico win-gtab.pico gtab-util.pico

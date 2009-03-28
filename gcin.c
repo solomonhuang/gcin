@@ -327,6 +327,16 @@ void cb_trad_sim_toggle()
 #endif
 }
 void execute_message(char *message);
+static int b_show_win_kbm=0;
+void kbm_toggle()
+{
+  win_kbm_inited = 1;
+  b_show_win_kbm^=1;
+  if (b_show_win_kbm)
+    show_win_kbm();
+  else
+    hide_win_kbm();
+}
 
 static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
                                      GdkEvent *event,

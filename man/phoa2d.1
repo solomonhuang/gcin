@@ -1,0 +1,20 @@
+.TH GCIN 1 "21 JAN 2008" "GCIN 1.3.8" "gcin input method platform"
+.SH NAME
+phoa2d, phod2a \- gcin's Bopomofo tools
+.SH SYNOPSIS
+.B phoa2d
+.br
+.B phod2a
+.SH DESCRIPTION
+.B phoa2d
+converts $HOME/.gcin/pho.tab.src to $HOME/.gcin/pho.tab, which is used by Bopomofo and Tsin input methods.
+.PP
+.B phod2a
+converts $HOME/.gcin/pho.tab to $HOME/.gcin/pho.tab.src, which may be edited by users.
+.SH ENVIRONMENT VARIABLES
+.IP GCIN_NO_RELOAD
+Tell gcin server do not reload data after execution of phoa2d.
+.SH SEE ALSO
+.BR gcin (1).
+.SH AUTHOR
+phoa2d and phod2a were written by Edward Der-Hua Liu <cp76@csie.nctu.edu.tw>.

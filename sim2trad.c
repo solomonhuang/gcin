@@ -25,54 +25,7 @@ void all_wrap()
   gtk_text_buffer_apply_tag_by_name (buffer, "char_wrap", &mstart, &mend);
 }
 
-static char *A = "GB2312";
-static char *B = "big5";
-
-int utf8sz(char *s)
-{
-  if (!(*s & 0x80))
-    return 1;
-
-  if ((*s & 0xe0) == 0xc0)
-    return 2;
-
-  if ((*s & 0xf0) == 0xe0)
-    return 3;
-
-  if ((*s & 0xf8) == 0xf0)
-    return 4;
-
-  return 1;
-}
-
-char *m_conv(char *txt, char *to, char *frm)
-{
-  int rn,wn;
-  GError *err;
-  char *out;
-  int len=strlen(txt);
-
-  do {
-    rn = wn = 0;
-    err = NULL;
-    out = g_convert(txt, len, to , frm, &rn, &wn, &err);
-
-    if (err) {
-      dbg("%s -> %s  convert error %d %d\n", frm, to, rn, wn);
-      if (!strcmp(frm, "UTF-8")) {
-        int sz = utf8sz(&txt[rn]);
-        dbg("sz %d\n", sz);
-        memset(&txt[rn], ' ', sz);
-      } else {
-        txt[rn]=' ';
-        txt[rn+1]=' ';
-      }
-    }
-  } while (err);
-  free(txt);
-
-  return out;
-}
+gboolean b_trad2sim = FALSE;
 
 
 static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
@@ -82,17 +35,15 @@ static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer 
     return;
   }
 
-  char *txt = g_strdup(text);
-  int len = strlen(text);
-  u_int rn = 0, wn = 0;
+  char *out;
+  if (b_trad2sim)
+    trad2sim(text, strlen(text), &out);
+  else
+    sim2trad(text, strlen(text), &out);
 
-  char *gb = m_conv(txt, A, "UTF-8");
-  char *big5 = m_conv(gb, B, A);
-  char *big5utf8 = m_conv(big5, "UTF-8", B);
+  gtk_text_buffer_set_text (buffer, out, -1);
+  free(out);
 
-  gtk_text_buffer_set_text (buffer, big5utf8, -1);
-
-  g_free(big5utf8);
   all_wrap();
 }
 
@@ -121,10 +72,7 @@ int main(int argc, char **argv)
   gtk_init (&argc, &argv);
 
   if (strstr(argv[0],"trad2sim")) {
-    char *t = A;
-    A = B;
-    B = t;
-
+    b_trad2sim= TRUE;
     dbg("trad2sim\n");
   }
 
