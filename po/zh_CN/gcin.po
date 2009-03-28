@@ -100,6 +100,10 @@ msgstr "垂直选择"
 msgid "唯一選擇時自動送出"
 msgstr "唯一选择时自动送出"
 
+#: ../gcin-setup-gtab.c:366
+msgid "使用？萬用字元"
+msgstr "使用？万用字符"
+
 #: ../gcin-setup-gtab.c:349
 msgid "編輯內定輸入法的使用者外加字詞"
 msgstr "编辑默认输入法的用户外加字词"

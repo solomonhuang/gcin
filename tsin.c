@@ -1458,12 +1458,9 @@ tab_phrase_end:
          return 1;
        }
 
-       if (tsin_space_opt == TSIN_SPACE_OPT_FLUSH_BUFFER) {
-         if (c_len && eng_ph
-           && (ityp3_pho || (!typ_pho[0] && !typ_pho[1] && !typ_pho[2])) ) {
-           flush_tsin_buffer();
-           return 1;
-         }
+       if (tsin_space_opt == TSIN_SPACE_OPT_INPUT && !typ_pho[0] && !typ_pho[1] && !typ_pho[2] && !ityp3_pho && !sel_pho) {
+         close_selection_win();
+         goto asc_char;
        }
      case XK_Down:
        if (!eng_ph && xkey == XK_space)

@@ -53,6 +53,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_tsin_tone_char_input,
                  *check_button_tsin_tab_phrase_end,
                  *check_button_tsin_tail_select_key,
+                 *check_button_gtab_que_wild_card,
                  *check_button_gcin_capslock_lower,
                  *spinner_tsin_buffer_size;
 
@@ -94,7 +95,7 @@ static struct {
   int key;
 } tsin_space_options[]={
   {"選擇同音字", TSIN_SPACE_OPT_SELECT_CHAR},
-  {"送出編輯區的內容", TSIN_SPACE_OPT_FLUSH_BUFFER},
+  {"輸入空白", TSIN_SPACE_OPT_INPUT},
 };
 int tsin_space_optionsN = sizeof(tsin_space_options) / sizeof(tsin_space_options[0]);
 
@@ -1154,6 +1155,9 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send)));
 
+  save_gcin_conf_int(GTAB_QUE_WILD_CARD,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_que_wild_card)));
+
   idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
@@ -1818,6 +1822,15 @@ static void create_main_win()
      gtab_unique_auto_send);
   GtkWidget *label_gtab_unique_auto_send = gtk_label_new(_("唯一選擇時自動送出"));
   gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send), label_gtab_unique_auto_send,  FALSE, FALSE, 0);
+
+  GtkWidget *hbox_gtab_que_wild_card = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gtab_que_wild_card, FALSE, FALSE, 0);
+  check_button_gtab_que_wild_card = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_que_wild_card), check_button_gtab_que_wild_card,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_que_wild_card),
+     gtab_que_wild_card);
+  GtkWidget *label_gtab_que_wild_card = gtk_label_new(_("使用？萬用字元"));
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_que_wild_card), label_gtab_que_wild_card,  FALSE, FALSE, 0);
 
   GtkWidget *button_edit_append = gtk_button_new_with_label(_("編輯內定輸入法的使用者外加字詞"));
   gtk_box_pack_start (GTK_BOX (vbox), button_edit_append, FALSE, FALSE, 0);

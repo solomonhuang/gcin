@@ -54,7 +54,7 @@ static struct {
   int key;
 } tsin_space_options[]={
   {"選擇同音字", TSIN_SPACE_OPT_SELECT_CHAR},
-  {"送出編輯區的內容", TSIN_SPACE_OPT_FLUSH_BUFFER},
+  {"輸入空白", TSIN_SPACE_OPT_INPUT}
 };
 int tsin_space_optionsN = sizeof(tsin_space_options) / sizeof(tsin_space_options[0]);
 

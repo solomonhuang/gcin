@@ -100,6 +100,10 @@ msgstr "Vertical selection window"
 msgid "唯一選擇時自動送出"
 msgstr "Auto-send when only one choice matched"
 
+#: ../gcin-setup-gtab.c:366
+msgid "使用？萬用字元"
+msgstr "Use ? as wildcard"
+
 #: ../gcin-setup-gtab.c:349
 msgid "編輯內定輸入法的使用者外加字詞"
 msgstr "Add definitions for default input method"
