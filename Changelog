@@ -4,7 +4,7 @@
 - 當詞音空白鍵選項為「輸入空白」，則右邊的 keypad 數字區可以用來選擇同音字；如果是選擇同音字，則是用來輸入數字。
 - 詞音同音字選擇，中文字不會對齊的問題。
 - 修正smartboy (小光光)回報 tsin.src 裏面資料的錯誤。
-- tray icon 不見的問題，特別是 icewm，目前的解法會造成 gcin tray icon 晚 3秒鐘出現。
+- tray icon 不見的問題，特別是 icewm，目前的解法會造成 gcin tray icon 晚5 秒鐘出現。
 
 1.3.5:
 - gcin 現在輸入注音 gtab輸入法時可以念出正在輸入的字，必須安裝語音資料庫於 /usr/share/gcin/ogg or /usr/local/share/gcin/ogg，還需要 ogg123 這個執行檔。

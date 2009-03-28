@@ -92,6 +92,9 @@ void get_icon_path(char *iconame, char fname[]);
 
 void load_tray_icon()
 {
+  if (!gcin_status_tray)
+    return;
+
   if (!da)
     create_tray();
 
