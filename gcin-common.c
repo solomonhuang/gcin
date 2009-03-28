@@ -19,7 +19,7 @@ static char text_pho[6][CH_SZ];
 void bell()
 {
 #if 1
-  XBell(dpy, -97);
+  XBell(dpy, gcin_bell_volume);
 #else
   gdk_beep();
 #endif

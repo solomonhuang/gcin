@@ -17,6 +17,9 @@
 #define GCIN_POP_UP_WIN_ABS_CORNER "gcin-pop-up-win-abs-corner"
 #define GCIN_INNER_FRAME "gcin-inner-frame"
 #define GCIN_INIT_IM_ENABLED "gcin-init-im-enabled"
+#define GCIN_INIT_IM_ENABLED "gcin-init-im-enabled"
+#define GCIN_BELL_VOLUME "gcin-bell-volume"
+#define GCIN_SOUND_PLAY_OVERLAP "gcin-sound-play-overlap"
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -86,7 +89,8 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
            gcin_capslock_lower, pho_hide_row2, pho_in_row1,
-           gcin_eng_phrase_enabled, gtab_que_wild_card, gcin_win_sym_click_close;
+           gcin_eng_phrase_enabled, gtab_que_wild_card, gcin_win_sym_click_close,
+           gcin_bell_volume, gcin_sound_play_overlap;
 
 extern int default_input_method;
 extern int left_right_button_tips;

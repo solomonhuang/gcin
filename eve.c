@@ -957,6 +957,8 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
   switch(current_CS->in_method) {
     case 6:
       return feedkey_pp_release(keysym, kev_state);
+    case 12:
+      return feedkey_anthy_release(keysym, kev_state);
   }
 #endif
 

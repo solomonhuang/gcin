@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 2004-2009	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 #include <string.h>
 
@@ -9,7 +9,7 @@
 #include "gcin-conf.h"
 #include "tsin-parse.h"
 
-static gint64 key_press_time;
+gint64 key_press_time;
 extern gboolean b_hsu_kbm;
 
 extern PHO_ITEM *ch_pho;

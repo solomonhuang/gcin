@@ -8,7 +8,8 @@ void (*f_anthy_get_segment)(anthy_context_t ac, int,int,char *, int);
 void (*f_anthy_get_segment_stat)(anthy_context_t ac, int, struct anthy_segment_stat *);
 void (*f_anthy_commit_segment)(anthy_context_t ac, int, int);
 void (*f_anthy_set_string)(anthy_context_t ac, char *);
-
+extern int eng_ph;
+extern gint64 key_press_time;
 
 struct {
   char *en;
@@ -219,7 +220,7 @@ struct {
 {"n'",	"ん"},
 {"nn",	"ん"},
 {"n",	"ん"},
-{"m",	"ん"},
+{"m",	"ん"},  // tombo
 {"wyi",	"ゐ"},
 {"wye",	"ゑ"},
 {",",	"、"},
@@ -248,10 +249,21 @@ struct {
 {"}",	"｝"},
 {"|",	"｜"},
 {"'",	"’"},
+{"\"",	"”"},
 {"`",	"‘"},
 {"?",	"？"},
 {":",	"："},
 {";",	"；"},
+{"0",	"0"},
+{"1",	"1"},
+{"2",	"2"},
+{"3",	"3"},
+{"4",	"4"},
+{"5",	"5"},
+{"6",	"6"},
+{"7",	"7"},
+{"8",	"8"},
+{"9",	"9"},
 };
 
 
@@ -546,11 +558,39 @@ static void next_page()
   disp_select();
 }
 
+
+static int flush_input()
+{
+  hide_selections_win();
+
+  int val;
+  if (state==STATE_CONVERT) {
+    val = TRUE;
+    send_seg();
+  } else {
+    val = send_jp();
+  }
+
+  jpN=0;
+  keysN = 0;
+  cursor = 0;
+  disp_input();
+  state = STATE_ROMANJI;
+  auto_hide();
+  return val;
+}
+
 gboolean feedkey_anthy(int kv, int kvstate)
 {
   int lkv = tolower(kv);
   int shift_m=(kvstate&ShiftMask) > 0;
 //  printf("%x %c  %d\n", kv, kv, shift_m);
+
+  if (kv==XK_Shift_L||kv==XK_Shift_R)
+    key_press_time = current_time();
+
+  if (!eng_ph)
+    return 0;
 
   gboolean is_empty = !keysN && !jpN && !segN;
 
@@ -561,23 +601,7 @@ gboolean feedkey_anthy(int kv, int kvstate)
       if (is_empty)
         return FALSE;
 send:
-      hide_selections_win();
-
-      int val;
-      if (state==STATE_CONVERT) {
-        val = TRUE;
-        send_seg();
-      } else {
-        val = send_jp();
-      }
-
-      jpN=0;
-      keysN = 0;
-      cursor = 0;
-      disp_input();
-      state = STATE_ROMANJI;
-      auto_hide();
-      return val;
+      return flush_input();
     case XK_Escape:
         if (state==STATE_SELECT) {
           state = STATE_CONVERT;
@@ -781,6 +805,8 @@ int init_win_anthy()
   void *handle;
   char *error;
 
+  eng_ph = 1;
+
   if (win_anthy)
     return TRUE;
 
@@ -809,7 +835,12 @@ int init_win_anthy()
   }
 
   if ((*f_anthy_init)() == -1) {
-    printf("cannot init anthy");
+    GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                     GTK_MESSAGE_ERROR,
+                                     GTK_BUTTONS_CLOSE,
+                                     "Cannot init anthy. Please install anthy.");
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
     return FALSE;
   }
 
@@ -924,4 +955,29 @@ void move_win_anthy(int x, int y)
   win_y = y;
 
   move_win_sym();
+}
+
+
+int feedkey_anthy_release(KeySym xkey, int kbstate)
+{
+  switch (xkey) {
+     case XK_Shift_L:
+     case XK_Shift_R:
+        if (
+(  (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) ||
+   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL
+     && xkey == XK_Shift_L) ||
+   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
+     && xkey == XK_Shift_R))
+          &&  current_time() - key_press_time < 300000) {
+          flush_input();
+          key_press_time = 0;
+          hide_selections_win();
+          tsin_set_eng_ch(!eng_ph);
+          return 1;
+        } else
+          return 0;
+     default:
+        return 0;
+  }
 }

@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1994,1995	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 1994-2005	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
 

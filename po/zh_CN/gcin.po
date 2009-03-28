@@ -378,7 +378,7 @@ msgstr "左:正/简体 中:小键盘 右:选项"
 
 #: ../tslearn.c:336
 msgid "按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"
-msgstr "按老鼠中键, 贴上你要 tslearn 学习的文章。"
+msgstr "按鼠标中键, 贴上你要 tslearn 学习的文章。"
 
 #: ../tslearn.c:349
 msgid "標示已知詞"
@@ -407,7 +407,7 @@ msgstr "Ctrl 片语编辑"
 
 #: ../gcin-setup-tab.c:1252
 msgid "剪貼區 正體字->簡體字"
-msgstr "简贴区 正体字->简体字"
+msgstr "剪贴区 正体字->简体字"
 
 #: ../gcin-setup-tab.c:1304
 msgid "通用"

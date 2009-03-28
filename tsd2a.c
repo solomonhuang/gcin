@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1995	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 1995-2005	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
 #include "gcin.h"

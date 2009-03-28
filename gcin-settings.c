@@ -54,7 +54,8 @@ int gcin_status_tray;
 #endif
 
 int pho_hide_row2, pho_in_row1;
-int gcb_position, gcb_position_x, gcb_position_y;
+int gcb_position, gcb_position_x, gcb_position_y, gcin_bell_volume;
+int gcin_sound_play_overlap;
 
 
 int get_gcin_conf_int(char *name, int default_value);
@@ -146,4 +147,6 @@ void load_setttings()
   gcb_position = get_gcin_conf_int(GCB_POSITION, 4);
   gcb_position_x = get_gcin_conf_int(GCB_POSITION_X, 0);
   gcb_position_y = get_gcin_conf_int(GCB_POSITION_Y, 0);
+  gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
+  gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
 }

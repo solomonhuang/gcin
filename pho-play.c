@@ -8,10 +8,10 @@ int pho_play(phokey_t key)
   static int pid;
   static time_t last_time;
   time_t t = time(NULL);
-#if 1
-  if (pid && t - last_time < 2)
-    kill(pid, 9);
-#endif
+  if (!gcin_sound_play_overlap) {
+    if (pid && t - last_time < 2)
+      kill(pid, 9);
+  }
   char *ph = phokey_to_str2(key, 1);
   char tt[512];
   sprintf(tt, GCIN_OGG_DIR"/%s/%s", ph, phonetic_speak_sel);
