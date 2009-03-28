@@ -421,7 +421,7 @@ void do_exit()
 
 char *get_gcin_xim_name();
 void load_phrase(), init_TableDir(),  load_gtab_list();
-void init_im_serv(), create_tray();
+void init_im_serv(), init_tray();
 void init_gcin_im_serv(Window win);
 
 int main(int argc, char **argv)
@@ -515,8 +515,7 @@ int main(int argc, char **argv)
 
 #if TRAY_ENABLED
   if (gcin_status_tray) {
-    sleep(3);
-    create_tray();
+    init_tray();
   }
 #endif
 

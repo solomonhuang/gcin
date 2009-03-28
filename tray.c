@@ -76,7 +76,7 @@ static void draw_icon()
 
 }
 
-void create_tray();
+gboolean create_tray();
 void update_tray_icon()
 {
   if (!gcin_status_tray)
@@ -215,7 +215,7 @@ gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
 }
 
 
-void create_tray()
+gboolean create_tray()
 {
   EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
 
@@ -256,11 +256,18 @@ void create_tray()
   gtk_widget_show_all (GTK_WIDGET (tray_icon));
   tray_da_win = da->window;
   // tray window is not ready ??
-  if (!tray_da_win) {
+  if (!tray_da_win || !GTK_WIDGET_DRAWABLE(da)) {
     gtk_widget_destroy(tray_icon);
     da = NULL;
     return;
   }
+
+#if 0
+  Window xwin = GDK_WINDOW_XID(tray_da_win);
+  XWindowAttributes att;
+  XGetWindowAttributes(dpy, xwin, &att);
+  dbg("www %d %d\n", att.width, att.height);
+#endif
 
   PangoContext *context=gtk_widget_get_pango_context(da);
   PangoFontDescription* desc=pango_context_get_font_description(context);
@@ -281,4 +288,10 @@ void create_tray()
   dbg("font %x %x\n",pango_layout_get_font_description(pango), desc);
 #endif
   gc = gdk_gc_new (tray_da_win);
+  return FALSE;
+}
+
+void init_tray()
+{
+  g_timeout_add(5000, create_tray, NULL);
 }
