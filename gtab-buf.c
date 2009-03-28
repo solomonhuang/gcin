@@ -109,6 +109,7 @@ static void clear_buf_all()
   for(i=0;i<gbufN;i++)
     free_gbuf(i);
   gbuf_cursor = gbufN=0;
+  gtab_buf_select = 0;
 }
 
 void disp_gbuf()
@@ -290,7 +291,7 @@ static int gtab_parse_recur(int start, TSIN_PARSE *out,
       usecount_t usecount;
       int eq_N;
 
-      int  ge_N = find_match(tt, strlen(tt), &eq_N, &usecount);
+      int  ge_N = find_match(tt, &eq_N, &usecount);
       if (ge_N)
         has_ge = TRUE;
 
@@ -497,6 +498,14 @@ void insert_gbuf_cursor1(char *s)
    sel[0] = strdup(s);
    insert_gbuf_cursor(sel, 1);
    clear_after_put();
+}
+
+void insert_gbuf_cursor_char(char ch)
+{
+  char t[2];
+  t[0]=ch;
+  t[1]=0;
+  insert_gbuf_cursor1(t);
 }
 
 int gtab_buf_delete()

@@ -28,5 +28,7 @@ tsin:
 簡易:
        aa space -> should be able to skip to next page
 
+
 gtab-buf:
-  實用性
+  ar30:實用性
+  簡易: 「mg空白鍵ho空白鍵ni空白鍵」

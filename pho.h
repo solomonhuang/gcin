@@ -55,7 +55,7 @@ void prph(phokey_t kk);
 phokey_t pho2key(char typ_pho[]);
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t usecount);
 int lookup(u_char *s);
-int find_match(char *str, int len, int *eq_N, usecount_t *usecount);
+int find_match(char *str, int *eq_N, usecount_t *usecount);
 
 
 #define MAX_PH_BF (90)

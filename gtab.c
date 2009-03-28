@@ -1149,7 +1149,11 @@ gboolean shift_char_proc(KeySym key, int kbstate)
     if (current_CS->b_half_full_char)
       return full_char_proc(key);
 
-    send_ascii(key);
+    if (gbufN)
+      insert_gbuf_cursor_char(key);
+    else
+      send_ascii(key);
+
     return TRUE;
 }
 
@@ -1186,7 +1190,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
     if (gcin_capslock_lower) {
       case_inverse(&key, shift_m);
-      send_ascii(key);
+      if (gbufN)
+        insert_gbuf_cursor_char(key);
+      else
+        send_ascii(key);
       return 1;
     } else
       return 0;
@@ -1207,9 +1214,9 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 shift_proc:
   if (shift_m && !strchr(cur_inmd->selkey, key) && !more_pg &&
        key!='*' && (key!='?' || gtab_shift_phrase_key && !ci)) {
-    if (gtab_shift_phrase_key)
+    if (gtab_shift_phrase_key) {
       return feed_phrase(key, kbstate);
-    else {
+    } else {
       if (!cur_inmd->keymap[key] || (lcase != ucase &&
            cur_inmd->keymap[lcase]==cur_inmd->keymap[ucase]))
         return shift_char_proc(key, kbstate);
@@ -1490,10 +1497,10 @@ next:
 
         if (seltab[vv][0]) {
           if (gtab_auto_select_by_phrase) {
-            if (wild_mode)
-              insert_gbuf_cursor1(seltab[vv]);
-            else
+            if (gtab_buf_select)
               set_gbuf_c_sel(vv);
+            else
+              insert_gbuf_cursor1(seltab[vv]);
           }
           else
             putstr_inp(seltab[vv]);
@@ -1770,7 +1777,9 @@ next_pg:
     if (pendkey)
       spc_pressed = 1;
 
-    if (gtab_auto_select_by_phrase && (spc_pressed||pendkey)) {
+    int full_send = gtab_press_full_auto_send && last_full;
+
+    if (gtab_auto_select_by_phrase && (spc_pressed||pendkey||full_send)) {
       j = S1;
       int selN=0;
       char **sel = NULL;
@@ -1803,7 +1812,7 @@ next_pg:
       last_full=1;
 
     if (defselN==1 && !more_pg) {
-      if (spc_pressed || (gtab_press_full_auto_send && last_full) || gtab_unique_auto_send) {
+      if (spc_pressed || full_send || gtab_unique_auto_send) {
         if (gtab_auto_select_by_phrase)
           insert_gbuf_cursor1(seltab[0]);
         else
