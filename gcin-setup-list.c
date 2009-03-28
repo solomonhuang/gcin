@@ -181,7 +181,10 @@ static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpoint
   gtk_tree_model_get (model, &iter, COLUMN_USE, &value, -1);
   int i = gtk_tree_path_get_indices (path)[0];
   char *key=g_array_index (articles, Item, i).key;
-  int in_no = atoi(key);
+  int in_no = gcin_switch_keys_lookup(key[0]);
+
+  if (in_no < 0)
+    return;
 
   gcin_flags_im_enabled ^= 1 << in_no;
   value ^= 1;

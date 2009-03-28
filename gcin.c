@@ -291,6 +291,7 @@ void load_tsin_db();
 void load_tsin_conf(), load_setttings(), load_tab_pho_file();
 
 void disp_hide_tsin_status_row();
+void change_tsin_line_color();
 
 static void reload_data()
 {
@@ -299,6 +300,7 @@ static void reload_data()
   load_tsin_db();
   disp_hide_tsin_status_row();
   load_tab_pho_file();
+  change_tsin_line_color();
 }
 
 void change_tsin_font_size();

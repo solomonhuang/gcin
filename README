@@ -402,7 +402,7 @@ r 指令會開始執行 gcin， 掛了之後，
 ------------------------------------------------------------------------------------------------------
 GTK_IM_MODULE 使用 gcin 自己的 .so，和XIM相比，有何好處？
   1. gcin 掛掉重新執行時比較不會有程式跟著一起掛掉的情形，現在可以直接在 gnome-terminal 下
-      'pkill gcin'，不用擔心 gnome-terminal 會停在那邊不動 (mozilla-gtk2 除外)。
+      'pkill gcin'，不用擔心 gnome-terminal 會停在那邊不動 (mozilla-gtk2 除外，這是因為如果你有 install flash player，flash 會 open XIM 的 sesseion，X11 裏面的 XIM close 時在 server當掉時也會跟著當掉。)。
   2. GTK2 的程式 locale 即使設定成 zh_TW.Big5 也還是可以輸入所有的 UTF-8 字。
   3. 詞音由於現在有了 key release event，現在也可以用 Shift 來切換中/英。
   3. gcin 的協定對 input focus 的處理比 XIM 好。

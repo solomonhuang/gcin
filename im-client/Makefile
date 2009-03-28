@@ -4,7 +4,8 @@ include ../config.mak
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) -I. -I.. -I../IMdkit/include $(GTKINC) \
         -DCLIENT_LIB=1 -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
-        -DDEBUG="0$(GCIN_DEBUG)" -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"
+        -DDEBUG="0$(GCIN_DEBUG)" -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" \
+        -DFREEBSD=$(FREEBSD)
 OBJS = gcin-im-client.o im-addr.o gcin-conf.o util.o gcin-crypt.o
 
 .c.o:

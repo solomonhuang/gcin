@@ -32,6 +32,7 @@
 #define TSIN_DISP_STATUS_ROW "tsin-disp-status-row"
 #define TSIN_SPACE_OPT "tsin-space-opt"
 #define TSIN_BUFFER_SIZE "tsin-buffer-size"
+#define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
 
 
 #define PHONETIC_KEYBOARD "phonetic-keyboard"
@@ -65,6 +66,7 @@ extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;
 extern int tsin_space_opt;
 
+extern char tsin_phrase_line_color[];
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char rstr[], char *default_str);

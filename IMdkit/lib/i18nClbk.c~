@@ -465,7 +465,7 @@ int _Xi18nStringConversionCallback (XIMS ims, IMProtocol *call_data)
     Xi18n i18n_core = ims->protocol;
     FrameMgr fm;
     extern XimFrameRec str_conversion_fr[];
-    int total_size;
+    register int total_size;
     unsigned char *reply = NULL;
     IMStrConvCBStruct *call_back =
         (IMStrConvCBStruct *) &call_data->strconv_callback;

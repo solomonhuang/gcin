@@ -143,8 +143,8 @@ void create_win_gtab()
   gtk_container_set_border_width (GTK_CONTAINER (gwin_gtab), 0);
   gtk_widget_realize (gwin_gtab);
   GdkWindow *gdkwin = gwin_gtab->window;
-
   gdk_window_set_override_redirect(gdkwin, TRUE);
+
   xwin_gtab = GDK_WINDOW_XWINDOW(gdkwin);
 }
 

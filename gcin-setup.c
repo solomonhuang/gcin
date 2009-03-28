@@ -74,7 +74,7 @@ static void cb_file_ts_export(GtkWidget *widget, gpointer user_data)
    get_gcin_dir(gcin_dir);
 
    char cmd[256];
-   snprintf(cmd, sizeof(cmd), "tsd2a %s/tsin > %s", gcin_dir, selected_filename);
+   snprintf(cmd, sizeof(cmd), GCIN_BIN_DIR"/tsd2a %s/tsin > %s", gcin_dir, selected_filename);
    int res = system(cmd);
    create_result_win(res);
 }
@@ -113,7 +113,7 @@ static void cb_file_ts_import(GtkWidget *widget, gpointer user_data)
 
    char cmd[256];
    snprintf(cmd, sizeof(cmd),
-      "cd %s/.gcin && tsd2a tsin > tmpfile && cat %s >> tmpfile && tsa2d tmpfile",
+      "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a tsin > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d tmpfile",
       getenv("HOME"), selected_filename);
    int res = system(cmd);
    create_result_win(res);
@@ -149,7 +149,8 @@ static void cb_ts_edit()
 {
   char tt[512];
 
-  sprintf(tt, "( cd ~/.gcin && tsd2a tsin > tmpfile && %s tmpfile && tsa2d tmpfile ) &", utf8_edit);
+  sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a tsin > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d tmpfile ) &", utf8_edit);
+  dbg("exec %s\n", tt);
   system(tt);
 }
 
@@ -158,7 +159,7 @@ static void cb_ts_import_sys()
 {
   char tt[512];
 
-  sprintf(tt, "cd ~/.gcin && tsd2a tsin > tmpfile && tsd2a %s/tsin >> tmpfile && tsa2d tmpfile", GCIN_TABLE_DIR);
+  sprintf(tt, "cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a tsin > tmpfile && "GCIN_BIN_DIR"/tsd2a %s/tsin >> tmpfile && "GCIN_BIN_DIR"/tsa2d tmpfile", GCIN_TABLE_DIR);
   dbg("exec %s\n", tt);
   system(tt);
 }
@@ -608,7 +609,7 @@ static void create_main_win()
   GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (main_window), vbox);
 
-  GtkWidget *button_kbm = gtk_button_new_with_label("gcin 注音輸入設定");
+  GtkWidget *button_kbm = gtk_button_new_with_label("gcin 注音/詞音設定");
   gtk_box_pack_start (GTK_BOX (vbox), button_kbm, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_kbm), "clicked",
                     G_CALLBACK (cb_kbm), NULL);

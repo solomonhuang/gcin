@@ -179,7 +179,7 @@ static void putbuf(int len)
   for(idx=i=0;i<len;i++) {
     int len = utf8_sz(chpho[i].ch);
 
-    if (chpho[i].pho) {
+    if (chpho[i].pho && len > 1) {
       int pho_idx = ch_key_to_ch_pho_idx(chpho[i].pho, chpho[i].ch);
       if (pho_idx >= 0)
         inc_pho_count(chpho[i].pho, pho_idx);
@@ -845,17 +845,8 @@ void tsin_toggle_eng_ch()
 
 void tsin_toggle_half_full()
 {
-#if 0
-  if (!eng_ph) {
     tsin_half_full^=1;
     drawcursor();
-  } else {
-    flush_tsin_buffer();
-  }
-#else
-    tsin_half_full^=1;
-    drawcursor();
-#endif
 }
 
 
@@ -1453,6 +1444,15 @@ other_keys:
            chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
            set_phrase_link(c_idx, len);
            raise_phr(c);
+#if 1
+           if (c_idx + len == c_len) {
+             ph_sta = -1;
+
+             for(i=c_idx; i < c_len; i++) {
+               draw_underline(i);
+             }
+           }
+#endif
          } else
          if (len == 1) { // single chinese char
            i= c_idx==c_len?c_idx-1:c_idx;

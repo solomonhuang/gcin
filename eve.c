@@ -476,6 +476,9 @@ static KeySym last_keysym;
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
+#if 0
+  dbg_time("key press %x %x", keysym, kev_state);
+#endif
   check_CS();
 
   if (current_CS->client_win)
@@ -647,8 +650,8 @@ int gcin_FocusIn(ClientState *cs)
   }
 
 
-#if DEBUG || 0
-  dbg("gcin_FocusIn %x %x\n",cs, current_CS);
+#if 0
+  dbg_time("gcin_FocusIn %x %x\n",cs, current_CS);
 #endif
   return True;
 }
@@ -674,13 +677,13 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 
 int gcin_FocusOut(ClientState *cs)
 {
-    if (cs == current_CS) {
+#if 0
+    if (cs == current_CS && gcin_focus_out_close_win) {
       hide_in_win(cs);
+//      focus_win = 0;
     }
-#if DEBUG || 0
-    dbg("focus out %x %x\n", cs, current_CS);
 #endif
-    focus_win = 0;
+
     reset_current_in_win_xy();
 
     if (cs == current_CS)

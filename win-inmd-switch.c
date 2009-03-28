@@ -22,7 +22,7 @@ void create_inmd_switch()
 
     char tt[64];
 
-    sprintf(tt, "%s ctrl-alt-%d", inmd[i].cname, i);
+    sprintf(tt, "%s ctrl-alt-%c", inmd[i].cname, gcin_switch_keys[i]);
 
     GtkWidget *item = gtk_menu_item_new_with_label (tt);
 

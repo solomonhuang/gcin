@@ -69,7 +69,7 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 
       if ((pid=fork())==0) {
 #if 	FREEBSD
-        setgrp();
+        setpgid(0, getpid());
 #else
         setpgrp();
 #endif

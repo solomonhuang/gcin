@@ -166,10 +166,11 @@ void move_IC_in_win(ClientState *cs)
 
    if (!inpwin)
       return;
-#if 1
-   if (inpwin != focus_win)
+
+   // non focus win filtering is done in the client lib
+   if (inpwin != focus_win && focus_win && !cs->b_gcin_protocol)
       return;
-#endif
+
    int inpx = cs->spot_location.x;
    int inpy = cs->spot_location.y;
    XWindowAttributes att;

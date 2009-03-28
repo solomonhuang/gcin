@@ -7,6 +7,7 @@
 #include "gcin-protocol.h"
 #include "im-srv.h"
 
+#define DBG 0
 
 GCIN_ENT *gcin_clients;
 int gcin_clientsN;
@@ -109,6 +110,19 @@ void process_client_req(int fd)
   switch (req.req_no) {
     case GCIN_req_key_press:
     case GCIN_req_key_release:
+#if 1
+      {
+        char tt[128];
+
+        if (req.keyeve.key < 127) {
+          sprintf(tt,"'%c'", req.keyeve.key);
+        } else {
+          strcpy(tt, XKeysymToString(req.keyeve.key));
+        }
+
+//        dbg_time("GCIN_key_press  %x %s\n", cs, tt);
+      }
+#endif
       to_gcin_endian_4(&req.keyeve.key);
       to_gcin_endian_4(&req.keyeve.state);
 
@@ -140,21 +154,27 @@ void process_client_req(int fd)
 
       break;
     case GCIN_req_focus_in:
-//      dbg("GCIN_req_focus_in  %d %d\n", cs->spot_location.x, cs->spot_location.y);
+#if DBG
+      dbg_time("GCIN_req_focus_in  %x %d %d\n",cs, cs->spot_location.x, cs->spot_location.y);
+#endif
       gcin_FocusIn(cs);
       break;
     case GCIN_req_focus_out:
-//      dbg("GCIN_req_focus_out  %x\n", cs);
+#if DBG
+      dbg_time("GCIN_req_focus_out  %x\n", cs);
+#endif
       gcin_FocusOut(cs);
       break;
     case GCIN_req_set_cursor_location:
-#if 0
-      dbg("jjjjj %d %d\n", cs->spot_location.x, cs->spot_location.y);
+#if DBG
+      dbg_time("set_cursor_location %x %d %d\n", cs,
+         cs->spot_location.x, cs->spot_location.y);
 #endif
       update_in_win_pos();
       break;
     default:
-      dbg("Invaild request %x from:", req.req_no);
+      dbg_time("Invaild request %x from:", req.req_no);
+
       struct sockaddr_in addr;
       int len=sizeof(addr);
       bzero(&addr, sizeof(addr));

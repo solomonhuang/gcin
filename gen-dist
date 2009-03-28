@@ -1,4 +1,7 @@
-#cp -f ~/.gcin/tsin.src data
+if [ -d /root2/$HOME/gcin ]; then
+  rm -fr /root2/$HOME/gcin
+  cp -a ~/gcin /root2/$HOME
+fi
 
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
 rm -f tags core.*

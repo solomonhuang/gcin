@@ -50,6 +50,7 @@ static int kbm_selN = sizeof(kbm_sel) / sizeof(kbm_sel[0]);
 static GtkWidget *gcin_kbm_window = NULL;
 
 static int new_select_idx, new_select_idx_tsin_sw, new_select_idx_tsin_space_opt;
+static GdkColor tsin_phrase_line_gcolor;
 
 
 static gboolean cb_ok( GtkWidget *widget,
@@ -77,6 +78,11 @@ static gboolean cb_ok( GtkWidget *widget,
 
   tsin_buffer_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_buffer_size));
   save_gcin_conf_int(TSIN_BUFFER_SIZE, tsin_buffer_size);
+
+  gchar *cstr = gtk_color_selection_palette_to_string(&tsin_phrase_line_gcolor, 1);
+  dbg("color %s\n", cstr);
+  save_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, cstr);
+  g_free(cstr);
 
   send_gcin_message(GDK_DISPLAY(), "reload kbm");
 
@@ -148,6 +154,47 @@ static gboolean close_kbm_window( GtkWidget *widget,
   gtk_widget_destroy(gcin_kbm_window); gcin_kbm_window = NULL;
   return TRUE;
 }
+
+static GtkWidget *da;
+
+static void cb_save_tsin_phrase_line_color(GtkWidget *widget, gpointer user_data)
+{
+  GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
+  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &tsin_phrase_line_gcolor);
+
+  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+}
+
+
+static gboolean cb_tsin_phrase_line_color( GtkWidget *widget,
+                                   gpointer   data )
+{
+   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)gtk_color_selection_dialog_new ("詞音標示詞的底線顏色");
+
+   gtk_color_selection_set_current_color(
+           GTK_COLOR_SELECTION(color_selector->colorsel),
+           &tsin_phrase_line_gcolor);
+
+
+   g_signal_connect (GTK_OBJECT (color_selector->ok_button),
+                     "clicked",
+                     G_CALLBACK (cb_save_tsin_phrase_line_color),
+                     (gpointer) color_selector);
+#if 1
+   g_signal_connect_swapped (GTK_OBJECT (color_selector->ok_button),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             (gpointer) color_selector);
+#endif
+   g_signal_connect_swapped (GTK_OBJECT (color_selector->cancel_button),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             (gpointer) color_selector);
+
+   gtk_widget_show((GtkWidget*)color_selector);
+   return TRUE;
+}
+
 
 void load_setttings();
 
@@ -297,6 +344,21 @@ void create_kbm_window()
    (GtkAdjustment *) gtk_adjustment_new (tsin_buffer_size, 10.0, MAX_PH_BF, 1.0, 1.0, 0.0);
   spinner_tsin_buffer_size = gtk_spin_button_new (adj_gtab_in, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_tsin_buffer_size), spinner_tsin_buffer_size);
+
+
+  GtkWidget *frame_tsin_phrase_line_color = gtk_frame_new("詞音標示詞的底線顏色");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_phrase_line_color, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_phrase_line_color), 3);
+  GtkWidget *button_tsin_phrase_line_color = gtk_button_new();
+  g_signal_connect (G_OBJECT (button_tsin_phrase_line_color), "clicked",
+                    G_CALLBACK (cb_tsin_phrase_line_color), G_OBJECT (gcin_kbm_window));
+  da =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_phrase_line_color), da);
+  gdk_color_parse(tsin_phrase_line_color, &tsin_phrase_line_gcolor);
+  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+  gtk_widget_set_size_request(da, 16, 2);
+  gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
+
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

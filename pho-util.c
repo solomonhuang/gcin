@@ -126,7 +126,7 @@ int utf8_pho_keys(char *utf8, phokey_t *phkeys)
 
 ret:
 
-  dbg("%s %d\n", utf8, phkeysN);
+//  dbg("%s %d\n", utf8, phkeysN);
   qsort(phcou, phkeysN, sizeof(PH_COUNT), qcmp_pho_count);
 
   for(i=0; i < phkeysN; i++)

@@ -77,12 +77,31 @@ static void create_char(int index)
   set_label_font_size(label, gcin_font_size);
 
   chars[index].label = label;
-
+#if 0
   GtkWidget *separator = gtk_hseparator_new ();
+#else
+  GtkWidget *separator =  gtk_drawing_area_new();
+  GdkColor color_bg;
+  gdk_color_parse(tsin_phrase_line_color, &color_bg);
+  gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
+  gtk_widget_set_size_request(separator, 8, 2);
+#endif
   gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
   chars[index].line = separator;
 }
 
+void change_tsin_line_color()
+{
+  int i;
+
+  for(i=0; i < MAX_PH_BF_EXT; i++) {
+    if (!chars[i].line)
+      continue;
+    GdkColor color_bg;
+    gdk_color_parse(tsin_phrase_line_color, &color_bg);
+    gtk_widget_modify_bg(chars[i].line, GTK_STATE_NORMAL, &color_bg);
+  }
+}
 
 gboolean b_use_full_space = TRUE;
 
@@ -424,15 +443,17 @@ void create_win0()
   gtk_container_set_border_width (GTK_CONTAINER (gwin0), 0);
   gtk_widget_realize (gwin0);
   GdkWindow *gdkwin0 = gwin0->window;
-  xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
   gdk_window_set_override_redirect(gdkwin0, TRUE);
-
+  xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
+#if 0
   g_signal_connect(G_OBJECT(gwin0),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
+#endif
 }
 
 
 #define PHO_IN_AREA_FONT_SIZE_DELTA 6
+void create_win1();
 
 void create_win0_gui()
 {

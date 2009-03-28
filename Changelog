@@ -1,5 +1,18 @@
 ** UTF-8 encoding **
 
+0.9.5:
+- 把 focus-out 關掉視窗的部份拿掉，看這樣有沒有改進某些程式亂送 focus-out 的問題，這樣做的問題是如果移到沒有使用輸入法的程式則視窗不會自動關掉。
+- debug 訊息忘記關掉。
+
+0.9.4:
+- 詞音用英數輸入數字或字母後注音選字順序會跑到前面的問題。
+- 現在可以任意設定詞音的標示詞的底線的顏色，在gcin-up 注音的設定裏面。
+- 內碼與簡易沒有辦法在 gcin-setup 中關閉的問題。
+- gcin-setup 裏面改用絕對路徑執行 tsa2d & tsd2a，以避免執行到舊版本的問題。
+- 詞音選詞以後現在會畫底線。
+- FreeBSD 上的問題。
+- gcc-4.0 compile 的問題，Thanks to Funda Wang for reporting this problem.
+
 0.9.3:
 - gcin-seutp 新增匯入系統詞庫的功能。
 - [倉頡/全] 無法直接輸入「，．／；」的問題。

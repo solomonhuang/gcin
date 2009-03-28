@@ -29,6 +29,7 @@ int tsin_buffer_size;
 int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
+char tsin_phrase_line_color[16];
 
 int get_gcin_conf_int(char *name, int default_value);
 
@@ -69,4 +70,6 @@ void load_setttings()
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);
+
+  get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, tsin_phrase_line_color, "blue");
 }
