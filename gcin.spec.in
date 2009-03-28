@@ -10,7 +10,7 @@ Version:	%{version}
 Release:	%{release}
 License: 	LGPL
 Vendor:		Edward Liu
-URL: 		http://www.csie.nctu.edu.tw/~cp76/gcin
+URL: 	        http://hyperrate.com/dir.php?eid=67
 Group: 		Applications/System
 Source0:	%{name}-%{version}.tar.bz2
 Packager:       Edward Liu <cp76@csie.nctu.edu.tw>

@@ -62,7 +62,7 @@ static void cb_sel (GtkWidget *button, gpointer user_data)
   const char *ch = gtk_label_get_text(GTK_LABEL(near_entry->label));
 
   tsin_remove_last();
-
+  char_play(ch);
   add_to_tsin_buf(ch, &near_entry->pk, 1);
 
   close_win_pho_near();

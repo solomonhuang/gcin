@@ -132,24 +132,12 @@ logout & login
 ----------------------
 為什麼有時候gcin的輸入視窗不會跟著程式的游標 ? 
 如果是 GTK(gnome) 的程式，可能你沒有設定 GTK_IM_MODULE=gcin， QT 的程式必須在在 qtconfig 設定 XIM over-the-spot。如果你的 QT 支援 QT_IM_MODULE，只要設定 QT_IM_MODULE=gcin就可以了。
-
-mozilla gtk2-ft 的版本中是不支援 over-the-spot，如果要用 over-the-spot，必須 download
-http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
-
-如果是用 Mandrake 10.2 cooker ，libwidget_gtk2.so 是分開 compiled 的，你可以在這邊找到 .so
-http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
-official firefox 現在是 把 libwidget_gtk2.so link 進去，所以沒有辦法取代。
-
-這個 patch 早就送交 mozilla bugzilla，但一直沒有進去，需要多一些人關切，請參考底下的link，
-  https://bugzilla.mozilla.org/show_bug.cgi?id=271815
-你可以用這個 link 來投票，
-  https://bugzilla.mozilla.org/votes.cgi?action=show_user&bug_id=271815
 ----------------------------
 在詞音中按 control-u 可以把整個編輯區的內容清除。
 -----------------------------------
 如何在非 gnome environment(如 KDE) 修改 gcin 顯示的 button 外觀
 
-  執行  gnome-theme-manager 可以選擇主題, 修改外觀. 但是必須在 KDE startup
+執行  gnome-theme-manager 可以選擇主題, 修改外觀. 但是必須在 KDE startup
 script 中執行 gnome-settings-daemon.
 -----------------------------------------
 把 gcin 一類的 XIM server kill 掉再重新啟動，容易造成 X window 底下程式運作

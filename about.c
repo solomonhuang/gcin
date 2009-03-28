@@ -64,12 +64,14 @@ void create_about_window()
 
     char tt[512];
 
-    GtkWidget *label_sf = gtk_label_new (
-strcat(strcat(strcpy(tt, "http://www.csie.nctu.edu.tw/~cp76/gcin\n"),
-_("bug tracking")), " http://cle.linux.org.tw/gcin"));
+#if 1
+    GtkWidget *label_sf = gtk_label_new ("http://hyperrate.com/dir.php?eid=67\n");
     gtk_label_set_selectable(GTK_LABEL(label_sf), TRUE);
-
     gtk_box_pack_start(GTK_BOX(vbox), label_sf, FALSE, FALSE, 0);
+#else
+    GtkWidget *button_url = gtk_link_button_new_with_label("http://hyperrate.com/dir.php?eid=67", "forum");
+    gtk_box_pack_start(GTK_BOX(vbox), button_url, FALSE, FALSE, 0);
+#endif
 
     image = gtk_image_new_from_file (SYS_ICON_DIR"/gcin.png");
 
