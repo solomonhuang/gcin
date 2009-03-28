@@ -383,8 +383,7 @@ void check_CS()
   if (!current_CS) {
     current_CS = &temp_CS;
 
-    if (!temp_CS.input_style)
-      temp_CS.input_style = InputStyleOverSpot;
+    temp_CS.input_style = InputStyleOverSpot;
   }
   else
     temp_CS = *current_CS;
@@ -677,8 +676,8 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 
 int gcin_FocusOut(ClientState *cs)
 {
-#if 0
-    if (cs == current_CS && gcin_focus_out_close_win) {
+#if 1
+    if (cs == current_CS) {
       hide_in_win(cs);
 //      focus_win = 0;
     }

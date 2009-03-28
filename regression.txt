@@ -3,4 +3,4 @@ cj:   yhmbc, then 2, should be able to select
 
 dayi: 6 space keypad6
 
-hsu.kbm: v吃  c失  a疵  ld兒   mj按      jel經   jem間
+hsu.kbm: v吃  c失  a疵  ld兒   mj按  jel經   jem間  kgf可  gxij怪  nef你   mef米

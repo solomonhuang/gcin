@@ -305,6 +305,7 @@ static void reload_data()
 
 void change_tsin_font_size();
 void change_gtab_font_size();
+void change_pho_font_size();
 void change_win_sym_font_size();
 
 
@@ -313,6 +314,7 @@ static void change_font_size()
   load_setttings();
   change_tsin_font_size();
   change_gtab_font_size();
+  change_pho_font_size();
   change_win_sym_font_size();
 }
 

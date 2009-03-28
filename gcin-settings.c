@@ -23,7 +23,7 @@ int phonetic_char_dynamic_sequence;
 int phonetic_huge_tab;
 int tsin_chinese_english_toggle_key;
 int gcin_font_size_tsin_pho_in;
-int tsin_disp_status_row;
+int pho_simple_win;
 int tsin_space_opt;
 int tsin_buffer_size;
 int gcin_chars_big5_only;
@@ -56,7 +56,7 @@ void load_setttings()
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
-  gtab_simple_win = get_gcin_conf_int(GTAB_SIMPLE_WIN, 0);
+  gtab_simple_win = get_gcin_conf_int(GTAB_SIMPLE_WIN, 1);
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
   gtab_disp_im_name = get_gcin_conf_int(GTAB_DISP_IM_NAME, 1);
   gtab_invalid_key_in = get_gcin_conf_int(GTAB_INVALID_KEY_IN, 0);
@@ -64,7 +64,7 @@ void load_setttings()
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
                                     TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock);
-  tsin_disp_status_row = get_gcin_conf_int(TSIN_DISP_STATUS_ROW, 1);
+  pho_simple_win = get_gcin_conf_int(PHO_SIMPLE_WIN, 1);
   tsin_space_opt = get_gcin_conf_int(TSIN_SPACE_OPT, TSIN_SPACE_OPT_SELECT_CHAR);
   tsin_buffer_size = get_gcin_conf_int(TSIN_BUFFER_SIZE, 40);
 

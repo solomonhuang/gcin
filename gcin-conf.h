@@ -26,10 +26,10 @@
 #define GTAB_DISP_IM_NAME "gtab-disp-im-name"
 #define GTAB_INVALID_KEY_IN "gtab-invalid-key-in"
 
+#define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
 #define TSIN_CHINESE_ENGLISH_TOGGLE_KEY "tsin-chinese-english-toggle_key"
 #define TSIN_CHINESE_ENGLISH_SWITCH "tsin-chinese-english-switch"
-#define TSIN_DISP_STATUS_ROW "tsin-disp-status-row"
 #define TSIN_SPACE_OPT "tsin-space-opt"
 #define TSIN_BUFFER_SIZE "tsin-buffer-size"
 #define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
@@ -57,7 +57,7 @@ extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int tsin_ec_toggle_key;
-extern int tsin_disp_status_row, tsin_buffer_size;
+extern int pho_simple_win, tsin_buffer_size;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;

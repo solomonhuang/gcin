@@ -80,6 +80,7 @@ static IC
     }
 
     bzero(rec, sizeof(IC));
+    rec->cs.input_style = InputStyleOverSpot;
 
     rec->id = ++icid;
 
@@ -235,7 +236,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 	XICAttribute *sts_attr = call_data->status_attr;
 	register int i;
 
-	if (!cs)
+	if (cs)
           current_CS = cs;
 #if DEBUG
         dbg(".... StoreIC\n");

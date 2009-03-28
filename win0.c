@@ -31,7 +31,7 @@ static int max_yl;
 
 void disp_hide_tsin_status_row()
 {
-  if (tsin_disp_status_row)
+  if (!pho_simple_win)
     gtk_widget_show_all(hbox_row2);
   else {
     gtk_widget_hide_all(hbox_row2);
