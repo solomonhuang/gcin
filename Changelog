@@ -1,4 +1,13 @@
 ** UTF-8 encoding **
+1.0.0:
+- 在倉頡行列中如果使用由詞庫自動選詞，gcin 會當掉的問題。
+- .gtab 中預選列也可以顯示詞。
+- 內碼輸入法的問題。
+- 行列的 .cin 現在必須加上 '0 0'  '1 1'  …才可以輸入數字。
+- 第一個鍵就是 endkey無法使用的問題。ctrl-alt-` 有一個測試的希臘字母輸入法。
+- 採用 http://www.calno.com/moto/gcin/cin/nippon-sort.cin.bz2 的日文輸入法。
+  按 ctrl-alt-= 就可以用。
+
 0.9.9:
 - 在詞音中用 shift + ',.;/' 輸入標點符號會 coredump 的問題。
 - .gtab 辨別大小寫無法使用的問題。

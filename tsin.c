@@ -561,7 +561,7 @@ static void disp_current_sel_page()
     } else
     if (idx < phrase_count + pho_count) {
       int v = idx - phrase_count + startf;
-      set_sele_text(i, ch_pho[v].ch, CH_SZ);
+      set_sele_text(i, ch_pho[v].ch, utf8_sz(ch_pho[v].ch));
     } else
       break;
   }

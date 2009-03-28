@@ -320,10 +320,10 @@ int main(int argc, char **argv)
         while (*p) {
           char tp[4];
           int len=u8cpy(tp, p);
-#if 1
+
           if (utf8_eq(tp,"□"))
              tp[0]=0;
-#endif
+
           u8cpy(th.qkeys.quick2[(int)k][(int)k1][N++], tp);
           p+=len;
         }
@@ -332,8 +332,6 @@ int main(int argc, char **argv)
 
       quick_def++;
     }
-
-//    cmd_arg(tt,&cmd, &arg);
   }
 
   long pos=ftell(fr);
@@ -403,8 +401,10 @@ int main(int argc, char **argv)
       memcpy(&itar64[chno].key, &kk, 8);
     else {
       u_int key32 = kk;
+
       memcpy(&itar[chno].key, &key32, 4);
     }
+
 
     if ((len=strlen(arg)) <= CH_SZ && (arg[0] & 0x80)) {
       char out[CH_SZ+1];
@@ -417,9 +417,6 @@ int main(int argc, char **argv)
         bchcpy(itar64[chno].ch, out);
       else
         bchcpy(itar[chno].ch, out);
-
-//      printf("uuu %x %c%c\n", kk, out[0], out[1]);
-
 
     } else {
       if (key64) {

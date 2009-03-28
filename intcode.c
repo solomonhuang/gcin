@@ -21,7 +21,7 @@ static int h2i(int x)
   return (x<='9'?x-'0':x-'A'+10);
 }
 
-static char dstr[]="¢¯¢°¢±¢²¢³¢´¢µ¢¶¢·¢¸¢Ï¢Ğ¢Ñ¢Ò¢Ó¢Ô";
+static char *dstr[]={"ï¼","ï¼‘","ï¼’","ï¼“","ï¼”","ï¼•","ï¼–","ï¼—","ï¼˜","ï¼™","ï¼¡","ï¼¢","ï¼£","ï¼¤","ï¼¥","ï¼¦"};
 
 void disp_int(int index, char *intcode);
 
@@ -60,7 +60,7 @@ dispIn:
   clear_int_code_all();
 
   for(i=0;i<cin;i++) {
-    disp_int(i, &dstr[h2i(inch[i])<<1]);
+    disp_int(i, dstr[h2i(inch[i])]);
   }
 
   if (cin==4) {

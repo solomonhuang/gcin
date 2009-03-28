@@ -7,10 +7,7 @@ static GtkWidget *labels_int[4];
 
 void disp_int(int index, char *intcode)
 {
-  char utf8[512];
-  big5_utf8_n(intcode, CH_SZ, utf8);
-
-  gtk_label_set_text(GTK_LABEL(labels_int[index]), utf8);
+  gtk_label_set_text(GTK_LABEL(labels_int[index]), intcode);
 }
 
 void clear_int_code(int index)

@@ -291,6 +291,9 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
   char tstr[MAX_PHRASE_STR_LEN];
   int matchN=0;
 
+  if (match_chars)
+      match_chars[0] = 0;
+
   do {
     mid = (bottom + top) /2;
 

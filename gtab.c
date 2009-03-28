@@ -597,6 +597,28 @@ static gboolean set_sel1st_i()
 }
 
 
+static void load_phr(int j, char *tt)
+{
+  int len;
+  u_char *ch = tblch(j);
+  int phrno =((int)(ch[0])<<16)|((int)ch[1]<<8)|ch[2];
+
+  int ofs = cur_inmd->phridx[phrno], ofs1 = cur_inmd->phridx[phrno+1];
+
+//  dbg("load_phr   j:%d %d %d %d\n", j, phrno, ofs, ofs1);
+  len = ofs1 - ofs;
+
+  if (len > 128 || len <= 0) {
+    dbg("phrae error %d\n", len);
+    strcpy(tt,"err");
+    return;
+  }
+
+  memcpy(tt, cur_inmd->phrbuf + ofs, len);
+  tt[len]=0;
+}
+
+
 #define swap(a,b) { tt=a; a=b; b=tt; }
 
 static u_int vmask[]=
@@ -624,6 +646,21 @@ static u_int64_t vmask64[]=
 };
 
 #define KEY_N (cur_inmd->max_keyN)
+
+static gboolean load_seltab(int tblidx, int seltabidx)
+{
+  u_char *tbl_ch = tblch(tblidx);
+  if (tbl_ch[0] < 0x80) {
+    load_phr(tblidx, seltab[seltabidx]);
+    return TRUE;
+  }
+
+  int len = u8cpy(seltab[seltabidx], tbl_ch);
+  seltab[seltabidx][len] = 0;
+
+  return FALSE;
+}
+
 
 void wildcard()
 {
@@ -692,8 +729,12 @@ void wildcard()
     if (!regexec(&reg, ts, 0, 0, 0)) {
       if (wild_ofs >= wild_page) {
         b1_cat(tt, cur_inmd->selkey[defselN]);
-        bch_cat(tt, tblch(t));
-        bchcpy(seltab[defselN++], tblch(t));
+
+        load_seltab(t, defselN);
+
+        strcat(tt, seltab[defselN]);
+        defselN++;
+
         b1_cat(tt, ' ');
       } else
         wild_ofs++;
@@ -716,26 +757,6 @@ static char *ptr_selkey(KeySym key)
   return strchr(cur_inmd->selkey, key);
 }
 
-static void load_phr(int j, char *tt)
-{
-  int len;
-  u_char *ch = tblch(j);
-  int phrno =((int)(ch[0])<<16)|((int)ch[1]<<8)|ch[2];
-
-  int ofs = cur_inmd->phridx[phrno], ofs1 = cur_inmd->phridx[phrno+1];
-
-//  dbg("load_phr   j:%d %d %d %d\n", j, phrno, ofs, ofs1);
-  len = ofs1 - ofs;
-
-  if (len > 128 || len <= 0) {
-    dbg("phrae error %d\n", len);
-    strcpy(tt,"err");
-    return;
-  }
-
-  memcpy(tt, cur_inmd->phrbuf + ofs, len);
-  tt[len]=0;
-}
 
 void init_gtab_pho_query_win();
 int feedkey_pho(KeySym xkey, int state);
@@ -861,6 +882,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   int inkey;
   char *pselkey= NULL;
   gboolean phrase_selected = FALSE;
+  char seltab_phrase[MAX_SELKEY];
+
+  bzero(seltab_phrase, sizeof(seltab_phrase));
+
 
 //  dbg("uuuuu %x %x\n", key, kbstate);
 
@@ -1043,13 +1068,13 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
 
       char *pendkey = strchr(cur_inmd->endkey, key);
-
+#if 0
       // for array30
-      if (!ci) {
+      if (!ci && (_gtab_space_auto_first & GTAB_space_auto_first_nofull)) {
         if (cur_inmd->endkey[0] && pendkey)
           return 0;
       }
-
+#endif
       pselkey=ptr_selkey(key);
 
 
@@ -1117,7 +1142,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         inch[ci++]=inkey;
         last_full=0;
 
-        if (cur_inmd->use_quick) {
+        if (cur_inmd->use_quick && !pendkey) {
           if (ci==1) {
             int i;
             for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
@@ -1266,16 +1291,14 @@ refill:
 
   j=s1;
 
-  if (ci < cur_inmd->MaxPress && !spc_pressed && !strchr(cur_inmd->endkey, key)) {
+  if (ci < cur_inmd->MaxPress && !spc_pressed && !pendkey) {
     int shiftb=(KEY_N - 1 -ci) * KeyBits;
 
     exa_match=0;
     bzero(seltab, sizeof(seltab));
     while (CONVT2(cur_inmd, j)==val && exa_match <= cur_inmd->M_DUP_SEL) {
-      u_char *tbl_ch = tblch(j);
-
-      if (tbl_ch[0] >= 0x80)
-        bchcpy(seltab[exa_match++], tbl_ch);
+      seltab_phrase[exa_match] = load_seltab(j, exa_match);
+      exa_match++;
 
       j++;
     }
@@ -1291,12 +1314,21 @@ refill:
       int fff=cur_inmd->keycol[(CONVT2(cur_inmd, j)>>shiftb) & 0x3f];
       u_char *tbl_ch = tblch(j);
 
-      if (!(seltab[fff][0]) ||
+      if (!seltab[fff][0] || seltab_phrase[fff] ||
            (bchcmp(seltab[fff], tbl_ch)>0 && fff > exa_match)) {
+#if 0
         if (tbl_ch[0] >= 0x80) {
           bchcpy(seltab[fff], tbl_ch);
           defselN++;
         }
+        else
+        if (!seltab[fff][0]) {
+          load_phr(j, seltab[fff]);
+          seltab_phrase[fff] = TRUE;
+        }
+#endif
+        if (!(seltab_phrase[fff] = load_seltab(j, fff)))
+          defselN++;
       }
 
       j++;
@@ -1305,17 +1337,12 @@ refill:
 next_pg:
     defselN=more_pg=0;
     bzero(seltab,sizeof(seltab));
-    if (strchr(cur_inmd->endkey, key))
+
+    if (pendkey)
       spc_pressed = 1;
 
     while(CONVT2(cur_inmd, j)==val && defselN<cur_inmd->M_DUP_SEL && j<e1) {
-      u_char *tbl_ch = tblch(j);
-
-      if (tbl_ch[0] < 0x80)
-        load_phr(j, seltab[defselN]);
-      else {
-        bchcpy(seltab[defselN], tbl_ch);
-      }
+      load_seltab(j, defselN);
 
       j++; defselN++;
 
