@@ -47,9 +47,6 @@ void load_gtab_list()
     if (keyidx < 0)
       p_err("bad key value %s in %s\n", key, ttt);
 
-    if (keyidx==16)
-      puts("jjjj");
-
     free(inmd[keyidx].filename);
     inmd[keyidx].filename = strdup(file);
 

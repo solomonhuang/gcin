@@ -1330,8 +1330,9 @@ int feedkey_pp(KeySym xkey, int kbstate)
   int shift_m=kbstate&ShiftMask;
   int j,jj,kk, idx;
   char kno;
+  int caps_eng_tog = tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock;
 
-  if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock)
+  if (caps_eng_tog)
     eng_ph = !(kbstate&LockMask);
 
   key_press_time = 0;
@@ -1345,7 +1346,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
 
    if (!eng_ph && !c_len && gcin_pop_up_win && xkey!=XK_Caps_Lock) {
      hide_win0();
-     return 0;
+
+     if (caps_eng_tog && xkey>=' ' && xkey<0x7f) {
+       case_inverse(&xkey, shift_m);
+       send_ascii(xkey);
+       return 1;
+     }
+     else
+       return 0;
    }
 
    int o_sel_pho = sel_pho;
@@ -1401,7 +1409,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
      case XK_Right:
         return cursor_right();
      case XK_Caps_Lock:
-        if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
+        if (caps_eng_tog) {
           close_selection_win();
           tsin_toggle_eng_ch();
           return 1;
@@ -1609,9 +1617,6 @@ other_keys:
            return cursor_delete();
        }
 
-       if (tsin_space_opt == TSIN_SPACE_OPT_INPUT)
-         xkey_lcase = keypad_proc(xkey);
-
        char *pp;
        if ((pp=strchr(phkbm.selkey,xkey_lcase)) && sel_pho) {
          int c=pp-phkbm.selkey;
@@ -1689,9 +1694,6 @@ asc_char:
             return 1;
         }
 
-
-//        dbg("xkey: %c\n", xkey);
-
         if (shift_m && eng_ph)  {
           char *ppp=strchr(ochars,xkey);
 
@@ -1721,7 +1723,6 @@ asc_char:
         if (tsin_half_full) {
           bchcpy(chpho[c_idx].ch, half_char_to_full_char(xkey));
         } else {
-//          dbg("%c\n", tt);
           chpho[c_idx].ch[0]=tt;
         }
 
@@ -1745,6 +1746,7 @@ asc_char:
      if (xkey > 127) {
        return 0;
      }
+
 
      // for hsu & et26
      if (strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num && typ_pho[0]!=BACK_QUOTE_NO)
@@ -1852,7 +1854,6 @@ llll2:
    clr_in_area_pho_tsin();
    drawcursor();
    hide_pre_sel();
-
 
    if (ph_sta < 0) {
 restart:
@@ -1970,7 +1971,6 @@ restart:
          if (pre_selN == 1)
            pre_selN = 0;
        }
-
        return 1;
      }
    }
