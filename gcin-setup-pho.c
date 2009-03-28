@@ -13,6 +13,8 @@ static struct {
  {"倚天 26 鍵", "et26"},
  {"倚天 26 鍵,使用 asdf 選擇", "et26-asdf"},
  {"許氏(國音,自然)", "hsu"},
+ {"聲調拼音", "pinyin"},
+ {"聲調拼音, 使用 asdf 選擇", "pinyin-asdf"},
  {"IBM", "ibm"},
  {NULL, NULL}
 };

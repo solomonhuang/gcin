@@ -71,12 +71,13 @@ int utf8_sz(char *s)
 }
 
 
-void utf8cpy(char *t, char *s)
+int utf8cpy(char *t, char *s)
 {
   int utf8sz = utf8_sz(s);
 
   memcpy(t, s, utf8sz);
   t[utf8sz] = 0;
+  return utf8sz;
 }
 
 

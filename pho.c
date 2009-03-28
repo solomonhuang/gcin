@@ -16,8 +16,11 @@ static int cpg, maxi;
 int start_idx, stop_idx;
 PHOKBM phkbm;
 u_char typ_pho[4];
-char inph[4];
+char inph[8];
+int text_pho_N=3;
 gboolean b_hsu_kbm;
+PIN_JUYIN *pin_juyin;
+int pin_juyinN;
 
 
 #define MAX_HASH_PHO 27
@@ -55,6 +58,43 @@ void key_typ_pho(phokey_t phokey, char rtyp_pho[])
   rtyp_pho[0] = phokey;
 }
 
+
+gboolean pin2juyin()
+{
+  int i;
+
+  char pin[7];
+  pin[7]=0;
+#if 0
+  for(i=0; i < pin_juyinN; i++) {
+    memcpy(pin,  pin_juyin[i].pinyin, sizeof(pin_juyin[0].pinyin));
+
+    if (!strcmp(pin, inph))
+      goto match;
+  }
+#endif
+  int inphN = strlen(inph);
+  for(i=0; i < pin_juyinN; i++) {
+    memcpy(pin,  pin_juyin[i].pinyin, sizeof(pin_juyin[0].pinyin));
+
+    int pinN = strlen(pin);
+
+    if (pinN < inphN)
+      continue;
+
+    if (!memcmp(pin, inph, inphN))
+      break;
+  }
+
+  if (i==pin_juyinN)
+    return FALSE;
+
+match:
+  bzero(typ_pho, sizeof(typ_pho));
+  key_typ_pho(pin_juyin[i].key, typ_pho);
+
+  return TRUE;
+}
 
 void mask_key_typ_pho(phokey_t *key)
 {
@@ -118,6 +158,34 @@ gboolean inph_typ_pho(int newkey)
   int i;
   int insert = -1;
 
+  if (pin_juyin) {
+    char num = phkbm.phokbm[(int)newkey][0].num;
+    int typ = phkbm.phokbm[(int)newkey][0].typ;
+
+    for(i=0; i < 7; i++)
+      if (!inph[i])
+        break;
+    if (i==7)
+      return FALSE;
+
+//    dbg("zzz %d\n", typ);
+    inph[i] = newkey;
+
+    if (typ==3) {
+      typ_pho[typ] = num;
+      return TRUE;
+    }
+
+    if (!pin2juyin()) {
+      if (newkey != ' ')
+        bell();
+
+      inph[i]=0;
+      return FALSE;
+    }
+
+    return TRUE;
+  }
 
   int max_in_idx;
 
@@ -148,7 +216,6 @@ gboolean inph_typ_pho(int newkey)
 
       if (num) {
         inph[typ] = newkey;
-        typ_pho[typ] = num;
         insert = typ;
         break;
       }
@@ -405,8 +472,32 @@ void load_tab_pho_file()
   char kbmfname[MAX_GCIN_STR];
   FILE *fr;
   char phokbm_name[MAX_GCIN_STR];
-
+#if 1
   get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm_name, "zo-asdf");
+#else
+  strcpy(phokbm_name, "pinyin-asdf");
+#endif
+  free(pin_juyin);
+  pin_juyin = NULL;
+
+  if (!strstr(phokbm_name, "pinyin")) {
+    text_pho_N = 3;
+  } else {
+    text_pho_N = 6;
+    char pinfname[128];
+
+    get_sys_table_file_name("pin-juyin.xlt", pinfname);
+    dbg("pinyin kbm %s\n", pinfname);
+
+    if ((fr=fopen(pinfname,"r"))==NULL)
+       p_err("Cannot open %s", pinfname);
+
+    fread(&pin_juyinN, sizeof(short), 1, fr);
+    pin_juyin = tmalloc(PIN_JUYIN, pin_juyinN);
+    fread(pin_juyin, sizeof(PIN_JUYIN), pin_juyinN, fr);
+    fclose(fr);
+  }
+
   if (strcmp(phokbm_name, "hsu"))
     b_hsu_kbm = FALSE;
   else
@@ -418,9 +509,8 @@ void load_tab_pho_file()
 
   get_sys_table_file_name(phokbm_name, kbmfname);
 
-  if ((fr=fopen(kbmfname,"r"))==NULL) {
+  if ((fr=fopen(kbmfname,"r"))==NULL)
      p_err("Cannot open %s", kbmfname);
-  }
 
   fread(&phkbm,sizeof(phkbm),1,fr);
   fclose (fr);

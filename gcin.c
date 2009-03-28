@@ -344,6 +344,7 @@ static int xerror_handler(Display *d, XErrorEvent *eve)
 
 Atom gcin_atom;
 void cb_trad_sim_toggle();
+void execute_message(char *message);
 
 static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
                                      GdkEvent *event,
@@ -375,6 +376,10 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
        if (!strcmp(message, GB_OUTPUT_TOGGLE)) {
          cb_trad_sim_toggle();
        } else
+       if (strstr(message, "#gcin_message")) {
+         execute_message(message);
+       }
+       else
          reload_data();
 
        XFree(message);
@@ -398,8 +403,8 @@ void init_atom_property()
 
 void hide_win0();
 void do_exit();
-void destory_win0();
-void destory_win1();
+void destroy_win0();
+void destroy_win1();
 void destroy_win_gtab();
 void free_pho_mem(),free_tsin(),free_all_IC(), free_gtab(), free_phrase();
 
@@ -416,8 +421,8 @@ void do_exit()
   free_phrase();
 
 #if 1
-  destory_win0();
-  destory_win1();
+  destroy_win0();
+  destroy_win1();
   destroy_win_gtab();
 #endif
 

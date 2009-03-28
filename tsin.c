@@ -228,15 +228,20 @@ static void prbuf()
 }
 
 
-static int orig_disp_in_area_x = -1;
 void disp_tsin_pho(int index, char *pho);
 
 static void disp_in_area_pho_tsin()
 {
   int i;
 
-  for(i=0;i<4;i++) {
-    disp_tsin_pho(i, &pho_chars[i][typ_pho[i] * PHO_CHAR_LEN]);
+  if (pin_juyin) {
+    for(i=0;i<6;i++) {
+      disp_tsin_pho(i, &inph[i]);
+    }
+  } else {
+    for(i=0;i<4;i++) {
+      disp_tsin_pho(i, &pho_chars[i][typ_pho[i] * PHO_CHAR_LEN]);
+    }
   }
 }
 
@@ -450,6 +455,14 @@ static void save_phrase()
   return;
 }
 
+
+static void set_fixed(int idx, int len)
+{
+  int i;
+  for(i=idx; i < idx+len; i++)
+    chpho[i].flag |= FLAG_CHPHO_FIXED;
+}
+
 #define PH_SHIFT_N (tsin_buffer_size - 1)
 
 static void shift_ins()
@@ -462,6 +475,12 @@ static void shift_ins()
    else
    if (c_len >= PH_SHIFT_N) {
      int ofs;
+
+     // set it fixed so that it will not cause partial phrase in the beginning
+     int fixedlen = c_len - 10;
+     if (fixedlen <= 0)
+       fixedlen = 1;
+     set_fixed(0, Min(c_len, fixedlen));
 
      ofs = 1;
      putbuf(ofs);
@@ -481,7 +500,7 @@ static void shift_ins()
        chpho[j+1] = chpho[j];
      }
 
-     chpho[c_len].ch[0]=' ';
+     init_chpho_i(c_len);
     /*    prbuf(); */
    }
 
@@ -493,6 +512,7 @@ static void put_b5_char(char *b5ch, phokey_t key)
 {
    shift_ins();
 
+   init_chpho_i(c_idx);
    bchcpy(chpho[c_idx].ch, b5ch);
    bchcpy(chpho[c_idx].och, b5ch);
    bchcpy(chpho[c_idx].ph1ch, b5ch);
@@ -507,8 +527,7 @@ static void put_b5_char(char *b5ch, phokey_t key)
    }
 }
 
-
-#define MAX_PHRASE_SEL_N (9)
+#define MAX_PHRASE_SEL_N 10
 
 static u_char selstr[MAX_PHRASE_SEL_N][MAX_PHRASE_LEN * CH_SZ];
 static u_char sellen[MAX_PHRASE_SEL_N];
@@ -532,29 +551,29 @@ static gboolean chpho_eq_pho(int idx, phokey_t *phos, int len)
 static void get_sel_phrase()
 {
   int sti,edi,j;
-  phokey_t key, stk[MAX_PHRASE_LEN];
-  u_char len, mlen, stch[MAX_PHRASE_LEN * CH_SZ + 1];
+  u_char len, mlen;
+
+  phrase_count = 0;
 
   mlen=c_len-c_idx;
 
   if (mlen > MAX_PHRASE_LEN)
     mlen=MAX_PHRASE_LEN;
 
-  key=chpho[c_idx].pho;
-  j= key >> TSIN_HASH_SHIFT;
+  phokey_t pp[MAX_PHRASE_LEN + 1];
+  extract_pho(c_idx, mlen, pp);
 
-  if (j >= TSIN_HASH_N)
+  if (!tsin_seek(pp, 2, &sti, &edi))
     return;
 
-  sti=hashidx[j];
-  edi=hashidx[j+1];
-  phrase_count = 0;
+  while (sti < edi && phrase_count < phkbm.selkeyN) {
+    phokey_t stk[MAX_PHRASE_LEN];
+    usecount_t usecount;
+    u_char stch[MAX_PHRASE_LEN * CH_SZ + 1];
 
-  while (sti < edi && phrase_count < MAX_PHRASE_SEL_N) {
-    usecount_t usecount=0;
     load_tsin_entry(sti, &len, &usecount, stk, stch);
 
-    if (len > mlen) {
+    if (len > mlen || len==1) {
       sti++;
       continue;
     }
@@ -752,9 +771,10 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
       continue;
     }
 
-    int i;
 
-    for(i=0;i < plen;i++) {
+
+    int i;
+    for(i=0; i < plen; i++) {
       if (mtk[i]!=pp[i])
         break;
     }
@@ -995,6 +1015,8 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     disp_in_area_pho_tsin();
 
     prbuf();
+
+    set_fixed(c_idx, len);
 #if 1
     for(i=1;i < len; i++) {
       chpho[c_idx+i].psta= c_idx;
@@ -1031,12 +1053,6 @@ static void set_phrase_link(int idx, int len)
 }
 #endif
 
-static void set_fixed(int idx, int len)
-{
-  int i;
-  for(i=idx; i < idx+len; i++)
-    chpho[i].flag |= FLAG_CHPHO_FIXED;
-}
 
 // should be used only if it is a real phrase
 gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
@@ -1197,6 +1213,14 @@ gint64 current_time()
 
   gettimeofday(&tval, NULL);
   return (gint64)tval.tv_sec * 1000000 + tval.tv_usec;
+}
+
+static void call_tsin_parse()
+{
+  TSIN_PARSE parse[MAX_PH_BF_EXT+1];
+  bzero(parse, sizeof(parse));
+  tsin_parse(parse);
+  prbuf();
 }
 
 
@@ -1541,7 +1565,9 @@ other_keys:
            set_phrase_link(c_idx, len);
 #endif
            set_fixed(c_idx, len);
-
+#if 1
+           call_tsin_parse();
+#endif
            raise_phr(c);
            if (c_idx + len == c_len) {
              ph_sta = -1;
@@ -1564,6 +1590,9 @@ other_keys:
            }
 
            chpho[i].flag |= FLAG_CHPHO_FIXED;
+#if 1
+           call_tsin_parse();
+#endif
          }
 
          if (len) {
@@ -1654,6 +1683,7 @@ asc_char:
           chpho[c_idx].ch[0]=tt;
         }
 
+        set_fixed(c_idx, 1);
         phokey_t tphokeys[32];
         tphokeys[0]=0;
         utf8_pho_keys(chpho[c_idx].ch, tphokeys);
@@ -1663,8 +1693,6 @@ asc_char:
         c_idx++;
         if (c_idx < c_len)
           prbuf();
-
-        orig_disp_in_area_x = -1;
 
         if (gcin_pop_up_win)
           show_win0();
@@ -1757,10 +1785,7 @@ llll2:
 
    put_b5_char(ch_pho[start_idx].ch, key);
 
-   TSIN_PARSE parse[MAX_PH_BF_EXT+1];
-   bzero(parse, sizeof(parse));
-   tsin_parse(parse);
-   prbuf();
+   call_tsin_parse();
 
    disp_ph_sta();
    clrin_pho_tsin();

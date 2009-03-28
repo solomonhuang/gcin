@@ -1,4 +1,18 @@
 ** UTF-8 encoding **
+1.2.7:
+- 單字的詞現在不會在選詞時顯示了。
+- 某些時候在選詞的視窗詞會重複列出的問題。
+- 編輯區裝滿在移出一個字時會先把開頭的部份固定不讓整句斷詞變動，以免開頭不完整的詞造成錯誤的判斷。
+- 編輯區裝滿時自動選字會發生詞庫明明就有這個詞卻不會去使用的問題，特別是前面有改字的情形。
+- 輸入英數有時候後來輸入的中文字結合變成很奇怪的片語的問題。
+- 新增 GCIN_OUTPUT_FILTER 這個 environ variable 可以用來指定 output filter。output filter 是一個任何類型的可執行檔，filter 從 stdin/stdout read/write data。gcin_filter 是一個 shell script範例，紀錄所有 output。
+- 現在可以用 ~/.gcin/gcin-tray.png 取代 gcin 的 png。
+- tray 的 font 改成 12x12。
+- 詞音開始支援有聲調的拼音，可以選擇 (1234 or asdf)  選字詞。234用來輸入(234)聲。  輕聲(˙)可以用 (1 or .)輸入。目前純注音並不支援拼音。
+- 新增一個可執行檔 gcin-message，可以通知 gcin 顯示 message, 語法為
+	gcin-message -icon file_name -text string -duration milli_seconds
+  其中 file_name 必須為 full_path name, 告訴 gcin 要顯示的 image file。 「-text」 是要顯示的 UTF-8字串(不得有空白)。 「-duration」 是顯示多久才關掉，單位是 0.001 秒。
+
 1.2.6:
 - 支援大易 「"{}_」的選擇鍵方式。
 - 詞音裏面的英文模式現在 cursor 會顯示了。

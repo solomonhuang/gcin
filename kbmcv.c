@@ -105,20 +105,13 @@ int main(int argc, char **argv)
         phkb.phokbm[(int)chk][i].num=num;
         phkb.phokbm[(int)chk][i].typ=typ;
 
-        // printf("%c %d %d\n", chk, num, typ);
+//        printf("%c %d %d  i:%d\n", chk, num, typ, i);
         break;
       }
     }
   }
   fclose(fp);
 
-
-#if 0
-  if (phkb.phokbm['c'][0].num && phkb.phokbm['c'][1].num) {
-    swap_char(&phkb.phokbm['c'][0].num, &phkb.phokbm['c'][1].num);
-    swap_char(&phkb.phokbm['c'][0].typ, &phkb.phokbm['c'][1].typ);
-  }
-#endif
   if ((fp=fopen(fnameout,"w"))==NULL) {
     printf("Cannot create %s\n", fnameout);
     exit(1);

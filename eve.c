@@ -1,5 +1,6 @@
 #include "gcin.h"
 #include "gtab.h"
+#include <signal.h>
 #include <X11/extensions/XTest.h>
 
 
@@ -113,7 +114,57 @@ void send_text(char *text)
     len = wn;
   }
 
-  append_str(&output_buffer, &output_bufferN, text, len);
+  char *filter = getenv("GCIN_OUTPUT_FILTER");
+  char filter_text[512];
+
+  if (filter) {
+    int pfdr[2], pfdw[2];
+
+    if (pipe(pfdr) == -1) {
+      dbg("cannot pipe r\n");
+      goto next;
+    }
+
+    if (pipe(pfdw) == -1) {
+      dbg("cannot pipe w\n");
+      goto next;
+    }
+
+    int pid = fork();
+
+    if (pid < 0) {
+      dbg("cannot fork filter\n");
+      goto next;
+    }
+
+    if (pid) {
+      signal(SIGPIPE, SIG_IGN);
+      close(pfdw[0]);
+      close(pfdr[1]);
+      write(pfdw[1], text, len);
+      close(pfdw[1]);
+      int rn = read(pfdr[0], filter_text, sizeof(filter_text) - 1);
+      filter_text[rn] = 0;
+//      puts(filter_text);
+      close(pfdr[0]);
+      text = filter_text;
+      len = rn;
+    } else {
+      close(pfdr[0]);
+      close(pfdw[1]);
+      dup2(pfdw[0], 0);
+      dup2(pfdr[1], 1);
+      if (execl(filter, filter, NULL) < 0) {
+        dbg("execl %s err", filter);
+        goto next;
+      }
+    }
+
+  }
+
+next:
+  if (len)
+    append_str(&output_buffer, &output_bufferN, text, len);
 
   g_free(utf8_gbtext);
 }

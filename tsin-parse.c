@@ -77,6 +77,7 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
       for(i=0;i < plen;i++)
         if (mtk[i]!=pp[i])
           break;
+
       if (i < plen)
         continue;
 
@@ -178,6 +179,10 @@ void tsin_parse(TSIN_PARSE out[])
     dbg("%d] %s  %d  flag:%x\n", i,  out[i].str, out[i].len, out[i].flag);
 #endif
   }
+#if 0
+  for(i=0; i < c_len; i++)
+    dbg("psta %d %x\n", chpho[i].psta, chpho[i].flag);
+#endif
 
   i--;
   if ((out[i].flag & FLAG_TSIN_PARSE_PHRASE) && c_len - out[i].start > 1) {

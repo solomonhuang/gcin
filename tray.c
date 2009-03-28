@@ -8,8 +8,10 @@ static GdkPixbuf *pixbuf, *pixbuf_ch;
 static PangoLayout* pango;
 static GtkWidget *da;
 static GdkGC *gc;
+GdkWindow *tray_da_win;
 
-static char gcin_icon[]=GCIN_ICON_DIR"/gcin-tray.png";
+#define GCIN_TRAY_PNG "gcin-tray.png"
+static char gcin_icon[]=GCIN_ICON_DIR"/"GCIN_TRAY_PNG;
 static char pixbuf_ch_fname[128];
 void exec_gcin_setup();
 
@@ -39,10 +41,10 @@ static void draw_icon()
   gdk_gc_set_rgb_fg_color(gc, &color_fg);
 
   if (pix)
-    gdk_draw_pixbuf(da->window, NULL, pix, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
+    gdk_draw_pixbuf(tray_da_win, NULL, pix, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
   else {
     get_text_w_h(inmd[current_CS->in_method].cname, &w, &h);
-    gdk_draw_layout(da->window, gc, 0, 0, pango);
+    gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
   }
 
   if (current_CS) {
@@ -50,14 +52,14 @@ static void draw_icon()
       static char full[] = "全";
 
       get_text_w_h(full,  &w, &h);
-      gdk_draw_layout(da->window, gc, dw - w, dh - h, pango);
+      gdk_draw_layout(tray_da_win, gc, dw - w, dh - h, pango);
     }
 
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
       static char efull[] = "英全";
 
       get_text_w_h(efull,  &w, &h);
-      gdk_draw_layout(da->window, gc, 0, 0, pango);
+      gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
     }
   }
 
@@ -67,7 +69,7 @@ static void draw_icon()
   if (gb_output) {
     static char sim[] = "简";
     get_text_w_h(sim,  &w, &h);
-    gdk_draw_layout(da->window, gc, 0, dh - h, pango);
+    gdk_draw_layout(tray_da_win, gc, 0, dh - h, pango);
   }
 }
 
@@ -75,6 +77,7 @@ void update_tray_icon()
 {
   gtk_widget_queue_draw(da);
 }
+
 
 void load_tray_icon()
 {
@@ -217,7 +220,16 @@ void create_tray()
                     G_CALLBACK (tray_button_press_event_cb), NULL);
 
   GError *err = NULL;
-  pixbuf = gdk_pixbuf_new_from_file(gcin_icon, &err);
+
+
+  char tt[128];
+  char *icon_fname = gcin_icon;
+  get_gcin_user_fname(GCIN_TRAY_PNG, tt);
+
+  if (access(tt, R_OK)==0)
+   icon_fname = tt;
+
+  pixbuf = gdk_pixbuf_new_from_file(icon_fname, &err);
   int pwidth = gdk_pixbuf_get_width (pixbuf);
   int pheight = gdk_pixbuf_get_height (pixbuf);
 
@@ -236,10 +248,18 @@ void create_tray()
 
   PangoContext *context=gtk_widget_get_pango_context(da);
   PangoFontDescription* desc=pango_context_get_font_description(context);
+#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 10
+  pango_font_description_set_size(desc, 12);
+#endif
   pango_layout_set_font_description(pango, desc);
-  pango_font_description_set_size(desc, 10);
+  // older pango need this
+#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION < 10
+  pango_font_description_set_size(desc, 12);
+#endif
 
   gtk_widget_show_all (GTK_WIDGET (tray_icon));
 
-  gc = gdk_gc_new (da->window);
+  tray_da_win = da->window;
+
+  gc = gdk_gc_new (tray_da_win);
 }

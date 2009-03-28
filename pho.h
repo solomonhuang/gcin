@@ -23,6 +23,12 @@ typedef struct {
   u_short start;
 } PHO_IDX;
 
+
+typedef struct {
+  char pinyin[6];
+  phokey_t key;
+} PIN_JUYIN;
+
 extern int start_idx, stop_idx;
 
 #define MAX_PHRASE_LEN (16)
@@ -38,6 +44,8 @@ extern PHO_IDX *idx_pho;
 extern int ch_pho_ofs;
 extern PHO_ITEM *ch_pho;
 extern int ch_phoN;
+extern PIN_JUYIN *pin_juyin;
+extern int pin_juyinN;
 
 void pho_load();
 extern char *pho_chars[];

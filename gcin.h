@@ -108,7 +108,7 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 #define bchcmp(a,b) memcmp(a,b, CH_SZ)
 
 int utf8_sz(char *s);
-void utf8cpy(char *t, char *s);
+int utf8cpy(char *t, char *s);
 int u8cpy(char *t, char *s);
 int utf8_tlen(char *s, int N);
 void utf8_putchar(char *s);

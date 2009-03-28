@@ -6,6 +6,7 @@ export GCIN_IM_CLIENT_NO_AUTO_EXEC=
 pkill gcin.test
 export LC_CTYPE=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
+export GCIN_OUTPUT_FILTER=./gcin_filter
 ./gcin.test &
 gcinpid=$!
 sleep 1

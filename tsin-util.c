@@ -126,8 +126,6 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t 
     return FALSE;
 
   for(mid=hashidx[hashno]; mid<hashidx[hashno+1]; mid++) {
-//    u_char usecount;
-
     ph_ofs=phidx[mid];
     fseek(fph, ph_ofs, SEEK_SET);
     fread(sbuf,1,1,fph);
@@ -367,6 +365,8 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
 void load_tsin_entry(int idx, char *len, usecount_t *usecount, phokey_t *pho,
                     u_char *ch)
 {
+  *usecount = 0;
+
   if (idx >= phcount) {
     load_tsin_db(); // probably db changed, reload;
     *len = 0;

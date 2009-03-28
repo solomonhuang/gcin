@@ -7,7 +7,7 @@ include config.mak
 OBJS=gcin.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
      gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o \
-     gcin-switch.o tray.o eggtrayicon.o tsin-parse.o
+     gcin-switch.o tray.o eggtrayicon.o tsin-parse.o win-message.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
@@ -25,6 +25,8 @@ OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
+OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
+OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
@@ -47,9 +49,9 @@ im-srv = im-srv/im-srv.a
 	$(CC) $(CFLAGS) -E -o $@ $<
 
 PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
-	juyin-learn sim2trad gcin-gb-toggle
+	juyin-learn sim2trad gcin-gb-toggle gcin-message
 PROGS_SYM=trad2sim
-PROGS_CV=kbmcv
+PROGS_CV=kbmcv pin-juyin
 
 all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
@@ -105,6 +107,12 @@ kbmcv:  $(OBJS_kbmcv)
 gcin-gb-toggle:	$(OBJS_gcin_gb_toggle)
 	$(CC) -o $@ $(OBJS_gcin_gb_toggle) $(LDFLAGS)
 
+gcin-message:	$(OBJS_gcin_message)
+	$(CC) -o $@ $(OBJS_gcin_message) $(LDFLAGS)
+
+pin-juyin:	$(OBJS_pin_juyin)
+	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
+
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
 
@@ -152,7 +160,7 @@ clean:
 	$(MAKE) -C menu clean
 	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) \
 	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.* tscr/*~ \
-	trad2sim gcin.spec.tmp
+	trad2sim gcin.spec.tmp gcin.log
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

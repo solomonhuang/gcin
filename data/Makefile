@@ -5,8 +5,9 @@ include ../config.mak
 DATA=pho.tab tsin32.idx \
      cj.gtab ar30.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
+     pinyin.kbm pinyin-asdf.kbm \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab kana-nippon.gtab \
-     greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src
+     greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt
 DATAKEEP=symbol-table gtab.list phrase.table
 
 all:	$(DATA)
@@ -22,6 +23,9 @@ pho.tab:	 pho.tab.src ../phoa2d
 
 pho-huge.tab:	 pho-huge.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
+
+pin-juyin.xlt:	../pin-juyin
+	../pin-juyin
 
 extr1:	extr1.c
 	cc $< ../util.o ../locale.o -o $@ $(LDFLAGS)

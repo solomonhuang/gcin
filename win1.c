@@ -125,7 +125,7 @@ void disp_arrow_down()
   gtk_widget_show(arrow_down);
 }
 
-void destory_win1()
+void destroy_win1()
 {
   if (!gwin1)
     return;

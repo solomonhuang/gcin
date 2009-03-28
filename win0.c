@@ -23,8 +23,11 @@ static struct {
   GtkWidget *line;
 } chars[MAX_PH_BF_EXT];
 
+
 static GtkWidget *button_pho;
-static GtkWidget *labels_pho[4];
+static GtkWidget *label_pho;
+static char text_pho[6][CH_SZ];
+extern int text_pho_N;
 static GtkWidget *button_eng_ph;
 static int max_yl;
 
@@ -33,7 +36,7 @@ static void create_win0_gui();
 static void recreate_win0()
 {
   bzero(chars, sizeof(chars));
-  bzero(labels_pho, sizeof(chars));
+  label_pho = NULL;
 
   create_win0_gui();
 }
@@ -205,22 +208,31 @@ void clr_tsin_cursor(int index)
 }
 
 
+
 void disp_tsin_pho(int index, char *pho)
 {
-  if (index>=3)
+  if (index>=text_pho_N)
     return;
 
-  if (!labels_pho[index])
-    return;
 
-  char s[CH_SZ+1];
-
-  if (pho[0]==' ')
-    set_label_space(labels_pho[index]);
-  else {
-    utf8cpy(s, pho);
-    gtk_label_set_text(GTK_LABEL(labels_pho[index]), s);
+  if (pho[0]==' ' && !pin_juyin) {
+    u8cpy(text_pho[index], "　");
   }
+  else {
+    u8cpy(text_pho[index], pho);
+  }
+
+  char s[text_pho_N * CH_SZ+1];
+
+
+  int tn = 0;
+  int i;
+  for(i=0; i < text_pho_N; i++) {
+    int n = utf8cpy(s + tn, text_pho[i]);
+    tn += n;
+  }
+
+  gtk_label_set_text(label_pho, s);
 }
 
 
@@ -228,14 +240,10 @@ void clr_in_area_pho_tsin()
 {
   int i;
 
-  for(i=0; i < 4; i++)
+  for(i=0; i < text_pho_N; i++)
    disp_tsin_pho(i, " ");
 }
 
-void hide_pho(int index)
-{
-  gtk_widget_hide(labels_pho[index]);
-}
 
 void get_char_index_xy(int index, int *rx, int *ry)
 {
@@ -528,8 +536,6 @@ static void create_win0_gui()
   button_pho = gtk_button_new();
   gtk_container_set_border_width (GTK_CONTAINER (button_pho), 0);
   gtk_box_pack_start (GTK_BOX (hbox_row1), button_pho, FALSE, FALSE, 0);
-  GtkWidget *hbox_pho = gtk_hbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (button_pho), hbox_pho);
 
   g_signal_connect(G_OBJECT(button_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
@@ -540,13 +546,10 @@ static void create_win0_gui()
   }
 
 
-  int i;
-  for(i=0; i < 3;i ++) {
-    GtkWidget *label = gtk_label_new("");
-    labels_pho[i] = label;
-    gtk_box_pack_start (GTK_BOX (hbox_pho), label, FALSE, FALSE, 0);
-    set_label_font_size(label, gcin_font_size_tsin_pho_in);
-  }
+  label_pho = gtk_label_new("");
+  set_label_font_size(label_pho, gcin_font_size_tsin_pho_in);
+  gtk_container_add (GTK_CONTAINER (button_pho), label_pho);
+
 
   if (!pho_simple_win) {
     GtkWidget *hbox_row2 = gtk_hbox_new (FALSE, 0);
@@ -583,7 +586,7 @@ static void create_win0_gui()
 }
 
 
-void destory_win0()
+void destroy_win0()
 {
   if (!gwin0)
     return;
@@ -643,9 +646,7 @@ void change_tsin_font_size()
   if (!top_bin)
     return;
 
-  for(i=0; i < 3;i ++) {
-    set_label_font_size(labels_pho[i], gcin_font_size_tsin_pho_in);
-  }
+  set_label_font_size(label_pho, gcin_font_size_tsin_pho_in);
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *label = chars[i].label;
@@ -674,7 +675,7 @@ char *get_full_str();
 
 void win_tsin_disp_half_full()
 {
-  gtk_label_set_text(GTK_LABEL(labels_pho[0]), get_full_str());
+  gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
 
   compact_win0();
 }

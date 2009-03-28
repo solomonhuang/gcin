@@ -1,0 +1,4 @@
+#!/bin/bash
+read -r aa
+echo -n $aa
+echo -n $aa >> gcin.log

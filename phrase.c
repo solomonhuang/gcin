@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1994	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 1994-2006		Edward  Hsin-Chu, Taiwan
 */
 
 #include <stdio.h>
@@ -59,7 +59,7 @@ void load_phrase()
 
   while (!feof(fp)) {
     int i,j;
-    char str[256];
+    char str[512];
 
     kname[0]=str[0]=0;
     fgets(ttt, sizeof(ttt), fp);
