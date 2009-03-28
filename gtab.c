@@ -927,7 +927,7 @@ static void disp_selection(gboolean phrase_selected)
 
       utf8cpy(uu, &cur_inmd->selkey[i - ofs]);
       char vvv[16];
-      char www[32];
+      char www[512];
       sprintf(www, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, htmlspecialchars(uu, vvv));
       strcat(tt, www);
 

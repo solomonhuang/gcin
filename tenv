@@ -1,4 +1,5 @@
 #!/bin/bash -f
+ulimit -c unlimited
 rm -f core.*
 export PATH=.:$PATH
 export GCIN_TABLE_DIR=./data

@@ -24,7 +24,7 @@ pho.tab:	 pho.tab.src ../phoa2d
 pho-huge.tab:	 pho-huge.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
 
-t2s.dat:	t2s-file Big5_to_GB2312.txt
+t2s.dat:	t2s-file t2s-file.table
 	./t2s-file
 s2t.dat:	t2s-file
 
@@ -51,4 +51,4 @@ install:
 	install -m 644 $(DATA) $(DATAKEEP) $(GCIN_TABLE_DIR_i)
 #	cd $(GCIN_TABLE_DIR_i); bzip2 -f *.gtab
 clean:
-	rm -f *~ tags core.* $(DATA) *.gtab extr1 tsin-1.src
+	rm -f *~ tags core.* $(DATA) *.gtab extr1 t2s-file tsin-1.src

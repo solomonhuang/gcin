@@ -36,7 +36,7 @@ void gen(T2S *t, char *name)
 
 main()
 {
-  char *fname="Big5_to_GB2312.txt";
+  char *fname="t2s-file.table";
   FILE *fp=fopen(fname, "r");
 
   if (!fp)
