@@ -1,6 +1,5 @@
 #ifndef GCIN_IM_CLIENT_H
 #define GCIN_IM_CLIENT_H
-
 struct GCIN_PASSWD;
 
 typedef struct {

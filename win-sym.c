@@ -111,47 +111,76 @@ static gboolean read_syms()
 
 gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len);
 void send_text_call_back(char *text);
+void tsin_reset_in_pho(), reset_gtab_all(), clr_in_area_pho();
 
 static void cb_button_sym(GtkButton *button, char *str)
 {
   phokey_t pho[256];
   bzero(pho, sizeof(pho));
 
-  if (current_CS->in_method == 6)
+  if (current_CS->in_method == 6 && current_CS->im_state != GCIN_STATE_DISABLED) {
     add_to_tsin_buf(str, pho, utf8_str_N(str));
+  }
   else
     send_text_call_back(str);
+
+  switch (current_CS->in_method) {
+    case 3:
+       clr_in_area_pho();
+       break;
+    case 6:
+       tsin_reset_in_pho();
+       break;
+    default:
+       reset_gtab_all();
+       break;
+  }
 }
 
 void update_active_in_win_geom();
+extern int win_status_y;
 
 void move_win_sym()
 {
   gwin_sym = win_syms[current_CS->in_method];
 #if 0
-  dbg("move %d gwin_sym:%x\n", current_CS->in_method, gwin_sym);
+  dbg("move_win_sym %d\n", current_CS->in_method);
 #endif
   if (!gwin_sym)
     return;
 
+  int wx, wy;
+#if 0
+  if (gcin_pop_up_win) {
+    wx = dpy_xl;
+  } else
+#endif
+  {
+  //  dbg("win_y: %d  %d\n", win_y, win_yl);
+    update_active_in_win_geom();
 
-//  dbg("win_y: %d  %d\n", win_y, win_yl);
-  update_active_in_win_geom();
+    wx = win_x; wy = win_y + win_yl;
+  }
 
   int winsym_xl, winsym_yl;
   get_win_size(gwin_sym, &winsym_xl, &winsym_yl);
-
-  int wx = win_x, wy = win_y + win_yl;
 
   if (wx + winsym_xl > dpy_xl)
     wx = dpy_xl - winsym_xl;
   if (wx < 0)
     wx = 0;
 
-  if (wy + winsym_yl > dpy_yl)
-    wy = win_y - winsym_yl;
-  if (wy < 0)
-    wy = 0;
+#if 0
+  if (gcin_pop_up_win) {
+    wy = win_status_y - winsym_yl;
+  } else
+#endif
+  {
+    if (wy + winsym_yl > dpy_yl)
+      wy = win_y - winsym_yl;
+    if (wy < 0)
+      wy = 0;
+  }
 
   gtk_window_move(GTK_WINDOW(gwin_sym), wx, wy);
 }
@@ -164,12 +193,9 @@ void hide_win_sym()
 
   if (!gwin_sym)
     return;
-#if 0
-  dbg("hide_win_sym %x\n", gwin_sym);
-#endif
+
   gtk_widget_hide(gwin_sym);
 }
-
 
 void show_win_sym()
 {

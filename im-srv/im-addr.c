@@ -14,6 +14,14 @@ void get_gcin_im_srv_sock_path(char *outstr, int outstrN)
   if (!disp || !strcmp(disp, ":0"))
     disp = ":0.0";
 
+  char tdisp[64];
+  strcpy(tdisp, disp);
+
+  if (!strchr(disp, ':'))
+      strcat(tdisp, ":0");
+  if (!strchr(disp, '.'))
+      strcat(tdisp, ".0");
+
   char my_dir[128];
 
   struct passwd *pw = getpwuid(my_uid);
@@ -29,7 +37,7 @@ void get_gcin_im_srv_sock_path(char *outstr, int outstrN)
     }
   }
 
-  snprintf(outstr,outstrN, "%s/socket-%s-%s", my_dir, disp, get_gcin_xim_name());
+  snprintf(outstr,outstrN, "%s/socket-%s-%s", my_dir, tdisp, get_gcin_xim_name());
 }
 
 

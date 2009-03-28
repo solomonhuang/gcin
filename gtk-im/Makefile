@@ -3,7 +3,7 @@ include ../config.mak
 OBJS = imgcin.o gtkimcontextgcin.o
 GTK2IM=gtk-2.0/immodules
 IMMODULES=$(libdir)/$(GTK2IM)
-IMMODULES_LOCAL=/usr/lib/$(GTK2IM)
+IMMODULES_LOCAL=/usr/$(LIB)/$(GTK2IM)
 
 .SUFFIXES:	.c .o .E
 CFLAGS = $(OPTFLAGS) $(GTKINC) -I../im-client -I.. -I../IMdkit/include -DCLIENT_LIB=1

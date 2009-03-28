@@ -218,7 +218,7 @@ struct {
 };
 
 static GtkWidget *spinner_gcin_font_size, *spinner_gcin_font_size_tsin_presel,
-                 *spinner_gcin_font_size_symbol,
+                 *spinner_gcin_font_size_symbol,*spinner_gcin_font_size_pho_near,
                  *spinner_gcin_font_size_tsin_pho_in, *spinner_gcin_font_size_gtab_in, *spinner_root_style_x,
                  *spinner_root_style_y, *font_sel;
 
@@ -254,6 +254,9 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   int font_size_tsin_pho_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_tsin_pho_in));
   save_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, font_size_tsin_pho_in);
+
+  int font_size_pho_near = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_pho_near));
+  save_gcin_conf_int(GCIN_FONT_SIZE_PHO_NEAR, font_size_pho_near);
 
   int font_size_gtab_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_gtab_in));
   save_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, font_size_gtab_in);
@@ -319,7 +322,7 @@ void create_appearance_conf_window()
   GtkWidget *label_gcin_font_size = gtk_label_new("字型大小");
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size), label_gcin_font_size, FALSE, FALSE, 0);
   GtkAdjustment *adj_gcin_font_size =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size, 8.0, 24.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size, 8.0, 32.0, 1.0, 1.0, 0.0);
   spinner_gcin_font_size = gtk_spin_button_new (adj_gcin_font_size, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size), spinner_gcin_font_size, FALSE, FALSE, 0);
 
@@ -329,7 +332,7 @@ void create_appearance_conf_window()
   GtkWidget *label_gcin_font_size_symbol = gtk_label_new("符號選擇視窗字型大小");
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_symbol), label_gcin_font_size_symbol, FALSE, FALSE, 0);
   GtkAdjustment *adj_gcin_font_size_symbol =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 24.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_symbol, 8.0, 32.0, 1.0, 1.0, 0.0);
   spinner_gcin_font_size_symbol = gtk_spin_button_new (adj_gcin_font_size_symbol, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_symbol), spinner_gcin_font_size_symbol, FALSE, FALSE, 0);
 
@@ -339,7 +342,7 @@ void create_appearance_conf_window()
   GtkWidget *label_gcin_font_size_tsin_presel = gtk_label_new("詞音預選詞視窗字型大小");
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_tsin_presel), label_gcin_font_size_tsin_presel, FALSE, FALSE, 0);
   GtkAdjustment *adj_gcin_font_size_tsin_presel =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_presel, 8.0, 24.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_presel, 8.0, 32.0, 1.0, 1.0, 0.0);
   spinner_gcin_font_size_tsin_presel = gtk_spin_button_new (adj_gcin_font_size_tsin_presel, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_tsin_presel), spinner_gcin_font_size_tsin_presel, FALSE, FALSE, 0);
 
@@ -349,9 +352,19 @@ void create_appearance_conf_window()
   GtkWidget *label_gcin_font_size_tsin_pho_in = gtk_label_new("詞音注音輸入區字型大小");
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_tsin_pho_in), label_gcin_font_size_tsin_pho_in, FALSE, FALSE, 0);
   GtkAdjustment *adj_gcin_font_size_tsin_pho_in =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_pho_in, 8.0, 24.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_pho_in, 8.0, 32.0, 1.0, 1.0, 0.0);
   spinner_gcin_font_size_tsin_pho_in = gtk_spin_button_new (adj_gcin_font_size_tsin_pho_in, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_tsin_pho_in), spinner_gcin_font_size_tsin_pho_in, FALSE, FALSE, 0);
+
+
+  GtkWidget *hbox_gcin_font_size_pho_near = gtk_hbox_new (FALSE, 14);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gcin_font_size_pho_near, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_font_size_pho_near = gtk_label_new("詞音近似音顯示字型大小");
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_pho_near), label_gcin_font_size_pho_near, FALSE, FALSE, 0);
+  GtkAdjustment *adj_gcin_font_size_pho_near =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_pho_near, 8.0, 32.0, 1.0, 1.0, 0.0);
+  spinner_gcin_font_size_pho_near = gtk_spin_button_new (adj_gcin_font_size_pho_near, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_pho_near), spinner_gcin_font_size_pho_near, FALSE, FALSE, 0);
 
 
   GtkWidget *hbox_gcin_font_size_gtab_in = gtk_hbox_new (FALSE, 10);
@@ -359,7 +372,7 @@ void create_appearance_conf_window()
   GtkWidget *label_gcin_font_size_gtab_in = gtk_label_new("gtab(倉頡…)輸入區字型大小");
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_gtab_in), label_gcin_font_size_gtab_in, FALSE, FALSE, 0);
   GtkAdjustment *adj_gcin_font_size_gtab_in =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 8.0, 24.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 8.0, 32.0, 1.0, 1.0, 0.0);
   spinner_gcin_font_size_gtab_in = gtk_spin_button_new (adj_gcin_font_size_gtab_in, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_gtab_in), spinner_gcin_font_size_gtab_in, FALSE, FALSE, 0);
 

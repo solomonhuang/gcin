@@ -228,9 +228,11 @@ void clrin_pho()
 }
 
 void disp_pho(int index, char *phochar);
-static void clr_in_area_pho()
+void clr_in_area_pho()
 {
   int i;
+
+  clrin_pho();
 
   for(i=0; i < 4; i++)
     disp_pho(i, "  ");
@@ -370,7 +372,6 @@ void putkey_pho(u_short key, int idx)
 
   inc_pho_count(key, idx);
 
-  clrin_pho();
   clr_in_area_pho();
   ClrSelArea();
 
@@ -442,7 +443,6 @@ void init_tab_pho()
 
   show_win_pho();
   clr_in_area_pho();
-  clrin_pho();
 }
 
 gboolean shift_char_proc(KeySym key, int kbstate);
@@ -470,7 +470,6 @@ int feedkey_pho(KeySym xkey, int kbstate)
     case XK_Escape:
       if (!typ_pho[0] &&!typ_pho[1] &&!typ_pho[2] &&!typ_pho[3])
         return 0;
-      clrin_pho();
       ClrSelArea();
       clr_in_area_pho();
       if (is_gtab_query_mode())
@@ -483,7 +482,6 @@ int feedkey_pho(KeySym xkey, int kbstate)
         if (!typ_pho[0]&&!typ_pho[1]&&!typ_pho[2]&&!typ_pho[3]) {
           ClrSelArea();
           clr_in_area_pho();
-          clrin_pho();
           return 1;
         }
         break;

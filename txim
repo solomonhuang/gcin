@@ -5,7 +5,8 @@ echo "GCIN_TABLE_DIR=$GCIN_TABLE_DIR"
 export GCIN_IM_CLEINT_NO_AUTO_EXEC=
 pkill gcin.test
 export LC_CTYPE=zh_CN.GB2312
-export LC_ALL=zh_CN.GB2312
+#export LC_ALL=zh_CN.GB2312
+export LC_CTYPE=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
 ./gcin.test &
 gcinpid=$!

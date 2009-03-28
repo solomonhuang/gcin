@@ -1,7 +1,8 @@
 #include "gcin.h"
 #include "gtab.h"
 
-int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol, gcin_font_size_gtab_in;
+int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
+int gcin_font_size_pho_near, gcin_font_size_gtab_in;
 int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
@@ -51,6 +52,7 @@ void load_setttings()
   gcin_font_size_symbol = get_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, 12);
   gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
   gcin_font_size_gtab_in = get_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, 10);
+  gcin_font_size_pho_near = get_gcin_conf_int(GCIN_FONT_SIZE_PHO_NEAR, 14);
   gcin_input_style = get_gcin_conf_int(GCIN_INPUT_STYLE, InputStyleOverSpot);
   gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 2000);
   gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 2000);

@@ -14,8 +14,6 @@ if [ ! -d .gcin/config ]; then
   mkdir .gcin/config
 fi
 
-touch .gcin/gcin-UTF-8-format
-
 cd $1 || echo "$1 is not a gcin table dir"
 
 for i in pho.tab pho-huge.tab tsin* symbol-table phrase.table
@@ -24,13 +22,3 @@ do
      cp $i ~/.gcin
   fi
 done
-
-# to support UTF-8 4-byte character
-cd ~/.gcin
-bindir=$2
-UTF8_4=utf8-4byte
-if [ ! -f $UTF8_4 ]; then
-    $bindir/tsd2a tsin > tmpfile
-    $bindir/tsa2d tmpfile
-    touch $UTF8_4
-fi

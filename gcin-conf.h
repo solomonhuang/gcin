@@ -8,6 +8,7 @@
 #define GCIN_FONT_SIZE_SYMBOL "gcin-font-size-symbol"
 #define GCIN_FONT_SIZE_TSIN_PHO_IN "gcin-font-size-tsin-pho-in"
 #define GCIN_FONT_SIZE_GTAB_IN "gcin-font-size-gtab-in"
+#define GCIN_FONT_SIZE_PHO_NEAR "gcin-font-size-pho-near"
 #define GCIN_INPUT_STYLE "gcin-input-style"
 #define GCIN_ROOT_X      "gcin-root-x"
 #define GCIN_ROOT_Y      "gcin-root-y"
@@ -57,7 +58,7 @@
 
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
-           gcin_font_size_tsin_pho_in, gcin_chars_big5_only,
+           gcin_font_size_tsin_pho_in, gcin_font_size_pho_near, gcin_chars_big5_only,
            gcin_font_size_gtab_in, gcin_inner_frame,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,

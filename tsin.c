@@ -293,7 +293,7 @@ void clr_in_area_pho_tsin();
 void close_win_pho_near();
 void compact_win0_x();
 
-static void tsin_reset_in_pho()
+void tsin_reset_in_pho()
 {
   clrin_pho_tsin();
   prbuf();

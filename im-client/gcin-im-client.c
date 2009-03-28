@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
+#ifndef _XSERVER64
+#define _XSERVER64
+#endif
 #include "gcin.h"
 #include "gcin-protocol.h"
 #include "gcin-im-client.h"
@@ -243,7 +246,8 @@ static void gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
   req->input_style = handle->input_style;
   to_gcin_endian_4(&req->input_style);
 
-  req->spot_location = handle->spot_location;
+  req->spot_location.x = handle->spot_location.x;
+  req->spot_location.y = handle->spot_location.y;
   to_gcin_endian_2(&req->spot_location.x);
   to_gcin_endian_2(&req->spot_location.y);
 }
@@ -444,7 +448,7 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y
 {
   handle->spot_location.x = x;
   handle->spot_location.y = y;
-//  dbg("gcin_im_client_set_cursor_location %d\n", handle->flag);
+//  dbg("gcin_im_client_set_cursor_location %d   %d,%d\n", handle->flag, x, y);
   if (!BITON(handle->flag, FLAG_GCIN_client_handle_has_focus))
     return;
 

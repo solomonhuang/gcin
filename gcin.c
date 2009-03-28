@@ -433,7 +433,6 @@ static void exec_script(char *name)
 
 static void exec_setup_scripts()
 {
-  exec_script("gcin-utf8-setup");
   exec_script("gcin-user-setup "GCIN_TABLE_DIR" "GCIN_BIN_DIR);
 }
 
@@ -461,7 +460,13 @@ int main(int argc, char **argv)
   char *lc_utf8;
   char *lc;
 
-  if (strstr(lc_ctype, "CN")) {
+  if (lc_ctype && strstr(lc_ctype, "en") || lang && strstr(lang, "en")){
+    lc = "en_US";
+    enc = "UTF-8";
+    lc_enc = "en_US.UTF-8";
+    lc_utf8 = "en_US.UTF-8";
+  } else
+  if (lc_ctype && strstr(lc_ctype, "CN") || lang && strstr(lang, "CN")) {
     lc = "zh_CN";
     enc = "GB2312";
     lc_enc = "zh_CN.GB2312";
@@ -495,12 +500,11 @@ int main(int argc, char **argv)
     strcat(xim_arr[1].xim_server_name, ".UTF-8");
     dbg("gcin will use %s as the default encoding\n", enc);
   }
+#endif
 
   if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {
     p_err(" version %s\n", GCIN_VERSION);
   }
-
-#endif
 
   exec_setup_scripts();
 

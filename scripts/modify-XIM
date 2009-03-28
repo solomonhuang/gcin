@@ -133,6 +133,10 @@ if [ $GTK_QUERY_IM ]; then
     GTK_ETC=/etc/opt/gnome/gtk-2.0
   fi
   cd $GTK_ETC
-  $GTK_QUERY_IM > gtk.immodules.lib
+
+  imlib=gtk.immodules.lib
+  [ -f gtk.immodules.lib64 ] &&  imlib=gtk.immodules.lib64
+
+  $GTK_QUERY_IM > $imlib
   cp gtk.immodules.lib gtk.immodules
 fi

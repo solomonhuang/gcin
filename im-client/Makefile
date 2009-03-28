@@ -8,6 +8,9 @@ CFLAGS= $(WALL) $(OPTFLAGS) -I. -I.. -I../IMdkit/include $(GTKINC) \
         -DFREEBSD=$(FREEBSD)
 OBJS = gcin-im-client.o im-addr.o gcin-conf.o util.o gcin-crypt.o
 
+.c.E:
+	$(CC) $(CFLAGS) -E -o $@ $<
+
 .c.o:
 	$(CC) -c -fpic $(CFLAGS) -o $@ $<
 
@@ -15,13 +18,18 @@ libgcin-im-client.so:   $(OBJS)
 	$(CC) -shared $(OBJS) -o $@
 	$(MAKE) -C ../gtk-im
 
+LOCALLIB=/usr/local/$(LIB)
+
 install:
 	install -d $(libdir)
-	install -m 755 libgcin-im-client.so $(libdir)
 	if [ $(prefix) = /usr/local ]; then \
-	  grep /usr/local/lib /etc/ld.so.conf > /dev/null 2>&1 || \
-	  echo /usr/local/lib >> /etc/ld.so.conf; \
+	  ! [ -d $(LOCALLIB) ] && mkdir $(LOCALLIB) ; \
+	  install -m 755 libgcin-im-client.so $(LOCALLIB); \
+	  grep $(LOCALLIB) /etc/ld.so.conf > /dev/null 2>&1 || \
+	  echo $(LOCALLIB) >> /etc/ld.so.conf; \
 	  PATH=/sbin:/usr/sbin:$(PATH); ldconfig; \
+	else \
+	  install -m 755 libgcin-im-client.so $(libdir); \
 	fi; \
 	install -d $(includedir); \
 	install -m 444 gcin-im-client.h $(includedir)

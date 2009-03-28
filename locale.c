@@ -34,7 +34,7 @@ void utf8_big5_n(char *s, int len, char out[])
   int rn, wn;
   char *big5 = g_locale_from_utf8 (s, len, &rn, &wn, &err);
 
-  if (err) {
+  if (err || !big5) {
     dbg("utf8_big5 convert error\n");
 //    abort();
     return;

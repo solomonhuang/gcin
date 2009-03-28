@@ -14,16 +14,29 @@ enum {
 };
 
 typedef struct {
+#if 0
     KeySym key;
+#else
+    u_int key;
+#endif
     u_int state;
 } KeyEvent;
 
 typedef struct {
+    short x, y;
+} GCINpoint;
+
+
+typedef struct {
   u_int req_no;  // to make the im server stateless, more is better
+#if 0
   Window client_win;
+#else
+  u_int client_win;
+#endif
   u_int flag;
   u_int input_style;
-  XPoint spot_location;
+  GCINpoint spot_location;
 
   union {
     KeyEvent keyeve;

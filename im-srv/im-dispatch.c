@@ -173,7 +173,7 @@ void process_client_req(int fd)
       update_in_win_pos();
       break;
     default:
-      dbg_time("Invaild request %x from:", req.req_no);
+      dbg_time("Invalid request %x from:", req.req_no);
 
       struct sockaddr_in addr;
       int len=sizeof(addr);

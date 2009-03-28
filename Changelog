@@ -1,4 +1,20 @@
 ** UTF-8 encoding **
+1.1.7:
+- client與 server 間如果是不同的 32/64  bit，會無法互通的問題，64-bit的使用者必須同時用新的 gcin server and libgcin-imclient.so。 
+- 倉頡等輸入法中，如果沒有開啟預覽字，則只有在重覆字出現時才會顯示字。
+- 只能用 LC_CTYPE 設定 locale 的 bug。
+- 現在也可以在 Mandriva x86_64 上 intall to /usr/local了。不過只會 install 64-bit 的 .so。
+
+1.1.6:
+- XIM en_US.UTF-8 的支援，感謝某人提供的 patch。
+- 在 gdmxnest 中 gcin 無法使用的問題。
+- gcin 在 compile 時如果選擇 disable XIM ，則 gcin -v 不會顯示版本。
+- gcin-setup 中字型大小的上限改為 32。
+- 詞音的近似音查詢現在也可以設定字型的大小。
+- 彈出式視窗現在可以按右下角的狀態視窗
+	左:  顯示符號視窗  中:切換輸入法  右:執行 gcin-setup。
+
+
 1.1.5:
 - 使用最新的 GTK，gdm 會 coredump 的問題。如果 GTK 程式有不穩的情形，也建議 update 。
 - 外觀設定中新增可以設定字型名稱的選項。 但是如果你的 GTK < 2.4，則無法在 gcin-setup 中設定。如果你有這種情形，可以用底下的方式設定。 echo "AR PL New Sung" > ~/.gcin/config/gcin-font-name

@@ -66,11 +66,15 @@ else
   echo " found."
 fi
 
+LIB='lib'
+if [ -d /lib64 ]; then
+LIB='lib64'
+fi
 
 QT_IM='N'
 for i in qt3 qt4
 do
-  QT_IM_DIR=/usr/lib/$i/plugins/lib/inputmethods
+  QT_IM_DIR=/usr/lib/$i/plugins/$LIB/inputmethods
   echo "testing if you have QT_IM_MODULE dir:$QT_IM_DIR support"
   if [ -d  $QT_IM_DIR ]; then
     QT_IM='Y'
@@ -125,6 +129,7 @@ if [ $prefix = /usr ]; then
   OPTFLAGS="-O"
 fi
 
+
 echo "CC=gcc" > config.mak
 echo "MAKE=$MAKE" >> config.mak
 echo "GTKINC=$GTKINC" >> config.mak
@@ -158,6 +163,7 @@ echo "USE_XIM=$use_xim" >> config.mak
 echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
 echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak
 echo "NEW_GTK_IM=$new_gtk_im" >> config.mak
+echo "LIB=$LIB" >> config.mak
 
 
 cd menu

@@ -1496,6 +1496,7 @@ next_pg:
   }
 
 Disp_opt:
+  if (gtab_disp_partial_match || gtab_pre_select || exa_match > 1)
   disp_selection(phrase_selected);
 
   return 1;
