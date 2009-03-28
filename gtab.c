@@ -508,9 +508,10 @@ void init_gtab(int inmdno)
 
 
   if (all_full_ascii) {
+    int mkeyn = 1 <<  th.keybits;
     free(inp->keyname_lookup);
-    inp->keyname_lookup = malloc(sizeof(char) * MAX_GTAB_KEYS);
-    memcpy(inp->keyname_lookup, keyname_lookup, MAX_GTAB_KEYS);
+    inp->keyname_lookup = malloc(sizeof(char) * mkeyn);
+    memcpy(inp->keyname_lookup, keyname_lookup, mkeyn);
   }
 
   inp->KeyS=th.KeyS;
@@ -1227,6 +1228,18 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (same_pho_query_state == SAME_PHO_QUERY_pho_select)
     return feedkey_pho(key, 0);
 
+
+  if (gtab_capslock_in_eng && (kbstate&LockMask)) {
+    if (gcin_capslock_lower) {
+      case_inverse(&key, shift_m);
+      send_ascii(key);
+      return 1;
+    }
+
+    return 0;
+  }
+
+
   int lcase = tolower(key);
   int ucase = toupper(key);
   if (key < 127 && cur_inmd->keymap[key]) {
@@ -1235,15 +1248,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
      if (cur_inmd->keymap[lcase] != cur_inmd->keymap[ucase])
        goto next;
 
-     if (gtab_capslock_in_eng && (kbstate&LockMask)) {
-       if (gcin_capslock_lower) {
-         case_inverse(&key, shift_m);
-         send_ascii(key);
-         return 1;
-       }
-
-       return 0;
-     }
   }
 
 
