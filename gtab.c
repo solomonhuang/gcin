@@ -237,7 +237,6 @@ void lookup_gtab_out(char *ch, char *out)
   lookup_gtabn(tt, out);
 }
 
-
 void free_gtab()
 {
   int i;

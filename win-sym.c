@@ -260,7 +260,7 @@ void show_win_sym()
 }
 
 
-void lookup_gtab(char *ch, char out[]);
+void lookup_gtab_out(char *ch, char *out);
 void str_to_all_phokey_chars(char *b5_str, char *out);
 
 static void sym_lookup_key(char *instr, char *outstr)

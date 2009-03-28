@@ -397,7 +397,7 @@ void create_win_gtab_gui_simple()
     top_bin = vbox_top;
   }
 
-  GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
+  GtkWidget *align = gtk_alignment_new (0, 0.0, 0, 0);
 
   label_gtab_sele = gtk_label_new(NULL);
   gtk_container_add (GTK_CONTAINER (align), label_gtab_sele);

@@ -6,7 +6,7 @@ Window xwin1;
 
 #define SELEN (12)
 
-static GtkWidget *labels_sele[SELEN];
+static GtkWidget *labels_sele[SELEN], *labels_seleR[SELEN];
 static GtkWidget *arrow_up, *arrow_down;
 
 void create_win1()
@@ -34,23 +34,27 @@ void create_win1_gui()
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER(frame), vbox_top);
 
-
   arrow_up = gtk_arrow_new (GTK_ARROW_UP, GTK_SHADOW_IN);
   gtk_box_pack_start (GTK_BOX (vbox_top), arrow_up, FALSE, FALSE, 0);
 
+  GtkWidget *table = gtk_table_new(SELEN, 2, FALSE);
+  gtk_box_pack_start (GTK_BOX (vbox_top), table, FALSE, FALSE, 0);
 
-  GtkWidget *vbox_labels = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), vbox_labels, FALSE, FALSE, 0);
   int i;
   for(i=0; i < SELEN; i++) {
     GtkWidget *align = gtk_alignment_new(0,0,0,0);
-    gtk_box_pack_start (GTK_BOX (vbox_labels), align, FALSE, FALSE, 0);
-
+    gtk_table_attach_defaults(table,align, 0,1,i,i+1);
     labels_sele[i] = gtk_label_new(NULL);
+    gtk_container_add (GTK_CONTAINER (align), labels_sele[i]);
     gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
 
-    gtk_container_add (GTK_CONTAINER(align), labels_sele[i]);
+    GtkWidget *alignR = gtk_alignment_new(0,0,0,0);
+    gtk_table_attach_defaults(table, alignR, 1,2,i,i+1);
+    labels_seleR[i] = gtk_label_new(NULL);
+    gtk_container_add (GTK_CONTAINER (alignR), labels_seleR[i]);
+    gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
+    set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
   }
 
   arrow_down = gtk_arrow_new (GTK_ARROW_DOWN, GTK_SHADOW_IN);
@@ -70,8 +74,10 @@ void clear_sele()
   if (!gwin1)
     create_win1();
 
-  for(i=0; i < SELEN; i++)
+  for(i=0; i < SELEN; i++) {
     gtk_widget_hide(labels_sele[i]);
+    gtk_widget_hide(labels_seleR[i]);
+  }
 
   gtk_widget_hide(arrow_up);
   gtk_widget_hide(arrow_down);
@@ -88,13 +94,17 @@ void set_sele_text(int i, char *text, int len)
   memcpy(utf8, text, len);
   utf8[len]=0;
 
-  if (tsin_tail_select_key)
+  if (tsin_tail_select_key) {
     snprintf(tt, sizeof(tt), "%s %c", utf8, phkbm.selkey[i]);
-  else
-    snprintf(tt, sizeof(tt), "%c %s", phkbm.selkey[i], utf8);
+  }
+  else {
+    gtk_label_set_text(GTK_LABEL(labels_seleR[i]), utf8);
+    gtk_widget_show(labels_seleR[i]);
+    snprintf(tt, sizeof(tt), "%c ", phkbm.selkey[i]);
+  }
 
-  gtk_label_set_text(GTK_LABEL(labels_sele[i]), tt);
   gtk_widget_show(labels_sele[i]);
+  gtk_label_set_text(GTK_LABEL(labels_sele[i]), tt);
 }
 
 
@@ -153,7 +163,9 @@ void change_win1_font()
 
   for(i=0; i < SELEN; i++) {
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
+    set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
     gtk_widget_modify_fg(labels_sele[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
+    gtk_widget_modify_fg(labels_seleR[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
   }
 
   change_win_bg(gwin1);

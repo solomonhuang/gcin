@@ -49,13 +49,17 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
 
   for(plen=1; start + plen <= c_len && plen <= MAX_PHRASE_LEN; plen++) {
+#if DBG
+    dbg("aa st:%d hh plen:%d ", start, plen);utf8_putchar(chpho[start].ch); dbg("\n");
+#endif
     if (plen > 1 && (chpho[start+plen-1].flag & FLAG_CHPHO_PHRASE_USER_HEAD))
       break;
 
     phokey_t pp[MAX_PHRASE_LEN + 1];
     int sti, edi;
     TSIN_PARSE pbest[MAX_PH_BF_EXT+1];
-    int maxusecount = -10000;
+#define MAXV 100
+    int maxusecount = 5-MAXV;
     int remlen;
     short match_phr_N=0, no_match_ch_N = 1;
 
@@ -158,7 +162,7 @@ next:
       maxusecount += uc;
     }
 
-    double score = log(maxusecount + 10) /
+    double score = log(maxusecount + MAXV) /
       pow(match_phr_N + 0.05, 6) / pow(no_match_ch_N + 0.01, 20);
 
 #if DBG

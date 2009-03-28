@@ -1191,6 +1191,31 @@ static void call_tsin_parse()
   prbuf();
 }
 
+static KeySym keypad_proc(KeySym xkey)
+{
+  if (xkey <= XK_KP_9 && xkey >= XK_KP_0)
+    xkey=xkey-XK_KP_0+'0';
+  else {
+    switch (xkey) {
+      case XK_KP_Add:
+        xkey = '+';
+        break;
+      case XK_KP_Subtract:
+        xkey = '-';
+        break;
+      case XK_KP_Multiply:
+        xkey = '*';
+        break;
+      case XK_KP_Divide:
+        xkey = '/';
+        break;
+    }
+  }
+
+  return xkey;
+}
+
+
 void case_inverse();
 
 void pho_play(phokey_t key);
@@ -1526,6 +1551,9 @@ other_keys:
        if ('A' <= xkey && xkey <= 'Z')
           xkey_lcase = tolower(xkey);
 
+       if (tsin_space_opt == TSIN_SPACE_OPT_INPUT)
+         xkey_lcase = keypad_proc(xkey);
+
        if ((pp=strchr(phkbm.selkey,xkey_lcase)) && sel_pho) {
          int c=pp-phkbm.selkey;
          char *sel_text;
@@ -1598,6 +1626,8 @@ other_keys:
         xkey == XK_KP_Subtract || xkey == XK_KP_Add || xkey == XK_KP_Multiply ||
         xkey == XK_KP_Divide
        ) {
+
+       xkey = keypad_proc(xkey);
 asc_char:
         if (shift_m) {
           if (pre_sel_handler(xkey)) {
@@ -1608,24 +1638,6 @@ asc_char:
             return 1;
         }
 
-        if (xkey <= XK_KP_9 && xkey >= XK_KP_0)
-          xkey=xkey-XK_KP_0+'0';
-        else {
-          switch (xkey) {
-            case XK_KP_Add:
-              xkey = '+';
-              break;
-            case XK_KP_Subtract:
-              xkey = '-';
-              break;
-            case XK_KP_Multiply:
-              xkey = '*';
-              break;
-            case XK_KP_Divide:
-              xkey = '/';
-              break;
-          }
-        }
 
 //        dbg("xkey: %c\n", xkey);
 
