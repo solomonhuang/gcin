@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004	Edward Liu, Taiwan
+	Copyright (C) 2004-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 #include <string.h>
 
@@ -1927,11 +1927,11 @@ restart:
 
        if (j < mdist)
          continue;
-
+#if 0
        ch_pho_cpy(&chpho[ph_sta], pre_sel[i].str, pre_sel[i].phokey, mdist);
        if (chpho[ph_sta].psta < 0)
          set_chpho_ch2(&chpho[ph_sta], pre_sel[i].str, mdist);
-
+#endif
 
        int j;
        for(j=0;j < mdist; j++) {

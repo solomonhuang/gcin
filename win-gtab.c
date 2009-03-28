@@ -414,7 +414,7 @@ static void create_win_gtab_gui()
   current_gtab_in_row1 = gtab_in_row1;
   current_gtab_vertical_select = gtab_vertical_select;
   current_gcin_inner_frame = gcin_inner_frame;
-  gdk_color_parse("yellow", &better_color);
+  gdk_color_parse(gcin_win_color_fg, &better_color);
 }
 
 
@@ -470,7 +470,12 @@ void hide_win_gtab()
 //  dbg("hide_win_gtab gwin_gtab\n", gwin_gtab);
   if (!gwin_gtab)
     return;
-
+#if 0
+  // get around the grey window bug in GTK/X11
+  gdk_flush();
+  XSync(dpy, False);
+  usleep(10000);
+#endif
   gtk_widget_hide(gwin_gtab);
   close_gtab_pho_win();
 

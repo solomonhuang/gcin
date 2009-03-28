@@ -53,10 +53,10 @@ main()
     bzero(a, sizeof(a));
     bzero(b, sizeof(b));
     sscanf(tt,"%s %s",a,b);
-    t2s[t2sn].a=*((int *)a);
-    t2s[t2sn].b=*((int *)b);
-    s2t[t2sn].a=*((int *)b);
-    s2t[t2sn].b=*((int *)a);
+    memcpy(&t2s[t2sn].a, a, sizeof(t2s[0].a));
+    memcpy(&t2s[t2sn].b, b, sizeof(t2s[0].b));
+    memcpy(&s2t[t2sn].a, a, sizeof(s2t[0].a));
+    memcpy(&s2t[t2sn].b, b, sizeof(s2t[0].b));
     t2sn++;
 //    dbg("%s %s\n", a,b);
   }

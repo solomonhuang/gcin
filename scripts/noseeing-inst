@@ -2,16 +2,15 @@
 
 SAYYA=edt1023.sayya.org
 CLE=cle.linux.org.tw
-#nosee=noseeing-8.tar.gz
 nosee=noseeing.tar.gz
 cd
 [ -d tmp ] || mkdir tmp
 cd tmp
 rm -f $nosee
 
-wget http://$SAYYA/misc/$nosee > /dev/null 2>&1
+wget http://$SAYYA/gcin/$nosee > /dev/null 2>&1
 if [ $? != 0 ]; then
-  wget http://$CLE/~edt1023/misc/$nosee > /dev/null 2>&1
+  wget http://$CLE/~edt1023/gcin/$nosee > /dev/null 2>&1
 fi
 if [ ! -f $nosee ]; then
   echo "file $nosee was not downloaded"
@@ -30,8 +29,13 @@ if [ $id = 0 ]; then
   do
     [ -d $i ] && cp -p noseeing.gtab $i && echo "  install to $i"
   done
+  for i in /usr/share/gcin/scripts /usr/local/share/gcin/scripts
+  do
+    [ -d $i ] && install -m 0755 noseeadd.rb $i && echo "  install to $i"
+  done
 else
   mv noseeing.gtab ~/.gcin
+  install -m 0755 noseeadd.rb ~/.gcin
 fi
 echo "*******************************"
 echo "Installation completed. Press ctrl-alt-9 to activate boshiamy"

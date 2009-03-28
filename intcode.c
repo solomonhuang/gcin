@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1994	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 1994-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
 #define InAreaX (0)

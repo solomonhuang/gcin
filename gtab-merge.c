@@ -1,6 +1,6 @@
 
 /*
-	Copyright (C) 2006	Edward Liu Taiwan
+	Copyright (C) 2006-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
 #include <stdio.h>

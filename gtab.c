@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004	 Edward Liu, Hsin-Chu, Taiwan
+	Copyright (C) 2004-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
 #include <sys/stat.h>
@@ -1241,7 +1241,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       case_inverse(&key, shift_m);
       send_ascii(key);
       return 1;
-    }
+    } else
+      return 0;
   }
 
 
