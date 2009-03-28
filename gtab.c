@@ -694,6 +694,7 @@ void clear_after_put()
 static void putstr_inp(u_char *p)
 {
   int plen = strlen(p);
+  extern int c_len;
   usecount_t usecount;
 
   clear_page_label();
@@ -703,7 +704,7 @@ static void putstr_inp(u_char *p)
 
   char_play(p);
 
-  int to_tsin = (cur_inmd->flag & FLAG_GTAB_SYM_KBM) && default_input_method==6;
+  int to_tsin = (cur_inmd->flag & FLAG_GTAB_SYM_KBM) && default_input_method==6 && c_len;
 
   if (utf8_str_N(p) > 1  || p[0] < 128) {
     if (gtab_disp_key_codes && !gtab_hide_row2 || wild_mode)

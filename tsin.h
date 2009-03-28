@@ -9,7 +9,6 @@ typedef struct {
   phokey_t pho;
   char ch[CH_SZ];
   char och[CH_SZ];
-  char ph1ch[CH_SZ]; // char selected by 1st pho
   u_char flag;
   char psta; // phrase start index
 } CHPHO;

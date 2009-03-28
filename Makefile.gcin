@@ -12,7 +12,7 @@ GCIN_SO= gcin1.so gcin2.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o \
-     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o
+     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o gcb.o phrase.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o
@@ -162,7 +162,7 @@ gcin-message:	$(OBJS_gcin_message)
 pin-juyin:	$(OBJS_pin_juyin)
 	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
 
-gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico \
+gcin1_so= intcode.pico win-int.pico win-message.pico win-sym.pico \
 win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico tsin-char.pico
 gcin1.so: $(gcin1_so)
 	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
@@ -211,12 +211,12 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
 	   install -d $(DOC_DIR); \
-	   install -m 644 README.html Changelog $(DOC_DIR); \
+	   install -m 644 README.html Changelog.html $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
 	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim; \
 	else \
 	   install -d $(DOC_DIR_i); \
-	   install -m 644 README.html Changelog $(DOC_DIR_i); \
+	   install -m 644 README.html Changelog.html $(DOC_DIR_i); \
 	   install -s $(PROGS) $(bindir); \
 	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim; \
 	fi

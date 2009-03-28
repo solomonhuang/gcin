@@ -162,10 +162,12 @@ gboolean feed_phrase(KeySym ksym, int state)
     str = ((state & LockMask) && tr[i].str_caps) ? tr[i].str_caps : tr[i].str;
 
     if (str) {
-      if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)
+      extern int c_len;
+
+      if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE && c_len)
         add_to_tsin_buf_str(str);
       else
-      if (!cur_inmd->DefChars || !insert_gbuf_cursor1_not_empty(str))
+      if (!cur_inmd || !cur_inmd->DefChars || !insert_gbuf_cursor1_not_empty(str))
         send_text(str);
 
       return TRUE;

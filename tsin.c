@@ -514,7 +514,6 @@ static void put_b5_char(char *b5ch, phokey_t key)
    init_chpho_i(c_idx);
    bchcpy(chpho[c_idx].ch, b5ch);
    bchcpy(chpho[c_idx].och, b5ch);
-   bchcpy(chpho[c_idx].ph1ch, b5ch);
 
    disp_char_chbuf(c_idx);
 
@@ -546,14 +545,12 @@ static gboolean chpho_eq_pho(int idx, phokey_t *phos, int len)
 }
 
 
-static void get_sel_phrase()
+static void get_sel_phrase0(int selidx, gboolean eqlen)
 {
   int sti,edi,j;
   u_char len, mlen;
 
-  phrase_count = 0;
-
-  mlen=c_len-c_idx;
+  mlen=c_len-selidx;
 
   if (!mlen)
     return;
@@ -562,7 +559,7 @@ static void get_sel_phrase()
     mlen=MAX_PHRASE_LEN;
 
   phokey_t pp[MAX_PHRASE_LEN + 1];
-  extract_pho(c_idx, mlen, pp);
+  extract_pho(selidx, mlen, pp);
 
   if (!tsin_seek(pp, 2, &sti, &edi))
     return;
@@ -574,18 +571,37 @@ static void get_sel_phrase()
 
     load_tsin_entry(sti, &len, &usecount, stk, stch);
 
-    if (len > mlen || len==1) {
+    if (eqlen && len!=mlen || (!eqlen && len > mlen) || len==1) {
       sti++;
       continue;
     }
 
-    if (chpho_eq_pho(c_idx, stk, len)) {
+    if (chpho_eq_pho(selidx, stk, len)) {
       sellen[phrase_count]=len;
       utf8cpyN(selstr[phrase_count++], stch, len);
     }
 
     sti++;
   }
+}
+
+static void get_sel_phrase_end()
+{
+  int stidx = c_idx - 5;
+  if (stidx < 0)
+    stidx = 0;
+
+  phrase_count = 0;
+  int i;
+  for(i=stidx; i < c_len - 1; i++) {
+    get_sel_phrase0(i, TRUE);
+  }
+}
+
+static void get_sel_phrase()
+{
+  phrase_count = 0;
+  get_sel_phrase0(c_idx, FALSE);
 }
 
 static void get_sel_pho()
@@ -1554,10 +1570,10 @@ tab_phrase_end:
          close_selection_win();
          goto asc_char;
        }
-     case XK_Down:
-       if (!eng_ph && xkey == XK_space)
-           goto asc_char;
 
+       if (!eng_ph)
+           goto asc_char;
+     case XK_Down:
        if (!ityp3_pho && (typ_pho[0]||typ_pho[1]||typ_pho[2]) && xkey==XK_space) {
          ctyp=3;
          kno=0;
@@ -1575,7 +1591,11 @@ change_char:
          return 1;
 
        if (!sel_pho) {
-         get_sel_phrase();
+         if (c_idx==c_len) {
+           get_sel_phrase_end();
+         } else
+           get_sel_phrase();
+
          get_sel_pho();
          sel_pho=1;
          current_page = 0;
@@ -1637,38 +1657,24 @@ other_keys:
          int c=pp-phkbm.selkey;
          char *sel_text;
          int len = fetch_user_selection(c, &sel_text);
+         int cpsta = chpho[c_idx].psta;
+         int sel_idx = c_idx;
+         if (c_idx == c_len)
+           sel_idx = c_len - len;
 
-         if (len > 1) {
-           int cpsta = chpho[c_idx].psta;
-           if (cpsta >= 0)
-             set_chpho_ch(&chpho[c_idx], sel_text, len);
-           else
-             set_chpho_ch2(&chpho[c_idx], sel_text, len);
+         if (cpsta >= 0)
+           set_chpho_ch(&chpho[sel_idx], sel_text, len);
+         else
+           set_chpho_ch2(&chpho[sel_idx], sel_text, len);
 
-           chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
-           set_fixed(c_idx, len);
+//         chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
+         set_fixed(sel_idx, len);
 
-           call_tsin_parse();
+         call_tsin_parse();
 
-           if (c_idx + len == c_len) {
-             ph_sta = -1;
-             draw_ul(c_idx, c_len);
-           }
-         } else
-         if (len == 1) { // single chinese char
-           i= c_idx==c_len?c_idx-1:c_idx;
-           key=chpho[i].pho;
-           set_chpho_ch(&chpho[i], sel_text, 1);
-
-           if (i && chpho[i].psta == i-1 && !(chpho[i-1].flag & FLAG_CHPHO_FIXED)) {
-             set_chpho_ch(&chpho[i-1], chpho[i-1].ph1ch, 1);
-#if 0
-             chpho[i-1].flag |= FLAG_CHPHO_PHRASE_VOID;
-#endif
-           }
-
-           set_fixed(i, 1);
-           call_tsin_parse();
+         if (c_idx + len == c_len) {
+           ph_sta = -1;
+           draw_ul(c_idx, c_len);
          }
 
          if (len) {
@@ -1862,6 +1868,7 @@ llll2:
 
      ii=idx_pho[vv].start;
      start_idx=ii;
+     stop_idx = idx_pho[vv+1].start;
 #if 0
      printf("%x %x %d vv:%d idxnum_pho:%d-->", ttt, key, start_idx, vv, idxnum_pho);
      utf8_putchar(ch_pho[start_idx].ch);
@@ -1869,7 +1876,10 @@ llll2:
 #endif
    } /* pho */
 
-   put_b5_char(ch_pho[start_idx].ch, key);
+   if (!c_len && typ_pho[0]==BACK_QUOTE_NO && stop_idx - start_idx == 1)
+     send_text(ch_pho[start_idx].ch);  // it's ok since ,. are 3 byte
+   else
+     put_b5_char(ch_pho[start_idx].ch, key);
 
    call_tsin_parse();
 

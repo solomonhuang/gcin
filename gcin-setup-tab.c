@@ -5,6 +5,10 @@
 #include <dirent.h>
 #include <libintl.h>
 
+char *gcb_pos[] = {
+  N_("關閉"), N_("左下"), N_("左上"), N_("右下"), N_("右上")
+};
+
 static GdkColor gcin_win_gcolor_fg,
                 gcin_win_gcolor_bg,
                 gcin_sel_key_gcolor,
@@ -30,6 +34,7 @@ static GtkWidget *check_button_gcin_eng_phrase_enabled,
                  *da_sel_key,
                  *label_win_color_test,
                  *opt_eng_ch_opts,
+                 *opt_gcb_pos,
                  *opt_im_toggle_keys,
                  *opt_kbm_opts,
                  *opt_spc_opts,
@@ -75,7 +80,8 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_vertical_select,
                  *check_button_gtab_unique_auto_send,
                  *check_button_gcin_init_im_enabled,
-		 *check_button_gcin_win_sym_click_close;
+                 *check_button_gcin_win_sym_click_close,
+                 *spinner_gcb_position_x, *spinner_gcb_position_y;
 
 char *pho_speaker[16];
 int pho_speakerN;
@@ -733,6 +739,9 @@ static GtkWidget *create_speaker_opts()
   for(i=0; i<pho_speakerN; i++) {
     GtkWidget *item = gtk_menu_item_new_with_label (pho_speaker[i]);
 
+    if (imkeys[i].keynum == gcin_im_toggle_keys)
+      current_idx = i;
+
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_speaker_opts), item);
   }
 
@@ -742,6 +751,27 @@ static GtkWidget *create_speaker_opts()
   return hbox;
 }
 
+static GtkWidget *create_gcb_pos_opts()
+{
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+
+  opt_gcb_pos = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_gcb_pos, FALSE, FALSE, 0);
+  GtkWidget *menu_gcb_pos = gtk_menu_new ();
+
+  int i;
+
+  for(i=0; i<sizeof(gcb_pos)/sizeof(gcb_pos[0]); i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (_(gcb_pos[i]));
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_gcb_pos), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcb_pos), menu_gcb_pos);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcb_pos), gcb_position);
+
+  return hbox;
+}
 
 typedef struct {
   GdkColor *color;
@@ -1232,6 +1262,13 @@ static gboolean cb_ok( GtkWidget *widget,
     save_gcin_conf_str(PHONETIC_SPEAK_SEL, pho_speaker[idx]);
   }
 
+  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcb_pos));
+  save_gcin_conf_int(GCB_POSITION, idx);
+  int pos_x = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_x));
+  save_gcin_conf_int(GCB_POSITION_X, pos_x);
+  int pos_y = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_y));
+  save_gcin_conf_int(GCB_POSITION_Y, pos_y);
+
   save_gcin_conf_int(PHONETIC_SPEAK,
      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_speak)));
 
@@ -1608,6 +1645,21 @@ static void create_main_win()
      gcin_win_sym_click_close);
   GtkWidget *label_gcin_win_sym_click_close = gtk_label_new(_("符號視窗點選後自動關閉"));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_win_sym_click_close,  FALSE, FALSE, 0);
+
+/* aaaaa */
+  GtkWidget *hbox_gcb_pos = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcb_pos, FALSE, FALSE, 0);
+  GtkWidget *label_gcb_pos = gtk_label_new(_("剪貼區管理視窗位置"));
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), label_gcb_pos,  FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), create_gcb_pos_opts(),  FALSE, FALSE, 0);
+  GtkAdjustment *adj_gcb_position_x =
+   (GtkAdjustment *) gtk_adjustment_new (gcb_position_x, 0.0, 100.0, 1.0, 1.0, 0.0);
+  spinner_gcb_position_x = gtk_spin_button_new (adj_gcb_position_x, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), spinner_gcb_position_x, FALSE, FALSE, 0);
+  GtkAdjustment *adj_gcb_position_y =
+   (GtkAdjustment *) gtk_adjustment_new (gcb_position_y, 0.0, 100.0, 1.0, 1.0, 0.0);
+  spinner_gcb_position_y = gtk_spin_button_new (adj_gcb_position_y, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), spinner_gcb_position_y, FALSE, FALSE, 0);
 
 /* label 3 */
 

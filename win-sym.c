@@ -294,7 +294,7 @@ static void destory_win()
 }
 
 
-gboolean  button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
+static gboolean button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
 {
   if (pagesN < 2)
     return;

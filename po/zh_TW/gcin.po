@@ -573,3 +573,23 @@ msgstr "簡->正體"
 #: ../tray.c:181
 msgid "小鍵盤"
 msgstr "小鍵盤"
+
+#: ../gcin-setup-list.c:570 ../gcin-setup-tab.c:1652
+msgid "剪貼區管理視窗位置"
+msgstr "剪貼區管理視窗位置"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "左下"
+msgstr "左下"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "左上"
+msgstr "左上"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "右下"
+msgstr "右下"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "右上"
+msgstr "右上"

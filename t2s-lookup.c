@@ -72,5 +72,7 @@ int trad2sim(char *str, int strN, char **out)
 
 int sim2trad(char *str, int strN, char **out)
 {
+  puts(str);
   translate("s2t.dat", str, strN, out);
+  puts(*out);
 }

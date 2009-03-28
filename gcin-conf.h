@@ -75,7 +75,9 @@
 #define PHONETIC_HUGE_TAB "phonetic-huge-tab"
 #define PHONETIC_SPEAK "phonetic-speak"
 #define PHONETIC_SPEAK_SEL "phonetic-speak-sel"
-
+#define GCB_POSITION "gcb-position"
+#define GCB_POSITION_X "gcb-position-x"
+#define GCB_POSITION_Y "gcb-position-y"
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_font_size_pho_near, gcin_chars_big5_only,
@@ -116,6 +118,7 @@ extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name, *gcin_
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use;
 extern int gcin_init_im_enabled;
+extern int gcb_position, gcb_position_x, gcb_position_y;
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char **rstr, char *default_str);

@@ -3,7 +3,7 @@ include ../config.mak
 .SUFFIXES:	.kbmsrc .kbm .cin .gtab
 
 DATA=pho.tab tsin32.idx \
-     cj.gtab ar30.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
+     cj.gtab ar30.gtab ar30-big.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
      pinyin.kbm pinyin-asdf.kbm dvorak.kbm mitac.kbm \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab kana-nippon.gtab symbols.gtab \

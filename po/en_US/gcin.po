@@ -573,3 +573,23 @@ msgstr "Simplified Chinese -> Traditional Chinese"
 #: ../tray.c:181
 msgid "小鍵盤"
 msgstr "Virtual keyboard"
+
+#: ../gcin-setup-list.c:570 ../gcin-setup-tab.c:1652
+msgid "剪貼區管理視窗位置"
+msgstr "gcb window position"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "左下"
+msgstr "Lower left"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "左上"
+msgstr "Upper left"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "右下"
+msgstr "Lower right"
+
+#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
+msgid "右上"
+msgstr "Upper right"

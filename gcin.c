@@ -292,6 +292,7 @@ static void reload_data()
   change_tsin_color();
   if (win_kbm_inited)
     update_win_kbm();
+  gcb_main();
 }
 
 void change_tsin_font_size();
@@ -536,6 +537,10 @@ int main(int argc, char **argv)
   }
 #endif
 
+#if 1
+  if (gcb_position)
+    gcb_main();
+#endif
 
   gtk_main();
 

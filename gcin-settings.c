@@ -54,6 +54,8 @@ int gcin_status_tray;
 #endif
 
 int pho_hide_row2, pho_in_row1;
+int gcb_position, gcb_position_x, gcb_position_y;
+
 
 int get_gcin_conf_int(char *name, int default_value);
 
@@ -139,4 +141,9 @@ void load_setttings()
   get_gcin_conf_str(GCIN_WIN_COLOR_FG, &gcin_win_color_fg, "white");
   get_gcin_conf_str(GCIN_WIN_COLOR_BG, &gcin_win_color_bg, "#005BFF");
   gcin_win_color_use = get_gcin_conf_int(GCIN_WIN_COLOR_USE, 0);
+
+
+  gcb_position = get_gcin_conf_int(GCB_POSITION, 4);
+  gcb_position_x = get_gcin_conf_int(GCB_POSITION_X, 0);
+  gcb_position_y = get_gcin_conf_int(GCB_POSITION_Y, 0);
 }
