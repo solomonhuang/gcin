@@ -548,11 +548,11 @@ msgstr "Enable Tsin VI editing mode"
 
 #: ../gcin-setup-tab.c:779 ../gcin-setup.c:63
 msgid "結果失敗"
-msgstr "Success"
+msgstr "Failed"
 
 #: ../gcin-setup-tab.c:779 ../gcin-setup.c:63
 msgid "結果成功"
-msgstr "Failed"
+msgstr "Success"
 
 #: ../tray.c:177
 msgid "設定"

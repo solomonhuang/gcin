@@ -699,6 +699,8 @@ gboolean init_in_method(int in_no)
       if (init_win_anthy()) {
         current_CS->in_method = in_no;
         show_win_anthy();
+      } else {
+        return FALSE;
       }
       break;
     default:

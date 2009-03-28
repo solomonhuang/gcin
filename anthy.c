@@ -222,8 +222,52 @@ struct {
 {"m",	"ん"},
 {"wyi",	"ゐ"},
 {"wye",	"ゑ"},
+{",",	"、"},
+{".",	"。"},
+{"[",	"「"},
+{"]",	"」"},
+{"/",	"／"},
+{"\\",	"＼"},
+{"=",	"＝"},
+{"+",	"＋"},
+{"_",	"＿"},
+{"~",	"〜"},
+{"!",	"！"},
+{"@",	"＠"},
+{"#",	"＃"},
+{"$",	"＄"},
+{"%",	"％"},
+{"^",	"＾"},
+{"&",	"＆"},
+{"*",	"＊"},
+{"(",	"（"},
+{")",	"）"},
+{"<",	"＜"},
+{">",	"＞"},
+{"{",	"｛"},
+{"}",	"｝"},
+{"|",	"｜"},
+{"'",	"’"},
+{"`",	"‘"},
+{"?",	"？"},
+{":",	"："},
+{";",	"；"},
 };
+
+
 static short int anthy_romaji_mapN = sizeof(anthy_romaji_map)/sizeof(anthy_romaji_map[0]);
+
+static int is_legal_char(int k)
+{
+  int i;
+
+  if (k==' ')
+    return 1;
+  for(i=0; i < anthy_romaji_mapN; i++)
+    if (strchr(anthy_romaji_map[i].en, k))
+      return 1;
+  return 0;
+}
 
 static char keys[32];
 static short int keysN;
@@ -256,7 +300,7 @@ static int is_empty()
 static void auto_hide()
 {
 //  puts("auto hide");
-  if (is_empty()) {
+  if (is_empty() && gcin_pop_up_win) {
 //    puts("empty");
     hide_win_anthy();
   }
@@ -687,7 +731,7 @@ rom:
   }
 
 //  printf("kv %d\n", kv);
-  if (!kv || !isalpha(kv) || kv > 0x7e)
+  if (!is_legal_char(kv))
     return FALSE;
 
   kv = lkv;
@@ -733,21 +777,26 @@ lab1:
 
 int init_win_anthy()
 {
-  char so[] = "libanthy.so";
-  void *handle = dlopen(so, RTLD_LAZY);
+  char* so[] = {"libanthy.so", "libanthy.so.0", NULL};
+  void *handle;
   char *error;
 
   if (win_anthy)
     return TRUE;
 
+  int i;
+  for (i=0; so[i]; i++)
+    if (handle = dlopen(so[i], RTLD_LAZY))
+      break;
+
   if (!handle) {
     GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
                                      GTK_MESSAGE_ERROR,
                                      GTK_BUTTONS_CLOSE,
-                                     "Error loading %s %s. Please install anthy", so, dlerror());
+                                     "Error loading %s %s. Please install anthy", so[0], dlerror());
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
-    return TRUE;
+    return FALSE;
   }
   dlerror();    /* Clear any existing error */
 
@@ -799,7 +848,6 @@ int init_win_anthy()
 
   gtk_widget_show_all(win_anthy);
 
-  int i;
   for(i=0; i < MAX_SEG_N; i++) {
     seg[i].label = gtk_label_new(NULL);
     gtk_widget_show(seg[i].label);

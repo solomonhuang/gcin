@@ -6,7 +6,7 @@ DATA=pho.tab tsin32.idx \
      cj.gtab ar30.gtab ar30-big.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
      pinyin.kbm pinyin-asdf.kbm dvorak.kbm mitac.kbm \
-     ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab kana-nippon.gtab symbols.gtab \
+     ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab symbols.gtab \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
      t2s.dat s2t.dat
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table

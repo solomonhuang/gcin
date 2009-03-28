@@ -58,7 +58,7 @@ static void draw_icon()
   }
 
   if (current_CS) {
-    if (current_CS->b_half_full_char || current_CS->in_method==6 && tsin_half_full) {
+    if (current_CS->b_half_full_char || current_CS->in_method==6 && tsin_half_full && current_CS->im_state == GCIN_STATE_CHINESE) {
       static char full[] = "全";
       get_text_w_h(full,  &w, &h);
       gdk_draw_layout(tray_da_win, gc, dw - w, dh - h, pango);
