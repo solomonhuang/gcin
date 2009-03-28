@@ -362,21 +362,32 @@ void create_kbm_window()
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 3);
   gtk_container_add (GTK_CONTAINER (gcin_kbm_window), vbox_top);
 
-  GtkWidget *frame_kbm = gtk_frame_new(_("鍵盤排列方式"));
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_kbm, TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_kbm), 1);
 
+  GtkWidget *hbox_lr = gtk_hbox_new (FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_lr, TRUE, TRUE, 0);
+
+
+  GtkWidget *vbox_l = gtk_vbox_new (FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (hbox_lr), vbox_l, TRUE, TRUE, 10);
+
+  GtkWidget *vbox_r = gtk_vbox_new (FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (hbox_lr), vbox_r, TRUE, TRUE, 10);
+
+
+  GtkWidget *frame_kbm = gtk_frame_new(_("鍵盤排列方式"));
+  gtk_box_pack_start (GTK_BOX (vbox_l), frame_kbm, TRUE, TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_kbm), 1);
   gtk_container_add (GTK_CONTAINER (frame_kbm), create_kbm_opts());
 
 
   GtkWidget *frame_tsin_sw = gtk_frame_new(_("詞音輸入[中/英]切換"));
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_sw, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_l), frame_tsin_sw, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_sw), 1);
   gtk_container_add (GTK_CONTAINER (frame_tsin_sw), create_eng_ch_opts());
 
 
   GtkWidget *frame_tsin_space_opt = gtk_frame_new(_("詞音輸入空白鍵選項"));
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_space_opt, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_l), frame_tsin_space_opt, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_space_opt), 1);
 
   GtkWidget *box_tsin_space_opt = gtk_vbox_new (FALSE, 0);
@@ -403,7 +414,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_tsin_phrase_pre_select = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_phrase_pre_select , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_l), hbox_tsin_phrase_pre_select , TRUE, TRUE, 1);
   GtkWidget *label_tsin_phrase_pre_select = gtk_label_new(_("詞音輸入預選詞視窗"));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_phrase_pre_select), label_tsin_phrase_pre_select , TRUE, TRUE, 0);
   check_button_tsin_phrase_pre_select = gtk_check_button_new ();
@@ -413,7 +424,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_phonetic_char_dynamic_sequence = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_phonetic_char_dynamic_sequence , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_l), hbox_phonetic_char_dynamic_sequence , TRUE, TRUE, 1);
   GtkWidget *label_phonetic_char_dynamic_sequence = gtk_label_new(_("依使用頻率調整字的順序"));
   gtk_box_pack_start (GTK_BOX (hbox_phonetic_char_dynamic_sequence), label_phonetic_char_dynamic_sequence , TRUE, TRUE, 0);
   check_button_phonetic_char_dynamic_sequence = gtk_check_button_new ();
@@ -423,7 +434,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_pho_simple_win = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_pho_simple_win , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_l), hbox_pho_simple_win , TRUE, TRUE, 1);
   GtkWidget *label_pho_simple_win = gtk_label_new(_("詞音/注音精簡視窗"));
   gtk_box_pack_start (GTK_BOX (hbox_pho_simple_win), label_pho_simple_win , TRUE, TRUE, 0);
   check_button_pho_simple_win = gtk_check_button_new ();
@@ -433,7 +444,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_pho_hide_row2 = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_pho_hide_row2 , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_l), hbox_pho_hide_row2 , TRUE, TRUE, 1);
   GtkWidget *label_pho_hide_row2 = gtk_label_new(_("注音隱藏第二列(按鍵顯示)"));
   gtk_box_pack_start (GTK_BOX (hbox_pho_hide_row2), label_pho_hide_row2 , TRUE, TRUE, 0);
   check_button_pho_hide_row2 = gtk_check_button_new ();
@@ -443,7 +454,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_pho_in_row1 = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_pho_in_row1 , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_l), hbox_pho_in_row1 , TRUE, TRUE, 1);
   GtkWidget *label_pho_in_row1 = gtk_label_new(_("注音輸入顯示移至第一列"));
   gtk_box_pack_start (GTK_BOX (hbox_pho_in_row1), label_pho_in_row1 , TRUE, TRUE, 0);
   check_button_pho_in_row1 = gtk_check_button_new ();
@@ -453,7 +464,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_phonetic_huge_tab = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_phonetic_huge_tab , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_phonetic_huge_tab , TRUE, TRUE, 1);
   GtkWidget *label_phonetic_huge_tab = gtk_label_new(_("使用巨大 UTF-8 字集"));
   gtk_box_pack_start (GTK_BOX (hbox_phonetic_huge_tab), label_phonetic_huge_tab , TRUE, TRUE, 0);
   check_button_phonetic_huge_tab = gtk_check_button_new ();
@@ -463,7 +474,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_tsin_tone_char_input = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_tone_char_input , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_tone_char_input , TRUE, TRUE, 1);
   GtkWidget *label_tsin_tone_char_input = gtk_label_new(_("詞音輸入注音聲調符號"));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tone_char_input), label_tsin_tone_char_input , TRUE, TRUE, 0);
   check_button_tsin_tone_char_input = gtk_check_button_new ();
@@ -473,7 +484,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_tsin_tab_phrase_end = gtk_hbox_new(FALSE, 1);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_tab_phrase_end , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_tab_phrase_end , TRUE, TRUE, 1);
   GtkWidget *label_tsin_tab_phrase_end = gtk_label_new(_("詞音/Escape Tab 斷詞"));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tab_phrase_end), label_tsin_tab_phrase_end , TRUE, TRUE, 0);
   check_button_tsin_tab_phrase_end = gtk_check_button_new ();
@@ -482,7 +493,7 @@ void create_kbm_window()
      GTK_TOGGLE_BUTTON(check_button_tsin_tab_phrase_end), tsin_tab_phrase_end);
 
   GtkWidget *hbox_tsin_tail_select_key = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_tail_select_key , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_tail_select_key , TRUE, TRUE, 1);
   GtkWidget *label_tsin_tail_select_key = gtk_label_new(_("同音字詞選擇按鍵在後"));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tail_select_key), label_tsin_tail_select_key , TRUE, TRUE, 0);
   check_button_tsin_tail_select_key = gtk_check_button_new ();
@@ -492,7 +503,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_gcin_capslock_lower = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gcin_capslock_lower , TRUE, TRUE, 1);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_gcin_capslock_lower , TRUE, TRUE, 1);
   GtkWidget *label_gcin_capslock_lower = gtk_label_new(_("Capslock英數用小寫"));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), label_gcin_capslock_lower , TRUE, TRUE, 0);
   check_button_gcin_capslock_lower = gtk_check_button_new ();
@@ -501,7 +512,7 @@ void create_kbm_window()
      GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower), gcin_capslock_lower);
 
   GtkWidget *frame_tsin_buffer_size = gtk_frame_new(_("詞音編輯緩衝區大小"));
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_buffer_size, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_buffer_size, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_buffer_size), 1);
   GtkAdjustment *adj_gtab_in =
    (GtkAdjustment *) gtk_adjustment_new (tsin_buffer_size, 10.0, MAX_PH_BF, 1.0, 1.0, 0.0);
@@ -510,7 +521,7 @@ void create_kbm_window()
 
 
   GtkWidget *frame_tsin_phrase_line_color = gtk_frame_new(_("詞音標示詞的底線顏色"));
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_phrase_line_color, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_phrase_line_color, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_phrase_line_color), 1);
   GtkWidget *button_tsin_phrase_line_color = gtk_button_new();
   g_signal_connect (G_OBJECT (button_tsin_phrase_line_color), "clicked",
@@ -523,7 +534,7 @@ void create_kbm_window()
   gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
 
   GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_("詞音游標的顏色"));
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_cursor_color, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_cursor_color, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_cursor_color), 1);
   GtkWidget *button_tsin_cursor_color = gtk_button_new();
   g_signal_connect (G_OBJECT (button_tsin_cursor_color), "clicked",
@@ -537,13 +548,12 @@ void create_kbm_window()
 
 
 
-
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok , FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok , FALSE, FALSE, 5);
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
   GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
 
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
                             G_CALLBACK (close_kbm_window),

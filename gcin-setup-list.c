@@ -280,7 +280,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_KEY);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, _("Ctrl-Alt-數字鍵"), renderer,
+                                               -1, _("Ctrl-Alt-鍵"), renderer,
                                                "text", COLUMN_KEY,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
@@ -417,7 +417,7 @@ void create_gtablist_window (void)
   /* create gtab_list_window, etc */
   gtablist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (gtablist_window), _("輸入法選擇"));
-  gtk_container_set_border_width (GTK_CONTAINER (gtablist_window), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (gtablist_window), 1);
 
   g_signal_connect (G_OBJECT (gtablist_window), "destroy",
                     G_CALLBACK (gtk_widget_destroyed), &gtablist_window);
@@ -425,7 +425,7 @@ void create_gtablist_window (void)
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                       G_CALLBACK (callback_win_delete), NULL);
 
-  vbox = gtk_vbox_new (FALSE, 5);
+  vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (gtablist_window), vbox);
 
   gtk_box_pack_start (GTK_BOX (vbox),
@@ -533,7 +533,7 @@ void create_gtablist_window (void)
                     G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 550, 450);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 520, 450);
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);

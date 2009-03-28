@@ -27,7 +27,7 @@ gcin 的 FC3 FC4 FC5 FC6(Development) 等版本，都已經正式進入 Fedora E
 至於 REHL4 的 rpm 則仍可在 gcin 同好會的下載情報區裡下載
 -------------------
 gcin 論壇
-http://cle.linux.org.tw/gcin
+http://hyperrate.com/dir.php?eid=67
 -------------------
 如果使用 .tar.bz2 安裝者， table path 是 /usr/local/share/gcin/table，而不是 /usr/share/gcin/table
 選擇 .tar.bz2 者，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)，不過 compile 出來的可執行檔的大小大很多，如果不喜歡，可以在 ./configure 後修改 config.mak，把 OPTFLAGS=-g 改成 OPTFLAGS=-O

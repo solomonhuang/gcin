@@ -366,7 +366,7 @@ void create_appearance_conf_window()
   gtk_window_set_title (GTK_WINDOW (gcin_appearance_conf_window), _("輸入視窗外觀設定"));
   gtk_container_set_border_width (GTK_CONTAINER (gcin_appearance_conf_window), 3);
 
-  GtkWidget *vbox_top = gtk_vbox_new (FALSE, 10);
+  GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (gcin_appearance_conf_window), vbox_top);
 
   GtkWidget *hbox_gcin_font_size = gtk_hbox_new (FALSE, 10);
@@ -409,7 +409,7 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_tsin_pho_in), spinner_gcin_font_size_tsin_pho_in, FALSE, FALSE, 0);
 
 
-  GtkWidget *hbox_gcin_font_size_pho_near = gtk_hbox_new (FALSE, 14);
+  GtkWidget *hbox_gcin_font_size_pho_near = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gcin_font_size_pho_near, FALSE, FALSE, 0);
   GtkWidget *label_gcin_font_size_pho_near = gtk_label_new(_("詞音近似音顯示字型大小"));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_pho_near), label_gcin_font_size_pho_near, FALSE, FALSE, 0);
@@ -496,8 +496,8 @@ void create_appearance_conf_window()
 
   GtkWidget *frame_win_color = gtk_frame_new(_("顏色選擇"));
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_win_color, FALSE, FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_win_color), 3);
-  GtkWidget *vbox_win_color = gtk_vbox_new (FALSE, 10);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_win_color), 1);
+  GtkWidget *vbox_win_color = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (frame_win_color), vbox_win_color);
 
   GtkWidget *hbox_win_color_use = gtk_hbox_new (FALSE, 10);

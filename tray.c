@@ -35,15 +35,6 @@ static void draw_icon()
     (current_CS->im_state == GCIN_STATE_DISABLED||current_CS->im_state == GCIN_STATE_ENG_FULL) ?
     pixbuf : pixbuf_ch;
 
-#if 0
-  GdkPixmap *pixmap_return;
-  GdkBitmap *mask_return;
-  gdk_pixbuf_render_pixmap_and_mask(pix,  &pixmap_return, &mask_return, 1);
-  gdk_window_shape_combine_mask(da->window, mask_return, 0, 0);
-//  gdk_window_set_back_pixmap (da->window, pixmap_return, FALSE);
-//  g_free(pixmap_return); g_free(mask_return);
-#endif
-
   int dw = da->allocation.width, dh = da->allocation.height;
   int w, h;
 
@@ -55,8 +46,7 @@ static void draw_icon()
   if (pix) {
     int ofs = (dh - gdk_pixbuf_get_height (pix))/2;
     gdk_draw_pixbuf(tray_da_win, NULL, pix, 0, 0, 0, ofs, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
-  }
-  else {
+  } else {
     get_text_w_h(inmd[current_CS->in_method].cname, &w, &h);
     gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
   }
@@ -64,14 +54,12 @@ static void draw_icon()
   if (current_CS) {
     if (current_CS->b_half_full_char) {
       static char full[] = "全";
-
       get_text_w_h(full,  &w, &h);
       gdk_draw_layout(tray_da_win, gc, dw - w, dh - h, pango);
     }
 
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
       static char efull[] = "英全";
-
       get_text_w_h(efull,  &w, &h);
       gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
     }
@@ -93,6 +81,9 @@ void update_tray_icon()
   if (!gcin_status_tray)
     return;
 
+  if (!da)
+    create_tray();
+
   gtk_widget_queue_draw(da);
 }
 
@@ -100,6 +91,9 @@ void get_icon_path(char *iconame, char fname[]);
 
 void load_tray_icon()
 {
+  if (!da)
+    create_tray();
+
   char *iconame = inmd[current_CS->in_method].icon;
   char fname[512];
 
@@ -158,11 +152,11 @@ struct {
 };
 
 
-GtkWidget *menu;
+static GtkWidget *tray_menu;
 
 static void create_menu()
 {
-  menu = gtk_menu_new ();
+  tray_menu = gtk_menu_new ();
 
   int i;
   for(i=0; i < sizeof(mitems)/ sizeof(mitems[0]); i++) {
@@ -180,7 +174,7 @@ static void create_menu()
 
     gtk_widget_show(item);
 
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+    gtk_menu_shell_append (GTK_MENU_SHELL (tray_menu), item);
   }
 
   return;
@@ -199,10 +193,10 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
       inmd_switch_popup_handler(NULL, (GdkEvent *)event);
       break;
     case 3:
-      if (!menu)
+      if (!tray_menu)
         create_menu();
 
-      gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+      gtk_menu_popup(GTK_MENU(tray_menu), NULL, NULL, NULL, NULL,
          event->button, event->time);
       break;
   }
@@ -212,8 +206,10 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
 
 gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
 {
-  draw_icon();
+  if (!da)
+    create_tray();
 
+  draw_icon();
   return FALSE;
 }
 
@@ -243,25 +239,17 @@ void create_tray()
     p_err("cannot load file %s", icon_fname);
 
   da =  gtk_drawing_area_new();
+  g_signal_connect (G_OBJECT (event_box), "destroy",
+                    G_CALLBACK (gtk_widget_destroyed), &da);
 
-#if 0
-//  gtk_widget_set_double_buffered (da, FALSE);
-  gtk_widget_set_app_paintable(da, TRUE);
-#endif
   g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(cb_expose), NULL);
 
   gtk_container_add (GTK_CONTAINER (event_box), da);
 
   gtk_widget_set_size_request(tray_icon, pwidth, pheight);
 
-
   PangoContext *context=gtk_widget_get_pango_context(da);
-#if 1
   PangoFontDescription* desc=pango_context_get_font_description(context);
-#else
-  PangoFontDescription* desc=
-    pango_font_description_copy(pango_context_get_font_description(context));
-#endif
 
 //  dbg("zz %s %d\n",  pango_font_description_to_string(desc), PANGO_SCALE);
 
@@ -284,19 +272,6 @@ void create_tray()
   gtk_widget_show_all (GTK_WIDGET (tray_icon));
 
   tray_da_win = da->window;
-#if 0
-  gdk_window_set_back_pixmap (da->window, NULL, FALSE);
-#endif
-
-#if 0
-  gtk_widget_set_double_buffered (event_box, FALSE);
-  gtk_widget_set_app_paintable(event_box, TRUE);
-#endif
-
-#if 0
-  gtk_widget_set_double_buffered (tray_icon, FALSE);
-  gtk_widget_set_app_paintable(tray_icon, TRUE);
-#endif
 
   gc = gdk_gc_new (tray_da_win);
 }
