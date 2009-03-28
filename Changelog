@@ -1,4 +1,8 @@
 ** UTF-8 encoding **
+0.9.9:
+- 在詞音中用 shift + ',.;/' 輸入標點符號會 coredump 的問題。
+- .gtab 辨別大小寫無法使用的問題。
+
 0.9.8:
 - 請注意，現在 gcin 已經把 UTF-8 4-byte 的支援改成內定，詞音的資料庫(~/.gcin/tsin) 會自動轉換，但是如果你有自行產生的 .gtab 輸入法(e.g. 嘸蝦米)，必須再重新執行 gcin2tab。
 - 感謝卡拉蒙 ray2501.bbs bbs.ee.nchu.edu.tw 的行列輸入法二級簡碼支援。

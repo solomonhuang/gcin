@@ -1112,7 +1112,7 @@ static gboolean pre_sel_handler(KeySym xkey)
 static gboolean pre_punctuation(KeySym xkey)
 {
   static char shift_punc[]="<>?:\"{}!";
-  static char chars[]="，。？：；『』！";
+  static char *chars[]={"，","。","？","：","；","『","』","！"};
 
   char *p;
 
@@ -1120,7 +1120,7 @@ static gboolean pre_punctuation(KeySym xkey)
     int c = p - shift_punc;
     phokey_t key=0;
 
-    return add_to_tsin_buf(&chars[c*CH_SZ], &key, 1);
+    return add_to_tsin_buf(chars[c], &key, 1);
   }
 
   return 0;

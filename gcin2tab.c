@@ -392,7 +392,10 @@ int main(int argc, char **argv)
 
     kk=0;
     for(i=0;i<len;i++) {
-      k=kno[mtolower(cmd[i])];
+      int key =  BITON(th.flag, FLAG_KEEP_KEY_CASE) ?
+        cmd[i] : mtolower(cmd[i]);
+
+      k=kno[key];
       kk|=(u_int64_t)k << ( LAST_K_bitN - i*6);
     }
 
