@@ -1,13 +1,14 @@
 #include "gcin.h"
 #include "gtab.h"
-#include <X11/extensions/XTest.h>
+// #include <X11/extensions/XTest.h>
+#include "win-sym.h";
 
 static int current_gtab_simple_win;
 static int current_gcin_inner_frame;
 static int current_gtab_in_row1;
 static int current_gtab_vertical_select;
 
-static GtkWidget *gwin_gtab;
+GtkWidget *gwin_gtab;
 static GtkWidget *top_bin;
 static GtkWidget *label_full, *label_gtab_sele;
 static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64];
@@ -209,7 +210,7 @@ void move_win_gtab(int x, int y)
   gtk_window_move(GTK_WINDOW(gwin_gtab), x, y);
   win_x = x;  win_y = y;
 
-  show_win_sym();
+  move_win_sym();
 }
 
 void set_gtab_input_method_name(char *s)
@@ -241,8 +242,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 //  dbg("mouse_button_callback %d\n", event->button);
   switch (event->button) {
     case 1:
-      create_win_sym();
-//      send_fake_key_eve();
+      toggle_win_sym();
       break;
     case 2:
       inmd_switch_popup_handler(widget, (GdkEvent *)event);
@@ -456,7 +456,7 @@ void show_win_gtab()
 
   gtk_widget_show(gwin_gtab);
   if (current_CS->b_raise_window)
-    gtk_window_present(gwin_gtab);
+    gtk_window_present(GTK_WINDOW(gwin_gtab));
 
   show_win_sym();
 }

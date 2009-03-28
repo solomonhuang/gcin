@@ -497,8 +497,11 @@ void toggle_im_enabled(u_int kev_state)
         return;
       }
 
-      if (current_CS->in_method == 6)
+      if (current_CS->in_method == 6) {
+#if USE_TSIN
         flush_tsin_buffer();
+#endif
+      }
       else {
         reset_gtab_all();
       }
@@ -555,6 +558,26 @@ void update_active_in_win_geom()
       break;
   }
 }
+
+extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab;
+
+gboolean win_is_visible()
+{
+  switch (current_CS->in_method) {
+    case 3:
+      return GTK_WIDGET_VISIBLE(gwin_pho);
+#if USE_TSIN
+    case 6:
+      return GTK_WIDGET_VISIBLE(gwin0);
+      break;
+#endif
+    case 10:
+      break;
+    default:
+      return GTK_WIDGET_VISIBLE(gwin_gtab);
+  }
+}
+
 
 void disp_gtab_half_full(gboolean hf);
 void tsin_toggle_half_full();
@@ -616,8 +639,11 @@ gboolean init_in_method(int in_no)
 
 
   if (current_CS->in_method != in_no) {
-    if (current_CS->in_method == 6)
+    if (current_CS->in_method == 6) {
+#if USE_TSIN
       flush_tsin_buffer();
+#endif
+    }
 
     hide_in_win(current_CS);
 
@@ -698,6 +724,9 @@ gboolean full_char_proc(KeySym keysym)
   send_text(tt);
   return 1;
 }
+
+
+
 
 
 int feedkey_pho(KeySym xkey, int kbstate);
@@ -784,6 +813,11 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
     if (keysym == ',') {
       extern gboolean win_sym_enabled;
+      if (!win_is_visible())
+        win_sym_enabled=1;
+      else
+        win_sym_enabled^=1;
+
       create_win_sym();
       if (win_sym_enabled) {
         force_show = TRUE;

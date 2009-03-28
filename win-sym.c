@@ -6,6 +6,7 @@
 
 static GtkWidget *gwin_sym = NULL;
 static int cur_in_method;
+gboolean win_sym_enabled=0;
 
 typedef struct {
   char **sym;
@@ -187,8 +188,10 @@ static void cb_button_sym(GtkButton *button, char *str)
        break;
   }
 
-  if (gcin_win_sym_click_close)
+  if (gcin_win_sym_click_close) {
+    win_sym_enabled=0;
     hide_win_sym();
+  }
 }
 
 void update_active_in_win_geom();
@@ -238,7 +241,6 @@ void move_win_sym()
   gtk_window_move(GTK_WINDOW(gwin_sym), wx, wy);
 }
 
-gboolean win_sym_enabled=0;
 
 void hide_win_sym()
 {
@@ -246,8 +248,6 @@ void hide_win_sym()
     return;
   gtk_widget_hide(gwin_sym);
 
-  if (gcin_win_sym_click_close)
-    win_sym_enabled=0;
 }
 
 void show_win_sym()
@@ -261,7 +261,7 @@ void show_win_sym()
   dbg("show_win_sym\n");
 #endif
   gtk_widget_show_all(gwin_sym);
-  move_win_sym(gwin_sym);
+  move_win_sym();
 }
 
 
@@ -342,13 +342,13 @@ void create_win_sym()
       return;
   }
 
-  win_sym_enabled^=1;
 
   if (gwin_sym) {
     if (win_sym_enabled)
       show_win_sym();
     else
       hide_win_sym();
+
     return;
   }
 
@@ -411,13 +411,19 @@ void create_win_sym()
   g_signal_connect (G_OBJECT (gwin_sym), "scroll-event",
     G_CALLBACK (button_scroll_event), NULL);
 
- move_win_sym(gwin_sym);
+  move_win_sym();
 #if 0
   dbg("in_method:%d\n", current_CS->in_method);
 #endif
   return;
 }
 
+
+void toggle_win_sym()
+{
+  win_sym_enabled^=1;
+  create_win_sym();
+}
 
 void change_win_sym_font_size()
 {

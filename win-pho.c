@@ -1,10 +1,11 @@
 #include "gcin.h"
+#include "win-sym.h"
 
 static int current_pho_simple_win;
 static int current_gcin_inner_frame;
 static int current_pho_in_row1;
 
-static GtkWidget *gwin_pho;
+GtkWidget *gwin_pho;
 static GtkWidget *top_bin, *hbox_row2;
 Window xwin_pho;
 static GtkWidget *label_pho_sele;
@@ -81,7 +82,7 @@ void move_win_pho(int x, int y)
     y = 0;
 
   gtk_window_move(GTK_WINDOW(gwin_pho), x, y);
-  show_win_sym();
+  move_win_sym();
 }
 
 void minimize_win_pho()
@@ -111,8 +112,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 //  dbg("mouse_button_callback %d\n", event->button);
   switch (event->button) {
     case 1:
-      create_win_sym();
-//      send_fake_key_eve();
+      toggle_win_sym();
       break;
     case 2:
       inmd_switch_popup_handler(widget, (GdkEvent *)event);

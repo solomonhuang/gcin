@@ -882,6 +882,7 @@ void tsin_set_eng_ch(int nmod)
 
 void tsin_toggle_eng_ch()
 {
+  compact_win0_x();
   tsin_set_eng_ch(!eng_ph);
 }
 
@@ -1214,6 +1215,11 @@ static KeySym keypad_proc(KeySym xkey)
       case XK_KP_Divide:
         xkey = '/';
         break;
+      case XK_KP_Decimal:
+        xkey = '.';
+        break;
+      default:
+        return 0;
     }
   }
 
@@ -1660,12 +1666,10 @@ other_keys:
        sel_pho=current_page=0;
    }
 
-   if (!eng_ph || shift_m || (xkey <= XK_KP_9 && xkey >= XK_KP_0) ||
-        xkey == XK_KP_Subtract || xkey == XK_KP_Add || xkey == XK_KP_Multiply ||
-        xkey == XK_KP_Divide
-       ) {
-
-       xkey = keypad_proc(xkey);
+   KeySym key_pad = keypad_proc(xkey);
+   if (!eng_ph || shift_m || key_pad) {
+       if (key_pad)
+         xkey = key_pad;
 asc_char:
         if (shift_m) {
           if (pre_sel_handler(xkey)) {

@@ -316,6 +316,7 @@ void compact_win0()
 }
 
 gboolean tsin_has_input();
+GtkWidget *gwin_sym;
 
 void move_win0(int x, int y)
 {
@@ -334,15 +335,11 @@ void move_win0(int x, int y)
   if (y < 0)
     y = 0;
 
-
   gtk_window_move(GTK_WINDOW(gwin0), x, y);
   win_x = x;
   win_y = y;
 
-  if (gcin_pop_up_win && !tsin_has_input())
-    return;
-
-  show_win_sym();
+  move_win_sym();
 }
 
 GtkWidget *gwin1;
@@ -371,13 +368,12 @@ void clear_tsin_line()
 
 void exec_gcin_setup();
 
-
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
 //  dbg("mouse_button_callback %d\n", event->button);
   switch (event->button) {
     case 1:
-      create_win_sym();
+      toggle_win_sym();
       break;
     case 2:
       inmd_switch_popup_handler(widget, (GdkEvent *)event);
@@ -618,13 +614,12 @@ void show_win0()
 
   gtk_widget_show(gwin0);
 //  dbg("show_win0 b\n");
+
   show_win_sym();
-#if 1
   if (current_CS->b_raise_window) {
     gtk_window_present(gwin0);
     raise_tsin_selection_win();
   }
-#endif
 }
 
 void hide_selections_win();
