@@ -1258,6 +1258,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
      case XK_Return:
      case XK_KP_Enter:
         if (shift_m) {
+          if (!c_len)
+            return 0;
           save_frm=c_idx;
           save_to=c_len-1;
           draw_ul(c_idx, c_len);
@@ -1394,6 +1396,9 @@ tab_phrase_end:
 //          if (ph_sta < 0 || c_idx - ph_sta < 2)
             pre_selN = 0;
         }
+
+        if (!c_len && gcin_pop_up_win)
+          hide_win0();
 
         disp_ph_sta();
         return 1;
