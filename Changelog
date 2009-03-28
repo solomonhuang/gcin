@@ -1,4 +1,28 @@
 ** UTF-8 encoding **
+1.3.3:
+- 詞音新增同音字詞選擇鍵在後的選項，這樣做的好處是當你由左到右看到某個字詞符合後，就不用再回頭看是那一個鍵。
+- 詞音Tab 斷詞改成可以在任意地方按，代表詞從這邊開頭，如果在結尾按則代表把最後一個字當開頭。例如輸入「他示意蜘蛛」，我們想要的是「他是一隻豬」，這時直接在結尾按 Tab 一次就可以了，代表把豬當成一個單字的詞。當使用者自己按空白鍵選詞時，會把這個手動斷詞清除。不過很可惜的，在某些程式不能用，例如 gedit，因為 gedit沒有把  Tab key 傳給 gcin 解釋。
+
+1.3.2:
+- 新增編輯 gtab 輸入法外加字詞的功能，可以在 gcin-setup -> gtab 中執行。也可以自己手動編輯 ~/.gcin/xxx.gtab.append，其中 xxx 是你內定的 .gtab 輸入法，例如使用倉頡的人其 filename 就是 ~/.gcin/cj.gtab.append。gcin 會在按 ctrl-space 時檢查 file 是否有被修改，自動 reload。
+- candyz 提供的 gtab 垂直選字詞的方式，以解決如果詞很長，無法完全顯示的問題。
+- gtab 新增可以用  page up/down or keypad +- 跳頁。對嘸蝦米等 space 送出第一個且定義超過10個時就可以用到。
+- gcin2tab 現在不會刪除重複的定義，如果不喜歡，請刪除 .cin 重複定義的部份。
+- 超過 5 個 key 的時候，相同拆字鍵的字不會保留原來順序的問題。
+- 現在 freebsd 上應該是不用 mergesort 了。
+- 因為發現有不少人沒有設定 locale 為 zh_TW，也沒有設定 GTK_IM_MODULE=gcin，造成 install 1.3.1 後無法使用 gcin。所以把 gtk im module 的 language 適用範圍改回 '*'，省掉這個麻煩。
+- 如果使用注音輸入拼音，現在可以 juyin-learn 可以顯示成聲調拼音的注音方式。
+- gtab 在顯示片語的時候，如果遇到 http:// ftp:// 會不顯示這一部份，現在也改成至少顯示 18個 bytes。
+- 新增設定文字及視窗背景顏色的功能。不過取消還原成系統的 theme顏色 後不會馬上還原，必須 pkill gcin。
+- noseeing-inst bugfix from LGJ
+- 使用一般輸入及萬用字元(*?) 查詢現在會顯示目前及總共的頁數。
+- locale init patch from caleb.
+- 注音新增 ㄦˋ:½  ㄙㄢ: ⅓、⅔   ㄙˋ: ¼、¾，需要的自行更新 ~/.gcin/pho.tab。
+- 拿掉 DUAL_XIM ，因為 GTK/QT都有 im module，直接用 UTF-8，所以現在是用不到，如果還需要用，只好執行兩個 gcin。
+- 在 beryl 及某些 window manager 下，firefox 會一直閃爍的問題。
+- gtab 彈出式視窗輸入區空白的問題。
+
+
 1.3.1:
 - gtab key 超過5個則顯示部份符合的字無法使用。
 - 詞音斷詞把較長的詞選用比例提高。

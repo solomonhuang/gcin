@@ -77,6 +77,9 @@ static void create_char(int index)
 {
   int i;
 
+  GdkColor fg;
+  gdk_color_parse(gcin_win_color_fg, &fg);
+
   for(i=index; i<=index+1 && i < MAX_PH_BF_EXT; i++) {
     if (chars[i].vbox)
       continue;
@@ -99,6 +102,9 @@ static void create_char(int index)
     gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
     chars[i].line = separator;
 
+    if (gcin_win_color_use)
+      gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
+
     gtk_widget_show(vbox);
     gtk_widget_show(label);
   }
@@ -108,12 +114,16 @@ static void change_tsin_line_color()
 {
   int i;
 
+  GdkColor fg;
+  gdk_color_parse(gcin_win_color_fg, &fg);
+
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     if (!chars[i].line)
       continue;
     GdkColor color_bg;
     gdk_color_parse(tsin_phrase_line_color, &color_bg);
     gtk_widget_modify_bg(chars[i].line, GTK_STATE_NORMAL, &color_bg);
+    gtk_widget_modify_fg(chars[i].label, GTK_STATE_NORMAL, gcin_win_color_use ? &fg:NULL);
   }
 }
 
@@ -467,11 +477,23 @@ void create_win0()
   gtk_container_set_border_width (GTK_CONTAINER (gwin0), 0);
   gtk_widget_realize (gwin0);
   GdkWindow *gdkwin0 = gwin0->window;
+#if 0
+  GError *err = NULL;
+  GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(
+    "/usr/share/icons/gcin/pin-float16.png", &err);
+  if (err)
+    p_err("not load");
+
+  GdkPixmap *pixmap;
+  GdkBitmap *bitmap;
+
+  gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &bitmap, 100);
+  gdk_window_set_back_pixmap(gdkwin0, pixmap, FALSE);
+
+  dbg("gdkwin0:%x\n", gdkwin0);
+#endif
   gdk_window_set_override_redirect(gdkwin0, TRUE);
   xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
-#if 1
-  gtk_window_set_accept_focus(gwin0, FALSE);
-#endif
 }
 
 
@@ -503,6 +525,14 @@ static void create_cursor_attr()
 }
 
 void create_win1_gui();
+static void set_win0_bg()
+{
+#if 1
+  change_win_bg(gwin0);
+#endif
+}
+
+void change_win1_font();
 
 static void create_win0_gui()
 {
@@ -583,9 +613,12 @@ static void create_win0_gui()
   gdk_flush();
   gtk_widget_hide (gwin0);
 
-
   create_win1();
   create_win1_gui();
+
+  set_win0_bg();
+
+  change_win1_font();
 }
 
 
@@ -636,11 +669,14 @@ void hide_win0()
 
 void bell()
 {
+#if 1
   XBell(dpy, -97);
+#else
+  gdk_beep();
+#endif
 //  abort();
 }
 
-void change_win1_font();
 
 void change_tsin_font_size()
 {
@@ -649,17 +685,26 @@ void change_tsin_font_size()
   if (!top_bin)
     return;
 
+  GdkColor fg;
+  gdk_color_parse(gcin_win_color_fg, &fg);
+
   set_label_font_size(label_pho, gcin_font_size_tsin_pho_in);
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *label = chars[i].label;
 
     set_label_font_size(label, gcin_font_size);
+
+    if (gcin_win_color_use)
+      gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
   }
 
   compact_win0();
 
   change_win1_font();
+
+  set_win0_bg();
+  change_tsin_line_color();
 }
 
 

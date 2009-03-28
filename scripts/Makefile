@@ -1,6 +1,6 @@
 include ../config.mak
 
-SCRIPTS=gcin-user-setup modify-XIM utf8-edit noseeing-inst
+SCRIPTS=gcin-user-setup modify-XIM utf8-edit noseeing-inst gtab.append_prepare
 
 all:	$(SCRIPTS)
 

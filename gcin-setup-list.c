@@ -58,6 +58,8 @@ static int qcmp_key(const void *aa, const void *bb)
 extern char *TableDir;
 void get_icon_path(char *iconame, char fname[]);
 
+extern char gcin_switch_keys[];
+
 static void
 add_items (void)
 {
@@ -65,40 +67,20 @@ add_items (void)
 
   g_return_if_fail (articles != NULL);
 
-  char ttt[128];
-  FILE *fp;
+  load_gtab_list();
 
-  get_gcin_user_fname(GTAB_LIST, ttt);
-
-  if ((fp=fopen(ttt, "r"))==NULL) {
-    strcat(strcpy(ttt, TableDir),"/"GTAB_LIST);
-
-    if ((fp=fopen(ttt, "r"))==NULL)
-      p_err("cannot open %s", ttt);
-  }
-
-  dbg("--> %s\n", ttt);
-
-  while (!feof(fp)) {
-    char name[32];
-    char key[32];
-    char file[32];
-    char icon[32];
-
-    name[0]=0;
-    key[0]=0;
-    file[0]=0;
-
-    char line[128];
-
-    fgets(line, sizeof(line), fp);
-    sscanf(line, "%s %s %s %s", name, key, file, icon);
-
-    if (strlen(name) < 1)
-      break;
-
-    if (name[0]=='#')
+  int i;
+  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+    INMD *pinmd = &inmd[i];
+    char *name = pinmd->cname;
+    if (!name)
       continue;
+
+    char key[2];
+    char *file = pinmd->filename;
+    char *icon = pinmd->icon;
+
+    key[0] = gcin_switch_keys[i]; key[1]=0;
 
     foo.name = g_strdup(name);
     char icon_path[128];
@@ -107,16 +89,13 @@ add_items (void)
     foo.icon = gdk_pixbuf_new_from_file(icon_path, &err);
     foo.key = g_strdup(key);
 
-    int in_no = gcin_switch_keys_lookup(foo.key[0]);
     foo.file = g_strdup(file);
-    foo.used = (gcin_flags_im_enabled & (1 << in_no)) != 0;
-    foo.default_inmd = in_no == default_input_method;
+    foo.used = (gcin_flags_im_enabled & (1 << i)) != 0;
+    foo.default_inmd =  default_input_method == i;
     foo.editable = FALSE;
     g_array_append_vals (articles, &foo, 1);
   }
 
-
-  fclose(fp);
   g_array_sort (articles,qcmp_key);
 }
 

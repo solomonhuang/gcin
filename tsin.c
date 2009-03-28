@@ -462,8 +462,10 @@ static void save_phrase()
 static void set_fixed(int idx, int len)
 {
   int i;
-  for(i=idx; i < idx+len; i++)
+  for(i=idx; i < idx+len; i++) {
     chpho[i].flag |= FLAG_CHPHO_FIXED;
+    chpho[i].flag &= ~FLAG_CHPHO_PHRASE_USER_HEAD;
+  }
 }
 
 #define PH_SHIFT_N (tsin_buffer_size - 1)
@@ -483,7 +485,7 @@ static void shift_ins()
      int fixedlen = c_len - 10;
      if (fixedlen <= 0)
        fixedlen = 1;
-     set_fixed(0, Min(c_len, fixedlen));
+     set_fixed(0, fixedlen);
 
      ofs = 1;
      putbuf(ofs);
@@ -913,8 +915,9 @@ static void clear_disp_ph_sta()
 
 void draw_underline(int index);
 
-static void disp_ph_sta()
+void disp_ph_sta()
 {
+//  dbg("ph_sta:%d\n", ph_sta);
   clear_disp_ph_sta();
 
   if (ph_sta < 0)
@@ -1277,14 +1280,20 @@ int feedkey_pp(KeySym xkey, int kbstate)
         } else
           return 0;
      case XK_Tab:
+        close_selection_win();
         if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab) {
-          close_selection_win();
           tsin_toggle_eng_ch();
           return 1;
         }
 
         if (tsin_tab_phrase_end) {
-          ph_sta = -1;
+          if (c_idx==c_len)
+            chpho[c_idx-1].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
+          else
+            chpho[c_idx].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
+#if 1
+           call_tsin_parse();
+#endif
           return 1;
         } else {
           if (c_len) {
@@ -1558,7 +1567,7 @@ other_keys:
 #endif
            }
 
-           chpho[i].flag |= FLAG_CHPHO_FIXED;
+           set_fixed(i, 1);
 #if 1
            call_tsin_parse();
 #endif

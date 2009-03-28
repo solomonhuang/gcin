@@ -1,4 +1,4 @@
-#define MAX_CIN_PHR (32*CH_SZ + 1)
+#define MAX_CIN_PHR (100*CH_SZ + 1)
 
 
 
@@ -98,13 +98,14 @@ extern INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 u_int64_t CONVT2(INMD *inmd, int i);
 extern INMD *cur_inmd;
+void load_gtab_list();
 
 #define LAST_K_bitN (cur_inmd->key64 ? 54:24)
 
 #define GTAB_LIST "gtab.list"
 
 #if 1
-#define NEED_SWAP (__BYTE_ORDER == __BIG_ENDIAN && 1)
+#define NEED_SWAP (__BYTE_ORDER == __BIG_ENDIAN && 0)
 #else
 #define NEED_SWAP (1)
 #endif

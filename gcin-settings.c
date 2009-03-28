@@ -2,7 +2,7 @@
 #include "gtab.h"
 
 int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
-int gcin_font_size_pho_near, gcin_font_size_gtab_in;
+int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_win_color_use;
 int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
@@ -22,6 +22,7 @@ int gtab_shift_phrase_key;
 int gtab_hide_row2;
 int gtab_in_row1;
 int gtab_capslock_in_eng;
+int gtab_vertical_select;
 
 
 int tsin_phrase_pre_select, tsin_tone_char_input;
@@ -31,7 +32,7 @@ int tsin_chinese_english_toggle_key;
 int gcin_font_size_tsin_pho_in;
 int pho_simple_win;
 int tsin_space_opt;
-int tsin_buffer_size;
+int tsin_buffer_size, tsin_tail_select_key;
 int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
@@ -40,7 +41,7 @@ char *tsin_cursor_color;
 int tsin_tab_phrase_end;
 int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 int gcin_inner_frame;
-char *gcin_font_name;
+char *gcin_font_name, *gcin_win_color_fg, *gcin_win_color_bg;
 #if TRAY_ENABLED
 int gcin_status_tray;
 #endif
@@ -96,6 +97,7 @@ void load_setttings()
   gtab_hide_row2 = get_gcin_conf_int(GTAB_HIDE_ROW2, 0);
   gtab_in_row1 = get_gcin_conf_int(GTAB_IN_ROW1, 0);
   gtab_capslock_in_eng = get_gcin_conf_int(GTAB_CAPSLOCK_IN_ENG, 1);
+  gtab_vertical_select = get_gcin_conf_int(GTAB_VERTICAL_SELECT, 0);
 
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
@@ -106,6 +108,7 @@ void load_setttings()
   tsin_space_opt = get_gcin_conf_int(TSIN_SPACE_OPT, TSIN_SPACE_OPT_SELECT_CHAR);
   tsin_buffer_size = get_gcin_conf_int(TSIN_BUFFER_SIZE, 40);
   tsin_tab_phrase_end = get_gcin_conf_int(TSIN_TAB_PHRASE_END, 0);
+  tsin_tail_select_key = get_gcin_conf_int(TSIN_TAIL_SELECT_KEY, 0);
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);
@@ -115,4 +118,8 @@ void load_setttings()
 
   get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, &tsin_phrase_line_color, "blue");
   get_gcin_conf_str(TSIN_CURSOR_COLOR, &tsin_cursor_color, "blue");
+
+  get_gcin_conf_str(GCIN_WIN_COLOR_FG, &gcin_win_color_fg, "white");
+  get_gcin_conf_str(GCIN_WIN_COLOR_BG, &gcin_win_color_bg, "#005BFF");
+  gcin_win_color_use = get_gcin_conf_int(GCIN_WIN_COLOR_USE, 0);
 }

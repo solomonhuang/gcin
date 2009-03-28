@@ -24,7 +24,7 @@ pho.tab:	 pho.tab.src ../phoa2d
 pho-huge.tab:	 pho-huge.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
 
-pin-juyin.xlt:	../pin-juyin
+pin-juyin.xlt:	../pin-juyin pin-juyin.src
 	../pin-juyin
 
 extr1:	extr1.c

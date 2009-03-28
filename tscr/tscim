@@ -9,5 +9,6 @@ export XMODIFIERS=@im=SCIM
 #mozilla-firefox
 #kedit
 #gedit
-leafpad
+#leafpad
 #amsn
+abiword

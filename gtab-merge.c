@@ -1,6 +1,6 @@
 
 /*
-	Copyright (C) 1995	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 2006	Edward Liu Taiwan
 */
 
 #include <stdio.h>
@@ -169,188 +169,84 @@ int main(int argc, char **argv)
   char *phrbuf = NULL;
   int prbf_cou=0;
 
-  dbg("-- gcin2tab encoding UTF-8 --\n");
-  dbg("--- please use iconv -f big5 -t utf-8 if your file is in big5 encoding\n");
-
-  if (argc<=1) {
-          printf("Enter table file name [.cin] : ");
-          scanf("%s", fname);
-  } else strcpy(fname,argv[1]);
-
 
   if (!strcmp(fname, "-v") || !strcmp(fname, "--version")) {
     dbg("gcin2tab for gcin " GCIN_VERSION "\n");
     exit(0);
   }
 
+  if (argc != 4)
+    p_err("%s input_file.gtab  phrase_file.append   output.gtab.final", argv[0]);
 
-  char *p;
+  if ((fr=fopen(argv[1], "r"))==NULL)
+      p_err("cannot err open %s", argv[1]);
 
-  if((p=strchr(fname, '.')))
-    *p = 0;
+  gboolean key64;
+  INMD inmd, *inp = &inmd, *cur_inmd = &inmd;
 
-  strcpy(fname_cin,fname);
-  strcpy(fname_tab,fname);
-  strcat(fname_cin,".cin");
-  strcat(fname_tab,".gtab");
+  inp->tbl64 = itout64;
+  inp->tbl = itout;
 
-  if ((fr=fopen(fname_cin,"r"))==NULL)
-          p_err("Cannot open %s\n", fname_cin);
 
-  bzero(&th,sizeof(th));
-  bzero(kno,sizeof(kno));
-  bzero(keymap,sizeof(keymap));
+  fread(&th,1, sizeof(th), fr);
+  KeyNum = th.KeyS;
+  dbg("keys %d\n",KeyNum);
 
-  bzero(itar,sizeof(itar));
-  bzero(itout,sizeof(itout));
-  bzero(itar64,sizeof(itar64));
-  bzero(itout64,sizeof(itout64));
+  fread(keymap, 1, th.KeyS, fr);
+  fread(kname, CH_SZ, th.KeyS, fr);
+  fread(idx1, sizeof(gtab_idx1_t), KeyNum+1, fr);
 
-  cmd_arg(tt, &cmd, &arg);
-  if (sequ(cmd, "%gen_inp") || sequ(cmd, "%encoding")) {
-    dbg("skip gen_inp\n");
-    cmd_arg(tt, &cmd, &arg);
+  for(i=0; i < th.KeyS; i++) {
+    kno[keymap[i]] = i;
   }
 
-  if (!sequ(cmd,"%ename") || !(*arg) )
-    p_err("%d:  %%ename english_name  expected", lineno);
-  arg[15]=0;
-//  strcpy(th.ename,arg);
-
-  cmd_arg(tt, &cmd, &arg);
-  if (!(sequ(cmd,"%prompt") || sequ(cmd,"%cname")) || !(*arg) )
-    p_err("%d:  %%prompt prompt_name  expected", lineno);
-  strncpy(th.cname, arg, MAX_CNAME);
-  printf("cname %s\n", th.cname);
-
-  cmd_arg(tt,&cmd, &arg);
-  if (!sequ(cmd,"%selkey") || !(*arg) )
-    p_err("%d:  %%selkey select_key_list expected", lineno);
-  strcpy(th.selkey,arg);
-
-  cmd_arg(tt,&cmd, &arg);
-  if (!sequ(cmd,"%dupsel") || !(*arg) ) {
-    th.M_DUP_SEL = strlen(th.selkey);
-  }
-  else {
-    th.M_DUP_SEL=atoi(arg);
-    cmd_arg(tt,&cmd, &arg);
+  if (th.MaxPress > 5) {
+    inp->max_keyN = 10;
+    key64 = inp->key64 = TRUE;
+    dbg("it's a 64-bit .gtab\n");
+  } else {
+    inp->max_keyN = 5;
+    key64 = inp->key64 = FALSE;
   }
 
-  if (sequ(cmd,"%endkey")) {
-    strcpy(th.endkey, arg);
-    cmd_arg(tt,&cmd, &arg);
-  }
+  for(i=0; i < th.DefC; i++) {
+    ITEM it;
+    ITEM64 it64;
 
-  if (sequ(cmd,"%space_style")) {
-    th.space_style = atoi(arg);
-    cmd_arg(tt,&cmd, &arg);
-  }
-
-  if (sequ(cmd,"%keep_key_case")) {
-    th.flag |= FLAG_KEEP_KEY_CASE;
-    cmd_arg(tt,&cmd, &arg);
-  }
-
-  if (!sequ(cmd,"%keyname") || !sequ(arg,"begin")) {
-    p_err("%d:  %%keyname begin   expected, instead of %s %s", lineno, cmd, arg);
-  }
-
-  for(KeyNum=0;;) {
-    char k;
-
-    cmd_arg(tt,&cmd, &arg);
-    if (sequ(cmd,"%keyname")) break;
-    if (BITON(th.flag, FLAG_KEEP_KEY_CASE))
-      k=cmd[0];
-    else
-      k=mtolower(cmd[0]);
-
-    if (kno[(int)k])
-      p_err("%d:  key %c is already used",lineno, k);
-
-    kno[(int)k]=++KeyNum;
-    keymap[KeyNum]=k;
-    bchcpy(&kname[KeyNum][0], arg);
-  }
-
-  keymap[0]=kname[0][0]=kname[0][1]=' ';
-  KeyNum++;
-  th.KeyS=KeyNum;    /* include space */
-
-  cmd_arg(tt,&cmd, &arg);
-
-  if (sequ(cmd,"%quick") && sequ(arg,"begin")) {
-    dbg(".. quick keys defined\n");
-    for(quick_def=0;;) {
-      char k;
-      int len;
-
-      cmd_arg(tt,&cmd, &arg);
-      if (sequ(cmd,"%quick")) break;
-      k=kno[mtolower(cmd[0])]-1;
-
-      int N = 0;
-      char *p = arg;
-
-      if (strlen(cmd)==1) {
-        while (*p) {
-          int len=u8cpy(th.qkeys.quick1[(int)k][N++], p);
-          p+=len;
-        }
-      } else
-      if (strlen(cmd)==2) {
-        int k1=kno[mtolower(cmd[1])]-1;
-        while (*p) {
-          char tp[4];
-          int len=u8cpy(tp, p);
-
-          if (utf8_eq(tp,"□"))
-             tp[0]=0;
-
-          u8cpy(th.qkeys.quick2[(int)k][(int)k1][N++], tp);
-          p+=len;
-        }
-      } else
-        p_err("%d:  %quick only 1&2 keys are allowed '%s'", lineno, cmd);
-
-      quick_def++;
+    if (key64) {
+      fread(&it64, sizeof(ITEM64), 1, fr);
+      itar64[i].oseq = i;
+      memcpy(itar64[i].ch, it64.ch, sizeof(it64.ch));
+      memcpy(&itar64[i].key, it64.key, sizeof(it64.key));
+    }
+    else {
+      fread(&it, sizeof(ITEM), 1, fr);
+      itar[i].oseq = i;
+      memcpy(itar[i].ch, it.ch, sizeof(it.ch));
+      memcpy(&itar[i].key, it.key, sizeof(it.key));
     }
   }
 
-  long pos=ftell(fr);
-  int olineno = lineno;
-  gboolean key64 = FALSE;
+  chno = th.DefC;
+  fread(&phr_cou, sizeof(int), 1, fr);
 
-  while (!feof(fr)) {
-    int len;
 
-    cmd_arg(tt,&cmd,&arg);
-    if (!cmd[0] || !arg[0])
-      continue;
-    if (cmd[0]=='%')
-      continue;
-
-    len=strlen(cmd);
-
-    if (len > 5) {
-      key64 = TRUE;
-      dbg("more than 5 keys, will use 64 bit");
-      break;
-    }
+  if (phr_cou) {
+    phridx = tmalloc(int, phr_cou+1);
+    fread(phridx, sizeof(int), phr_cou, fr);
+    phr_cou--;
+    prbf_cou = phridx[phr_cou];
+    phrbuf = malloc(prbf_cou);
+    fread(phrbuf, 1, prbf_cou, fr);
   }
 
-  fseek(fr, pos, SEEK_SET);
-  lineno=olineno;
+  fclose(fr);
+  dbg("input phr_cou %d  DefC:%d  prbf_cou:%d\n", phr_cou, chno, prbf_cou);
 
-  INMD inmd, *cur_inmd = &inmd;
-
-  cur_inmd->key64 = key64;
-  cur_inmd->tbl64 = itout64;
-  cur_inmd->tbl = itout;
+  if ((fr=fopen(argv[2], "r"))==NULL)
+      p_err("cannot err open %s", argv[2]);
 
   puts("char def");
-  chno=0;
   while (!feof(fr)) {
     int len;
     u_int64_t kk;
@@ -364,11 +260,8 @@ int main(int argc, char **argv)
 
     len=strlen(cmd);
 
-    if (len > th.MaxPress)
-      th.MaxPress=len;
-
-    if (len > 10)
-      p_err("%d:  only <= 10 keys is allowed '%s'", lineno, cmd);
+    if (len > inp->max_keyN)
+      p_err("%d:  only <= %d keys is allowed '%s'", lineno, inp->max_keyN, cmd);
 
     kk=0;
     for(i=0;i<len;i++) {
@@ -456,6 +349,11 @@ int main(int argc, char **argv)
 
   for(i=0; i<chno; i++) {
     u_int64_t key = CONVT2(cur_inmd, i);
+#if 0
+    dbg("%d] %llx %d %d %d %d zzz\n", i, key,
+     cur_inmd->tbl[i].ch[0], cur_inmd->tbl[i].ch[1],
+     cur_inmd->tbl[i].ch[2], cur_inmd->tbl[i].ch[3]);
+#endif
     int kk = (key>>LAST_K_bitN) & 0x3f;
 
     if (!def1[kk]) {
@@ -468,8 +366,8 @@ int main(int argc, char **argv)
   for(i=KeyNum-1;i>0;i--)
     if (!def1[i]) idx1[i]=idx1[i+1];
 
-  if ((fw=fopen(fname_tab,"w"))==NULL) {
-    p_err("Cannot create");
+  if ((fw=fopen(argv[3],"w"))==NULL) {
+    p_err("Cannot create %s", argv[3]);
   }
 
   printf("Defined Characters:%d\n", chno);
@@ -512,8 +410,8 @@ int main(int argc, char **argv)
   }
 
   if (phr_cou) {
-    phridx[phr_cou++]=prbf_cou;
     printf("phrase count:%d\n", phr_cou);
+    phridx[phr_cou++]=prbf_cou;
 
     int ophr_cou = phr_cou;
 #if NEED_SWAP

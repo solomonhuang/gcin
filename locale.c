@@ -182,3 +182,21 @@ void utf8cpyn(char *t, char *s, int n)
 
   t[tn]=0;
 }
+
+
+// copy at most utf-8 bytes
+void utf8cpy_bytes(char *t, char *s, int n)
+{
+  int tn=0;
+  int i;
+
+  for (i=0; tn < n && *s; i++) {
+    int sz = utf8_sz(s);
+
+    memcpy(t+tn, s, sz);
+    tn+=sz;
+    s+=sz;
+  }
+
+  t[tn]=0;
+}

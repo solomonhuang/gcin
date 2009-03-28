@@ -17,7 +17,8 @@ typedef struct {
 enum {
   FLAG_CHPHO_FIXED=1,    // user selected the char, so it should not be changed
   FLAG_CHPHO_PHRASE_HEAD=2,
-  FLAG_CHPHO_PHRASE_VOID=4
+  FLAG_CHPHO_PHRASE_USER_HEAD=4,
+  FLAG_CHPHO_PHRASE_VOID=8
 };
 
 extern CHPHO chpho[MAX_PH_BF_EXT];

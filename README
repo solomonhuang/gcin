@@ -250,40 +250,8 @@ gaim 裏面有選項可以設定成用 ctrl-Enter 送出內容，這樣就可以
 ----------------------------------------------
 gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
 目前好像只有行列有使用，如果有需求時，可以加在 %quick 段落內。
-----------------------------------------------
-如何使用 utf8 encoding  : 使用雙重 XIM
-
-- gcin 現在內定可以執行一個 process 卻可以同時支援雙 Big5 & UTF-8，以下是一個範例， 
-      export LC_ALL=zh_TW.Big5
-      export XMODIFIERS=@im=$GCIN_XIM
-      gcin &
-      sleep 1
-      rxvt.bin &
-
-      export LC_ALL=zh_TW.UTF-8
-      export XMODIFIERS=@im=$GCIN_XIM.UTF-8
-      gedit
-
-  這樣 gcin 會自動多一個 zh_TW.UTF-8 的 XIM server，在上面一個例子中， crxvt 是用 zh-TW.Big5，
-  gedit 是用 zh_TW.UTF-8，export XMODIFIERS=@im=xcin.UTF-8，這個 gedit 就可以以注音輸入(方方土)，
-  如果你想要把 這個功能關掉，可以用，
-      export GCIN_DUAL_XIM_OFF=
-
-  上面的例子是 Big5 為主，底下的範例是 UTF-8 為主，主要差別就在 export XMODIFIERS=@im= 部份。
-
-      export LC_ALL=zh_TW.UTF-8
-      export XMODIFIERS=@im=$GCIN_XIM
-      gcin &
-      sleep 1
-      gnome-termial &
-
-      export LC_ALL=zh_TW.Big5
-      export XMODIFIERS=@im=$GCIN_XIM.Big5
-      gedit
-
 ------------------------------------------------
 如何使用 utf8 encoding  : 使用單一 XIM
-export GCIN_DUAL_XIM_OFF=
 export XMODIFIERS=@im=$GCIN_XIM
 export LC_ALL=zh_TW.UTF-8
 gcin &
@@ -303,7 +271,7 @@ gedit
 >  打:ㄅㄛ/ 出來 「嘸 PPD」這樣？
 
 有啊，按 ctrl-alt-3 輸入注音 & 選字，就會顯示你選用的目前 gtab
-輸入法的所有的可能拆字。gcin 和 windows 的不一樣， 是直接顯示你內定使用的輸入法。
+輸入法的所有的可能拆字。gcin 和 windows 的不一樣， 是直接顯示你內定使用的輸入法，不需要另外去設定。
 
 另外，如果字的某部份忘了如何拆，你可以用 '*' or '?' wildcard 來幫助你選字。
 

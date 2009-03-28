@@ -24,6 +24,9 @@
 #define GCIN_REMOTE_CLIENT "gcin-remote-client"
 #define GCIN_SHIFT_SPACE_ENG_FULL "gcin-shift-space-eng-full"
 #define GCIN_STATUS_TRAY "gcin-status-tray"
+#define GCIN_WIN_COLOR_FG "gcin-win-color-fg"
+#define GCIN_WIN_COLOR_BG "gcin-win-color-bg"
+#define GCIN_WIN_COLOR_USE "gcin-win-color-use"
 
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
@@ -40,6 +43,7 @@
 #define GTAB_HIDE_ROW2 "gtab-hide-row2"
 #define GTAB_IN_ROW1 "gtab-in-row1"
 #define GTAB_CAPSLOCK_IN_ENG "gtab-capslock-in-eng"
+#define GTAB_VERTICAL_SELECT "gtab-vertical-select"
 
 #define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
@@ -51,6 +55,7 @@
 #define TSIN_CURSOR_COLOR "tsin-cursor-color"
 #define TSIN_TONE_CHAR_INPUT "tsin-tone-char-input"
 #define TSIN_TAB_PHRASE_END "tsin-tab-phrase-end"
+#define TSIN_TAIL_SELECT_KEY "tsin-tail-select-key"
 
 #define PHO_HIDE_ROW2 "pho-hide-row2"
 #define PHO_IN_ROW1 "pho-in-row1"
@@ -80,6 +85,7 @@ extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;
+extern int gtab_vertical_select;
 extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
 extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
@@ -87,13 +93,15 @@ extern int gcin_status_tray;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;
-extern int tsin_tab_phrase_end;
+extern int tsin_tab_phrase_end, tsin_tail_select_key;
 
 extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;
 extern int tsin_space_opt, tsin_tone_char_input;
 
 extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name;
+extern char *gcin_win_color_fg, *gcin_win_color_bg;
+extern int gcin_win_color_use;
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char **rstr, char *default_str);

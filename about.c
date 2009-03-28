@@ -64,8 +64,7 @@ void create_about_window()
 
     GtkWidget *label_sf = gtk_label_new (
 "http://www.csie.nctu.edu.tw/~cp76/gcin\n"
-"bug tracking http://cle.linux.org.tw/gcin\n"
-"phpbb 討論區 http://cle.linux.org.tw/forum/viewforum.php?f=24");
+"bug tracking http://cle.linux.org.tw/gcin");
     gtk_label_set_selectable(GTK_LABEL(label_sf), TRUE);
 
     gtk_box_pack_start(GTK_BOX(vbox), label_sf, FALSE, FALSE, 0);

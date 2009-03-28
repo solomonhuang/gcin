@@ -36,18 +36,9 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
   int plen;
   float bestscore = 0;
 
-#if 0
-  /* if there is no phrase, out is not updated in the recursive parse,
-     so we need this */
-  int i;
-  for(i=0; i < c_len - start; i++) {
-    out[i].len = 1;
-    out[i].start = start + i;
-    utf8cpy(out[i].str, chpho[start + i].ch);
-  }
-#endif
-
   for(plen=1; start + plen <= c_len && plen <= MAX_PHRASE_LEN; plen++) {
+    if (plen > 1 && (chpho[start+plen-1].flag & FLAG_CHPHO_PHRASE_USER_HEAD))
+      break;
     phokey_t pp[MAX_PHRASE_LEN + 1];
     int sti, edi;
     TSIN_PARSE pbest[MAX_PH_BF_EXT+1];
@@ -100,23 +91,10 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
 
       score = plen;
       if (match_len > plen) {
-#if 0
-        if (start + plen == c_len)
-          pbest[0].flag |= FLAG_TSIN_PARSE_PARTIAL;
-
-        if (pbestscore < score) {
-#if 1
-          dbg("start:%d flag:%x %d part plen %d  sc:%d,%d ",
-            start, pbest[0].flag, sti, plen, pbestscore, score);
-          utf8_putchar(chpho[start].ch); dbg(" %d\n", pbest[0].len);
-#endif
-//          pbestscore = score;
-        }
-#endif
         continue;
       }
 
-      score = (float)usecount + 200 * plen * plen * plen;
+      score = (float)usecount + 200 * plen * plen;
 
       if (pbestscore >= score)
         continue;
@@ -199,35 +177,17 @@ void tsin_parse(TSIN_PARSE out[])
 
       ofsi++;
     }
-#if 0
-    dbg("%d] %s  %d  flag:%x\n", i,  out[i].str, out[i].len, out[i].flag);
-#endif
   }
-#if 0
-  for(i=0; i < c_len; i++)
-    dbg("psta %d %x\n", chpho[i].psta, chpho[i].flag);
-#endif
 
-  i--;
-  if ((out[i].flag & FLAG_TSIN_PARSE_PHRASE) && c_len - out[i].start > 1) {
-    ph_sta = out[i].start;
+  if (chpho[c_len-1].psta>=0) {
+    ph_sta = chpho[c_len-1].psta;
   }
-#if 0
-  else {
-    for(; i>=0 ; i--)
-      if (out[i].flag & FLAG_TSIN_PARSE_PARTIAL)
-        break;
-
-    if (i < 0)
-      ph_sta = -1;
-    else
-      ph_sta = out[i].start;
-  }
-#endif
 
 #if 0
   dbg("%d ph_sta: %d\n",i, ph_sta);
 #endif
+
+  disp_ph_sta();
 
   free(cache); cache = NULL;
 }

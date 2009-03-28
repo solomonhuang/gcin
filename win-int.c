@@ -57,7 +57,6 @@ static GtkWidget *create_int_opts()
   for(i=0; i < int_selN; i++) {
     GtkWidget *item = gtk_menu_item_new_with_label (int_sel[i].name);
 
-
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_int_opts), item);
   }
 

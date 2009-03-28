@@ -6,7 +6,7 @@ include config.mak
 
 gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
-gcin_gtab_o = gtab.o win-gtab.o gtab-util.o
+gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o
 
 GCIN_SO= gcin1.so
 
@@ -17,7 +17,7 @@ OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
-                 gcin-settings.o gcin-conf.o table-update.o
+                 gcin-settings.o gcin-conf.o table-update.o pinyin.o
 OBJS_sim2trad=sim2trad.o util.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
@@ -27,21 +27,22 @@ OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
+OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
-	gcin-icon.o
+	gcin-icon.o gcin-setup-gtab.o gtab-list.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
 OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 
 
-WALL=-Wall
+#WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
-        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD)
+        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS)
 ifeq ($(USE_XIM),Y)
 IMdkitLIB = IMdkit/lib/libXimd.a
 CFLAGS += -DUSE_XIM=1
@@ -60,7 +61,7 @@ im-srv = im-srv/im-srv.a
 	$(CC) $(CFLAGS) -c -fpic -o $@ $<
 
 PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
-	juyin-learn sim2trad gcin-gb-toggle gcin-message
+	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -89,6 +90,7 @@ trad2sim:	sim2trad
 	ln -sf sim2trad trad2sim
 
 gcin-setup:     $(OBJS_gcin_steup)
+	rm -f core.*
 	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
 
 phoa2d: $(OBJS_phoa2d)
@@ -112,6 +114,9 @@ tsd2a32:  $(OBJS_tsd2a32)
 gcin2tab:  $(OBJS_gcin2tab)
 	$(CC) -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
 	rm -f data/*.gtab
+
+gtab-merge:  $(OBJS_gtab_merge)
+	$(CC) -o $@ $(OBJS_gtab_merge) $(LDFLAGS)
 
 kbmcv:  $(OBJS_kbmcv)
 	$(CC) -o $@ $(OBJS_kbmcv) $(LDFLAGS)
@@ -192,7 +197,7 @@ clean:
 	$(MAKE) -C menu clean
 	rm -f *.o *.E *.db *.pico *.so config.mak tags $(PROGS) $(PROGS_CV) \
 	$(DATA) .depend gcin.spec trad2sim gcin.spec.tmp gcin.log
-	find . -name '.ted*' -o -name '*~' -o -name 'core.*' -exec rm {} \;
+	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' ')' -exec rm {} \;
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

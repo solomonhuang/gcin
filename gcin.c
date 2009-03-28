@@ -8,14 +8,11 @@ int win_xl, win_yl;
 int win_x, win_y;   // actual win x/y
 int dpy_xl, dpy_yl;
 
-#if USE_XIM
-gboolean dual_xim=TRUE;
-DUAL_XIM_ENTRY xim_arr[2];
-DUAL_XIM_ENTRY *pxim_arr;
-#else
 DUAL_XIM_ENTRY xim_arr[1];
-#endif
 
+#if USE_XIM
+DUAL_XIM_ENTRY *pxim_arr;
+#endif
 
 char *fullchar[]=
 {"　","！","”","＃","＄","％","＆","’","（","）","＊","＋",
@@ -43,31 +40,14 @@ void start_inmd_window()
   switch (default_input_method) {
     case 3:
       create_win_pho();
-#if USE_XIM
-      if (dual_xim)
-        create_win0();
-      xim_arr[1].xim_xwin = xwin0;
-#endif
       xim_arr[0].xim_xwin = xwin_pho;
       break;
     case 6:
       create_win0();
-#if USE_XIM
-      if (dual_xim)
-        create_win1();
-      xim_arr[1].xim_xwin = xwin1;
-#endif
       xim_arr[0].xim_xwin = xwin0;
       break;
     default:
       create_win_gtab();
-
-#if USE_XIM
-      if (dual_xim)
-        create_win_pho();
-      xim_arr[1].xim_xwin = xwin_pho;
-#endif
-
       xim_arr[0].xim_xwin = xwin_gtab;
       break;
   }
@@ -153,9 +133,6 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 
   if (ims == xim_arr[0].xims)
     index = 0;
-  else
-  if (ims == xim_arr[1].xims)
-    index = 1;
   else
      p_err("bad ims %x\n", ims);
 
@@ -274,7 +251,7 @@ void open_xim()
   encodings.supported_encodings = chEncodings;
 
 
-  int dualN = dual_xim ? 2 : 1;
+  int dualN = 1;
   int i;
 
   for(i=0; i < dualN; i++) {
@@ -463,69 +440,53 @@ void init_gcin_im_serv(Window win);
 int main(int argc, char **argv)
 {
 #if USE_XIM
-  dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
   char *lc_ctype = getenv("LC_CTYPE");
   char *lc_all = getenv("LC_ALL");
   char *lang = getenv("LANG");
-  if (!lc_ctype)
-    lc_ctype = "";
-  if (!lc_all)
-    lc_all = "";
+
   dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s  LANG=%s\n", lc_ctype, lc_all, lang);
 
-  char *enc;
-  char *lc_enc;
-  char *lc_utf8;
+  if (!lc_ctype && lang)
+    lc_ctype = lang;
+
+  if (lc_all)
+    lc_ctype = lc_all;
+
+  if (!lc_ctype)
+    lc_ctype = "zh_TW.Big5";
+
   char *lc;
 
   signal(SIGCHLD, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);
 
-  if (lc_ctype && strstr(lc_ctype, "en") /* || lang && strstr(lang, "en") */){
-    lc = "en_US";
-    enc = "UTF-8";
-#if 0
-    lc_enc = "zh_TW.UTF-8";
-    lc_utf8 = "en_US.UTF-8";
+  char *t = strchr(lc_ctype, '.');
+  if (t) {
+    int len = t - lc_ctype;
+#if MAC_OS || FREEBSD
+    lc = strdup(lc_ctype);
+    lc[len] = 0;
 #else
-    // XIM in en_US doesn't work
-    lc_enc = "zh_TW.UTF-8";
-    lc_utf8 = "zh_TW.UTF-8";
+    lc = strndup(lc_ctype, len);
 #endif
-  } else
-  if (lc_ctype && strstr(lc_ctype, "CN") || lang && strstr(lang, "CN")) {
-    lc = "zh_CN";
-    enc = "GB2312";
-    lc_enc = "zh_CN.GB2312";
-    lc_utf8 = "zh_CN.UTF-8";
-  } else {
-    lc = "zh_TW";
-    enc = "Big5";
-    lc_enc = "zh_TW.Big5";
-    lc_utf8 = "zh_TW.UTF-8";
   }
+  else
+    lc = lc_ctype;
 
   xim_arr[0].server_locale = lc;
   char *xim_server_name = get_gcin_xim_name();
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
-  strcpy(xim_arr[1].xim_server_name, xim_server_name);
 
-  if ((lc_ctype && strstr(lc_ctype, ".UTF-8")) ||
-      (lc_all && strstr(lc_all, ".UTF-8")) ||
-      (lang && strstr(lang, "UTF-8"))) {
+  if (strstr(lc_ctype, ".UTF-8")) {
     xim_arr[0].b_send_utf8_str = TRUE;
-    xim_arr[1].b_send_utf8_str = FALSE;
-    xim_arr[1].server_locale = lc_enc;
-    strcat(xim_arr[1].xim_server_name, enc);
-    dbg("gcin will use UTF-8 as the default encoding\n");
   } else {
     xim_arr[0].b_send_utf8_str = FALSE;
-    xim_arr[1].b_send_utf8_str = TRUE;
-    xim_arr[1].server_locale = lc_utf8;
-    strcat(xim_arr[1].xim_server_name, ".UTF-8");
-    dbg("gcin will use %s as the default encoding\n", enc);
   }
+#endif
+
+#if USE_XIM
+  dbg("gcin XIM will use %s as the default encoding\n", lc_ctype);
 #endif
 
   if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {

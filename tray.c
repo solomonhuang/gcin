@@ -52,8 +52,10 @@ static void draw_icon()
   gdk_color_parse("black", &color_fg);
   gdk_gc_set_rgb_fg_color(gc, &color_fg);
 
-  if (pix)
-    gdk_draw_pixbuf(tray_da_win, NULL, pix, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
+  if (pix) {
+    int ofs = (dh - gdk_pixbuf_get_height (pix))/2;
+    gdk_draw_pixbuf(tray_da_win, NULL, pix, 0, 0, 0, ofs, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
+  }
   else {
     get_text_w_h(inmd[current_CS->in_method].cname, &w, &h);
     gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
@@ -88,12 +90,10 @@ static void draw_icon()
 
 void update_tray_icon()
 {
-#if 0
-  gtk_widget_hide(da);
-  gtk_widget_show(da);
-#else
+  if (!gcin_status_tray)
+    return;
+
   gtk_widget_queue_draw(da);
-#endif
 }
 
 void get_icon_path(char *iconame, char fname[]);
@@ -223,11 +223,11 @@ gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
 void create_tray()
 {
   EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
+
   GtkWidget *event_box = gtk_event_box_new ();
+  gtk_container_add (GTK_CONTAINER (tray_icon), event_box);
   GtkTooltips *tips = gtk_tooltips_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, "左:正/簡體 中:輸入法 右:選項", NULL);
-
-  gtk_container_add (GTK_CONTAINER (tray_icon), event_box);
 
   g_signal_connect (G_OBJECT (event_box), "button-press-event",
                     G_CALLBACK (tray_button_press_event_cb), NULL);

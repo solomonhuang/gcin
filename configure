@@ -64,18 +64,21 @@ if [ $? != 0 ]; then
   exit -1;
 fi
 
-## problem in MacOS
+## problem in MacOS, by candyz
 if [ $MAC_OS = 1 ]; then
-  GTKINC = "$GTKINC -I/sw/include"
+  GTKINC="-I/sw/include `pkg-config --cflags $GTK`"
 fi
 
-
-if [ -x /usr/bin/bash -a ! -x /bin/bash ]; then
-  echo "/bin/bash -> /usr/bin/bash"
-  for i in scripts/*
+if [ ! -x /bin/bash ]; then
+  for i in /usr/bin/bash /usr/local/bin/bash
   do
-    sed -e "s~/bin~/usr/bin~" < $i > $i.tmp
-    mv $i.tmp $i
+    [ -x $i ] || next
+    echo "/bin/bash -> $i"
+    for i in scripts/*
+    do
+      sed -e "s~/bin/bash~$i~" < $i > $i.tmp
+      mv $i.tmp $i
+    done
   done
 fi
 

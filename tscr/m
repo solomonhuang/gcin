@@ -1,0 +1,36 @@
+GCIN_TABLE_DIR=../data
+LANG=en_US.UTF-8
+LC_CTYPE=zh_TW.UTF-8
+LC_NUMERIC=en_US
+LC_TIME=en_US
+LC_COLLATE=en_US
+LC_MONETARY=en_US
+LC_MESSAGES=en_US
+LC_PAPER=zh_TW
+LC_NAME="en_US.UTF-8"
+LC_ADDRESS=en_US
+LC_TELEPHONE=en_US
+LC_MEASUREMENT=en_US
+LC_IDENTIFICATION=en_US
+LC_ALL=
+gcin get env LC_CTYPE=zh_TW.UTF-8  LC_ALL=  LANG=en_US.UTF-8
+kkkk
+LANG=en_US.UTF-8
+LC_CTYPE=en_US.UTF-8
+LC_NUMERIC=en_US
+LC_TIME=en_US
+LC_COLLATE=en_US
+LC_MONETARY=en_US
+LC_MESSAGES=en_US
+LC_PAPER=zh_TW
+LC_NAME="en_US.UTF-8"
+LC_ADDRESS=en_US
+LC_TELEPHONE=en_US
+LC_MEASUREMENT=en_US
+LC_IDENTIFICATION=en_US
+LC_ALL=
+gcin will use UTF-8 as the default encoding
+load_gtab_list /home/dhliu/.gcin/gtab.list
+-- /tmp/gcin-dhliu/socket-:0.0-gcin_test
+connection via TCP is disabled
+----------------- do_ exit ----------------

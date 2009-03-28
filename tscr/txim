@@ -7,9 +7,10 @@ pkill gcin.test
 export LC_CTYPE=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
 export GTK_IM_MODULE=xim
+locale
 ../gcin.test &
 gcinpid=$!
 sleep 1
-# gedit
+gedit
 #leafpad
-amsn
+#amsn

@@ -115,6 +115,7 @@ gboolean utf8_str_eq(char *a, char *b, int len);
 void utf8cpyN(char *t, char *s, int N);
 int utf8_str_N(char *str);
 void utf8cpyn(char *t, char *s, int n);
+void utf8cpy_bytes(char *t, char *s, int n);
 
 void get_gcin_dir(char *tt);
 Atom get_gcin_atom(Display *dpy);
@@ -127,6 +128,7 @@ void set_label_font_size(GtkWidget *label, int size);
 void send_gcin_message(Display *dpy, char *s);
 void check_CS();
 void get_win_size(GtkWidget *win, int *width, int *height);
+void change_win_fg_bg(GtkWidget *win, GtkWidget *label);
 
 
 #define BITON(flag, bit) ((flag) & (bit))

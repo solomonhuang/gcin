@@ -44,7 +44,7 @@ gboolean win_size_exceed(GtkWidget *win)
 
   get_win_size(win, &width, &height);
 
-  return (width + current_in_win_x > dpy_xl);
+  return (width + current_in_win_x > dpy_xl || height + current_in_win_y > dpy_yl);
 }
 
 
@@ -108,6 +108,7 @@ void create_win_pho()
   GdkWindow *gdkwin = gwin_pho->window;
   xwin_pho = GDK_WINDOW_XWINDOW(gdkwin);
   gdk_window_set_override_redirect(gdkwin, TRUE);
+  change_win_bg(gwin_pho);
 }
 
 void create_win_sym(), exec_gcin_setup();
@@ -402,4 +403,6 @@ void change_pho_font_size()
   }
 
   set_label_font_size(label_pho_sele, gcin_font_size);
+
+  change_win_fg_bg(gwin_pho, label_pho_sele);
 }

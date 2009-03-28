@@ -942,19 +942,17 @@ extern Window xwin_pho, xwin0, xwin_gtab;
 gint64 current_time();
 
 static gint64 last_focus_out_time;
-static ClientState *last_cs;
 
 int gcin_FocusOut(ClientState *cs)
 {
   gint64 t = current_time();
 
-  if (t - last_focus_out_time < 100000 && cs == last_cs) {
+  if (t - last_focus_out_time < 100000) {
     last_focus_out_time = t;
     return;
   }
 
   last_focus_out_time = t;
-  last_cs = cs;
 
   if (cs == current_CS) {
     hide_in_win(cs);

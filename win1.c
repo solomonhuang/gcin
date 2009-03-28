@@ -21,6 +21,7 @@ void create_win1()
   gdk_window_set_override_redirect(gdkwin1, TRUE);
 }
 
+void change_win1_font();
 
 void create_win1_gui()
 {
@@ -58,6 +59,8 @@ void create_win1_gui()
   gtk_widget_show_all(gwin1);
   gdk_flush();
   gtk_widget_hide(gwin1);
+
+  change_win1_font();
 }
 
 void clear_sele()
@@ -85,7 +88,10 @@ void set_sele_text(int i, char *text, int len)
   memcpy(utf8, text, len);
   utf8[len]=0;
 
-  snprintf(tt, sizeof(tt), "%c %s", phkbm.selkey[i], utf8);
+  if (tsin_tail_select_key)
+    snprintf(tt, sizeof(tt), "%s %c", utf8, phkbm.selkey[i]);
+  else
+    snprintf(tt, sizeof(tt), "%c %s", phkbm.selkey[i], utf8);
 
   gtk_label_set_text(GTK_LABEL(labels_sele[i]), tt);
   gtk_widget_show(labels_sele[i]);
@@ -136,6 +142,13 @@ void change_win1_font()
 {
   int i;
 
-  for(i=0; i < SELEN; i++)
+  GdkColor fg, bg;
+  gdk_color_parse(gcin_win_color_fg, &fg);
+
+  for(i=0; i < SELEN; i++) {
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
+    gtk_widget_modify_fg(labels_sele[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
+  }
+
+  change_win_bg(gwin1);
 }
