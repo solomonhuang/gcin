@@ -18,3 +18,4 @@ typedef struct {
 
 void tsin_parse();
 void init_cache(int tc_len);
+CACHE *cache_lookup(int start);

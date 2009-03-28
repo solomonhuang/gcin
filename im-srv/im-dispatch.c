@@ -224,3 +224,13 @@ void process_client_req(int fd)
       break;
   }
 }
+
+
+
+void close_all_clients()
+{
+  int i;
+  for(i=3; i <= gcin_clientsN; i++)
+    if (gcin_clients[i].tag)
+      close(i);
+}

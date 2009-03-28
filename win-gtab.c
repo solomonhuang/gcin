@@ -574,7 +574,7 @@ void win_gtab_disp_half_full()
   minimize_win_gtab();
 }
 
-
+#if 0
 void recreate_win_gtab()
 {
 //  puts("recreate_win_gtab");
@@ -582,3 +582,4 @@ void recreate_win_gtab()
   create_win_gtab();
   create_win_gtab_gui();
 }
+#endif

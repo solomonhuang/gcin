@@ -301,7 +301,7 @@ void change_pho_font_size()
   change_win_fg_bg(gwin_pho, label_pho_sele);
 }
 
-
+#if 0
 void recreate_win_pho()
 {
   gtk_widget_destroy(gwin_pho);
@@ -310,3 +310,4 @@ void recreate_win_pho()
   create_win_pho();
   create_win_pho_gui_simple();
 }
+#endif

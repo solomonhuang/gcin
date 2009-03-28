@@ -677,7 +677,7 @@ void change_tsin_color()
 
 
 void recreate_tsin_select_win();
-
+#if 0
 void recreate_tsin_win()
 {
   destroy_win0();
@@ -685,3 +685,4 @@ void recreate_tsin_win()
   create_win0_gui();
   recreate_tsin_select_win();
 }
+#endif

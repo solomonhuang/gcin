@@ -1486,10 +1486,12 @@ tab_phrase_end:
               disp_pre_sel_page();
             }
 
-            if (!c_len && gcin_pop_up_win && !j)
+            if (!c_len && gcin_pop_up_win && typ_pho_empty())
               hide_win0();
+
             return 1;
           }
+
 
         if (!c_idx)
           return 0;

@@ -81,7 +81,7 @@ im-srv = im-srv/im-srv.a
 
 PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge gcin-setup-tab \
-	gcin-kbm-toggle
+	gcin-kbm-toggle anthy
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -162,6 +162,10 @@ gcin-message:	$(OBJS_gcin_message)
 pin-juyin:	$(OBJS_pin_juyin)
 	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
 
+OBJS_ANTHY = anthy.o
+anthy:	$(OBJS_ANTHY)
+	$(CC) -o $@ $(OBJS_ANTHY) -lanthy -lanthydic $(LDFLAGS)
+
 gcin1_so= intcode.pico win-int.pico win-message.pico win-sym.pico \
 win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico tsin-char.pico
 gcin1.so: $(gcin1_so)
@@ -189,7 +193,6 @@ $(IMdkitLIB):
 
 $(im-srv):
 	$(MAKE) -C im-srv
-
 
 ibin:
 	install $(PROGS) $(bindir); \
