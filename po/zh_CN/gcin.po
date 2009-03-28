@@ -373,8 +373,8 @@ msgid "離開"
 msgstr "离开"
 
 #: ../tray.c:228
-msgid "左:正/簡體 中:輸入法 右:選項"
-msgstr "左:正/简体 中:输入法 右:选项"
+msgid "左:正/簡體 中:小鍵盤 右:選項"
+msgstr "左:正/简体 中:小键盘 右:选项"
 
 #: ../tslearn.c:336
 msgid "按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"

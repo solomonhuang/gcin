@@ -190,6 +190,16 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 extern gboolean win_kbm_inited;
 
 static int b_show_win_kbm=0;
+void kbm_toggle()
+{
+  win_kbm_inited = 1;
+  b_show_win_kbm^=1;
+  if (b_show_win_kbm)
+    show_win_kbm();
+  else
+    hide_win_kbm();
+}
+
 gboolean
 tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer userdata)
 {
@@ -201,12 +211,7 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
 #if 0
       inmd_switch_popup_handler(NULL, (GdkEvent *)event);
 #else
-      win_kbm_inited = 1;
-      b_show_win_kbm^=1;
-      if (b_show_win_kbm)
-        show_win_kbm();
-      else
-        hide_win_kbm();
+      kbm_toggle();
 #endif
       break;
     case 3:
@@ -244,7 +249,7 @@ gboolean create_tray()
   GtkWidget *event_box = gtk_event_box_new ();
   gtk_container_add (GTK_CONTAINER (tray_icon), event_box);
   GtkTooltips *tips = gtk_tooltips_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, _("左:正/簡體 中:輸入法 右:選項"), NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, _("左:正/簡體 中:小鍵盤 右:選項"), NULL);
 
   g_signal_connect (G_OBJECT (event_box), "button-press-event",
                     G_CALLBACK (tray_button_press_event_cb), NULL);

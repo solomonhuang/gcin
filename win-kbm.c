@@ -80,7 +80,7 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
 }
 
 
-void create_win_kbm()
+static void create_win_kbm()
 {
   gdk_color_parse("red", &red);
 
@@ -141,16 +141,11 @@ void create_win_kbm()
   gtk_widget_realize (gwin_kbm);
   GdkWindow *gdkwin_kbm = gwin_kbm->window;
   set_no_focus(gwin_kbm);
-
-
-#if 0
-  show_win_kbm();
-#endif
 }
 
 extern GdkWindow *tray_da_win;
 
-void move_win_kbm()
+static void move_win_kbm()
 {
   int width, height;
   get_win_size(gwin_kbm, &width, &height);

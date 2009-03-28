@@ -35,6 +35,7 @@ OBJS_gcin_setup_tab=gcin-setup-tab.o gcin-conf.o util.o gcin-send.o gcin-setting
 	gcin-switch.o about.o gcin-icon.o gtab-list.o gcin-exec-script.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
+OBJS_gcin_kbm_toggle = gcin-kbm-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
 OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 
@@ -79,7 +80,8 @@ im-srv = im-srv/im-srv.a
 	$(CC) $(CFLAGS) -c -fpic -o $@ $<
 
 PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
-	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge gcin-setup-tab
+	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge gcin-setup-tab \
+	gcin-kbm-toggle
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -148,6 +150,9 @@ kbmcv:  $(OBJS_kbmcv)
 
 gcin-gb-toggle:	$(OBJS_gcin_gb_toggle)
 	$(CC) -o $@ $(OBJS_gcin_gb_toggle) $(LDFLAGS)
+
+gcin-kbm-toggle:	$(OBJS_gcin_kbm_toggle)
+	$(CC) -o $@ $(OBJS_gcin_kbm_toggle) $(LDFLAGS)
 
 gcin-message:	$(OBJS_gcin_message)
 	$(CC) -o $@ $(OBJS_gcin_message) $(LDFLAGS)

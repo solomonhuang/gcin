@@ -360,6 +360,9 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
        if (!strcmp(message, GB_OUTPUT_TOGGLE)) {
          cb_trad_sim_toggle();
        } else
+       if (!strcmp(message, KBM_TOGGLE)) {
+         kbm_toggle();
+       } else
        if (strstr(message, "#gcin_message")) {
          execute_message(message);
        }
@@ -517,7 +520,6 @@ int main(int argc, char **argv)
   init_gcin_im_serv(xim_arr[0].xim_xwin);
 #endif
 
-//  show_win_kbm();
 #if TRAY_ENABLED
   if (gcin_status_tray) {
     init_tray();

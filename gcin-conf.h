@@ -1,5 +1,6 @@
 #define CHANGE_FONT_SIZE "change font size"
 #define GB_OUTPUT_TOGGLE "gb output toggle"
+#define KBM_TOGGLE "kbm toggle"
 
 
 #define GCIN_FONT_SIZE "gcin-font-size"

@@ -75,6 +75,8 @@ static void append_str(char **buf, int *bufN, char *text, int len)
 
 void send_text(char *text)
 {
+  char *filter;
+
   if (!text)
     return;
   int len = strlen(text);
@@ -90,7 +92,7 @@ void send_text(char *text)
 
     if (err) {
       dbg("utf8 -> gb  convert error %d %d\n", rn, wn);
-      return;
+      goto direct;
     }
 
     err = NULL;
@@ -99,7 +101,7 @@ void send_text(char *text)
 
     if (err) {
       dbg("big5 -> gb  convert error %d %d\n", rn, wn);
-      return;
+      goto direct;
     }
 
     err = NULL;
@@ -108,14 +110,15 @@ void send_text(char *text)
 
     if (err) {
       dbg("gb -> utf8  convert error %d %d\n", rn, wn);
-      return;
+      goto direct;
     }
 
     text = utf8_gbtext;
     len = wn;
   }
 
-  char *filter = getenv("GCIN_OUTPUT_FILTER");
+direct:
+  filter = getenv("GCIN_OUTPUT_FILTER");
   char filter_text[512];
 
   if (filter) {
@@ -186,7 +189,7 @@ void sendkey_b5(char *bchar)
 }
 
 
-void send_ascii(int key)
+void send_ascii(char key)
 {
   sendkey_b5(&key);
 }
