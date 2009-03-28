@@ -472,7 +472,9 @@ void show_win_gtab()
   if (gcin_pop_up_win && !gtab_has_input() && !force_show)
     return;
 
-  gtk_widget_show(gwin_gtab);
+  if (!GTK_WIDGET_VISIBLE(gwin_gtab))
+    gtk_widget_show(gwin_gtab);
+
   if (current_CS->b_raise_window)
     gtk_window_present(GTK_WINDOW(gwin_gtab));
 

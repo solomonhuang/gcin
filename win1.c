@@ -33,7 +33,6 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
       tsin_sele_by_idx(v);
       break;
   }
-
 }
 
 void create_win1_gui()
@@ -108,6 +107,7 @@ void clear_sele()
   gtk_widget_hide(arrow_up);
   gtk_widget_hide(arrow_down);
   gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
+  hide_selections_win();
 }
 
 char *htmlspecialchars(char *s, char out[]);
@@ -143,17 +143,21 @@ void set_sele_text(int i, char *text, int len)
 
 void move_win_char_index(GtkWidget *win1, int index);
 
-void disp_selections(int idx)
+void disp_selections(int x, int y)
 {
-  if (idx < 0)
-    p_err("err");
-#if 0
-  move_win_char_index(gwin1, idx);
-#endif
-  gtk_widget_show(gwin1);
-#if 1 // strange bug in gtk
-  move_win_char_index(gwin1, idx);
-#endif
+  if (!GTK_WIDGET_VISIBLE(gwin1))
+    gtk_widget_show(gwin1);
+
+  int win1_xl, win1_yl;
+  get_win_size(gwin1, &win1_xl, &win1_yl);
+
+  if (x + win1_xl > dpy_xl)
+    x = dpy_xl - win1_xl;
+  if (y + win1_yl > dpy_yl)
+    y = win_y - win1_yl;
+
+//  dbg("move_win_char_index:%d %d\n", index, x);
+  gtk_window_move(GTK_WINDOW(gwin1), x, y);
 }
 
 void raise_tsin_selection_win()
@@ -210,12 +214,3 @@ void change_win1_font()
 
   change_win_bg(gwin1);
 }
-
-#if 0
-void recreate_tsin_select_win()
-{
-  destroy_win1();
-  create_win1();
-  create_win1_gui();
-}
-#endif

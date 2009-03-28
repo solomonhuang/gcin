@@ -217,12 +217,43 @@ void clr_in_area_pho_tsin()
    disp_tsin_pho(i, " ");
 }
 
-
-void get_char_index_xy(int index, int *rx, int *ry)
+void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
 {
-  int wx, wy;
   int ofs=0;
+  gtk_widget_show_all(widget);
+  gdk_flush();
 
+  GtkRequisition sz;
+  gtk_widget_size_request(widget, &sz);
+  int wx, wy;
+
+  wx=wy=0;
+
+  gtk_widget_translate_coordinates(widget, win,
+         0, sz.height, &wx, &wy);
+
+  gtk_widget_translate_coordinates(widget, win,
+         0, sz.height, &wx, &wy);
+
+//  dbg("%d wx:%d\n", index,  wx);
+
+  int win_x, win_y;
+
+  gtk_window_get_position(GTK_WINDOW(win), &win_x, &win_y);
+  int win_xl, win_yl;
+  get_win_size(win, &win_xl, &win_yl);
+
+  if (wx > win_xl)
+    wx = win_xl;
+
+  *rx = win_x + wx;
+  *ry = win_y + wy + ofs;
+}
+
+void disp_tsin_select(int index)
+{
+  int x,y;
+  int ofs=0;
 #if 0
   GtkWidget *widget =chars[index].line;
 
@@ -237,51 +268,8 @@ void get_char_index_xy(int index, int *rx, int *ry)
   GtkWidget *widget = chars[index].vbox;
 #endif
 
-  gtk_widget_show_all(widget);
-  gdk_flush();
-
-  GtkRequisition sz;
-  gtk_widget_size_request(widget, &sz);
-
-  wx=wy=0;
-
-  gtk_widget_translate_coordinates(widget, gwin0,
-         0, sz.height, &wx, &wy);
-
-  gtk_widget_translate_coordinates(widget, gwin0,
-         0, sz.height, &wx, &wy);
-
-//  dbg("%d wx:%d\n", index,  wx);
-
-  int win_x, win_y;
-
-  gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
-  int win_xl, win_yl;
-  get_win_size(gwin0, &win_xl, &win_yl);
-
-  if (wx > win_xl)
-    wx = win_xl;
-
-  *rx = win_x + wx;
-  *ry = win_y + wy + ofs;
-}
-
-void move_win_char_index(GtkWidget *win1, int index)
-{
-  int x,y;
-
-  get_char_index_xy(index, &x, &y);
-
-  int win1_xl, win1_yl;
-  get_win_size(win1, &win1_xl, &win1_yl);
-
-  if (x + win1_xl > dpy_xl)
-    x = dpy_xl - win1_xl;
-  if (y + win1_yl > dpy_yl)
-    y = win_y - win1_yl;
-
-//  dbg("move_win_char_index:%d %d\n", index, x);
-  gtk_window_move(GTK_WINDOW(win1), x, y);
+  get_widget_xy(gwin0, widget, &x, &y);
+  disp_selections(x, y);
 }
 
 #define MIN_X_SIZE 32
@@ -593,7 +581,8 @@ void show_win0()
   if (gcin_pop_up_win && !tsin_has_input() && !force_show)
     return;
 
-  gtk_widget_show(gwin0);
+  if (!GTK_WIDGET_VISIBLE(gwin0))
+    gtk_widget_show(gwin0);
 
   show_win_sym();
   if (current_CS->b_raise_window) {

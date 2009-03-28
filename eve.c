@@ -246,6 +246,9 @@ void hide_in_win(ClientState *cs)
     case 10:
       hide_win_int();
       break;
+    case 12:
+      hide_win_anthy();
+      break;
     default:
       hide_win_gtab();
   }
@@ -283,6 +286,9 @@ void show_in_win(ClientState *cs)
 #endif
     case 10:
       show_win_int();
+      break;
+    case 12:
+      show_win_anthy();
       break;
     default:
       show_win_gtab();
@@ -332,6 +338,9 @@ void move_in_win(ClientState *cs, int x, int y)
 #endif
     case 10:
       move_win_int(x, y);
+      break;
+    case 12:
+      move_win_anthy(x, y);
       break;
     default:
       if (!cs->in_method)
@@ -686,6 +695,12 @@ gboolean init_in_method(int in_no)
       current_CS->in_method = in_no;
       init_inter_code();
       break;
+    case 12:
+      if (init_win_anthy()) {
+        current_CS->in_method = in_no;
+        show_win_anthy();
+      }
+      break;
     default:
       init_gtab(in_no);
       if (!inmd[in_no].DefChars)
@@ -899,6 +914,8 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 #endif
     case 10:
       return feedkey_intcode(keysym);
+    case 12:
+      return feedkey_anthy(keysym, kev_state);
     default:
       return feedkey_gtab(keysym, kev_state);
   }

@@ -36,7 +36,7 @@ static int save_frm, save_to;
 static int current_page;
 static int startf;
 static gboolean full_match;
-static gboolean tsin_half_full;
+gboolean tsin_half_full;
 static gboolean tsin_buffer_editing = 0;
 
 typedef struct {
@@ -638,7 +638,6 @@ static void get_sel_pho()
 
 void clear_sele();
 void set_sele_text(int i, char *text, int len);
-void disp_selections(int idx);
 void disp_arrow_up(), disp_arrow_down();
 
 static void disp_current_sel_page()
@@ -668,7 +667,7 @@ static void disp_current_sel_page()
   if (current_page > 0)
     disp_arrow_up();
 
-  disp_selections(c_idx==c_len?c_idx-1:c_idx);
+  disp_tsin_select(c_idx==c_len?c_idx-1:c_idx);
 }
 
 static int fetch_user_selection(int val, char **seltext)
@@ -873,7 +872,7 @@ static void disp_pre_sel_page()
 #if 0
   dbg("ph_sta:%d\n", ph_sta);
 #endif
-  disp_selections(ph_sta);
+  disp_tsin_select(ph_sta);
 }
 
 static void close_selection_win()
@@ -914,6 +913,7 @@ void tsin_toggle_half_full()
     tsin_half_full^=1;
     key_press_time = 0;
     drawcursor();
+    load_tray_icon();
 }
 
 

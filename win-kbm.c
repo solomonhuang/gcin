@@ -154,11 +154,16 @@ static void move_win_kbm()
   if (tray_da_win) {
     gdk_window_get_origin(tray_da_win, &ox, &oy);
     gdk_window_get_size(tray_da_win, &szx, &szy);
-    oy -= height;
-    if (oy + height > dpy_yl)
-      oy = dpy_yl - height;
-    if (oy < 0)
+
+    if (oy<height) {
       oy = szy;
+    } else {
+      oy -= height;
+      if (oy + height > dpy_yl)
+        oy = dpy_yl - height;
+      if (oy < 0)
+        oy = szy;
+    }
 
     if (ox + width > dpy_xl)
       ox = dpy_xl - width;

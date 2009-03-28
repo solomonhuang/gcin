@@ -197,7 +197,7 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 // probably only works for linux
   static char *moz[]={"mozilla", "firefox", "thunderbird", "nvu", "sunbird",
 	"seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape", "swiftfox",
-	"iceowl", "kompozer", "swiftdove", "swiftweasel", "navigator"};
+	"iceowl", "kompozer", "swiftdove", "swiftweasel", "navigator", "xulrunner"};
   char tstr0[64];
   char exec[256];
   sprintf(tstr0, "/proc/%d/exe", pid);

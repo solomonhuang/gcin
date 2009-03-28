@@ -26,7 +26,7 @@ static void get_text_w_h(char *s, int *w, int *h)
 }
 
 #if USE_TSIN
-extern gboolean eng_ph;
+extern gboolean eng_ph, tsin_half_full;
 #endif
 
 static void draw_icon()
@@ -58,7 +58,7 @@ static void draw_icon()
   }
 
   if (current_CS) {
-    if (current_CS->b_half_full_char) {
+    if (current_CS->b_half_full_char || current_CS->in_method==6 && tsin_half_full) {
       static char full[] = "全";
       get_text_w_h(full,  &w, &h);
       gdk_draw_layout(tray_da_win, gc, dw - w, dh - h, pango);
@@ -167,50 +167,20 @@ static void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer *dat)
   phonetic_speak= gtk_check_menu_item_get_active(checkmenuitem);
 }
 
-void recreate_tsin_win();
-void recreate_win_gtab();
-extern Window xwin_pho, xwin0, xwin_gtab;
-extern Atom gcin_atom;
-extern DUAL_XIM_ENTRY xim_arr[1];
 
-void recreate_window()
+void restart_gcin()
 {
-#if 0
-  Window win;
-
-  if (!current_CS)
-    return;
-  switch (current_CS->in_method) {
-    case 3:
-      win = xwin_pho;
-      break;
-    case 6:
-      recreate_tsin_win();
-      win = xwin0;
-      break;
-    default:
-      recreate_win_gtab();
-      win = xwin_gtab;
-      break;
-  }
-
-
-  XSetSelectionOwner(dpy, gcin_atom, win, CurrentTime);
-#else
   static char execbin[]=GCIN_BIN_DIR"/gcin";
-  int pid;
-
 
   signal(SIGCHLD, SIG_IGN);
 
-  pid = fork();
+  int pid = fork();
   if (!pid) {
     close_all_clients();
     sleep(1);
     execl(execbin, "gcin", NULL);
   } else
     exit(0);
-#endif
 }
 
 
@@ -223,7 +193,7 @@ struct {
   int *check_dat;
 } mitems[] = {
   {N_("設定"), GTK_STOCK_PREFERENCES, exec_gcin_setup},
-  {N_("重新執行gcin"), NULL, recreate_window},
+  {N_("重新執行gcin"), NULL, restart_gcin},
   {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
   {N_("正->簡體"), NULL, cb_trad2sim},
   {N_("簡->正體"), NULL, cb_sim2trad},

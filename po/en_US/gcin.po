@@ -595,5 +595,5 @@ msgid "右上"
 msgstr "Upper right"
 
 #: ../tray.c:197
-msgid "解空白視窗"
-msgstr "Resolve blank window"
+msgid "重新執行gcin"
+msgstr "Restart gcin"
