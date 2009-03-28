@@ -55,7 +55,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
     phokey_t pp[MAX_PHRASE_LEN + 1];
     int sti, edi;
     TSIN_PARSE pbest[MAX_PH_BF_EXT+1];
-    int maxusecount = 0;
+    int maxusecount = -10000;
     int remlen;
     short match_phr_N=0, no_match_ch_N = 1;
 

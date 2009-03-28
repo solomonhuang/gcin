@@ -16,6 +16,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: ../eggtrayicon.c:127 
+msgid "Orientation"
+msgstr "Orientation"
+
+#: ../eggtrayicon.c:128
+msgid "The orientation of the tray."
+msgstr "The orientation of the tray."
+
 #: ../gcin-setup-gtab.c:131
 msgid "空白鍵選項"
 msgstr "空格键选项"
@@ -139,6 +147,10 @@ msgstr "远端 client 程序支持 (port 9999-)"
 #: ../gcin-setup-list.c:435
 msgid "shift-space 進入全形英文模式"
 msgstr "shift-space 进入全角英文模态"
+
+#: ../gcin-setup-list.c:483
+msgid "英數狀態使用 alt-shift 片語"
+msgstr "半角英文模态使用 Alt-Shift 片语"
 
 #: ../gcin-setup-pho.c:205 ../gcin-setup-pho.c:477
 msgid "詞音標示詞的底線顏色"
@@ -355,3 +367,36 @@ msgstr "臭虫追踪"
 #: ../about.c:83
 msgid "關閉"
 msgstr "关闭"
+
+#: ../juyin-learn.c:172 ../sim2trad.c:135
+msgid "自剪貼區更新"
+msgstr "自剪贴区更新"
+
+#: ../juyin-learn.c:177 ../sim2trad.c:140
+msgid "離開"
+msgstr "离开"
+
+#: ../tray.c:228
+msgid "左:正/簡體 中:輸入法 右:選項"
+msgstr "左:正/简体 中:输入法 右:选项"
+
+#: ../tslearn.c:336
+msgid "按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"
+msgstr "按老鼠中键, 贴上你要 tslearn 学习的文章。"
+
+#: ../tslearn.c:349
+msgid "標示已知詞"
+msgstr "标示已知词"
+
+#: ../tslearn.c:354
+msgid "新增詞"
+msgstr "新增词"
+
+#: ../tslearn.c:360
+msgid "離開 tslearn"
+msgstr "离开 tslearn"
+
+#: ../win-gtab.c:340 ../win-gtab.c:447 ../win-pho.c:182 ../win-pho.c:258
+#: ../win0.c:601
+msgid "左鍵符號，右鍵設定"
+msgstr "左键符号，右键设置"

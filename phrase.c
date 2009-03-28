@@ -12,7 +12,9 @@ struct keystruc {
   KeySym ksym;
   char *str;
   char *str_caps;
-} tran[]={
+};
+
+struct keystruc tran[]={
   {"`", '~'},
   {"0", ')'}, {"1", '!'}, {"2", '@'}, {"3", '#'}, {"4", '$'}, {"5", '%'},
   {"6", '^'}, {"7", '&'}, {"8", '*'}, {"9", '('},
@@ -42,19 +44,27 @@ struct keystruc {
 };
 
 
+struct keystruc tran_ctrl[]={
+  {",", ','}, {".", '.'}, {";", ';'}, {"'", '\''}, {"/", '/'},
+};
+
+
 int tranN=sizeof(tran)/sizeof(tran[0]);
+int tran_ctrlN=sizeof(tran_ctrl)/sizeof(tran_ctrl[0]);
 extern char *TableDir;
 
 FILE *watch_fopen(char *filename, time_t *pfile_modify_time);
 
-void load_phrase()
+static time_t file_modify_time;
+static time_t ctrl_file_modify_time;
+
+void load_phrase(char *fname, time_t *modtime, struct keystruc *tr, int trN)
 {
   FILE *fp;
   char kname[32];
   char ttt[512];
-  static time_t file_modify_time;
 
-  if ((fp=watch_fopen("phrase.table", &file_modify_time)) == NULL)
+  if ((fp=watch_fopen(fname, modtime)) == NULL)
     return;
 
   while (!feof(fp)) {
@@ -87,20 +97,19 @@ void load_phrase()
 
     str[j]=0;
 
-    for(i=0; i < tranN; i++)
-      if (!strcmp(kname, tran[i].kname))
-            break;
 
-    if (i==tranN) {
+    for(i=0; i < trN; i++)
+      if (!strcmp(kname, tr[i].kname))
+            break;
+    if (i==trN) {
       dbg("unknown key: %s\n", kname);
       continue;
     }
 
-    if (is_upper) {
-      tran[i].str_caps = strdup(str);
-    }
+    if (is_upper)
+      tr[i].str_caps = strdup(str);
     else
-      tran[i].str = strdup(str);
+      tr[i].str = strdup(str);
   }
 }
 
@@ -120,17 +129,30 @@ gboolean feed_phrase(KeySym ksym, int state)
   int i;
 
 //  dbg("ksym:%x %c\n", ksym, ksym);
-  load_phrase();
+  load_phrase("phrase.table", &file_modify_time, tran, tranN);
+  load_phrase("phrase-ctrl.table", &ctrl_file_modify_time, tran_ctrl, tran_ctrlN);
 
   if (isupper(ksym))
     ksym = tolower(ksym);
 
-  for(i=0; i < tranN; i++) {
-    if (tran[i].ksym!= ksym)
-      continue;
+  struct keystruc *tr;
+  int trN;
 
-    char *str = ((state & LockMask) && tran[i].str_caps) ?
-                 tran[i].str_caps : tran[i].str;
+  if (state & ControlMask) {
+    tr = tran_ctrl;
+    trN = tran_ctrlN;
+  } else {
+    tr = tran;
+    trN = tranN;
+  }
+
+
+  for(i=0; i < trN; i++) {
+    if (tr[i].ksym!= ksym)
+      continue;
+    char *str;
+
+    str = ((state & LockMask) && tr[i].str_caps) ? tr[i].str_caps : tr[i].str;
 
     if (str) {
       if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)

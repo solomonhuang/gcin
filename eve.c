@@ -720,6 +720,10 @@ gboolean timeout_raise_window()
 }
 
 
+gboolean control_punc(KeySym keysym)
+{
+}
+
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
@@ -820,6 +824,11 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     if (timeout_handle)
       g_source_remove(timeout_handle);
     timeout_handle = g_timeout_add(200, timeout_raise_window, NULL);
+  }
+
+  if (kev_state & ControlMask) {
+    if (feed_phrase(keysym, kev_state))
+      return TRUE;
   }
 
   switch(current_CS->in_method) {

@@ -1,5 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
+#include "config.h"
+#include <libintl.h>
 
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
@@ -126,6 +128,13 @@ gboolean cb_button_fetch()
 
 int main(int argc, char **argv)
 {
+
+#if GCIN_i18n_message
+  gtk_set_locale();
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain(GETTEXT_PACKAGE);
+#endif
+
   gtk_init (&argc, &argv);
 
   char kbm_str[32];

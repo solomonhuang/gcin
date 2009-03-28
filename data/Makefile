@@ -8,7 +8,7 @@ DATA=pho.tab tsin32.idx \
      pinyin.kbm pinyin-asdf.kbm dvorak.kbm mitac.kbm \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab kana-nippon.gtab \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt
-DATAKEEP=symbol-table gtab.list phrase.table
+DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 
 all:	$(DATA)
 

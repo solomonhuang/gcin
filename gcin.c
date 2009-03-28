@@ -1,6 +1,8 @@
 #include <signal.h>
 // #include <openssl/ssl.h>
 #include "gcin.h"
+#include "config.h"
+#include <libintl.h>
 
 Display *dpy;
 Window root;
@@ -422,6 +424,13 @@ void init_gcin_im_serv(Window win);
 
 int main(int argc, char **argv)
 {
+
+#if GCIN_i18n_message
+  gtk_set_locale();
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain(GETTEXT_PACKAGE);
+#endif
+
 #if USE_XIM
   char *lc_ctype = getenv("LC_CTYPE");
   char *lc_all = getenv("LC_ALL");

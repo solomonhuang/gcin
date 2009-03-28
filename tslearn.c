@@ -1,5 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
+#include "config.h"
+#include <libintl.h>
 
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
@@ -309,6 +311,12 @@ int main(int argc, char **argv)
   gtk_init (&argc, &argv);
 
   load_setttings();
+
+#if GCIN_i18n_message
+  gtk_set_locale();
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain(GETTEXT_PACKAGE);
+#endif
 
   pho_load();
   load_tsin_db();
