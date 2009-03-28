@@ -206,6 +206,7 @@ static void cb_clicked_fixed_pos()
 void toggle_half_full_char();
 
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
+char full_char_str[]="全";
 
 void create_win_gtab_gui_full()
 {
@@ -231,7 +232,7 @@ void create_win_gtab_gui_full()
   /* This packs the button into the gwin_gtab (a gtk container). */
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
 
-  label_full = gtk_label_new("全");
+  label_full = gtk_label_new(full_char_str);
 
   GtkWidget *button_input_method_name = gtk_button_new();
   label_input_method_name = gtk_label_new("");
@@ -279,6 +280,7 @@ void create_win_gtab_gui_full()
   change_gtab_font_size();
 
   gtk_widget_show_all (gwin_gtab);
+  gtk_widget_hide (gwin_gtab);
 
   set_disp_im_name();
 }
@@ -368,6 +370,7 @@ void create_win_gtab_gui_simple()
   change_gtab_font_size();
 
   gtk_widget_show_all (gwin_gtab);
+  gtk_widget_hide (gwin_gtab);
 
   set_disp_im_name();
   gtk_widget_hide(label_full);
@@ -392,6 +395,7 @@ void create_win_gtab_gui()
 
 
 void init_gtab(int inmdno, int usenow);
+gboolean gtab_has_input();
 
 void show_win_gtab()
 {
@@ -406,9 +410,14 @@ void show_win_gtab()
   }
 
   init_gtab(current_CS->in_method, True);
+
+  clear_gtab_in_area();
+
+  if (gcin_pop_up_win && !gtab_has_input())
+    return;
+
   gtk_widget_show(gwin_gtab);
   show_win_sym();
-  clear_gtab_in_area();
 }
 
 
@@ -463,11 +472,10 @@ static void set_disp_im_name()
     gtk_widget_hide(box_gtab_im_name);
 }
 
+char eng_full_str[]="英/全";
+
 char *get_full_str()
 {
-  static char eng_full_str[]="英/全";
-  static char ch_full_str[]="中/全";
-
   switch (current_CS->im_state) {
     case GCIN_STATE_ENG_FULL:
       return eng_full_str;
@@ -480,8 +488,9 @@ void win_gtab_disp_half_full()
 {
   if (current_CS->im_state == GCIN_STATE_CHINESE && current_CS->b_half_full_char) {
     gtk_widget_show(label_full);
-  } else
+  } else {
     gtk_widget_hide(label_full);
+  }
 
   gtk_label_set_text(GTK_LABEL(labels_gtab[0]), get_full_str());
   int i;

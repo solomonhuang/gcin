@@ -100,6 +100,14 @@ if [ $QT_IM = 'N' ]; then
   grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
 fi
 
+grep Cooker /etc/mandriva-release 2>1 | grep 2006 >& /dev/null
+if [ $? = 0 ]; then
+  NEW_GTK_IM='Y'
+  echo "!!!! new gtk-im(im-gcin.so) will be enabled because you are using Cooker 2006."
+  echo "!!!! You have to install the latest libwidget_gtk2.so"
+fi
+
+
 OPTFLAGS="-g"
 if [ $prefix = /usr ]; then
   OPTFLAGS="-O"
@@ -137,6 +145,7 @@ echo "QT=$QT" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
 echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
 echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak
+echo "NEW_GTK_IM=$NEW_GTK_IM" >> config.mak
 
 
 cd menu

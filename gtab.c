@@ -53,6 +53,18 @@ int key_col(char cha)
   return (p - keyrow)%10;
 }
 
+gboolean gtab_has_input()
+{
+  int i;
+
+  for(i=0; i < MAX_TAB_KEY_NUM64; i++)
+    if (inch[i])
+      return TRUE;
+
+  return FALSE;
+}
+
+
 static int qcmp_strlen(const void *aa, const void *bb)
 {
   char *a = *((char **)aa), *b = *((char **)bb);
@@ -195,6 +207,9 @@ static void ClrIn()
 
   clear_gtab_in_area();
   last_idx = 0;
+
+  if (gcin_pop_up_win)
+    hide_win_gtab();
 }
 
 
@@ -592,9 +607,7 @@ static gboolean set_sel1st_i()
 #define MAX_MATCH_STRS 1024
 
   char match_arr[CH_SZ * MAX_MATCH_STRS + 1];
-
-  int N = find_match(match_phrase, part_matched_len, match_arr, MAX_MATCH_STRS);
-  int i;
+  find_match(match_phrase, part_matched_len, match_arr, MAX_MATCH_STRS);
 
   int ofs = 0;
   char *pp = match_arr;
@@ -1162,14 +1175,19 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
           return 0;
       }
 
+
       if (wild_mode && inkey>=1 && ci< cur_inmd->MaxPress) {
         inch[ci++]=inkey;
+        if (gcin_pop_up_win)
+          show_win_gtab();
         proc_wild_disp();
         return 1;
       }
 
       if (inkey>=1 && ci< cur_inmd->MaxPress) {
         inch[ci++]=inkey;
+        if (gcin_pop_up_win)
+          show_win_gtab();
         last_full=0;
 
         if (cur_inmd->use_quick && !pendkey) {

@@ -224,6 +224,9 @@ void disp_tsin_pho(int index, char *pho)
   if (index>=3)
     return;
 
+  if (!labels_pho[index])
+    return;
+
   char s[CH_SZ+1];
 
   if (pho[0]==' ')
@@ -555,6 +558,7 @@ void create_win0_gui()
   clr_in_area_pho_tsin();
 
   gtk_widget_show_all (gwin0);
+  gtk_widget_hide (gwin0);
 
   disp_hide_tsin_status_row();
 
@@ -580,8 +584,11 @@ void get_win0_geom()
   get_win_size(gwin0, &win_xl, &win_yl);
 }
 
+gboolean tsin_has_input();
+
 void show_win0()
 {
+
   create_win0();
   create_win0_gui();
   set_currenet_IC_pin_image_pin();
@@ -595,6 +602,10 @@ void show_win0()
   else
     dbg("show_win0 current_CS is null");
 #endif
+
+  if (gcin_pop_up_win && !tsin_has_input())
+    return;
+
   gtk_widget_show(gwin0);
   show_win_sym();
 }

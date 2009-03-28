@@ -7,6 +7,10 @@
 #define GCIN_FONT_SIZE_SYMBOL "gcin-font-size-symbol"
 #define GCIN_FONT_SIZE_TSIN_PHO_IN "gcin-font-size-tsin-pho-in"
 #define GCIN_FONT_SIZE_GTAB_IN "gcin-font-size-gtab-in"
+#define GCIN_INPUT_STYLE "gcin-input-style"
+#define GCIN_ROOT_X      "gcin-root-x"
+#define GCIN_ROOT_Y      "gcin-root-y"
+#define GCIN_POP_UP_WIN "gcin-pop-up-win"
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -64,6 +68,7 @@ extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;
 extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
+extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;

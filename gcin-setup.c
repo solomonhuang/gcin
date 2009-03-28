@@ -11,7 +11,9 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_disp_key_codes,
                  *check_button_gtab_disp_im_name,
                  *check_button_gtab_invalid_key_in,
-                 *check_button_gtab_shift_phrase_key;
+                 *check_button_gtab_shift_phrase_key,
+                 *check_button_root_style_use;
+                 *check_button_gcin_pop_up_win;
 
 static GtkWidget *opt_spc_opts;
 
@@ -212,7 +214,7 @@ struct {
 };
 
 static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol,
-                 *spinner_tsin_pho_in, *spinner_gtab_in;
+                 *spinner_tsin_pho_in, *spinner_gtab_in, *spinner_root_style_x, *spinner_root_style_y;
 
 static gboolean cb_appearance_conf_ok( GtkWidget *widget,
                                    GdkEvent  *event,
@@ -233,6 +235,21 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   int font_size_gtab_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gtab_in));
   save_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, font_size_gtab_in);
+
+  int gcin_pop_up_win = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win));
+  save_gcin_conf_int(GCIN_POP_UP_WIN, gcin_pop_up_win);
+
+
+  int gcin_root_x = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_root_style_x));
+  save_gcin_conf_int(GCIN_ROOT_X, gcin_root_x);
+
+  int gcin_root_y = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_root_style_y));
+  save_gcin_conf_int(GCIN_ROOT_Y, gcin_root_y);
+
+  int style = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_root_style_use)) ?
+            InputStyleRoot : InputStyleOverSpot;
+  save_gcin_conf_int(GCIN_INPUT_STYLE, style);
+
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
   gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
@@ -310,6 +327,47 @@ void create_appearance_conf_window()
    (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 0.0, 24.0, 1.0, 1.0, 0.0);
   spinner_gtab_in = gtk_spin_button_new (adj_gtab_in, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_font_size_gtab_in), spinner_gtab_in);
+
+
+  GtkWidget *hbox_gcin_pop_up_win = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX(vbox_top), hbox_gcin_pop_up_win, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_pop_up_win = gtk_label_new("彈出式輸入視窗");
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win), label_gcin_pop_up_win, FALSE, FALSE, 0);
+  check_button_gcin_pop_up_win = gtk_check_button_new ();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win),
+       gcin_pop_up_win);
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win), check_button_gcin_pop_up_win, FALSE, FALSE, 0);
+
+
+  GtkWidget *frame_root_style = gtk_frame_new("固定 gcin 視窗位置");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_root_style, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_root_style), 3);
+  GtkWidget *vbox_root_style = gtk_vbox_new (FALSE, 10);
+  gtk_container_add (GTK_CONTAINER (frame_root_style), vbox_root_style);
+
+  GtkWidget *hbox_root_style_use = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX(vbox_root_style), hbox_root_style_use, FALSE, FALSE, 0);
+  GtkWidget *label_root_style_use = gtk_label_new("使用");
+  gtk_box_pack_start (GTK_BOX(hbox_root_style_use), label_root_style_use, FALSE, FALSE, 0);
+  check_button_root_style_use = gtk_check_button_new ();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_root_style_use),
+       gcin_input_style == InputStyleRoot);
+  gtk_box_pack_start (GTK_BOX(hbox_root_style_use), check_button_root_style_use, FALSE, FALSE, 0);
+
+
+  GtkWidget *hbox_root_style = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX(vbox_root_style), hbox_root_style, FALSE, FALSE, 0);
+
+  GtkAdjustment *adj_root_style_x =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_root_x, 0.0, 1600.0, 1.0, 1.0, 0.0);
+  spinner_root_style_x = gtk_spin_button_new (adj_root_style_x, 0, 0);
+  gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_x);
+
+  GtkAdjustment *adj_root_style_y =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_root_y, 0.0, 1200.0, 1.0, 1.0, 0.0);
+  spinner_root_style_y = gtk_spin_button_new (adj_root_style_y, 0, 0);
+  gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_y);
+
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

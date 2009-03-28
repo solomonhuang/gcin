@@ -8,6 +8,10 @@ IMMODULES_LOCAL=/usr/lib/$(GTK2IM)
 .SUFFIXES:	.c .o .E
 CFLAGS = $(OPTFLAGS) $(GTKINC) -I../im-client -I.. -I../IMdkit/include -DCLIENT_LIB=1
 
+ifeq ($(NEW_GTK_IM),Y)
+CFLAGS += -DNEW_GTK_IM=1
+endif
+
 .c.o:
 	$(CC) -c -fpic $(CFLAGS) -o $@ $<
 

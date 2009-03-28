@@ -1,5 +1,33 @@
 ** UTF-8 encoding **
-1.0.4:
+1.0.6:
+- 純注音輸入的問題。
+
+1.0.5:
+- 新增彈出式輸入視窗的功能，在中文輸入狀態視窗是看不到的，但螢幕右下角會顯示目前的輸入法名稱，開始輸入以後，視窗就會出現。內定是關閉，在 「gcin-setup->外觀設定」中設定。
+- 「gcin-setup -> 外觀設定」現在可以設定固定 gcin 視窗的位置。在 Gnome 中，如果把位置設定在 左下角，gcin window 會有被 panel 蓋掉不見的問題。
+- 注意: Mandriva 2006 (cooker)， install 完 1.0.5 後要 install mozilla/firefox 最新的 fix， 否則 over-the-spot 會不正常。如果有困難，可以修改 ./configure 完後的 config.mak，改成 NEW_GTK_IM=N。其他的 distribution 新的 gtk-im 是不開啟的，和以前一樣。如果你是用 firefox 1.5 也可以用新的 gtk im module，一樣要 patch 過 firefox。
+
+diff -b -u -r mozilla.orig/widget/src/gtk2/nsWindow.cpp mozilla/widget/src/gtk2/nsWindow.cpp
+--- mozilla.orig/widget/src/gtk2/nsWindow.cpp   2005-07-01 12:29:41.000000000 +0800
++++ mozilla/widget/src/gtk2/nsWindow.cpp        2005-09-07 18:31:10.000000000 +0800
+@@ -4405,6 +4405,9 @@
+         delete[] textEvent.rangeArray;
+     }
+
++    if (aLen == 0)
++        return;
++
+     gint x1, y1, x2, y2;
+     GtkWidget *widget =
+         get_gtk_widget_for_gdk_window(this->mDrawingarea->inner_window);
+
+這邊有 compiled 好的 .so file，要 gunzip & rename 回 libwidget_gtk2.so
+http://www.csie.nctu.edu.tw/~cp76/linux/mozilla/mdk-firefox-thunderbird-1.0.6/cooker-new-gtkim-libwidget_gtk2.so.gz
+
+由於最新的 firefox 1.5 & Mandriva 裏的 1.0.6 現在是在 on-the-spot 裏面的 compose event 回報 IM cursor 的位置，所以修改 gtk-im module，在按鍵時也會 trigger preedit_changed，以通知 mozilla 回報 cursor 位置。以前用的timer 的方式(ported from gtk1) 的確不好，要增加很多行，而且很 dirty。現在新的方式應該好很多，不過 mozilla 在處理 zero length preedit_change 方面還是有些問題，source code 還是必須增加兩行，希望 mozilla 這一次可以接受這個 patch。
+
+
+1.0.4:  (2005/9/5)
 - 現在詞音詞的選單的排列順序改成依詞的使用頻率排列，原來是用注音符號的順序。
 - 現在 user 可以在 ~/.gcin 裏加自己的 gtab.list *.gtab，gcin 會優先使用這裡的 files。
 - QT4 的 QT_IM_MODULE 支援，不過沒有實際測過。
@@ -12,7 +40,7 @@
 - SUSE gcin-setup gnome desktop 的 path fix。
 
 
-1.0.3:
+1.0.3: (2005/8/19)
 - QT_IM_MODULE=gcin 的支援。如果你的系統有支援(qt4.0 or Mandriva 2006)，會自動修改 /etc/sysconfig/i18n 加上QT_IM_MODULE=gcin。
 - gtab.list 如果有拿掉一些，則會 coredump 無法 ctrl-shift 的問題。
 - bugfix: 按「口 尸手」之後就按了space 接下來後悔再補上個「火」雖然能讓gcin出現「嗎」 再按一次space卻仍是無法輸出。

@@ -33,6 +33,7 @@ int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
 char tsin_phrase_line_color[16];
 char tsin_cursor_color[16];
+int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
 
 int get_gcin_conf_int(char *name, int default_value);
 
@@ -43,6 +44,10 @@ void load_setttings()
   gcin_font_size_symbol = get_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, 12);
   gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
   gcin_font_size_gtab_in = get_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, 10);
+  gcin_input_style = get_gcin_conf_int(GCIN_INPUT_STYLE, InputStyleOverSpot);
+  gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 2000);
+  gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 2000);
+  gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 0);
 
   gcin_chars_big5_only = get_gcin_conf_int(GCIN_CHARS_BIG5_ONLY,0);
   gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);

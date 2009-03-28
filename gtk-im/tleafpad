@@ -1,0 +1,6 @@
+export LC_ALL=zh_TW.Big5
+export XMODIFIERS=@im=gcin_test
+export LD_LIBRARY_PATH="../im-client"
+../gcin.test &
+export LD_PRELOAD=./im-gcin.so
+leafpad

@@ -35,7 +35,7 @@ typedef struct {
 } CHPHO;
 
 enum {
-  FLAG_CHPHO_FIXED=1,    // user selected the char, so it should not be change
+  FLAG_CHPHO_FIXED=1,    // user selected the char, so it should not be changed
   FLAG_CHPHO_PHRASE_HEAD=2,
   FLAG_CHPHO_PHRASE_VOID=4
 };
@@ -60,6 +60,24 @@ typedef struct {
 
 static PRE_SEL pre_sel[10];
 static int pre_selN;
+
+void clrin_pho(), hide_win0();
+
+static void clrin_pho_tsin()
+{
+  clrin_pho();
+
+  if (!c_len && gcin_pop_up_win)
+    hide_win0();
+}
+
+gboolean pho_has_input();
+
+gboolean tsin_has_input()
+{
+  return c_len || pho_has_input();
+}
+
 
 gboolean save_phrase_to_db2(CHPHO *chph, int len);
 
@@ -232,19 +250,20 @@ static void disp_in_area_pho_tsin()
 }
 
 
-void clrin_pho();
 void clear_chars_all();
 
+#if 0
 static void restore_ai()
 {
   if (sel_pho)
     return;
 
   clear_chars_all();
-  clrin_pho();
+  clrin_pho_tsin();
   disp_in_area_pho_tsin();
   prbuf();
 }
+#endif
 
 static void clear_disp_ph_sta();
 static void clear_match()
@@ -263,6 +282,59 @@ static void clr_ch_buf()
   }
 
   clear_match();
+}
+
+
+static void clear_ch_buf_sel_area()
+{
+  clear_chars_all();
+  c_len=c_idx=0; ph_sta=-1;
+  full_match = FALSE;
+  clr_ch_buf();
+  drawcursor();
+  clear_disp_ph_sta();
+}
+
+static void close_selection_win();
+
+static void clear_tsin_buffer()
+{
+  clear_ch_buf_sel_area();
+  close_selection_win();
+  pre_selN = 0;
+}
+
+void clr_in_area_pho_tsin();
+void close_win_pho_near();
+
+static void tsin_reset_in_pho()
+{
+  clrin_pho_tsin();
+  prbuf();
+  clr_in_area_pho_tsin();
+  close_selection_win();
+  pre_selN = 0;
+  drawcursor();
+
+  close_win_pho_near();
+}
+
+gboolean flush_tsin_buffer()
+{
+  tsin_reset_in_pho();
+
+  if (gcin_pop_up_win)
+    hide_win0();
+
+  if (c_len) {
+    putbuf(c_len);
+    compact_win0_x();
+    clear_ch_buf_sel_area();
+    clear_tsin_buffer();
+    return 1;
+  }
+
+  return 0;
 }
 
 
@@ -338,8 +410,14 @@ void init_tab_pp(int usenow)
   if (phcount && gwin0) {
 disp_prom:
     show_stat();
+#if 0
     restore_ai();
-    show_win0();
+#else
+    clear_ch_buf_sel_area();
+#endif
+    if (!gcin_pop_up_win)
+      show_win0();
+
     return;
   }
 
@@ -799,53 +877,6 @@ static void close_selection_win()
 }
 
 
-static void clear_ch_buf_sel_area()
-{
-  clear_chars_all();
-  c_len=c_idx=0; ph_sta=-1;
-  full_match = FALSE;
-  clr_ch_buf();
-  drawcursor();
-  clear_disp_ph_sta();
-}
-
-
-static void clear_tsin_buffer()
-{
-  clear_ch_buf_sel_area();
-  close_selection_win();
-  pre_selN = 0;
-}
-
-void clr_in_area_pho_tsin();
-void close_win_pho_near();
-
-static void tsin_reset_in_pho()
-{
-  clrin_pho();
-  prbuf();
-  clr_in_area_pho_tsin();
-  close_selection_win();
-  pre_selN = 0;
-  drawcursor();
-
-  close_win_pho_near();
-}
-
-gboolean flush_tsin_buffer()
-{
-  tsin_reset_in_pho();
-
-  if (c_len) {
-    putbuf(c_len);
-    compact_win0_x();
-    clear_ch_buf_sel_area();
-    clear_tsin_buffer();
-    return 1;
-  }
-
-  return 0;
-}
 
 void show_button_pho(gboolean bshow);
 
@@ -978,7 +1009,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
 
     c_len+=len;
 
-    clrin_pho();
+    clrin_pho_tsin();
     disp_in_area_pho_tsin();
 
     prbuf();
@@ -1031,7 +1062,7 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
 
     c_len=c_idx=idx + len;
 
-    clrin_pho();
+    clrin_pho_tsin();
     disp_in_area_pho_tsin();
 
     prbuf();
@@ -1441,6 +1472,7 @@ other_keys:
            return 0;
        }
 
+
        char *pp;
 
        char xkey_lcase = xkey;
@@ -1602,6 +1634,9 @@ asc_char:
 
      inph_typ_pho(xkey);
 
+     if (gcin_pop_up_win)
+         show_win0();
+
      if (typ_pho[3])
        ctyp = 3;
 
@@ -1613,7 +1648,7 @@ llll2:
        ityp3_pho=1;  /* last key is entered */
 
        if (!tsin_tone_char_input && !typ_pho[0] && !typ_pho[1] && !typ_pho[2]) {
-         clrin_pho();
+         clrin_pho_tsin();
          return TRUE;
        }
      }
@@ -1672,7 +1707,7 @@ llll2:
    put_b5_char(ch_pho[start_idx].ch, key);
 
    disp_ph_sta();
-   clrin_pho();
+   clrin_pho_tsin();
    clr_in_area_pho_tsin();
    drawcursor();
    hide_pre_sel();

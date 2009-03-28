@@ -1,9 +1,9 @@
 # UTF-8 encoding, please use editors that can support UTF-8 encoding like gedit.
 
 Mandrake
-  urpmi gcin-0.X.X-liu_mdk.i586.rpm
+  urpmi gcin-X.X.X-liu_mdk.i586.rpm
   or
-  rpm -i gcin-0.X.X-liu_mdk.i586.rpm
+  rpm -i gcin-X.X.X-liu_mdk.i586.rpm
 
 
 如果是用 Mandrake,  rpm install 完成之後會自動修改
@@ -506,12 +506,17 @@ terminal (console) 會出現以下 message
    connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin
 --------------------------------------------------------------------
 gcin 與 scim memory 使用比較。
-分別以 gcin 的詞音與 scim chewing 用 kedit 輸入「測試」兩個字，
-由於 scim 有數個 process，必須全部加起來。這個測試也比較 qt-im-module 的 memory 使用。
+分別以 gcin 的詞音與 scim chewing 用 kedit/gedit 輸入「測試」兩個字，
+由於 scim 有數個 process，必須全部加起來。這個測試也比較 qt-im-module/gtk-im-module 的 memory 使用。
 
       vsz    rss    kedit-vsz  kedit-rss
 scim  80168  31312  47052      17368
 gcin  29132  8568   41840      16144
+
+        gedit-vsz  gedit-rss
+scim  67148      16444
+gcin  61008      14924
+
 
 kedit: 3.4.1
 scim:  scim 1.4.2 + scim-chewing 0.2.1

@@ -25,6 +25,11 @@ u_short hash_pho[MAX_HASH_PHO+1];
 
 static char typ_pho_len[]={5, 2, 4, 3};
 
+gboolean pho_has_input()
+{
+  return typ_pho[0] || typ_pho[1] || typ_pho[2] || typ_pho[3];
+}
+
 phokey_t pho2key(char typ_pho[])
 {
   phokey_t key=typ_pho[0];
@@ -215,6 +220,9 @@ void clrin_pho()
   bzero(inph,sizeof(inph));
   maxi=ityp3_pho=0;
   cpg=0;
+
+  if (gcin_pop_up_win)
+    hide_win_pho();
 }
 
 void disp_pho(int index, char *phochar);
@@ -561,6 +569,9 @@ int feedkey_pho(KeySym xkey, int kbstate)
   }
 
   inph_typ_pho(xkey);
+
+  if (gcin_pop_up_win)
+    show_win_pho();
 
 
   if (typ_pho[3])

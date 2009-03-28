@@ -31,37 +31,29 @@
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
 
+#if NEW_GTK_IM
+static GtkIMContextGCIN *context_xim_queued;
+#endif
+
 struct _GtkIMContextGCIN
 {
   GtkIMContext object;
 
-  GtkGCINInfo *im_info;
-
   GdkWindow *client_window;
   GtkWidget *client_widget;
 
+#if 0
   gint preedit_size;
   gint preedit_length;
   gunichar *preedit_chars;
   XIMFeedback *feedbacks;
   gint preedit_cursor;
-
+#endif
   GCIN_client_handle *gcin_ch;
 
 //  guint in_toplevel : 1;
 //  guint has_focus : 1;
 };
-
-struct _GtkGCINInfo
-{
-  GdkScreen *screen;
-
-  GtkSettings *settings;
-  gulong status_set;
-  gulong preedit_set;
-
-};
-
 
 static void     gtk_im_context_gcin_class_init         (GtkIMContextGCINClass  *class);
 static void     gtk_im_context_gcin_init               (GtkIMContextGCIN       *im_context_gcin);
@@ -82,14 +74,9 @@ static void     gtk_im_context_gcin_get_preedit_string (GtkIMContext          *c
 						       PangoAttrList        **attrs,
 						       gint                  *cursor_pos);
 
-static GObjectClass *parent_class;
+// static GObjectClass *parent_class;
 
 GType gtk_type_im_context_gcin = 0;
-
-GSList *open_ims = NULL;
-
-/* List of status windows for different toplevels */
-static GSList *status_windows = NULL;
 
 void
 gtk_im_context_xim_register_type (GTypeModule *type_module)
@@ -114,12 +101,6 @@ gtk_im_context_xim_register_type (GTypeModule *type_module)
 				 &im_context_gcin_info, 0);
 }
 
-#define PREEDIT_MASK (GCINPreeditCallbacks | GCINPreeditPosition | \
-		      GCINPreeditArea | GCINPreeditNothing | GCINPreeditNone)
-#define STATUS_MASK (GCINStatusCallbacks | GCINStatusArea | \
-		      GCINStatusNothing | GCINStatusNone)
-
-
 static void
 reinitialize_all_ics (GtkGCINInfo *info)
 {
@@ -136,23 +117,19 @@ static void gcin_display_closed (GdkDisplay *display,
   context_xim->gcin_ch = NULL;
 }
 
+static void
+preedit_style_change (GtkGCINInfo *info)
+{
+//  dbg("preedit_style_change\n");
+}
 
-static GtkGCINInfo *
+
+static void
 get_im (GtkIMContextGCIN *context_xim)
 {
   GdkWindow *client_window = context_xim->client_window;
-  GSList *tmp_list;
-  GtkGCINInfo *info;
   GdkScreen *screen = gdk_drawable_get_screen (client_window);
   GdkDisplay *display = gdk_screen_get_display (screen);
-
-  info = g_new (GtkGCINInfo, 1);
-  open_ims = g_slist_prepend (open_ims, info);
-
-  info->screen = screen;
-  info->settings = NULL;
-  info->preedit_set = 0;
-  info->status_set = 0;
 
   if (!context_xim->gcin_ch) {
     if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
@@ -161,8 +138,6 @@ get_im (GtkIMContextGCIN *context_xim)
     g_signal_connect (display, "closed",
                       G_CALLBACK (gcin_display_closed), context_xim);
   }
-
-  return info;
 }
 
 ///
@@ -172,8 +147,7 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
   GtkIMContextClass *im_context_class = GTK_IM_CONTEXT_CLASS (class);
   GObjectClass *gobject_class = G_OBJECT_CLASS (class);
 
-  parent_class = g_type_class_peek_parent (class);
-
+//  parent_class = g_type_class_peek_parent (class);
   im_context_class->set_client_window = gtk_im_context_gcin_set_client_window;
   im_context_class->filter_keypress = gtk_im_context_gcin_filter_keypress;
   im_context_class->reset = gtk_im_context_gcin_reset;
@@ -202,6 +176,10 @@ gtk_im_context_gcin_finalize (GObject *obj)
     gcin_im_client_close(context_xim->gcin_ch);
     context_xim->gcin_ch = NULL;
   }
+#if NEW_GTK_IM
+  if (context_xim == context_xim_queued)
+    context_xim_queued = NULL;
+#endif
 }
 
 /* Finds the GtkWidget that owns the window, or if none, the
@@ -260,18 +238,12 @@ set_ic_client_window (GtkIMContextGCIN *context_xim,
 		      GdkWindow       *client_window)
 {
 //  printf("set_ic_client_window\n");
-  if (context_xim->client_window)
-    {
-//      context_xim->im_info->ics = g_slist_remove (context_xim->im_info->ics, context_xim);
-      context_xim->im_info = NULL;
-    }
 
   context_xim->client_window = client_window;
 
-
   if (context_xim->client_window)
     {
-      context_xim->im_info = get_im (context_xim);
+      get_im (context_xim);
 //      context_xim->im_info->ics = g_slist_prepend (context_xim->im_info->ics, context_xim);
 #if 1
       if (context_xim->gcin_ch) {
@@ -328,6 +300,18 @@ gtk_im_context_xim_new (void)
   return GTK_IM_CONTEXT (result);
 }
 
+#if NEW_GTK_IM
+static gboolean update_cursor_position(gpointer data)
+{
+  if (!context_xim_queued)
+    return;
+
+  g_signal_emit_by_name(context_xim_queued, "preedit_changed");
+  context_xim_queued = NULL;
+
+  return FALSE;
+}
+#endif
 
 ///
 static gboolean
@@ -365,6 +349,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   num_bytes = XLookupString (&xevent, buffer, buffer_size, &keysym, NULL);
 
   if (xevent.type == KeyPress) {
+
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
 #if 0
@@ -382,6 +367,14 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 #else
       rstr = strdup("ㄙㄙ");
 #endif
+    }
+#endif
+
+#if NEW_GTK_IM
+    // this one is for mozilla
+    if (!context_xim_queued) {
+        context_xim_queued = context_xim;
+        g_timeout_add(200, update_cursor_position, NULL);
     }
 #endif
 
@@ -416,8 +409,8 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 
 //  printf("gtk_im_context_gcin_focus_in\n");
-
   if (context_xim->gcin_ch) {
+    g_signal_emit_by_name(context_xim, "preedit_changed");
     gcin_im_client_focus_in(context_xim->gcin_ch);
   }
 
@@ -428,7 +421,6 @@ static void
 gtk_im_context_gcin_focus_out (GtkIMContext *context)
 {
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-
 //  printf("gtk_im_context_gcin_focus_out\n");
 
   if (context_xim->gcin_ch) {
@@ -443,9 +435,11 @@ static void
 gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
 					GdkRectangle *area)
 {
-//  printf("gtk_im_context_gcin_set_cursor_location\n");
+//  printf("gtk_im_context_gcin_set_cursor_location %d\n", area->x);
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-
+#if NEW_GTK_IM
+  context_xim_queued = NULL;
+#endif
   if (context_xim->gcin_ch) {
     gcin_im_client_set_cursor_location(context_xim->gcin_ch, area->x, area->y + area->height);
   }
@@ -456,9 +450,9 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
 ///
 static void
 gtk_im_context_gcin_set_use_preedit (GtkIMContext *context,
-				    gboolean      use_preedit)
+                                    gboolean      use_preedit)
 {
-//  printf("gtk_im_context_gcin_set_use_preedit\n");
+//  printf("gtk_im_context_gcin_set_use_preedit %d\n", use_preedit);
 }
 
 
@@ -472,89 +466,24 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
 /* Mask of feedback bits that we render
  */
 
-#define FEEDBACK_MASK (XIMReverse | XIMUnderline)
-
-static void
-add_feedback_attr (PangoAttrList *attrs,
-		   const gchar   *str,
-                   XIMFeedback    feedback,
-		   gint           start_pos,
-		   gint           end_pos)
-{
-  PangoAttribute *attr;
-
-  gint start_index = g_utf8_offset_to_pointer (str, start_pos) - str;
-  gint end_index = g_utf8_offset_to_pointer (str, end_pos) - str;
-
-  if (feedback & XIMUnderline)
-    {
-      attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
-      attr->start_index = start_index;
-      attr->end_index = end_index;
-
-      pango_attr_list_change (attrs, attr);
-    }
-
-  if (feedback & XIMReverse)
-    {
-      attr = pango_attr_foreground_new (0xffff, 0xffff, 0xffff);
-      attr->start_index = start_index;
-      attr->end_index = end_index;
-
-      pango_attr_list_change (attrs, attr);
-
-      attr = pango_attr_background_new (0, 0, 0);
-      attr->start_index = start_index;
-      attr->end_index = end_index;
-
-      pango_attr_list_change (attrs, attr);
-    }
-
-  if (feedback & ~FEEDBACK_MASK)
-    g_warning ("Unrendered feedback style: %#lx", feedback & ~FEEDBACK_MASK);
-}
 
 static void
 gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 				       gchar         **str,
 				       PangoAttrList **attrs,
-				       gint           *cursor_pos)
+                                       gint           *cursor_pos)
 {
+//  printf("gtk_im_context_gcin_get_preedit_string %x %x %x\n", str, attrs, cursor_pos);
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-  gchar *utf8 = g_ucs4_to_utf8 (context_xim->preedit_chars, context_xim->preedit_length, NULL, NULL, NULL);
-
-  if (attrs)
-    {
-      int i;
-      XIMFeedback last_feedback = 0;
-      gint start = -1;
-
-      *attrs = pango_attr_list_new ();
-
-      for (i = 0; i < context_xim->preedit_length; i++)
-	{
-	  XIMFeedback new_feedback = context_xim->feedbacks[i] & FEEDBACK_MASK;
-	  if (new_feedback != last_feedback)
-	    {
-	      if (start >= 0)
-		add_feedback_attr (*attrs, utf8, last_feedback, start, i);
-
-	      last_feedback = new_feedback;
-	      start = i;
-	    }
-	}
-
-      if (start >= 0)
-	add_feedback_attr (*attrs, utf8, last_feedback, start, i);
-    }
 
   if (str)
-    *str = utf8;
-  else
-    g_free (utf8);
+      *str = g_strdup ("");
 
   if (cursor_pos)
-    *cursor_pos = context_xim->preedit_cursor;
+      *cursor_pos = 0;
+
+  if (attrs)
+      *attrs = pango_attr_list_new ();
 }
 
 

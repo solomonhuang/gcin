@@ -271,13 +271,18 @@ void create_win_pho_gui()
     create_win_pho_gui_full();
 }
 
-
+gboolean pho_has_input();
 
 void show_win_pho()
 {
 //  dbg("show_win_pho\n");
+
   create_win_pho();
   create_win_pho_gui();
+
+  if (gcin_pop_up_win && !pho_has_input())
+    return;
+
   gtk_widget_show(gwin_pho);
   show_win_sym();
 }

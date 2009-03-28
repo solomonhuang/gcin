@@ -203,6 +203,7 @@ void hide_in_win(ClientState *cs)
   }
 
   reset_current_in_win_xy();
+  hide_win_status();
 }
 
 void show_win_pho();
@@ -232,6 +233,8 @@ void show_in_win(ClientState *cs)
     default:
       show_win_gtab();
   }
+
+  show_win_stautus();
 }
 
 void move_win_gtab(int x, int y);
@@ -247,6 +250,10 @@ void move_in_win(ClientState *cs, int x, int y)
   if (current_CS && current_CS->fixed_pos) {
     x = current_CS->fixed_x;
     y = current_CS->fixed_y;
+  } else
+  if (gcin_input_style == InputStyleRoot) {
+    x = gcin_root_x;
+    y = gcin_root_y;
   }
 
 #if DEBUG || 0
@@ -363,20 +370,30 @@ void update_in_win_pos()
 void win_pho_disp_half_full();
 void win_tsin_disp_half_full();
 void win_gtab_disp_half_full();
+extern char eng_full_str[], full_char_str[];
 
 void disp_im_half_full()
 {
-    switch (current_CS->in_method) {
-      case 3:
-        win_pho_disp_half_full();
-        break;
-      case 6:
-        win_tsin_disp_half_full();
-        break;
-      default:
-        win_gtab_disp_half_full();
-        break;
-    }
+  if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
+     set_win_status_half_full(eng_full_str);
+  }
+  else
+  if (current_CS->im_state == GCIN_STATE_CHINESE)
+     set_win_status_half_full(current_CS->b_half_full_char?full_char_str:"");
+  else
+     set_win_status_half_full("");
+
+  switch (current_CS->in_method) {
+    case 3:
+      win_pho_disp_half_full();
+      break;
+    case 6:
+      win_tsin_disp_half_full();
+      break;
+    default:
+      win_gtab_disp_half_full();
+      break;
+  }
 }
 
 gboolean flush_tsin_buffer();
@@ -413,6 +430,7 @@ void toggle_im_enabled(u_int kev_state)
       }
 
       hide_in_win(current_CS);
+      hide_win_status();
       current_CS->im_state = GCIN_STATE_DISABLED;
     } else {
       current_CS->im_state = GCIN_STATE_CHINESE;
@@ -430,6 +448,9 @@ void toggle_im_enabled(u_int kev_state)
       update_in_win_pos();
       show_in_win(current_CS);
 #endif
+
+      if (gcin_pop_up_win)
+        show_win_stautus();
     }
 }
 
@@ -457,7 +478,7 @@ void update_active_in_win_geom()
 
 void disp_gtab_half_full(gboolean hf);
 void tsin_toggle_half_full();
-
+extern char eng_full_str[];
 
 void toggle_half_full_char(u_int kev_state)
 {
@@ -468,13 +489,16 @@ void toggle_half_full_char(u_int kev_state)
   else {
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
       current_CS->im_state = GCIN_STATE_DISABLED;
-      hide_in_win(current_CS);
       disp_im_half_full();
+      hide_in_win(current_CS);
       return;
     } else
-    if (current_CS->im_state == GCIN_STATE_DISABLED && gcin_shift_space_eng_full) {
-      toggle_im_enabled(kev_state);
-      current_CS->im_state = GCIN_STATE_ENG_FULL;
+    if (current_CS->im_state == GCIN_STATE_DISABLED) {
+      if (gcin_shift_space_eng_full) {
+        toggle_im_enabled(kev_state);
+        current_CS->im_state = GCIN_STATE_ENG_FULL;
+      } else
+        return;
     } else
     if (current_CS->im_state == GCIN_STATE_CHINESE) {
       current_CS->b_half_full_char = !current_CS->b_half_full_char;
@@ -540,6 +564,8 @@ gboolean init_in_method(int in_no)
 //      init_gtab(in_no, True);
       break;
   }
+
+  set_win_status_inmd(inmd[in_no].cname);
 
   update_in_win_pos();
   return status;
@@ -770,6 +796,7 @@ int gcin_FocusIn(ClientState *cs)
       show_in_win(cs);
       move_IC_in_win(cs);
 #endif
+      set_win_status_inmd(inmd[cs->in_method].cname);
     } else
       hide_in_win(cs);
   }
