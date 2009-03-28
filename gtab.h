@@ -73,7 +73,7 @@ typedef struct {
   u_int flag;
 #define MAX_CNAME (4*CH_SZ+1)
   char *cname;
-  u_char keycol[50];
+  u_char *keycol;
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:5  changjei:5 */
   int DefChars;           /* defined chars */

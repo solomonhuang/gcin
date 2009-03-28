@@ -511,13 +511,14 @@ void init_gtab(int inmdno, int usenow)
   free(inp->keymap);
   inp->keymap = tzmalloc(char, 128);
 
+  free(inp->keycol);
+  inp->keycol=tzmalloc(char, th.KeyS+1);
   for(i=0;i<th.KeyS;i++) {
     inp->keymap[(int)ttt[i]]=i;
     if (!BITON(inp->flag, FLAG_KEEP_KEY_CASE))
       inp->keymap[toupper(ttt[i])]=i;
     inp->keycol[i]=key_col(ttt[i]);
   }
-
 
   inp->keymap[(int)'?']=WILD_QUES;
   if (!strchr(th.selkey, '*'))

@@ -394,9 +394,11 @@ void move_IC_in_win(ClientState *cs)
 
    int inpx = cs->spot_location.x;
    int inpy = cs->spot_location.y;
-   XWindowAttributes att;
 
+   XWindowAttributes att;
    XGetWindowAttributes(dpy, inpwin, &att);
+   if (att.override_redirect)
+     return;
 
    if (inpx >= att.width)
      inpx = att.width - 1;
@@ -938,10 +940,27 @@ int xim_ForwardEventHandler(IMForwardEventStruct *call_data)
 }
 #endif
 
+int skip_window(Window win)
+{
+  XWindowAttributes att;
+  XGetWindowAttributes(dpy, win, &att);
+#if 0
+  dbg("hhh %d %d class:%d all:%x %x\n", att.width, att.height, att.class,
+    att.all_event_masks, att.your_event_mask);
+#endif
+  if (att.override_redirect)
+    return 1;
+
+  return 0;
+}
+
 
 int gcin_FocusIn(ClientState *cs)
 {
   Window win = cs->client_win;
+
+  if (skip_window(win))
+    return;
 
   reset_current_in_win_xy();
 
@@ -1017,6 +1036,9 @@ static gint64 last_focus_out_time;
 int gcin_FocusOut(ClientState *cs)
 {
   gint64 t = current_time();
+
+  if (skip_window(cs->client_win))
+    return;
 
   if (t - last_focus_out_time < 100000) {
     last_focus_out_time = t;
