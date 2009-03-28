@@ -3,9 +3,9 @@ QT=qt4
 QTIM=$(QT)/plugins/lib/inputmethods
 IMMODULES=$(libdir)/$(QTIM)
 ifeq ($(LIB), lib64)
-	IMMODULES_LOCAL=/usr/lib/qt4/plugins/lib64/inputmethods
+	IMMODULES_LOCAL=/usr/$(LIB)/qt4/plugins/lib64/inputmethods
 else
-	IMMODULES_LOCAL=/usr/lib/$(QTIM)
+	IMMODULES_LOCAL=/usr/$(LIB)/$(QTIM)
 endif
 QTINC=/usr/lib/$(QT)/include
 

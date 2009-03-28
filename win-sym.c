@@ -160,6 +160,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len);
 void send_text_call_back(char *text);
 void tsin_reset_in_pho(), reset_gtab_all(), clr_in_area_pho();
 
+extern int eng_ph;
 static void cb_button_sym(GtkButton *button, char *str)
 {
   phokey_t pho[256];
@@ -180,6 +181,8 @@ static void cb_button_sym(GtkButton *button, char *str)
        tsin_reset_in_pho();
        break;
 #endif
+    case 12:
+       break;
     default:
        reset_gtab_all();
        break;
@@ -274,7 +277,7 @@ static void sym_lookup_key(char *instr, char *outstr)
 
     while (*instr) {
       char tt[512];
-
+      tt[0]=0;
       lookup_gtab_out(instr, tt);
       strcat(outstr, tt);
 
@@ -329,7 +332,7 @@ void create_win_sym()
     p_err("bad current_CS %d\n", current_CS->in_method);
   }
 
-  if (current_CS->in_method != 3 && current_CS->in_method != 6 && !cur_inmd)
+  if (current_CS->in_method != 3 && current_CS->in_method != 6 && current_CS->in_method != 12 && !cur_inmd)
     return;
 
   if (read_syms() || cur_in_method != current_CS->in_method) {

@@ -272,6 +272,7 @@ void update_win_kbm()
       }
       break;
     case 10:
+    case 12:
       break;
     default:
       if (!cur_inmd || !cur_inmd->DefChars)

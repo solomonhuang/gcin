@@ -3,9 +3,9 @@ QT=qt3
 QTIM=$(QT)/plugins/inputmethods
 IMMODULES=$(libdir)/$(QTIM)
 ifeq ($(LIB), lib64)
-	IMMODULES_LOCAL=/usr/lib/$(QT)/plugins/lib64/inputmethods
+	IMMODULES_LOCAL=/usr/$(LIB)/$(QT)/plugins/lib64/inputmethods
 else
-	IMMODULES_LOCAL=/usr/lib/$(QTIM)
+	IMMODULES_LOCAL=/usr/$(LIB)/$(QTIM)
 endif
 INCS=-I../im-client -I/usr/lib/$(QT)/include  -I/usr/include/Xft2/X11/Xft  -I/usr/include/fontconfig -I/usr/include/freetype2
 CXXFLAGS=$(OPTFLAGS) $(INCS) -Wall -D_REENTRANT -fPIC  -DQT_THREAD_SUPPORT -DQT_PLUGIN -DQT_SHARED -DQT_NO_DEBUG

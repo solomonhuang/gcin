@@ -10,6 +10,7 @@ void (*f_anthy_commit_segment)(anthy_context_t ac, int, int);
 void (*f_anthy_set_string)(anthy_context_t ac, char *);
 extern int eng_ph;
 extern gint64 key_press_time;
+static GtkWidget *event_box_anthy;
 
 struct {
   char *en;
@@ -797,6 +798,23 @@ lab1:
   return TRUE;
 }
 
+static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
+{
+//  dbg("mouse_button_callback %d\n", event->button);
+  switch (event->button) {
+    case 1:
+      toggle_win_sym();
+      break;
+    case 2:
+      inmd_switch_popup_handler(widget, (GdkEvent *)event);
+      break;
+    case 3:
+      exec_gcin_setup();
+      break;
+  }
+}
+
+
 #include <dlfcn.h>
 
 int init_win_anthy()
@@ -867,17 +885,19 @@ int init_win_anthy()
   win_anthy = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_default_size(GTK_WINDOW (win_anthy), 40, 50);
 
+
   gtk_widget_realize (win_anthy);
   set_no_focus(win_anthy);
 
-  g_signal_connect (G_OBJECT (win_anthy), "delete_event",
-                    G_CALLBACK (exit), NULL);
+  event_box_anthy = gtk_event_box_new();
+
+  gtk_container_add(GTK_CONTAINER(win_anthy), event_box_anthy);
 
   GtkWidget *hbox_top = gtk_hbox_new (FALSE, 0);
+  gtk_container_add(GTK_CONTAINER(event_box_anthy), hbox_top);
 
-  gtk_container_add(GTK_CONTAINER(win_anthy), hbox_top);
-
-  gtk_widget_show_all(win_anthy);
+  g_signal_connect(G_OBJECT(event_box_anthy),"button-press-event",
+                   G_CALLBACK(mouse_button_callback), NULL);
 
   for(i=0; i < MAX_SEG_N; i++) {
     seg[i].label = gtk_label_new(NULL);
@@ -885,9 +905,10 @@ int init_win_anthy()
     gtk_box_pack_start (GTK_BOX (hbox_top), seg[i].label, FALSE, FALSE, 0);
   }
 
+  gtk_widget_show_all(win_anthy);
+
   create_win1();
   create_win1_gui();
-
   change_anthy_font_size();
 
   if (!phkbm.selkeyN)
@@ -898,14 +919,20 @@ int init_win_anthy()
   return TRUE;
 }
 
-void show_win_anthy()
+int anthy_visible()
 {
-  if (!gcin_pop_up_win || !is_empty()) {
-    if (!GTK_WIDGET_VISIBLE(win_anthy))
-      gtk_widget_show(win_anthy);
-  }
+  return GTK_WIDGET_VISIBLE(win_anthy);
 }
 
+extern gboolean force_show;
+void show_win_anthy()
+{
+  if (!gcin_pop_up_win || !is_empty() || force_show) {
+    if (!anthy_visible())
+      gtk_widget_show(win_anthy);
+    show_win_sym();
+  }
+}
 
 void hide_win_anthy()
 {
@@ -914,6 +941,7 @@ void hide_win_anthy()
     hide_selections_win();
   }
   gtk_widget_hide(win_anthy);
+  hide_win_sym();
 }
 
 void change_anthy_font_size()
@@ -921,16 +949,17 @@ void change_anthy_font_size()
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
   change_win_bg(win_anthy);
+  change_win_bg(event_box_anthy);
 
   int i;
   for(i=0; i < MAX_SEG_N; i++) {
     GtkWidget *label = seg[i].label;
     set_label_font_size(label, gcin_font_size);
-    if (gcin_win_color_use)
+    if (gcin_win_color_use) {
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
+    }
   }
 }
-
 
 void move_win_anthy(int x, int y)
 {

@@ -27,7 +27,7 @@ void send_fake_key_eve(KeySym key)
 
 void send_text_call_back(char *text)
 {
-  callback_str_buffer = realloc(callback_str_buffer, strlen(text));
+  callback_str_buffer = realloc(callback_str_buffer, strlen(text)+1);
   strcpy(callback_str_buffer, text);
   send_fake_key_eve(XK_Shift_L);
 }
@@ -573,6 +573,7 @@ void update_active_in_win_geom()
 }
 
 extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab;
+int anthy_visible();
 
 gboolean win_is_visible()
 {
@@ -584,10 +585,11 @@ gboolean win_is_visible()
 #if USE_TSIN
     case 6:
       return GTK_WIDGET_VISIBLE(gwin0);
-      break;
 #endif
     case 10:
       break;
+    case 12:
+      return anthy_visible();
     default:
       if (!gwin_gtab)
         return FALSE;
@@ -763,10 +765,6 @@ gboolean full_char_proc(KeySym keysym)
   send_text(tt);
   return 1;
 }
-
-
-
-
 
 int feedkey_pho(KeySym xkey, int kbstate);
 int feedkey_pp(KeySym xkey, int state);
