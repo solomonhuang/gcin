@@ -88,9 +88,15 @@ int main(int argc, char **argv)
 
     phokey_t kk=0;
     u_char *p = s;
+    int is_back_quote=0;
 
-    while (*p && *p!=' ') {
-      kk |= lookup(p);
+    while (*p && *p!=' ' && *p!=9) {
+      if (kk==(BACK_QUOTE_NO << 9)) {
+        kk|=*p;
+//        printf("kk %x\n", kk);
+      }
+      else
+        kk |= lookup(p);
 
       p += utf8_sz(p);
     }

@@ -45,6 +45,9 @@ phokey_t pho2key(char typ_pho[])
   phokey_t key=typ_pho[0];
   int i;
 
+  if (key==BACK_QUOTE_NO)
+    return (BACK_QUOTE_NO<<9) | typ_pho[1];
+
   for(i=1; i < 4; i++) {
     key =  typ_pho[i] | (key << typ_pho_len[i]) ;
   }
@@ -129,6 +132,11 @@ gboolean inph_typ_pho(int newkey)
 
   if (pin_juyin) {
     return inph_typ_pho_pinyin(newkey);
+  }
+
+  if (typ_pho[0]==BACK_QUOTE_NO) {
+    typ_pho[1]=(char)newkey;
+    return TRUE;
   }
 
   int max_in_idx;

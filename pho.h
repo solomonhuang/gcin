@@ -65,3 +65,5 @@ int lookup(u_char *s);
 #define TSIN_HASH_SHIFT 6
 
 #define PHO_CHAR_LEN 3
+
+#define BACK_QUOTE_NO 24

@@ -1582,8 +1582,9 @@ other_keys:
        }
 
        char xkey_lcase = xkey;
-       if ('A' <= xkey && xkey <= 'Z')
-          xkey_lcase = tolower(xkey);
+       if ('A' <= xkey && xkey <= 'Z') {
+         xkey_lcase = tolower(xkey);
+       }
 
        if (tsin_buffer_editing) {
          if (xkey_lcase=='h')
@@ -1658,7 +1659,7 @@ other_keys:
    }
 
    KeySym key_pad = keypad_proc(xkey);
-   if (!eng_ph || shift_m || key_pad || !phkbm.phokbm[xkey][0].num) {
+   if (!eng_ph || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {
        if (key_pad)
          xkey = key_pad;
 asc_char:
@@ -1727,11 +1728,12 @@ asc_char:
      }
 
      // for hsu & et26
-     if (strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num)
+     if (strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num && typ_pho[0]!=BACK_QUOTE_NO)
        return pre_punctuation_hsu(xkey);
 
-     if (xkey >= 'A' && xkey <='Z')
+     if (xkey >= 'A' && xkey <='Z' && typ_pho[0]!=BACK_QUOTE_NO)
        xkey+=0x20;
+//     printf("bbbb %c\n", xkey);
 
      inph_typ_pho(xkey);
 
@@ -1766,18 +1768,23 @@ llll2:
      pho_play(key);
 
      int vv=hash_pho[typ_pho[0]];
+
      phokey_t ttt=0xffff;
      while (vv<idxnum_pho) {
        ttt=idx_pho[vv].key;
-       if (!typ_pho[0]) ttt &= ~(31<<9);
-       if (!typ_pho[1]) ttt &= ~(3<<7);
-       if (!typ_pho[2]) ttt &= ~(15<<3);
-       if (!typ_pho[3]) ttt &= ~(7);
+       if (typ_pho[0]!=BACK_QUOTE_NO) {
+         if (!typ_pho[0]) ttt &= ~(31<<9);
+         if (!typ_pho[1]) ttt &= ~(3<<7);
+         if (!typ_pho[2]) ttt &= ~(15<<3);
+         if (!typ_pho[3]) ttt &= ~(7);
+       }
        if (ttt>=key) break;
        else
        vv++;
      }
-
+#if 0
+     printf("aaaa vv:%d  idxnum_pho:%d   ttt:%x key:%x\n",vv, idxnum_pho, ttt, key);
+#endif
      if (ttt > key || (ityp3_pho && idx_pho[vv].key!=key) ) {
        while (jj<4) {
          while(kk<3)
@@ -1801,12 +1808,20 @@ llll2:
        return 1;
      }
 
+     if (typ_pho[0]==BACK_QUOTE_NO && typ_pho[1])
+       ityp3_pho = 1;
+
      if (key==0 || !ityp3_pho) {
        return 1;
      }
 
      ii=idx_pho[vv].start;
      start_idx=ii;
+#if 0
+     printf("%x %x %d vv:%d idxnum_pho:%d-->", ttt, key, start_idx, vv, idxnum_pho);
+     utf8_putchar(ch_pho[start_idx].ch);
+     puts("<---");
+#endif
    } /* pho */
 
    put_b5_char(ch_pho[start_idx].ch, key);
