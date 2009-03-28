@@ -179,7 +179,7 @@ void create_win_pho_gui_full()
 
   if (left_right_button_tips) {
     GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), button_pho, "左鍵符號，右鍵設定",NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), button_pho, _("左鍵符號，右鍵設定"),NULL);
   }
 
   label_key_codes  = gtk_label_new(NULL);
@@ -255,7 +255,7 @@ void create_win_pho_gui_simple()
 
   if (left_right_button_tips) {
     GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), event_box_pho, "左鍵符號，右鍵設定",NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), event_box_pho, _("左鍵符號，右鍵設定"),NULL);
   }
 
   label_key_codes  = gtk_label_new(NULL);

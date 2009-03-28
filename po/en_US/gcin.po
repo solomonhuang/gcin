@@ -209,7 +209,7 @@ msgid "輸入時念出發音"
 msgstr "Enable text-to-speech"
 
 #: ../gcin-setup-pho.c:557
-msgid "speaker"
+msgid "發音選擇"
 msgstr "speaker"
 
 #: ../gcin-setup-pho.c:468

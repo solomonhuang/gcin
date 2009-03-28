@@ -71,7 +71,6 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
     dbg("st:%d hh plen:%d ", start, plen);utf8_putchar(chpho[start].ch); dbg("\n");
 #endif
 
-
     extract_pho(start, plen, pp);
 
     if (!tsin_seek(pp, plen, &sti, &edi)) {
@@ -80,7 +79,6 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
       goto next;
     }
-
 
     for (;sti < edi; sti++) {
       phokey_t mtk[MAX_PHRASE_LEN];
@@ -111,7 +109,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
         continue;
       }
 
-      if (usecount < maxusecount)
+      if (usecount <= maxusecount)
         continue;
 
       pbest[0].len = plen;

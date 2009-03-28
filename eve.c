@@ -768,7 +768,10 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
 
   if ((kev_state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
-    return feed_phrase(keysym, kev_state);
+    if (current_CS->im_state != GCIN_STATE_DISABLED || gcin_eng_phrase_enabled)
+      return feed_phrase(keysym, kev_state);
+    else
+      return 0;
   }
 
 //  dbg("state %x\n", kev_state);

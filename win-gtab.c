@@ -337,7 +337,7 @@ void create_win_gtab_gui_full()
 
   if (left_right_button_tips) {
     GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), button_gtab, "左鍵符號，右鍵設定",NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), button_gtab, _("左鍵符號，右鍵設定"),NULL);
   }
 
   GtkWidget *hbox_gtab = gtk_hbox_new (FALSE, 0);
@@ -444,7 +444,7 @@ void create_win_gtab_gui_simple()
 
   if (left_right_button_tips) {
     GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), event_box_gtab, "左鍵符號，右鍵設定",NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), event_box_gtab, _("左鍵符號，右鍵設定"),NULL);
   }
 
   GtkWidget *hbox_gtab = gtk_hbox_new (FALSE, 0);
@@ -461,7 +461,6 @@ void create_win_gtab_gui_simple()
     gtk_box_pack_start (GTK_BOX (hbox_gtab), label, FALSE, FALSE, 0);
 //    set_label_font_family(label, "serif");
   }
-
 
   label_key_codes  = gtk_label_new(NULL);
   gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);

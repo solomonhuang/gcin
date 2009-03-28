@@ -21,6 +21,7 @@ static GtkWidget *treeview;
 static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts;
 static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
        *check_button_gcin_shift_space_eng_full;
+       *check_button_gcin_eng_phrase_enabled;
 
 char *pho_speaker[16];
 int pho_speakerN;
@@ -159,6 +160,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
   save_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full)));
+
+  save_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_eng_phrase_enabled)));
 
   if (opt_speaker_opts) {
     idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_speaker_opts));
@@ -473,6 +477,16 @@ void create_gtablist_window (void)
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full),
      gcin_shift_space_eng_full);
 
+
+  GtkWidget *hbox_gcin_eng_phrase_enabled = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_eng_phrase_enabled, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_eng_phrase_enabled = gtk_label_new(_("英數狀態使用 alt-shift 片語"));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_eng_phrase_enabled), label_gcin_eng_phrase_enabled,  FALSE, FALSE, 0);
+  check_button_gcin_eng_phrase_enabled = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_eng_phrase_enabled),check_button_gcin_eng_phrase_enabled,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_eng_phrase_enabled),
+     gcin_eng_phrase_enabled);
+
   GtkWidget *hbox_phonetic_speak = gtk_hbox_new(FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_phonetic_speak , FALSE, FALSE, 0);
   GtkWidget *label_phonetic_speak = gtk_label_new(_("輸入時念出發音"));
@@ -500,14 +514,12 @@ void create_gtablist_window (void)
     dbg("pho_speakerN:%d\n", pho_speakerN);
 
     if (pho_speakerN) {
-      GtkWidget *labelspeaker = gtk_label_new("發音選擇");
+      GtkWidget *labelspeaker = gtk_label_new(_("發音選擇"));
       gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), labelspeaker, FALSE, FALSE, 0);
       gtk_container_add (GTK_CONTAINER (hbox_phonetic_speak), create_speaker_opts());
     }
   }
 
-
-  /* some buttons */
   hbox = gtk_hbox_new (TRUE, 4);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 

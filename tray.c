@@ -225,7 +225,7 @@ void create_tray()
   GtkWidget *event_box = gtk_event_box_new ();
   gtk_container_add (GTK_CONTAINER (tray_icon), event_box);
   GtkTooltips *tips = gtk_tooltips_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, "左:正/簡體 中:輸入法 右:選項", NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, _("左:正/簡體 中:輸入法 右:選項"), NULL);
 
   g_signal_connect (G_OBJECT (event_box), "button-press-event",
                     G_CALLBACK (tray_button_press_event_cb), NULL);

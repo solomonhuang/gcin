@@ -209,8 +209,8 @@ msgid "輸入時念出發音"
 msgstr "输入时念出发音"
 
 #: ../gcin-setup-pho.c:557
-msgid "speaker"
-msgstr "语音编号"
+msgid "發音選擇"
+msgstr "发音选择"
 
 #: ../gcin-setup-pho.c:468
 msgid "詞音編輯緩衝區大小"

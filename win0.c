@@ -598,7 +598,7 @@ static void create_win0_gui()
 
   if (left_right_button_tips) {
     GtkTooltips *button_pho_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button_pho, "左鍵符號，右鍵設定",NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button_pho, _("左鍵符號，右鍵設定"),NULL);
   }
 
 
