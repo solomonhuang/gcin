@@ -7,6 +7,7 @@ Window xwin1;
 #define SELEN (12)
 
 static GtkWidget *labels_sele[SELEN], *labels_seleR[SELEN];
+static GtkWidget *eve_sele[SELEN], *eve_seleR[SELEN];
 static GtkWidget *arrow_up, *arrow_down;
 
 void create_win1()
@@ -22,6 +23,18 @@ void create_win1()
 }
 
 void change_win1_font();
+
+static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
+{
+  int v;
+  switch (event->button) {
+    case 1:
+      v = GPOINTER_TO_INT(data);
+      tsin_sele_by_idx(v);
+      break;
+  }
+
+}
 
 void create_win1_gui()
 {
@@ -44,17 +57,30 @@ void create_win1_gui()
   for(i=0; i < SELEN; i++) {
     GtkWidget *align = gtk_alignment_new(0,0,0,0);
     gtk_table_attach_defaults(table,align, 0,1,i,i+1);
-    labels_sele[i] = gtk_label_new(NULL);
-    gtk_container_add (GTK_CONTAINER (align), labels_sele[i]);
+    GtkWidget *event_box_pho = gtk_event_box_new();
+    GtkWidget *label = gtk_label_new(NULL);
+    gtk_container_add (GTK_CONTAINER (event_box_pho), label);
+    labels_sele[i] = label;
+    eve_sele[i] = event_box_pho;
+    gtk_container_add (GTK_CONTAINER (align), event_box_pho);
     gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
+    g_signal_connect(G_OBJECT(event_box_pho),"button-press-event",
+                   G_CALLBACK(mouse_button_callback), GINT_TO_POINTER(i));
+
 
     GtkWidget *alignR = gtk_alignment_new(0,0,0,0);
     gtk_table_attach_defaults(table, alignR, 1,2,i,i+1);
-    labels_seleR[i] = gtk_label_new(NULL);
-    gtk_container_add (GTK_CONTAINER (alignR), labels_seleR[i]);
+    GtkWidget *event_box_phoR = gtk_event_box_new();
+    GtkWidget *labelR = gtk_label_new(NULL);
+    gtk_container_add (GTK_CONTAINER (event_box_phoR), labelR);
+    labels_seleR[i] = labelR;
+    eve_seleR[i] = event_box_phoR;
+    gtk_container_add (GTK_CONTAINER (alignR), event_box_phoR);
     gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
     set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
+    g_signal_connect(G_OBJECT(event_box_phoR),"button-press-event",
+                   G_CALLBACK(mouse_button_callback), GINT_TO_POINTER(i));
   }
 
   arrow_down = gtk_arrow_new (GTK_ARROW_DOWN, GTK_SHADOW_IN);
@@ -173,6 +199,8 @@ void change_win1_font()
     set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
     gtk_widget_modify_fg(labels_sele[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
     gtk_widget_modify_fg(labels_seleR[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
+    change_win_bg(eve_sele[i]);
+    change_win_bg(eve_seleR[i]);
   }
 
   change_win_bg(gwin1);

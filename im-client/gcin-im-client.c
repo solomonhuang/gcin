@@ -18,6 +18,7 @@ static int flags_backup;
 static void save_old_sigaction_single(int signo, struct sigaction *act)
 {
   sigaction(signo, NULL, act);
+
   if (act->sa_handler != SIG_IGN)
     signal(signo, SIG_IGN);
 }
@@ -72,7 +73,7 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
       save_old_sigaction_single(SIGCHLD, &ori_act);
 
       if ((pid=fork())==0) {
-#if 	FREEBSD
+#if     FREEBSD
         setpgid(0, getpid());
 #else
         setpgrp();
@@ -273,7 +274,6 @@ static void error_proc(GCIN_client_handle *handle, char *msg)
 
 typedef struct {
   struct sigaction apipe;
-  struct sigaction aio;
 } SAVE_ACT;
 
 
@@ -282,18 +282,12 @@ typedef struct {
 static void save_old_sigaction(SAVE_ACT *save_act)
 {
   save_old_sigaction_single(SIGPIPE, &save_act->apipe);
-#if 0
-  save_old_sigaction_single(SIGIO, &save_act->aio);
-#endif
 }
 
 
 static void restore_old_sigaction(SAVE_ACT *save_act)
 {
   restore_old_sigaction_single(SIGPIPE, &save_act->apipe);
-#if 0
-  restore_old_sigaction_single(SIGIO, &save_act->aio);
-#endif
 }
 
 static int handle_read(GCIN_client_handle *handle, void *ptr, int n)

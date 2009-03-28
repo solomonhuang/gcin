@@ -51,6 +51,7 @@
 #define GTAB_VERTICAL_SELECT "gtab-vertical-select"
 #define GTAB_UNIQUE_AUTO_SEND "gtab-unique-auto-send"
 #define GTAB_QUE_WILD_CARD "gtab-que-wild-card"
+#define GTAB_EDIT_BUFFER "gtab-edit-buffer"
 
 #define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
@@ -95,7 +96,7 @@ extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;
-extern int gtab_vertical_select, gtab_unique_auto_send;
+extern int gtab_vertical_select, gtab_unique_auto_send, gtab_edit_buffer;
 extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
 extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;

@@ -6,7 +6,7 @@ include config.mak
 
 gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
-gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o
+gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o gtab-buf.o
 
 GCIN_SO= gcin1.so gcin2.so
 

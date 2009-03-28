@@ -325,7 +325,9 @@ void disp_tsin_eng_pho(int eng_pho);
 
 void show_stat()
 {
+#if TRAY_ENABLED
   load_tray_icon();
+#endif
   disp_tsin_eng_pho(eng_ph);
 }
 
@@ -873,7 +875,9 @@ void tsin_set_eng_ch(int nmod)
   drawcursor();
 
   show_button_pho(eng_ph);
+#if TRAY_ENABLED
   load_tray_icon();
+#endif
 #if 0
   show_win0();
 #endif
@@ -1100,6 +1104,23 @@ void add_to_tsin_buf_str(char *str)
   add_to_tsin_buf(str, pho, N);
 }
 
+int tsin_sele_by_idx(int c)
+{
+  int len = pre_sel[c].len;
+
+  if (c >= pre_selN)
+    return 0;
+
+#if 0
+    dbg("eqlenN:%d %d\n", eqlenN, current_ph_idx);
+#endif
+
+  full_match = FALSE;
+  gboolean b_added = add_to_tsin_buf_phsta(pre_sel[c].str, pre_sel[c].phokey, len);
+
+  return b_added;
+}
+
 
 static gboolean pre_sel_handler(KeySym xkey)
 {
@@ -1126,19 +1147,7 @@ static gboolean pre_sel_handler(KeySym xkey)
 
   c = p - phkbm.selkey;
 
-  int len = pre_sel[c].len;
-
-  if (c >= pre_selN)
-    return 0;
-
-#if 0
-    dbg("eqlenN:%d %d\n", eqlenN, current_ph_idx);
-#endif
-
-  full_match = FALSE;
-  gboolean b_added = add_to_tsin_buf_phsta(pre_sel[c].str, pre_sel[c].phokey, len);
-
-  return b_added;
+  return tsin_sele_by_idx(c);
 }
 
 
@@ -1321,6 +1330,9 @@ int feedkey_pp(KeySym xkey, int kbstate)
   int shift_m=kbstate&ShiftMask;
   int j,jj,kk, idx;
   char kno;
+
+  if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock)
+    eng_ph = !(kbstate&LockMask);
 
   key_press_time = 0;
 
@@ -1659,6 +1671,10 @@ other_keys:
    }
 
    KeySym key_pad = keypad_proc(xkey);
+
+   if (xkey > 0x7e && !key_pad)
+     return 0;
+
    if (!eng_ph || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {
        if (key_pad)
          xkey = key_pad;
@@ -1681,11 +1697,14 @@ asc_char:
 
           if (!(kbstate&LockMask) && ppp && !((ppp-ochars) & 1))
             xkey=*(ppp+1);
+
+#if 0
           if (kbstate&LockMask && islower(xkey))
             xkey-=0x20;
           else
             if (!(kbstate&LockMask) && isupper(xkey))
               xkey+=0x20;
+#endif
         } else {
           if (!eng_ph && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock
               && gcin_capslock_lower) {

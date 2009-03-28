@@ -61,7 +61,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 #define MAXV 1000
     int maxusecount = 5-MAXV;
     int remlen;
-    short match_phr_N=0, no_match_ch_N = 1;
+    short match_phr_N=0, no_match_ch_N = plen;
 
     bzero(pbest, sizeof(TSIN_PARSE) * c_len);
 
@@ -78,9 +78,10 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
     extract_pho(start, plen, pp);
 
     if (!tsin_seek(pp, plen, &sti, &edi)) {
+#if 1
       if (plen > 1)
         break;
-
+#endif
       goto next;
     }
 

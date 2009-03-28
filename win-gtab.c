@@ -17,6 +17,7 @@ static GtkWidget *image_pin;
 static GtkWidget *box_gtab_im_name;
 static GtkWidget *hbox_row2;
 static GtkWidget *label_page;
+static GtkWidget *label_edit;
 static GdkColor better_color;
 
 Window xwin_gtab;
@@ -290,6 +291,11 @@ void create_win_gtab_gui_simple()
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
 
+  if (gtab_edit_buffer) {
+    label_edit = gtk_label_new("wwwww");
+    gtk_container_add (GTK_CONTAINER (vbox_top), label_edit);
+  }
+
   GtkWidget *event_box_gtab = gtk_event_box_new();
   gtk_container_set_border_width (GTK_CONTAINER (event_box_gtab), 0);
 
@@ -414,7 +420,7 @@ static void create_win_gtab_gui()
   current_gtab_in_row1 = gtab_in_row1;
   current_gtab_vertical_select = gtab_vertical_select;
   current_gcin_inner_frame = gcin_inner_frame;
-  gdk_color_parse(gcin_win_color_fg, &better_color);
+  gdk_color_parse("red", &better_color);
 }
 
 

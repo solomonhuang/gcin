@@ -189,17 +189,16 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t 
 int *ts_gtab;
 extern int ts_gtabN;
 
-int read_tsin_phrase(char *str)
+int read_tsin_phrase(char *str, usecount_t *usecount)
 {
   u_char len;
-  usecount_t usecount;
   u_char pho[sizeof(phokey_t) * MAX_PHRASE_LEN];
   len = 0;
 
   fread(&len, 1, 1, fph);
   if (len > MAX_PHRASE_LEN || len <=0)
     return 0;
-  fread(&usecount, sizeof(usecount_t), 1, fph); // use count
+  fread(usecount, sizeof(usecount_t), 1, fph); // use count
   fread(pho, sizeof(phokey_t), len, fph);
 
   int i;
@@ -244,6 +243,7 @@ void build_ts_gtab()
 
   TS_TMP *tstmp=NULL;
   int tstmpN=0;
+  usecount_t usecount;
 
   while (!feof(fph)) {
     if (!(tstmp=trealloc(tstmp, TS_TMP, tstmpN + 1)))
@@ -251,7 +251,7 @@ void build_ts_gtab()
 
     tstmp[tstmpN].ofs = ftell(fph);
 
-    if (!read_tsin_phrase(tstmp[tstmpN].ts))
+    if (!read_tsin_phrase(tstmp[tstmpN].ts, &usecount))
       break;
 
     tstmpN++;
@@ -272,20 +272,24 @@ void build_ts_gtab()
 #endif
 
 
-static int load_ts_gtab(int idx, char *tstr)
+static int load_ts_gtab(int idx, char *tstr, usecount_t *usecount)
 {
   int ofs = ts_gtab[idx];
 
   fseek(fph, ofs, SEEK_SET);
-  return read_tsin_phrase(tstr);
+  return read_tsin_phrase(tstr, usecount);
 }
 
 #if USE_TSIN
-// len is in CH_SZ
-int find_match(char *str, int len, char *match_chars, int match_chars_max)
+int find_match(char *str, int len, int *eq_N, usecount_t *usecount)
 {
   if (!len)
     return 0;
+
+  int ge_N = 0;
+
+  *eq_N  = 0;
+  *usecount = 0;
 
   if (!ts_gtabN)
     build_ts_gtab();
@@ -295,20 +299,19 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
   int mid, tlen;
   char tstr[MAX_PHRASE_STR_LEN];
   int matchN=0;
+  usecount_t uc;
 
-  if (match_chars)
-      match_chars[0] = 0;
 
   do {
     mid = (bottom + top) /2;
 
 //    dbg("tstr:%s  %d %d %d\n", tstr, bottom, mid, top);
-    tlen = load_ts_gtab(mid, tstr);
+    tlen = load_ts_gtab(mid, tstr, usecount);
 
     if (!tlen) {  // error in db
       dbg("error in db\n");
       build_ts_gtab();
-      return 0;
+      return;
     }
 
     int r = strncmp(str, tstr, len);
@@ -322,44 +325,43 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
     } else {
       strcpy(str, tstr);
 
-      if (!match_chars)
-        return 1;
-
       bottom = mid;
       int i;
 
       int totlen=0;
       for(i=mid; i>=0; i--) {
-        tlen = load_ts_gtab(i, tstr);
+        tlen = load_ts_gtab(i, tstr, &uc);
 
-        if (strncmp(str, tstr, len) || tlen <= len)
+        if (strncmp(str, tstr, len))
           break;
 
-        if (matchN >= match_chars_max)
-          break;
+        ge_N++;
+        if (strcmp(str, tstr))
+          continue;
 
-        int slen= u8cpy(&match_chars[totlen], &tstr[len]);
-        totlen+=slen;
-        matchN++;
+        *eq_N++;
+        if (!*usecount) {
+          *usecount = uc;
+        }
       }
 
       for(i=mid+1; i< ts_gtabN; i++) {
-        tlen = load_ts_gtab(i, tstr);
+        tlen = load_ts_gtab(i, tstr, &uc);
 
-        if (strncmp(str, tstr, len) || tlen <= len)
+        if (strncmp(str, tstr, len))
           break;
 
-        if (matchN >= match_chars_max)
-          break;
+        ge_N++;
+        if (strcmp(str, tstr))
+          continue;
 
-        int slen = u8cpy(&match_chars[totlen], &tstr[len]);
-        totlen+=slen;
-        matchN++;
+        *eq_N++;
+        if (!*usecount) {
+          *usecount = uc;
+        }
       }
 
-      match_chars[totlen] = 0;
-
-      return matchN;
+      return ge_N;
     }
 
   } while (bottom <= top);

@@ -13,4 +13,4 @@ Icon=gcin.png
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=Applications;Settings;
+Categories=Settings;

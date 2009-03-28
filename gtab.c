@@ -659,20 +659,25 @@ void init_gtab(int inmdno)
 #endif
 }
 
+#if 0
 static char match_phrase[MAX_PHRASE_STR_LEN];
 static int part_matched_len;
-gboolean find_match(char *str, int len, char *match_str, int match_strs_max);
+#endif
+
 void start_gtab_pho_query(char *utf8);
 
+#if 0
 static void clear_phrase_match_buf()
 {
    part_matched_len = 0;
    match_phrase[0]=0;
 }
+#endif
 
 static void putstr_inp(u_char *p)
 {
   int plen = strlen(p);
+  usecount_t usecount;
 
   clear_page_label();
 
@@ -712,6 +717,7 @@ static void putstr_inp(u_char *p)
     else
       sendkey_b5(p);
 
+#if 0
     if (gtab_auto_select_by_phrase && !(_gtab_space_auto_first & GTAB_space_auto_first_any)) {
       if (part_matched_len < strlen(match_phrase) &&
           !memcmp(&match_phrase[part_matched_len], p, plen)) {
@@ -725,14 +731,14 @@ static void putstr_inp(u_char *p)
 #if DPHR
         dbg("%d   zzz %s\n",part_matched_len, match_phrase);
 #endif
-        if (find_match(match_phrase, part_matched_len + plen, NULL, 0)) {
+        if (find_match(match_phrase, part_matched_len + plen, NULL, 0, &usecount)) {
 #if DPHR
           dbg("cat match_phrase %s\n", match_phrase);
 #endif
           part_matched_len += plen;
         } else {
           strcpy(match_phrase, p);
-          if (find_match(match_phrase, plen, NULL, 0)) {
+          if (find_match(match_phrase, plen, NULL, 0, &usecount)) {
 #if DPHR
             dbg("single match_phrase %s\n", match_phrase);
 #endif
@@ -747,6 +753,8 @@ static void putstr_inp(u_char *p)
         }
       }
     } // gtab_auto_select_by_phrase
+#endif
+
   }
 
   ClrIn();
@@ -763,13 +771,15 @@ static void putstr_inp(u_char *p)
 
 static gboolean set_sel1st_i()
 {
+#if 0
   if (!part_matched_len)
     return FALSE;
+  usecount_t usecount;
 
 #define MAX_MATCH_STRS 1024
 
   char match_arr[CH_SZ * MAX_MATCH_STRS + 1];
-  find_match(match_phrase, part_matched_len, match_arr, MAX_MATCH_STRS);
+  find_match(match_phrase, part_matched_len, match_arr, MAX_MATCH_STRS, &usecount);
 
   char *pp = match_arr;
 
@@ -794,6 +804,9 @@ static gboolean set_sel1st_i()
   }
 
   return FALSE;
+#else
+  return FALSE;
+#endif
 }
 
 
@@ -868,6 +881,7 @@ static gboolean load_seltab(int tblidx, int seltabidx)
 
   return FALSE;
 }
+
 
 void set_gtab_input_error_color();
 static void bell_err()
@@ -1274,7 +1288,9 @@ shift_proc:
 
   switch (key) {
     case XK_BackSpace:
+#if 0
       clear_phrase_match_buf();
+#endif
       last_idx=0;
       spc_pressed=0;
       sel1st_i=MAX_SELKEY-1;
@@ -1317,7 +1333,9 @@ shift_proc:
 
       break;
     case XK_Return:
+#if 0
       clear_phrase_match_buf();
+#endif
       return 0;
     case XK_Escape:
       close_gtab_pho_win();
@@ -1384,12 +1402,6 @@ next_page:
         goto next_page;
       } else
       if (ci==0) {
-#if 0
-        if (last_full) {
-          last_full=0;
-//          return 1;
-        }
-#endif
         if (current_CS->b_half_full_char)
           return full_char_proc(key);
 
@@ -1775,18 +1787,23 @@ next_pg:
     if (pendkey)
       spc_pressed = 1;
 
-    j = pg_idx;
-    while(CONVT2(cur_inmd, j)==val && defselN < page_len() && j<E1) {
-      load_seltab(j, defselN);
 
-      j++; defselN++;
+    if (gtab_edit_buffer) {
+      insert_gbuf_cursor(S1, E1);
+    } else {
+      j = pg_idx;
+      while(j<E1 && CONVT2(cur_inmd, j)==val && defselN < page_len()) {
+        load_seltab(j, defselN);
 
-      if (ci == cur_inmd->MaxPress || spc_pressed) {
-//        dbg("sel1st_i %d %d %d\n", ci, cur_inmd->MaxPress, spc_pressed);
-        sel1st_i=0;
+        j++; defselN++;
 
-        if (gtab_auto_select_by_phrase && !(_gtab_space_auto_first & GTAB_space_auto_first_any))
-          phrase_selected = set_sel1st_i();
+        if (ci == cur_inmd->MaxPress || spc_pressed) {
+  //        dbg("sel1st_i %d %d %d\n", ci, cur_inmd->MaxPress, spc_pressed);
+          sel1st_i=0;
+
+          if (gtab_auto_select_by_phrase && !(_gtab_space_auto_first & GTAB_space_auto_first_any))
+            phrase_selected = set_sel1st_i();
+        }
       }
     }
 

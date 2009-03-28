@@ -2,7 +2,6 @@
 #include "pho.h"
 
 #if USE_TSIN
-int find_match();
 extern gboolean flush_tsin_buffer();
 #endif
 
@@ -116,11 +115,6 @@ void set_no_focus(GtkWidget *win)
 }
 
 #if !USE_TSIN
-// len is in CH_SZ
-int find_match(char *str, int len, char *match_chars, int match_chars_max)
-{
-}
-
 void add_to_tsin_buf(){}
 void add_to_tsin_buf_str(){}
 void build_ts_gtab(){}

@@ -1,4 +1,10 @@
 ** UTF-8 encoding **
+1.4.1:
+- 現在可以用 mouse 在預選詞的視窗點選，主要給小朋友用。
+- 中文輸入狀態按 Shfit + abc  改成輸入大寫。
+- tray 上面的選單現在可以切換是否要念出發音 & 也可以切換小鍵盤。
+- firefox 3.0/gnome-terminal 關閉 coredump 的問題。
+
 1.4.0:
 - 按 keypad . 現在可以輸入 '. '了 。感謝jackblackevo的建議。
 - ctrl-alt-, 有時候需要按兩次才會出現的問題。

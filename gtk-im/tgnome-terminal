@@ -1,0 +1,10 @@
+export LC_CTYPE=zh_TW.Big5
+export XMODIFIERS=@im=gcin_test
+export LD_LIBRARY_PATH="../im-client"
+
+export LD_PRELOAD=./im-gcin.so
+
+pkill gcin.test
+#../gcin.test &
+
+gnome-terminal
