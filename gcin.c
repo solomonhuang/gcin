@@ -514,8 +514,10 @@ int main(int argc, char **argv)
 #endif
 
 #if TRAY_ENABLED
-  if (gcin_status_tray)
+  if (gcin_status_tray) {
+    sleep(3);
     create_tray();
+  }
 #endif
 
   gtk_main();

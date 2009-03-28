@@ -32,10 +32,6 @@ msgstr "Behavior of Space key"
 msgid "倉頡/行列/嘸蝦米/大易設定"
 msgstr "Settings for gtab input methods"
 
-#: ../gcin-setup-gtab.c:178
-msgid "倉頡/行列/嘸蝦米/大易"
-msgstr "gtab input methods"
-
 #: ../gcin-setup-gtab.c:188
 msgid "重複字選擇鈴聲"
 msgstr "Bell ring for multiple choices"
@@ -117,7 +113,7 @@ msgid "icon"
 msgstr "Icon"
 
 #: ../gcin-setup-list.c:268
-msgid "Ctrl-Alt-數字鍵"
+msgid "Ctrl-Alt-鍵"
 msgstr "Ctrl-Alt-Toggle Key"
 
 #: ../gcin-setup-list.c:277
@@ -364,10 +360,6 @@ msgstr "About gcin"
 msgid "結束 gcin"
 msgstr "Disable gcin server"
 
-#: ../about.c:69
-msgid "bug tracking"
-msgstr "Bug tracking:"
-
 #: ../about.c:83
 msgid "關閉"
 msgstr "Close"
@@ -440,3 +432,11 @@ msgstr "gtab IMs"
 #: ../gcin-setup-tab.c:1830
 msgid "內定輸入法"
 msgstr "Default IMs"
+
+#: ../gcin-setup-gtab.c:188
+msgid "外觀"
+msgstr "Appearance Settings"
+
+#: ../gcin-setup-gtab.c:196
+msgid "行為"
+msgstr "Behavior Settings"

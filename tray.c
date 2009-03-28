@@ -76,6 +76,7 @@ static void draw_icon()
 
 }
 
+void create_tray();
 void update_tray_icon()
 {
   if (!gcin_status_tray)
@@ -218,6 +219,9 @@ void create_tray()
 {
   EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
 
+  if (!tray_icon)
+    return;
+
   GtkWidget *event_box = gtk_event_box_new ();
   gtk_container_add (GTK_CONTAINER (tray_icon), event_box);
   GtkTooltips *tips = gtk_tooltips_new ();
@@ -231,7 +235,10 @@ void create_tray()
   char icon_fname[128];
   get_icon_path(GCIN_TRAY_PNG, icon_fname);
 
+  if (pixbuf)
+    gdk_pixbuf_unref(pixbuf);
   pixbuf = gdk_pixbuf_new_from_file(icon_fname, &err);
+
   int pwidth = gdk_pixbuf_get_width (pixbuf);
   int pheight = gdk_pixbuf_get_height (pixbuf);
 
@@ -241,12 +248,19 @@ void create_tray()
   da =  gtk_drawing_area_new();
   g_signal_connect (G_OBJECT (event_box), "destroy",
                     G_CALLBACK (gtk_widget_destroyed), &da);
-
   g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(cb_expose), NULL);
 
   gtk_container_add (GTK_CONTAINER (event_box), da);
+  gtk_widget_set_size_request(GTK_WIDGET(tray_icon), pwidth, pheight);
 
-  gtk_widget_set_size_request(tray_icon, pwidth, pheight);
+  gtk_widget_show_all (GTK_WIDGET (tray_icon));
+  tray_da_win = da->window;
+  // tray window is not ready ??
+  if (!tray_da_win) {
+    gtk_widget_destroy(tray_icon);
+    da = NULL;
+    return;
+  }
 
   PangoContext *context=gtk_widget_get_pango_context(da);
   PangoFontDescription* desc=pango_context_get_font_description(context);
@@ -254,7 +268,6 @@ void create_tray()
 //  dbg("zz %s %d\n",  pango_font_description_to_string(desc), PANGO_SCALE);
 
   pango = gtk_widget_create_pango_layout(da, NULL);
-
   pango_layout_set_font_description(pango, desc);
 #if 1
   // strange bug, why do we need this ?
@@ -267,11 +280,5 @@ void create_tray()
   dbg("context %x %x\n", pango_layout_get_context(pango), context);
   dbg("font %x %x\n",pango_layout_get_font_description(pango), desc);
 #endif
-//  pango_layout_context_changed(pango);
-
-  gtk_widget_show_all (GTK_WIDGET (tray_icon));
-
-  tray_da_win = da->window;
-
   gc = gdk_gc_new (tray_da_win);
 }

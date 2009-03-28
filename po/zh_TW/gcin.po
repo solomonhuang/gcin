@@ -32,10 +32,6 @@ msgstr "空白鍵選項"
 msgid "倉頡/行列/嘸蝦米/大易設定"
 msgstr "倉頡/行列/嘸蝦米/大易設定"
 
-#: ../gcin-setup-gtab.c:182
-msgid "倉頡/行列/嘸蝦米/大易"
-msgstr "倉頡/行列/嘸蝦米/大易"
-
 #: ../gcin-setup-gtab.c:192
 msgid "重複字選擇鈴聲"
 msgstr "重複字選擇鈴聲"
@@ -117,8 +113,8 @@ msgid "icon"
 msgstr "icon"
 
 #: ../gcin-setup-list.c:268
-msgid "Ctrl-Alt-數字鍵"
-msgstr "Ctrl-Alt-數字鍵"
+msgid "Ctrl-Alt-鍵"
+msgstr "Ctrl-Alt-鍵"
 
 #: ../gcin-setup-list.c:277
 msgid "檔案名"
@@ -364,10 +360,6 @@ msgstr "關於 gcin"
 msgid "結束 gcin"
 msgstr "結束 gcin"
 
-#: ../about.c:69
-msgid "bug tracking"
-msgstr "bug tracking"
-
 #: ../about.c:83
 msgid "關閉"
 msgstr "關閉"
@@ -440,3 +432,11 @@ msgstr "倉頡/行列"
 #: ../gcin-setup-tab.c:1830
 msgid "內定輸入法"
 msgstr "內定輸入法"
+
+#: ../gcin-setup-gtab.c:188
+msgid "外觀"
+msgstr "外觀"
+
+#: ../gcin-setup-gtab.c:196
+msgid "行為"
+msgstr "行為"
