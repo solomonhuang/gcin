@@ -35,7 +35,7 @@ int pho_play(phokey_t key)
 
 void char_play(char *utf8)
 {
-  if (!phonetic_speak)
+  if (!phonetic_speak || !(utf8[0]&128))
     return;
 
   if (!ch_pho)

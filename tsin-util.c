@@ -215,7 +215,7 @@ int read_tsin_phrase(char *str, usecount_t *usecount)
 }
 
 
-static int load_ts_gtab(int idx, char *tstr, usecount_t *usecount)
+int load_ts_gtab(int idx, char *tstr, usecount_t *usecount)
 {
   int ofs = ts_gtab[idx];
 

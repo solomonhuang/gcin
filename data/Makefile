@@ -51,4 +51,4 @@ install:
 	install -m 644 $(DATA) $(DATAKEEP) $(GCIN_TABLE_DIR_i)
 #	cd $(GCIN_TABLE_DIR_i); bzip2 -f *.gtab
 clean:
-	rm -f *~ tags core.* $(DATA) *.gtab extr1 t2s-file tsin-1.src
+	rm -f *~ tags core.* $(DATA) *.gtab extr1 t2s-file tsin-1.src tsin-gtabidx*

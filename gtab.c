@@ -467,6 +467,9 @@ void init_gtab(int inmdno)
   if (th.flag & FLAG_GTAB_SYM_KBM)
     dbg("symbol kbm\n");
 
+  if (th.flag & FLAG_PHRASE_AUTO_SKIP_ENDKEY)
+    dbg("PHRASE_AUTO_SKIP_ENDKEY\n");
+
   fread(ttt, 1, th.KeyS, fp);
   dbg("KeyS %d\n", th.KeyS);
 
@@ -1528,8 +1531,14 @@ next:
       if (!ci && !inkey) {
         if (current_CS->b_half_full_char)
           return full_char_proc(key);
-        else
-          return 0;
+        else {
+          if (gbufN) {
+            insert_gbuf_cursor_char(key);
+            return 1;
+          }
+          else
+            return 0;
+        }
       }
 
       if (wild_mode && inkey>=1 && ci< cur_inmd->MaxPress) {
@@ -1774,16 +1783,17 @@ refill:
 next_pg:
     defselN=0;
     clr_seltab();
-    if (pendkey)
+    if (pendkey && (!(cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY) || !gtab_auto_select_by_phrase))
       spc_pressed = 1;
 
     int full_send = gtab_press_full_auto_send && last_full;
 
-    if (gtab_auto_select_by_phrase && (spc_pressed||pendkey||full_send)) {
+    if (gtab_auto_select_by_phrase && (spc_pressed||full_send)) {
       j = S1;
       int selN=0;
       char **sel = NULL;
 
+//     puts("kkkkkkkkkkk");
       while(j<E1 && CONVT2(cur_inmd, j)==val && selN < 255) {
         sel = trealloc(sel, char *, selN+1);
         sel[selN++] = load_tblidx(j);
@@ -1794,6 +1804,8 @@ next_pg:
       return 1;
     } else {
       j = pg_idx;
+
+//      puts("jjjjjjjjjjjjjjjjjj");
       while(j<E1 && CONVT2(cur_inmd, j)==val && defselN < page_len()) {
         load_seltab(j, defselN);
 

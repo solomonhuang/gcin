@@ -4,6 +4,7 @@
 %endkey 1234567890
 %space_style 4
 #%keep_key_case
+%phase_auto_skip_endkey
 %keyname begin
 a 1-
 b 5v

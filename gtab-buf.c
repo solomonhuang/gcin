@@ -126,7 +126,7 @@ void disp_gbuf()
 int gbuf_cursor_left()
 {
   if (!gbuf_cursor)
-    return 0;
+    return gbufN;
   if (gtab_buf_select)
     return 1;
   gbuf_cursor--;
@@ -138,7 +138,7 @@ int gbuf_cursor_left()
 int gbuf_cursor_right()
 {
   if (gbuf_cursor==gbufN)
-    return 0;
+    return gbufN;
   if (gtab_buf_select)
     return 1;
   gbuf_cursor++;
@@ -278,23 +278,29 @@ static int gtab_parse_recur(int start, TSIN_PARSE *out,
       int t=i;
       int j;
       for(j=0; j < plen; j++) {
-        unsigned char v = t % gbuf[start+j].selN;
+        int selN = gbuf[start+j].selN;
+        unsigned char v = t % selN;
+
         counter[j] = v;
-        t /= gbuf[start+j].selN;
+        t /= selN;
+
+        if (selN > 10 && !ch_pos_find(gbuf[start+j].sel[v], j))
+            break;
         strcat(tt, gbuf[start+j].sel[v]);
       }
 
-      if (check_gtab_fixed_mismatch(start, tt, plen))
+      if (j < plen)
         continue;
 
-//      dbg("a %s\n", tt);
+      if (check_gtab_fixed_mismatch(start, tt, plen))
+        continue;
+ //     dbg("a %s\n", tt);
       usecount_t usecount;
       int eq_N;
 
       int  ge_N = find_match(tt, &eq_N, &usecount);
       if (ge_N)
         has_ge = TRUE;
-
 //      dbg("b %s  ge:%d eq:%d\n", tt, ge_N, eq_N);
 
       if (usecount <= maxusecount)
@@ -312,7 +318,7 @@ static int gtab_parse_recur(int start, TSIN_PARSE *out,
     }
 
 //    printf("has_ge:%d\n", has_ge);
-    if (!has_ge)  // no longer phrases found
+    if (!has_ge && plen > 1)  // no longer phrases found
       break;
 
     remlen =  gbufN - (start + plen);
@@ -323,7 +329,6 @@ static int gtab_parse_recur(int start, TSIN_PARSE *out,
 
       short smatch_phr_N, sno_match_ch_N;
       int uc;
-
 
       if (pca = cache_lookup(next)) {
         uc = pca->usecount;
@@ -413,7 +418,6 @@ void gtab_parse()
   for(i=0; i < gbufN; i++)
     gbuf[i].flag &= ~FLAG_CHPHO_PHRASE_HEAD;
 
-#if 1
   for(i=0; out[i].len; i++) {
     int j;
     int psta = out[i].start;
@@ -433,7 +437,6 @@ void gtab_parse()
       gbuf[idx].c_sel = v;
     }
   }
-#endif
 
 #if 0
   puts("-----------------------------");

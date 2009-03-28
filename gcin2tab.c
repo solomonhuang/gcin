@@ -257,6 +257,10 @@ int main(int argc, char **argv)
     cmd_arg(&cmd, &arg);
   }
 
+  if (sequ(cmd,"%phase_auto_skip_endkey")) {
+    th.flag |= FLAG_PHRASE_AUTO_SKIP_ENDKEY;
+    cmd_arg(&cmd, &arg);
+  }
 
   if (!sequ(cmd,"%keyname") || !sequ(arg,"begin")) {
     p_err("%d:  %%keyname begin   expected, instead of %s %s", lineno, cmd, arg);
