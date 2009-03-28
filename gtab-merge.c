@@ -170,13 +170,10 @@ int main(int argc, char **argv)
   int prbf_cou=0;
 
 
-  if (!strcmp(fname, "-v") || !strcmp(fname, "--version")) {
-    dbg("gcin2tab for gcin " GCIN_VERSION "\n");
-    exit(0);
+  if (argc != 4) {
+    dbg("\tgtab-merge for gcin " GCIN_VERSION "\n");
+    p_err("%s input_file.gtab  phrase_file.append   final-output.gtab", argv[0]);
   }
-
-  if (argc != 4)
-    p_err("%s input_file.gtab  phrase_file.append   output.gtab.final", argv[0]);
 
   if ((fr=fopen(argv[1], "r"))==NULL)
       p_err("cannot err open %s", argv[1]);

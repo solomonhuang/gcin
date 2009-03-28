@@ -64,8 +64,8 @@ static int qcmp_usecount(const void *a, const void *b)
   u_short ka,kb;
   usecount_t usecounta, usecountb;
 
-  lena=*(pa++); usecounta = *((usecount_t *)pa); pa+= sizeof(usecount_t);
-  lenb=*(pb++); usecountb = *((usecount_t *)pb); pb+= sizeof(usecount_t);
+  lena=*(pa++); memcpy(&usecounta, pa, sizeof(usecount_t)); pa+= sizeof(usecount_t);
+  lenb=*(pb++); memcpy(&usecountb, pb, sizeof(usecount_t)); pb+= sizeof(usecount_t);
   len=Min(lena,lenb);
 
   for(i=0;i<len;i++) {

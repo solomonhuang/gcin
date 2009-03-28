@@ -29,6 +29,7 @@ struct keystruc tran[]={
   {"f1",XK_F1},{"f2",XK_F2},{"f3",XK_F3},{"f4",XK_F4},{"f5",XK_F5},{"f6",XK_F6},
   {"f7",XK_F7},{"f8",XK_F8},{"f9",XK_F9},{"f10",XK_F10},{"f11",XK_F11},
   {"f12",XK_F12},
+  {"left", XK_Left},  {"right", XK_Right},  {"down", XK_Down},  {"up", XK_Up},
   {"k_ins", XK_KP_Insert}, {"k_del", XK_KP_Delete},  {"k_end", XK_KP_End},
   {"k_down",XK_KP_Down}, {"k_pgup",XK_KP_Prior},
   {"k_up",XK_KP_Up},
