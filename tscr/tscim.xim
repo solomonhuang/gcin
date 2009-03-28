@@ -8,5 +8,5 @@ scim -d &
 #gedit --new-window &
 #mozilla-firefox
 #kedit
-#gedit
-leafpad
+gedit
+#leafpad

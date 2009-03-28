@@ -7,7 +7,7 @@ int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
 int gcin_im_toggle_keys;
-int gcin_capslock_lower, gcin_eng_phrase_enabled;
+int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -70,6 +70,7 @@ void load_setttings()
   gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 1);
   gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 0);
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
+  gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 0);
 #if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 4
 #define ABS_VAL 0
 #else

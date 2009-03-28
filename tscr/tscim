@@ -13,5 +13,9 @@ export XMODIFIERS=@im=SCIM
 #leafpad
 #amsn
 #abiword
-export LD_LIBRARY_PATH=/usr/lib/firefox
-$LD_LIBRARY_PATH/mozilla-firefox-bin
+
+#export LD_LIBRARY_PATH=/usr/lib/firefox
+#$LD_LIBRARY_PATH/mozilla-firefox-bin
+
+cd ~/fm
+./freemind.sh

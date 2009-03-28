@@ -21,6 +21,7 @@ static GtkWidget *treeview;
 static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts;
 static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
        *check_button_gcin_shift_space_eng_full;
+       *check_button_gcin_init_im_enabled;
        *check_button_gcin_eng_phrase_enabled;
 
 char *pho_speaker[16];
@@ -160,6 +161,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
   save_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full)));
+
+  save_gcin_conf_int(GCIN_INIT_IM_ENABLED,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_init_im_enabled)));
 
   save_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_eng_phrase_enabled)));
@@ -466,6 +470,16 @@ void create_gtablist_window (void)
   gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client),check_button_gcin_remote_client,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client),
      gcin_remote_client);
+
+
+  GtkWidget *hbox_gcin_init_im_enabled = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_init_im_enabled, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_init_im_enabled = gtk_label_new(_("直接進入中文輸入狀態(限非XIM)"));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_init_im_enabled), label_gcin_init_im_enabled,  FALSE, FALSE, 0);
+  check_button_gcin_init_im_enabled = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_init_im_enabled),check_button_gcin_init_im_enabled,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_init_im_enabled),
+     gcin_init_im_enabled);
 
 
   GtkWidget *hbox_gcin_shift_space_eng_full = gtk_hbox_new (FALSE, 10);

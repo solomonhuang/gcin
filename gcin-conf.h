@@ -15,6 +15,7 @@
 #define GCIN_POP_UP_WIN "gcin-pop-up-win"
 #define GCIN_POP_UP_WIN_ABS_CORNER "gcin-pop-up-win-abs-corner"
 #define GCIN_INNER_FRAME "gcin-inner-frame"
+#define GCIN_INIT_IM_ENABLED "gcin-init-im-enabled"
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -108,6 +109,7 @@ extern int tsin_space_opt, tsin_tone_char_input;
 extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name;
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use;
+extern int gcin_init_im_enabled;
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char **rstr, char *default_str);

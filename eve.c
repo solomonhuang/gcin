@@ -486,6 +486,15 @@ void disp_im_half_full()
 gboolean flush_tsin_buffer();
 void reset_gtab_all();
 
+static u_int orig_caps_state;
+
+void init_state_chinese(ClientState *cs)
+{
+  cs->im_state = GCIN_STATE_CHINESE;
+  if (!cs->in_method)
+    init_in_method(default_input_method);
+}
+
 void toggle_im_enabled(u_int kev_state)
 {
 //    dbg("toggle_im_enabled\n");
@@ -494,7 +503,6 @@ void toggle_im_enabled(u_int kev_state)
     if (current_CS->in_method < 0 || current_CS->in_method > MAX_GTAB_NUM_KEY)
       p_err("err found");
 
-    static u_int orig_caps_state;
 
     if (current_CS->im_state != GCIN_STATE_DISABLED) {
       if (current_CS->in_method== 6 && (kev_state & LockMask) != orig_caps_state &&
@@ -526,12 +534,9 @@ void toggle_im_enabled(u_int kev_state)
       update_tray_icon();
 #endif
     } else {
-      current_CS->im_state = GCIN_STATE_CHINESE;
-      orig_caps_state = kev_state & LockMask;
+      init_state_chinese(current_CS);
 
-      if (!current_CS->in_method) {
-        init_in_method(default_input_method);
-      }
+      orig_caps_state = kev_state & LockMask;
 
       reset_current_in_win_xy();
 #if 1
@@ -541,10 +546,7 @@ void toggle_im_enabled(u_int kev_state)
       update_in_win_pos();
       show_in_win(current_CS);
 #endif
-#if 0
-      if (gcin_pop_up_win)
-        show_win_stautus();
-#endif
+
 #if TRAY_ENABLED
       update_tray_icon();
 #endif
@@ -927,6 +929,8 @@ int gcin_FocusIn(ClientState *cs)
   }
 
   current_CS = cs;
+
+//  dbg("current_CS %x %d %d\n", cs, cs->im_state, current_CS->im_state);
 
   if (win == focus_win) {
     if (cs->im_state != GCIN_STATE_DISABLED) {

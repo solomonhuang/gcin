@@ -89,13 +89,20 @@ void process_client_req(int fd)
   } else {
     cs = gcin_clients[fd].cs;
 
+    int new_cli = 0;
     if (!cs) {
       cs = gcin_clients[fd].cs = tzmalloc(ClientState, 1);
+      new_cli = 1;
     }
 
     cs->client_win = req.client_win;
     cs->b_gcin_protocol = TRUE;
     cs->input_style = InputStyleOverSpot;
+
+    if (gcin_init_im_enabled && new_cli) {
+      current_CS = cs;
+      init_state_chinese(cs);
+    }
   }
 
   if (!cs)
@@ -112,7 +119,7 @@ void process_client_req(int fd)
     case GCIN_req_key_press:
     case GCIN_req_key_release:
       current_CS = cs;
-#if 0
+#if DBG && 0
       {
         char tt[128];
 
@@ -122,7 +129,7 @@ void process_client_req(int fd)
           strcpy(tt, XKeysymToString(req.keyeve.key));
         }
 
-//        dbg_time("GCIN_key_press  %x %s\n", cs, tt);
+        dbg_time("GCIN_key_press  %x %s\n", cs, tt);
       }
 #endif
       to_gcin_endian_4(&req.keyeve.key);

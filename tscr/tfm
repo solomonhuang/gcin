@@ -1,0 +1,11 @@
+#!/bin/bash
+export PATH=.:$PATH
+export GCIN_TABLE_DIR=../data
+echo "GCIN_TABLE_DIR=$GCIN_TABLE_DIR"
+export GCIN_IM_CLIENT_NO_AUTO_EXEC=
+pkill gcin.test
+export LC_ALL=zh_TW.UTF-8
+export XMODIFIERS=@im=gcin_test
+../gcin.test &
+cd ~/fm
+./freemind.sh 2>/dev/null

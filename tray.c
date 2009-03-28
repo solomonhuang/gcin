@@ -30,6 +30,8 @@ static void draw_icon()
 #if 0
   return;
 #endif
+  if (!da)
+    return;
 
   GdkPixbuf *pix =  !current_CS ||
     (current_CS->im_state == GCIN_STATE_DISABLED||current_CS->im_state == GCIN_STATE_ENG_FULL) ?
@@ -220,6 +222,9 @@ gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
 
 gboolean create_tray()
 {
+  if (da)
+    return;
+
   EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
 
   if (!tray_icon)

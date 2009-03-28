@@ -81,7 +81,6 @@ static IC
 
     bzero(rec, sizeof(IC));
     rec->cs.input_style = InputStyleOverSpot;
-
     rec->id = ++icid;
 
     rec->next = ic_list;
