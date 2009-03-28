@@ -44,10 +44,12 @@ void start_inmd_window()
       create_win_pho();
       xim_arr[0].xim_xwin = xwin_pho;
       break;
+#if USE_TSIN
     case 6:
       create_win0();
       xim_arr[0].xim_xwin = xwin0;
       break;
+#endif
     default:
       create_win_gtab();
       xim_arr[0].xim_xwin = xwin_gtab;

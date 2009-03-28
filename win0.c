@@ -26,7 +26,7 @@ static struct {
 
 static GtkWidget *button_pho;
 static GtkWidget *label_pho;
-static char text_pho[6][CH_SZ];
+extern char text_pho[];
 extern int text_pho_N;
 static GtkWidget *button_eng_ph;
 static int max_yl;
@@ -56,18 +56,7 @@ void change_win0_style()
   recreate_win0();
 }
 
-void set_label_font_size(GtkWidget *label, int size)
-{
-  if (!label)
-    return;
-
-  PangoContext *pango_context = gtk_widget_get_pango_context (label);
-  PangoFontDescription* font=pango_context_get_font_description
-       (pango_context);
-  pango_font_description_set_family(font, gcin_font_name);
-  pango_font_description_set_size(font, PANGO_SCALE * size);
-  gtk_widget_modify_font(label, font);
-}
+void set_label_font_size();
 
 /* there is a bug in gtk, if the widget is created and hasn't been processed by
    gtk_main(), the coodinate of the widget is sometimes invalid.
@@ -129,14 +118,9 @@ static void change_tsin_line_color()
 
 
 
-gboolean b_use_full_space = TRUE;
+extern gboolean b_use_full_space;
 
-// the width of ascii space in firefly song
-void set_label_space(GtkWidget *label)
-{
-  gtk_label_set_text(GTK_LABEL(label), "　");
-  return;
-}
+void set_label_space();
 
 
 void disp_char(int index, char *ch)
@@ -221,31 +205,7 @@ void clr_tsin_cursor(int index)
 
 
 
-void disp_pho_sub(GtkWidget *label, int index, char *pho)
-{
-  if (index>=text_pho_N)
-    return;
-
-
-  if (pho[0]==' ' && !pin_juyin) {
-    u8cpy(text_pho[index], "　");
-  }
-  else {
-    u8cpy(text_pho[index], pho);
-  }
-
-  char s[text_pho_N * CH_SZ+1];
-
-
-  int tn = 0;
-  int i;
-  for(i=0; i < text_pho_N; i++) {
-    int n = utf8cpy(s + tn, text_pho[i]);
-    tn += n;
-  }
-
-  gtk_label_set_text(label, s);
-}
+void disp_pho_sub();
 
 
 void disp_tsin_pho(int index, char *pho)
@@ -409,17 +369,7 @@ void clear_tsin_line()
   }
 }
 
-void exec_gcin_setup()
-{
-#if DEBUG
-  dbg("exec gcin\n");
-#endif
-
-  char pidstr[32];
-  sprintf(pidstr, "GCIN_PID=%d",getpid());
-  putenv(pidstr);
-  system(GCIN_BIN_DIR"/gcin-setup &");
-}
+void exec_gcin_setup();
 
 
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
@@ -440,7 +390,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 }
 
 
-char file_pin_float[] = GCIN_ICON_DIR"/pin-float16.png";
+extern char file_pin_float[];
 
 static void set_currenet_IC_pin_image_pin()
 {
@@ -478,16 +428,7 @@ static void cb_clicked_eng_ph()
   tsin_toggle_eng_ch();
 }
 
-void set_no_focus(GtkWidget *win)
-{
-  gdk_window_set_override_redirect(win->window, TRUE);
-#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 6
-  gtk_window_set_accept_focus(win, FALSE);
-#endif
-#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 6
-  gtk_window_set_focus_on_map (win, FALSE);
-#endif
-}
+void set_no_focus();
 
 
 void create_win0()
@@ -692,15 +633,7 @@ void hide_win0()
   hide_win_sym();
 }
 
-void bell()
-{
-#if 1
-  XBell(dpy, -97);
-#else
-  gdk_beep();
-#endif
-//  abort();
-}
+void bell();
 
 
 void change_tsin_font_size()

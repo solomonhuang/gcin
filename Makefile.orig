@@ -31,8 +31,6 @@ OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
 	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o
-OBJS_gcin_setup_tab=gcin-setup-tab.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
-	gcin-switch.o about.o gcin-icon.o gtab-list.o gcin-exec-script.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
@@ -79,7 +77,7 @@ im-srv = im-srv/im-srv.a
 	$(CC) $(CFLAGS) -c -fpic -o $@ $<
 
 PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
-	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge gcin-setup-tab
+	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -113,10 +111,6 @@ trad2sim:	sim2trad
 gcin-setup:     $(OBJS_gcin_steup)
 	rm -f core.*
 	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
-
-gcin-setup-tab: $(OBJS_gcin_setup_tab)
-	rm -f core.*
-	$(CC) -o $@ $(OBJS_gcin_setup_tab) $(LDFLAGS)
 
 phoa2d: $(OBJS_phoa2d)
 	$(CC) -o $@ $(OBJS_phoa2d) $(LDFLAGS)

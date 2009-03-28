@@ -7,6 +7,7 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "  --new_gtk_im=Y/N :  enable/disable new gtk im module for firefox 1.5 over-the-spot"
     echo "  --use_tray=N : disable the support of system tray, exec size is 12k smaller"
     echo "  --use_i18n=Y : enable i18n"
+    echo "  --use_tsin=N : disable Tsin input method"
     exit
 fi
 
@@ -37,6 +38,7 @@ use_xim='Y'
 new_gtk_im='Y'
 use_tray='Y'
 use_i18n='N'
+use_tsin='Y'
 
 if [ "$GCIN_USE_XIM" ]; then
   use_xim=$GCIN_USE_XIM
@@ -53,6 +55,8 @@ for opt do
   --use_tray=*) use_tray=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_i18n=*) use_i18n=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_tsin=*) use_tsin=`echo $opt | cut -d '=' -f 2`
   ;;
   esac
 done
@@ -198,6 +202,7 @@ echo "MAC_OS=$MAC_OS" >> config.mak
 echo "SO_FLAGS=$SO_FLAGS" >> config.mak
 echo "USE_TRAY=$use_tray" >> config.mak
 echo "USE_I18N=$use_i18n" >> config.mak
+echo "USE_TSIN=$use_tsin" >> config.mak
 
 
 cd menu

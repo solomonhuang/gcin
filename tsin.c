@@ -25,7 +25,8 @@ extern char tsidxfname[64];
 extern int hashidx[TSIN_HASH_N];
 
 CHPHO chpho[MAX_PH_BF_EXT];
-int c_idx, c_len;
+int c_idx;
+extern int c_len;
 int ph_sta=-1, ph_sta_last=-1;  // phrase start
 static int sel_pho;
 static gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
@@ -1180,13 +1181,7 @@ static gboolean pre_punctuation_hsu(KeySym xkey)
 gboolean inph_typ_pho(char newkey);
 
 
-gint64 current_time()
-{
-  struct timeval tval;
-
-  gettimeofday(&tval, NULL);
-  return (gint64)tval.tv_sec * 1000000 + tval.tv_usec;
-}
+gint64 current_time();
 
 static void call_tsin_parse()
 {
@@ -1196,15 +1191,7 @@ static void call_tsin_parse()
   prbuf();
 }
 
-void case_inverse(int *xkey, int shift_m)
-{
-  if (shift_m) {
-    if (islower(*xkey))
-      *xkey-=0x20;
-  } else
-  if (isupper(*xkey))
-    *xkey+=0x20;
-}
+void case_inverse();
 
 void pho_play(phokey_t key);
 

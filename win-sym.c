@@ -177,9 +177,11 @@ static void cb_button_sym(GtkButton *button, char *str)
     case 3:
        clr_in_area_pho();
        break;
+#if USE_TSIN
     case 6:
        tsin_reset_in_pho();
        break;
+#endif
     default:
        reset_gtab_all();
        break;
@@ -271,7 +273,7 @@ static void sym_lookup_key(char *instr, char *outstr)
     while (*instr) {
       char tt[512];
 
-      lookup_gtab(instr, tt);
+      lookup_gtab_out(instr, tt);
       strcat(outstr, tt);
 
       instr+= utf8_sz(instr);

@@ -115,9 +115,9 @@ static void clear_page_label()
   set_page_label("");
 }
 
-void lookup_gtabn(char *ch)
+void lookup_gtabn(char *ch, char *out)
 {
-  char out[512];
+  char outbuf[512];
   char *tbuf[128];
   int tbufN=0;
   INMD *tinmd = &inmd[default_input_method];
@@ -129,6 +129,15 @@ void lookup_gtabn(char *ch)
 
   if (!tinmd)
     return;
+
+  gboolean need_disp = FALSE;
+
+  if (!out) {
+    out = outbuf;
+    need_disp = TRUE;
+  }
+
+  out[0]=0;
 
   int i;
   for(i=0; i < tinmd->DefChars; i++) {
@@ -198,7 +207,7 @@ void lookup_gtabn(char *ch)
     free(tbuf[i]);
   }
 
-  if (!out[0])
+  if (!out[0] || !need_disp)
     return;
 
   set_key_codes_label(out);
@@ -210,7 +219,15 @@ void lookup_gtab(char *ch)
 {
   char tt[CH_SZ+1];
   utf8cpy(tt, ch);
-  lookup_gtabn(tt);
+  lookup_gtabn(tt, NULL);
+}
+
+
+void lookup_gtab_out(char *ch, char *out)
+{
+  char tt[CH_SZ+1];
+  utf8cpy(tt, ch);
+  lookup_gtabn(tt, out);
 }
 
 
@@ -636,7 +653,7 @@ static void putstr_inp(u_char *p)
 
   if (utf8_str_N(p) > 1  || p[0] < 128) {
     if (gtab_disp_key_codes && !gtab_hide_row2 || wild_mode)
-      lookup_gtabn(p);
+      lookup_gtabn(p, NULL);
 
     send_text(p);
   }

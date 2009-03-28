@@ -17,9 +17,9 @@ int start_idx, stop_idx;
 PHOKBM phkbm;
 u_char typ_pho[4];
 char inph[8];
-int text_pho_N=3;
+extern int text_pho_N;
 gboolean b_hsu_kbm;
-PIN_JUYIN *pin_juyin;
+extern PIN_JUYIN *pin_juyin;
 int pin_juyinN;
 
 
@@ -371,15 +371,14 @@ void inc_pho_count(phokey_t key, int ch_idx)
 }
 
 
-void lookup_gtab(char *ch, char out[]);
+void lookup_gtab(char *ch);
 gboolean is_gtab_query_mode();
 void set_gtab_target_displayed();
 
 void putkey_pho(u_short key, int idx)
 {
   sendkey_b5(ch_pho[idx].ch);
-  char tt[512];
-  lookup_gtab(ch_pho[idx].ch, tt);
+  lookup_gtab(ch_pho[idx].ch);
 
   inc_pho_count(key, idx);
 

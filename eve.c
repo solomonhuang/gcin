@@ -259,10 +259,12 @@ void hide_in_win(ClientState *cs)
     case 3:
       hide_win_pho();
       break;
+#if USE_TSIN
     case 6:
 //      flush_tsin_buffer();
       hide_win0();
       break;
+#endif
     case 10:
       hide_win_int();
       break;
@@ -294,9 +296,11 @@ void show_in_win(ClientState *cs)
     case 3:
       show_win_pho();
       break;
+#if USE_TSIN
     case 6:
       show_win0();
       break;
+#endif
     case 10:
       show_win_int();
       break;
@@ -341,9 +345,11 @@ void move_in_win(ClientState *cs, int x, int y)
     case 3:
       move_win_pho(x, y);
       break;
+#if USE_TSIN
     case 6:
       move_win0(x, y);
       break;
+#endif
     case 10:
       move_win_int(x, y);
       break;
@@ -466,9 +472,11 @@ void disp_im_half_full()
     case 3:
       win_pho_disp_half_full();
       break;
+#if USE_TSIN
     case 6:
       win_tsin_disp_half_full();
       break;
+#endif
     default:
       win_gtab_disp_half_full();
       break;
@@ -554,9 +562,11 @@ void update_active_in_win_geom()
     case 3:
       get_win_pho_geom();
       break;
+#if USE_TSIN
     case 6:
       get_win0_geom();
       break;
+#endif
     case 10:
       break;
     default:
@@ -642,10 +652,12 @@ gboolean init_in_method(int in_no)
       current_CS->in_method = in_no;
       init_tab_pho();
       break;
+#if USE_TSIN
     case 6:
       current_CS->in_method = in_no;
       init_tab_pp(True);
       break;
+#endif
     case 10:
       current_CS->in_method = in_no;
       init_inter_code(True);
@@ -834,8 +846,10 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   switch(current_CS->in_method) {
     case 3:
       return feedkey_pho(keysym, kev_state);
+#if USE_TSIN
     case 6:
       return feedkey_pp(keysym, kev_state);
+#endif
     case 10:
       return feedkey_intcode(keysym);
     default:
@@ -856,10 +870,12 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
   if (current_CS->im_state == GCIN_STATE_DISABLED)
     return FALSE;
 
+#if USE_TSIN
   switch(current_CS->in_method) {
     case 6:
       return feedkey_pp_release(keysym, kev_state);
   }
+#endif
 
   return FALSE;
 }

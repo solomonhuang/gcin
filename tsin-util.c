@@ -16,6 +16,7 @@ char tsidxfname[64]="";
 static int a_phcount;
 static char tsfname[64]="";
 
+#if USE_TSIN
 void load_tsin_db()
 {
   if (!tsfname[0]) {
@@ -59,8 +60,10 @@ void load_tsin_db()
   if ((fph=fopen(tsfname,"r+"))==NULL)
     p_err("Cannot open %s", tsfname);
 }
+#endif
 
 
+#if USE_TSIN
 void free_tsin()
 {
   if (fph) {
@@ -71,6 +74,7 @@ void free_tsin()
     free(phidx); phidx = NULL;
   }
 }
+#endif
 
 
 static int phseq(u_char *a, u_char *b)
@@ -183,7 +187,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t 
 
 
 int *ts_gtab;
-int ts_gtabN;
+extern int ts_gtabN;
 
 int read_tsin_phrase(char *str)
 {
@@ -226,6 +230,7 @@ static int qcmp_ts_gtab(const void *aa, const void *bb)
 }
 
 
+#if USE_TSIN
 void build_ts_gtab()
 {
   load_tsin_db();
@@ -264,6 +269,7 @@ void build_ts_gtab()
 
   free(tstmp);
 }
+#endif
 
 
 static int load_ts_gtab(int idx, char *tstr)
@@ -274,6 +280,7 @@ static int load_ts_gtab(int idx, char *tstr)
   return read_tsin_phrase(tstr);
 }
 
+#if USE_TSIN
 // len is in CH_SZ
 int find_match(char *str, int len, char *match_chars, int match_chars_max)
 {
@@ -360,6 +367,7 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
 //  dbg("%d %d\n", bottom, top);
   return 0;
 }
+#endif
 
 
 void load_tsin_entry(int idx, char *len, usecount_t *usecount, phokey_t *pho,
