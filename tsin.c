@@ -1206,6 +1206,7 @@ void case_inverse(int *xkey, int shift_m)
     *xkey+=0x20;
 }
 
+void pho_play(phokey_t key);
 
 int feedkey_pp(KeySym xkey, int kbstate)
 {
@@ -1731,6 +1732,8 @@ llll2:
      disp_pre_sel_page();
 
      key = pho2key(typ_pho);
+
+     pho_play(key);
 
      int vv=hash_pho[typ_pho[0]];
      phokey_t ttt=0xffff;

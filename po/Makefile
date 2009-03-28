@@ -5,6 +5,7 @@ all:	gmo
 gmo:
 	$(MAKE) -C en_US
 	$(MAKE) -C zh_CN
+	$(MAKE) -C zh_TW
 
 pot:
 	xgettext --from-code=UTF-8 --keyword=_ -o ./gcin.pot ../gcin-setup*.c ../about.c
@@ -12,10 +13,13 @@ pot:
 install:
 	install -d $(datadir)/locale/en_US/LC_MESSAGES
 	install -d $(datadir)/locale/zh_CN/LC_MESSAGES
+	install -d $(datadir)/locale/zh_TW/LC_MESSAGES
 	install -m 644 en_US/gcin.gmo $(datadir)/locale/en_US/LC_MESSAGES/gcin.mo
 	install -m 644 zh_CN/gcin.gmo $(datadir)/locale/zh_CN/LC_MESSAGES/gcin.mo
+	install -m 644 zh_TW/gcin.gmo $(datadir)/locale/zh_TW/LC_MESSAGES/gcin.mo
 
 clean:
 	$(MAKE) -C en_US clean
 	$(MAKE) -C zh_CN clean
+	$(MAKE) -C zh_TW clean
 	rm -f ./gcin.pot

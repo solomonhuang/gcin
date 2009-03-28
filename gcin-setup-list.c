@@ -255,7 +255,7 @@ add_columns (GtkTreeView *treeview)
   renderer = gtk_cell_renderer_pixbuf_new();
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_ICON);
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "icon", renderer,
+                                               -1, _("icon"), renderer,
                                                "pixbuf", COLUMN_ICON,
 //                                               "editable", COLUMN_EDITABLE,
                                                NULL);

@@ -145,7 +145,7 @@ ret:
   return phkeysN;
 }
 
-char *phokey_to_str(phokey_t kk)
+char *phokey_to_str2(phokey_t kk, int last_number)
 {
   u_int k1,k2,k3,k4;
   static u_char phchars[PHO_CHAR_LEN * 4 + 1];
@@ -172,11 +172,10 @@ char *phokey_to_str(phokey_t kk)
   }
 
   if (k4) {
-#if 0
-    phchars[phcharsN++] = k4 + '0';
-#else
-    phcharsN+=u8cpy(&phchars[phcharsN], &pho_chars[3][k4 * PHO_CHAR_LEN]);
-#endif
+    if (last_number)
+      phchars[phcharsN++] = k4 + '0';
+    else
+      phcharsN+=u8cpy(&phchars[phcharsN], &pho_chars[3][k4 * PHO_CHAR_LEN]);
   }
 
   phchars[phcharsN] = 0;
@@ -184,6 +183,11 @@ char *phokey_to_str(phokey_t kk)
   return phchars;
 }
 
+
+char *phokey_to_str(phokey_t kk)
+{
+  phokey_to_str2(kk, 0);
+}
 
 void str_to_all_phokey_chars(char *u8_str, char *out)
 {

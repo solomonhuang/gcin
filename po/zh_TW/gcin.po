@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-04 22:11+0000\n"
+"POT-Creation-Date: 2007-04-18 23:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,326 +16,326 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../gcin-setup-gtab.c:131
+#: ../gcin-setup-gtab.c:135
 msgid "空白鍵選項"
-msgstr "Behavior of Space key"
+msgstr "空白鍵選項"
 
-#: ../gcin-setup-gtab.c:171 ../gcin-setup.c:632
+#: ../gcin-setup-gtab.c:175 ../gcin-setup.c:632
 msgid "倉頡/行列/嘸蝦米/大易設定"
-msgstr "Settings for gtab input methods"
+msgstr "倉頡/行列/嘸蝦米/大易設定"
 
-#: ../gcin-setup-gtab.c:178
+#: ../gcin-setup-gtab.c:182
 msgid "倉頡/行列/嘸蝦米/大易"
-msgstr "gtab input methods"
+msgstr "倉頡/行列/嘸蝦米/大易"
 
-#: ../gcin-setup-gtab.c:188
+#: ../gcin-setup-gtab.c:192
 msgid "重複字選擇鈴聲"
-msgstr "Bell ring for multiple choices"
+msgstr "重複字選擇鈴聲"
 
-#: ../gcin-setup-gtab.c:200
+#: ../gcin-setup-gtab.c:204
 msgid "由詞庫自動選擇字"
-msgstr "Auto-select by Tsin's database"
+msgstr "由詞庫自動選擇字"
 
-#: ../gcin-setup-gtab.c:211
+#: ../gcin-setup-gtab.c:215
 msgid "預覽/預選 字"
-msgstr "Preview choices"
+msgstr "預覽/預選 字"
 
-#: ../gcin-setup-gtab.c:222
+#: ../gcin-setup-gtab.c:226
 msgid "按滿自動送字"
-msgstr "Auto-send when keycodes are filled"
+msgstr "按滿自動送字"
 
-#: ../gcin-setup-gtab.c:233
+#: ../gcin-setup-gtab.c:237
 msgid "預選列中顯示部份符合的字"
-msgstr "Preview keycode-partial-matched choices"
+msgstr "預選列中顯示部份符合的字"
 
-#: ../gcin-setup-gtab.c:244
+#: ../gcin-setup-gtab.c:248
 msgid "較小視窗"
-msgstr "Smaller input window"
+msgstr "較小視窗"
 
-#: ../gcin-setup-gtab.c:255
+#: ../gcin-setup-gtab.c:259
 msgid "顯示拆字"
-msgstr "Show keycodes"
+msgstr "顯示拆字"
 
-#: ../gcin-setup-gtab.c:266
+#: ../gcin-setup-gtab.c:270
 msgid "顯示輸入法名稱"
-msgstr "Show input method names"
+msgstr "顯示輸入法名稱"
 
-#: ../gcin-setup-gtab.c:277
+#: ../gcin-setup-gtab.c:281
 msgid "允許錯誤鍵進入(傳統)"
-msgstr "Tolerate wrong keycodes"
+msgstr "允許錯誤鍵進入(傳統)"
 
-#: ../gcin-setup-gtab.c:288
+#: ../gcin-setup-gtab.c:292
 msgid "Shift 用來輸入片語(Alt-Shift)"
-msgstr "Single Shift key to input Alt-Shift-phrases"
+msgstr "Shift 用來輸入片語(Alt-Shift)"
 
-#: ../gcin-setup-gtab.c:299
+#: ../gcin-setup-gtab.c:303
 msgid "隱藏第二列(輸入鍵…)"
-msgstr "Hide second row of input window"
+msgstr "隱藏第二列(輸入鍵…)"
 
-#: ../gcin-setup-gtab.c:310
+#: ../gcin-setup-gtab.c:314
 msgid "輸入鍵顯示移至第一列"
-msgstr "Move keycodes to first row of input window"
+msgstr "輸入鍵顯示移至第一列"
 
-#: ../gcin-setup-gtab.c:321
+#: ../gcin-setup-gtab.c:325
 msgid "CapsLock 打開輸入英數"
-msgstr "Toggle alphabet-numeric mode with CapsLock key"
+msgstr "CapsLock 打開輸入英數"
 
 #: ../gcin-setup-gtab.c:334
 msgid "\t用小寫字母"
-msgstr "\tUse lower case letters"
+msgstr "\t用小寫字母"
 
-#: ../gcin-setup-gtab.c:331
+#: ../gcin-setup-gtab.c:343
 msgid "垂直選擇"
-msgstr "Vertical selection window"
+msgstr "垂直選擇"
 
-#: ../gcin-setup-gtab.c:341
+#: ../gcin-setup-gtab.c:353
 msgid "唯一選擇時自動送出"
-msgstr "Auto-send when only one choice matched"
+msgstr "唯一選擇時自動送出"
 
-#: ../gcin-setup-gtab.c:349
+#: ../gcin-setup-gtab.c:361
 msgid "編輯內定輸入法的使用者外加字詞"
-msgstr "Add definitions for default input method"
+msgstr "編輯內定輸入法的使用者外加字詞"
 
 #: ../gcin-setup-list.c:250
 msgid "名稱"
-msgstr "Name"
+msgstr "名稱"
 
 #: ../gcin-setup-list.c:268
 msgid "Ctrl-Alt-數字鍵"
-msgstr "Ctrl-Alt-Toggle Key"
+msgstr "Ctrl-Alt-數字鍵"
 
 #: ../gcin-setup-list.c:277
 msgid "檔案名"
-msgstr "Filename"
+msgstr "檔案名"
 
 #: ../gcin-setup-list.c:289
 msgid "Ctrl-Shift 循環"
-msgstr "Ctrl-Shift selections"
+msgstr "Ctrl-Shift 循環"
 
 #: ../gcin-setup-list.c:302
 msgid "第一次內定"
-msgstr "Default"
+msgstr "第一次內定"
 
 #: ../gcin-setup-list.c:347
 msgid "輸入視窗(開啟/關閉)切換"
-msgstr "Toggle input window"
+msgstr "輸入視窗(開啟/關閉)切換"
 
 #: ../gcin-setup-list.c:381
 msgid "輸入法選擇"
-msgstr "Select input methods"
+msgstr "輸入法選擇"
 
 #: ../gcin-setup-list.c:394
 msgid "gcin 輸入法選擇"
-msgstr "Select input methods for gcin"
+msgstr "gcin 輸入法選擇"
 
 #: ../gcin-setup-list.c:425
 msgid "遠端 client 程式支援 (port 9999-)"
-msgstr "Remote client support (port 9999-)"
+msgstr "遠端 client 程式支援 (port 9999-)"
 
 #: ../gcin-setup-list.c:435
 msgid "shift-space 進入全形英文模式"
-msgstr "Toggle half-/double-width with Shift-Space"
+msgstr "shift-space 進入全形英文模式"
 
-#: ../gcin-setup-pho.c:205 ../gcin-setup-pho.c:477
+#: ../gcin-setup-pho.c:209 ../gcin-setup-pho.c:492
 msgid "詞音標示詞的底線顏色"
-msgstr "Underline color of selected phrases"
+msgstr "詞音標示詞的底線顏色"
 
-#: ../gcin-setup-pho.c:244 ../gcin-setup-pho.c:490
+#: ../gcin-setup-pho.c:248 ../gcin-setup-pho.c:505
 msgid "詞音游標的顏色"
-msgstr "Tsin's cursor color"
+msgstr "詞音游標的顏色"
 
-#: ../gcin-setup-pho.c:314 ../gcin-setup.c:622
+#: ../gcin-setup-pho.c:318 ../gcin-setup.c:622
 msgid "gcin 注音/詞音設定"
-msgstr "Settings for Bopomofo and Tsin"
+msgstr "gcin 注音/詞音設定"
 
-#: ../gcin-setup-pho.c:320
+#: ../gcin-setup-pho.c:324
 msgid "鍵盤排列方式"
-msgstr "Keymap selections"
+msgstr "鍵盤排列方式"
 
-#: ../gcin-setup-pho.c:327
+#: ../gcin-setup-pho.c:331
 msgid "詞音輸入[中/英]切換"
-msgstr "Toggle alphabet-numeric mode in Tsin"
+msgstr "詞音輸入[中/英]切換"
 
-#: ../gcin-setup-pho.c:354
+#: ../gcin-setup-pho.c:358
 msgid "詞音輸入空白鍵選項"
-msgstr "Behavior of Space key in Tsin"
+msgstr "詞音輸入空白鍵選項"
 
-#: ../gcin-setup-pho.c:382
+#: ../gcin-setup-pho.c:386
 msgid "詞音輸入預選詞視窗"
-msgstr "Enable preselection window in Tsin"
+msgstr "詞音輸入預選詞視窗"
 
-#: ../gcin-setup-pho.c:392
+#: ../gcin-setup-pho.c:396
 msgid "依使用頻率調整字的順序"
-msgstr "Resorting choices by user's usage frequency"
+msgstr "依使用頻率調整字的順序"
 
-#: ../gcin-setup-pho.c:402
+#: ../gcin-setup-pho.c:406
 msgid "詞音/注音精簡視窗"
-msgstr "Smaller input window for Tsin and Bopomofo"
+msgstr "詞音/注音精簡視窗"
 
-#: ../gcin-setup-pho.c:412
+#: ../gcin-setup-pho.c:416
 msgid "注音隱藏第二列(按鍵顯示)"
-msgstr "Hide second row of Bopomofo's window"
+msgstr "注音隱藏第二列(按鍵顯示)"
 
-#: ../gcin-setup-pho.c:422
+#: ../gcin-setup-pho.c:426
 msgid "注音輸入顯示移至第一列"
-msgstr "Move keycodes to first row of Bopomofo's window"
+msgstr "注音輸入顯示移至第一列"
 
-#: ../gcin-setup-pho.c:432
+#: ../gcin-setup-pho.c:436
 msgid "使用巨大 UTF-8 字集"
-msgstr "Enable more UTF-8 characters"
+msgstr "使用巨大 UTF-8 字集"
 
-#: ../gcin-setup-pho.c:442
+#: ../gcin-setup-pho.c:446
 msgid "詞音輸入注音聲調符號"
-msgstr "Enable tone symbols in Tsin"
+msgstr "詞音輸入注音聲調符號"
 
-#: ../gcin-setup-pho.c:452
+#: ../gcin-setup-pho.c:456
 msgid "詞音/Escape Tab 斷詞"
-msgstr "Break sentence with Escape/Tab key"
+msgstr "詞音/Escape Tab 斷詞"
 
-#: ../gcin-setup-pho.c:461
+#: ../gcin-setup-pho.c:465
 msgid "同音字詞選擇按鍵在後"
-msgstr "Show selection key behind choices"
+msgstr "同音字詞選擇按鍵在後"
 
 #: ../gcin-setup-pho.c:475
 msgid "Capslock英數用小寫"
-msgstr "Alphabet-numeric mode uses lower case letters"
+msgstr "Capslock英數用小寫"
 
-#: ../gcin-setup-pho.c:468
+#: ../gcin-setup-pho.c:483
 msgid "詞音編輯緩衝區大小"
-msgstr "Tsin's buffer size"
+msgstr "詞音編輯緩衝區大小"
 
 #: ../gcin-setup.c:98
 msgid "請輸入要匯出的檔案名稱"
-msgstr "Please input filename for exporting data"
+msgstr "請輸入要匯出的檔案名稱"
 
 #: ../gcin-setup.c:138
 msgid "請輸入要匯入的檔案名稱"
-msgstr "Please input filename for importing data"
+msgstr "請輸入要匯入的檔案名稱"
 
 #: ../gcin-setup.c:366
 msgid "輸入視窗外觀設定"
-msgstr "Settings for input windows"
+msgstr "輸入視窗外觀設定"
 
 #: ../gcin-setup.c:374
 msgid "字型大小"
-msgstr "Font size"
+msgstr "字型大小"
 
 #: ../gcin-setup.c:384
 msgid "符號選擇視窗字型大小"
-msgstr "Font size of symbols window"
+msgstr "符號選擇視窗字型大小"
 
 #: ../gcin-setup.c:394
 msgid "詞音預選詞視窗字型大小"
-msgstr "Font size of Tsin's preselection window"
+msgstr "詞音預選詞視窗字型大小"
 
 #: ../gcin-setup.c:404
 msgid "詞音注音輸入區字型大小"
-msgstr "Font size of keycodes for Bopomofo and Tsin"
+msgstr "詞音注音輸入區字型大小"
 
 #: ../gcin-setup.c:414
 msgid "詞音近似音顯示字型大小"
-msgstr "Font size of similar phonetic choices"
+msgstr "詞音近似音顯示字型大小"
 
 #: ../gcin-setup.c:424
 msgid "gtab(倉頡…)輸入區字型大小"
-msgstr "Font size of keycodes for gtab"
+msgstr "gtab(倉頡…)輸入區字型大小"
 
 #: ../gcin-setup.c:440
 msgid "彈出式輸入視窗"
-msgstr "Dynamic pop-up input window"
+msgstr "彈出式輸入視窗"
 
 #: ../gcin-setup.c:447
 msgid "固定 gcin 視窗位置"
-msgstr "Fixed input window"
+msgstr "固定 gcin 視窗位置"
 
 #: ../gcin-setup.c:455 ../gcin-setup.c:505
 msgid "使用"
-msgstr "Enable"
+msgstr "使用"
 
 #: ../gcin-setup.c:479
 msgid "顯示內框"
-msgstr "Show frame of input window"
+msgstr "顯示內框"
 
 #: ../gcin-setup.c:489
 msgid "面板狀態(tray)"
-msgstr "System tray support"
+msgstr "面板狀態(tray)"
 
 #: ../gcin-setup.c:497
 msgid "顏色選擇"
-msgstr "Color selection"
+msgstr "顏色選擇"
 
 #: ../gcin-setup.c:513
 msgid "測試目前狀態"
-msgstr "Preview"
+msgstr "測試目前狀態"
 
 #: ../gcin-setup.c:517
 msgid "前景顏色"
-msgstr "Foreground color"
+msgstr "前景顏色"
 
 #: ../gcin-setup.c:527
 msgid "背景顏色"
-msgstr "Background color"
+msgstr "背景顏色"
 
 #: ../gcin-setup.c:627
 msgid "外觀設定"
-msgstr "Appearance Settings"
+msgstr "外觀設定"
 
 #: ../gcin-setup.c:638
 msgid "內定輸入法 & 開啟/關閉"
-msgstr "Default input method and toggle key"
+msgstr "內定輸入法 & 開啟/關閉"
 
 #: ../gcin-setup.c:645
 msgid "alt-shift 片語編輯"
-msgstr "Edit Alt-Shift phrases"
+msgstr "alt-shift 片語編輯"
 
 #: ../gcin-setup.c:650
 msgid "符號表編輯"
-msgstr "Edit symbols"
+msgstr "符號表編輯"
 
 #: ../gcin-setup.c:655
 msgid "簡體字輸出切換"
-msgstr "Toggle Traditional Chinese to Simplified Chinese conversion"
+msgstr "簡體字輸出切換"
 
 #: ../gcin-setup.c:660
 msgid "剪貼區 簡體字->正體字"
-msgstr "Convert clipboard's Simplified Chinese to Traditional Chinese"
+msgstr "剪貼區 簡體字->正體字"
 
 #: ../gcin-setup.c:665
 msgid "剪貼區 注音查詢"
-msgstr "Lookup phonations of words in clipboard"
+msgstr "剪貼區 注音查詢"
 
 #: ../gcin-setup.c:671
 msgid "詞庫選項"
-msgstr "Options for Tsin's database"
+msgstr "詞庫選項"
 
 #: ../gcin-setup.c:680
 msgid "詞庫匯出"
-msgstr "Export phrase database"
+msgstr "詞庫匯出"
 
 #: ../gcin-setup.c:685
 msgid "詞庫匯入"
-msgstr "Import phrase database"
+msgstr "詞庫匯入"
 
 #: ../gcin-setup.c:690
 msgid "詞庫編輯"
-msgstr "Edit phrase database"
+msgstr "詞庫編輯"
 
 #: ../gcin-setup.c:695
 msgid "讓詞音從文章學習詞"
-msgstr "Learn phrases in articles"
+msgstr "讓詞音從文章學習詞"
 
 #: ../gcin-setup.c:700
 msgid "匯入系統的詞庫"
-msgstr "Import global database"
+msgstr "匯入系統的詞庫"
 
 #: ../gcin-setup.c:705 ../about.c:39
 msgid "關於 gcin"
-msgstr "About gcin"
+msgstr "關於 gcin"
 
 #: ../gcin-setup.c:719
 msgid "結束 gcin"
-msgstr "Disable gcin server"
+msgstr "結束 gcin"
 
 #: ../about.c:83
 msgid "關閉"
-msgstr "Close"
+msgstr "關閉"

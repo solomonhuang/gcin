@@ -31,6 +31,8 @@ int tsin_phrase_pre_select, tsin_tone_char_input;
 int tsin_capslock_upper;
 int phonetic_char_dynamic_sequence;
 int phonetic_huge_tab;
+int phonetic_speak;
+char *phonetic_speak_sel;
 int tsin_chinese_english_toggle_key;
 int gcin_font_size_tsin_pho_in;
 int pho_simple_win;
@@ -117,6 +119,8 @@ void load_setttings()
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);
+  phonetic_speak = get_gcin_conf_int(PHONETIC_SPEAK, 0);
+  get_gcin_conf_str(PHONETIC_SPEAK_SEL, &phonetic_speak_sel, "1");
 
   pho_hide_row2 = get_gcin_conf_int(PHO_HIDE_ROW2, 0);
   pho_in_row1 = get_gcin_conf_int(PHO_IN_ROW1, 1);

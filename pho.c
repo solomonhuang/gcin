@@ -616,6 +616,8 @@ llll3:
   if (!key)
     return 1;
 
+  pho_play(key);
+
   vv=hash_pho[typ_pho[0]];
   phokey_t ttt=0xffff;
 

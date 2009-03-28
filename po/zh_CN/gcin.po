@@ -80,6 +80,10 @@ msgstr "输入键显示移至第一列"
 msgid "CapsLock 打開輸入英數"
 msgstr "CapsLock 打开输入英数"
 
+#: ../gcin-setup-gtab.c:334
+msgid "\t用小寫字母"
+msgstr "\t用小写字母"
+
 #: ../gcin-setup-gtab.c:331
 msgid "垂直選擇"
 msgstr "垂直选择"
@@ -191,6 +195,10 @@ msgstr "智能拼音/Escape Tab 断词"
 #: ../gcin-setup-pho.c:461
 msgid "同音字詞選擇按鍵在後"
 msgstr "同音字词选择按键在后"
+
+#: ../gcin-setup-pho.c:475
+msgid "Capslock英數用小寫"
+msgstr "Capslock英数用小写"
 
 #: ../gcin-setup-pho.c:468
 msgid "詞音編輯緩衝區大小"

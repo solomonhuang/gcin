@@ -11,7 +11,7 @@ gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o
 GCIN_SO= gcin1.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
-     gcin-switch.o gcin-exec-script.o $(GCIN_SO) \
+     gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o \
      $(gcin_tsin_o) $(gcin_pho_o) $(gcin_gtab_o)
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
@@ -39,7 +39,9 @@ OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 
 #WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
-        -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
+        -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" \
+        -DGCIN_OGG_DIR=\"$(GCIN_OGG_DIR)\" \
+        -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
         -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS)
@@ -78,7 +80,9 @@ all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C im-client
 	$(MAKE) -C gtk-im
+ifeq ($(USE_I18N),Y)
 	$(MAKE) -C po
+endif
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)

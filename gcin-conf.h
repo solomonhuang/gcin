@@ -66,6 +66,8 @@
 #define PHONETIC_KEYBOARD "phonetic-keyboard"
 #define PHONETIC_CHAR_DYNAMIC_SEQUENCE "phonetic-char-dynamic-sequence"
 #define PHONETIC_HUGE_TAB "phonetic-huge-tab"
+#define PHONETIC_SPEAK "phonetic-speak"
+#define PHONETIC_SPEAK_SEL "phonetic-speak-sel"
 
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
@@ -74,9 +76,7 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
-           gcin_capslock_lower,
-           pho_hide_row2,
-           pho_in_row1;
+           gcin_capslock_lower, pho_hide_row2, pho_in_row1;
 
 extern int default_input_method;
 extern int left_right_button_tips;
@@ -99,7 +99,8 @@ extern int tsin_chinese_english_toggle_key;
 extern int tsin_tab_phrase_end, tsin_tail_select_key;
 
 extern int phonetic_char_dynamic_sequence;
-extern int phonetic_huge_tab;
+extern int phonetic_huge_tab, phonetic_speak;
+extern char *phonetic_speak_sel;
 extern int tsin_space_opt, tsin_tone_char_input;
 
 extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name;

@@ -62,9 +62,11 @@ void create_about_window()
     GtkWidget *separator = gtk_hseparator_new ();
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
+    char tt[512];
+
     GtkWidget *label_sf = gtk_label_new (
-"http://www.csie.nctu.edu.tw/~cp76/gcin\n"
-"bug tracking http://cle.linux.org.tw/gcin");
+strcat(strcat(strcpy(tt, "http://www.csie.nctu.edu.tw/~cp76/gcin\n"),
+_("bug tracking")), " http://cle.linux.org.tw/gcin"));
     gtk_label_set_selectable(GTK_LABEL(label_sf), TRUE);
 
     gtk_box_pack_start(GTK_BOX(vbox), label_sf, FALSE, FALSE, 0);
