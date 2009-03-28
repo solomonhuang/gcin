@@ -22,7 +22,9 @@ Mandrake
 ---------------------
 Fedora rpms
 
-ftp://cle.linux.org.tw/apt/heidelberg/Fedora/RPMS.cle/
+gcin 的 FC3 FC4 FC5 FC6(Development) 等版本，都已經正式進入 Fedora Extras 了
+因此，直接使用 'yum install gcin' 即可                                      
+至於 REHL4 的 rpm 則仍可在 gcin 同好會的下載情報區裡下載
 -------------------
 gcin 論壇
 http://cle.linux.org.tw/gcin

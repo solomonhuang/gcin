@@ -324,8 +324,6 @@ gboolean pho_has_input();
 void show_win_pho()
 {
 //  dbg("show_win_pho\n");
-  GtkWindow *owin = gwin_pho;
-
   create_win_pho();
   create_win_pho_gui();
 
@@ -333,7 +331,7 @@ void show_win_pho()
     return;
 
   gtk_widget_show(gwin_pho);
-  if (current_CS->b_raise_window && owin)
+  if (current_CS->b_raise_window)
     gtk_window_present(gwin_pho);
 
   show_win_sym();

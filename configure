@@ -31,7 +31,8 @@ fi
 
 prefix="/usr/local"
 use_xim='Y'
-new_gtk_im='N'
+#new_gtk_im='N'
+new_gtk_im='Y'
 
 if [ "$GCIN_USE_XIM" ]; then
   use_xim=$GCIN_USE_XIM
@@ -107,7 +108,7 @@ fi
 bindir=$prefix/bin
 datadir=$prefix/share
 mandir=$datadir/man
-libdir=$prefix/lib
+libdir=$prefix/$LIB
 includedir=$prefix/include
 optdir=/opt
 GCIN_VERSION=`cat VERSION.gcin`

@@ -292,7 +292,8 @@ void open_xim()
             IMOnKeysList, &triggerKeys,
   //        IMOffKeysList, &triggerKeys,
             NULL)) == NULL) {
-            p_err("IMOpenIM failed. Maybe another XIM server is running.\n");
+            p_err("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
+            xim_arr[i].xim_server_name);
     }
   }
 }

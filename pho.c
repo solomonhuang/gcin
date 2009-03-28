@@ -406,15 +406,16 @@ void load_tab_pho_file()
   FILE *fr;
   char phokbm_name[MAX_GCIN_STR];
 
-  get_gcin_conf_str(PHONETIC_KEYBOARD, phokbm_name, "zo");
+  get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm_name, "zo-asdf");
   if (strcmp(phokbm_name, "hsu"))
     b_hsu_kbm = FALSE;
   else
     b_hsu_kbm = TRUE;
 
-  dbg("pho kbm: %s\n", phokbm_name);
-
   strcat(phokbm_name, ".kbm");
+
+  dbg("phokbm_name:%s\n", phokbm_name);
+
   get_sys_table_file_name(phokbm_name, kbmfname);
 
   if ((fr=fopen(kbmfname,"r"))==NULL) {
@@ -423,13 +424,6 @@ void load_tab_pho_file()
 
   fread(&phkbm,sizeof(phkbm),1,fr);
   fclose (fr);
-
-#if     0
-  dbg("ooo\n");
-  for(i=0;i<128;i++)
-  if (phkbm.phokbm[i][0].num)
-    dbg("kbm %c %d %d\n", i, phkbm.phokbm[i][0].num, phkbm.phokbm[i][1].typ);
-#endif
 }
 
 

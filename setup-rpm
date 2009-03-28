@@ -10,10 +10,10 @@ sed -e "s~YOUR_HOME_DIR~$HOME~" > .rpmmacros << END2
 %_topdir                YOUR_HOME_DIR/rpm
 %_tmppath               YOUR_HOME_DIR/rpm/tmp
 %_signature             gpg
-%_gpg_name              Mandrakelinux
+%_gpg_name              Mdklinux
 %_gpg_path              ~/.gnupg
-%distribution           Mandrakelinux
-%vendor                 Mandrakesoft
+%distribution           Mdklinux
+%vendor                 gcin
 END2
 
 mkdir rpm

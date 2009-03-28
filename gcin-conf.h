@@ -93,10 +93,11 @@ extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;
 extern int tsin_space_opt, tsin_tone_char_input;
 
-extern char tsin_phrase_line_color[], tsin_cursor_color[], gcin_font_name[];
+extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name;
 
 void get_gcin_user_fname(char *name, char fname[]);
-void get_gcin_conf_str(char *name, char rstr[], char *default_str);
+void get_gcin_conf_str(char *name, char **rstr, char *default_str);
+void get_gcin_conf_fstr(char *name, char rstr[], char *default_str);
 void save_gcin_conf_str(char *name, char *str);
 void save_gcin_conf_int(char *name, int val);
 void load_setttings();

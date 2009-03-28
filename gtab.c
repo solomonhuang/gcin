@@ -88,12 +88,16 @@ void lookup_gtab(char *ch, char out[])
 {
   char *tbuf[32];
   int tbufN=0;
+  INMD *tinmd = &inmd[default_input_method];
 
-  if (!cur_inmd)
+  if (!tinmd->DefChars)
+    tinmd = cur_inmd;
+
+  if (!tinmd)
     return;
 
   int i;
-  for(i=0; i < cur_inmd->DefChars; i++) {
+  for(i=0; i < tinmd->DefChars; i++) {
     char *chi = tblch(i);
 
     if (!(chi[0] & 0x80))
@@ -101,7 +105,7 @@ void lookup_gtab(char *ch, char out[])
     if (!utf8_eq(chi, ch))
       continue;
 
-    u_int64_t key = CONVT2(cur_inmd, i);
+    u_int64_t key = CONVT2(tinmd, i);
 
     int j;
 
@@ -118,14 +122,14 @@ void lookup_gtab(char *ch, char out[])
       int len;
       char *keyname;
 
-      if (cur_inmd->keyname_lookup) {
+      if (tinmd->keyname_lookup) {
         len = 1;
-        keyname = &cur_inmd->keyname_lookup[k];
+        keyname = &tinmd->keyname_lookup[k];
       } else {
-        keyname = &cur_inmd->keyname[k * CH_SZ];
+        keyname = &tinmd->keyname[k * CH_SZ];
         len = (*keyname & 0x80) ? utf8_sz(keyname) : strlen(keyname);
       }
-//      dbg("uuuuuuuuuuuu %d %x len:%d\n", k, cur_inmd->keyname[k], len);
+//      dbg("uuuuuuuuuuuu %d %x len:%d\n", k, tinmd->keyname[k], len);
       memcpy(&t[tlen], keyname, len);
       tlen+=len;
     }
@@ -985,7 +989,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
 
 shift_proc:
-  if ((kbstate & ShiftMask) && key!='*' && (key!='?' || gtab_shift_phrase_key && !ci)) {
+  if ((kbstate & ShiftMask) && !strchr(cur_inmd->selkey, key) &&
+       key!='*' && (key!='?' || gtab_shift_phrase_key && !ci)) {
     if (gtab_shift_phrase_key)
       return feed_phrase(key, kbstate);
     else

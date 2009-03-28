@@ -35,12 +35,12 @@ int tsin_buffer_size;
 int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
-char tsin_phrase_line_color[16];
-char tsin_cursor_color[16];
+char *tsin_phrase_line_color;
+char *tsin_cursor_color;
 int tsin_tab_phrase_end;
 int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 int gcin_inner_frame;
-char gcin_font_name[64];
+char *gcin_font_name;
 #if TRAY_ENABLED
 int gcin_status_tray;
 #endif
@@ -52,7 +52,7 @@ int get_gcin_conf_int(char *name, int default_value);
 void load_setttings()
 {
   gcin_font_size = get_gcin_conf_int(GCIN_FONT_SIZE, 16);
-  get_gcin_conf_str(GCIN_FONT_NAME, gcin_font_name, "sans");
+  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "sans");
   gcin_font_size_tsin_presel = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PRESEL, 16);
   gcin_font_size_symbol = get_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, 12);
   gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
@@ -113,6 +113,6 @@ void load_setttings()
   pho_hide_row2 = get_gcin_conf_int(PHO_HIDE_ROW2, 0);
   pho_in_row1 = get_gcin_conf_int(PHO_IN_ROW1, 1);
 
-  get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, tsin_phrase_line_color, "blue");
-  get_gcin_conf_str(TSIN_CURSOR_COLOR, tsin_cursor_color, "blue");
+  get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, &tsin_phrase_line_color, "blue");
+  get_gcin_conf_str(TSIN_CURSOR_COLOR, &tsin_cursor_color, "blue");
 }

@@ -31,14 +31,12 @@ void send_text_call_back(char *text)
 
 
 ClientState *current_CS;
-static ClientState temp_CS;
+ClientState temp_CS;
 
 gboolean init_in_method(int in_no);
 
-char *output_buffer;
+char *output_buffer, *output_buffer_bak;
 int output_bufferN;
-static *output_buffer_raw, *output_buffer_raw_bak;
-static int output_buffer_rawN;
 
 void clear_output_buffer()
 {
@@ -46,13 +44,9 @@ void clear_output_buffer()
     output_buffer[0] = 0;
   output_bufferN = 0;
 
-  char *t = output_buffer_raw;
-  output_buffer_raw = output_buffer_raw_bak;
-  output_buffer_raw_bak = t;
-
-  if (output_buffer_raw)
-    output_buffer_raw[0] = 0;
-  output_buffer_rawN = 0;
+  char *t = output_buffer;
+  output_buffer = output_buffer_bak;
+  output_buffer_bak = t;
 }
 
 gboolean gb_output = FALSE;
@@ -71,56 +65,20 @@ static void append_str(char **buf, int *bufN, char *text, int len)
   *bufN += len;
 }
 
+
+
 void send_text(char *text)
 {
   if (!text)
     return;
   int len = strlen(text);
 
-  append_str(&output_buffer_raw, &output_buffer_rawN, text, len);
-
-  char *utf8_gbtext = NULL;
-
-  if (gb_output) {
-    u_int rn = 0 , wn = 0;
-    GError *err = NULL;
-    char *big5 = g_convert(text, len, "big5", "UTF-8", &rn, &wn, &err);
-
-    if (err) {
-      dbg("utf8 -> gb  convert error %d %d\n", rn, wn);
-      return;
-    }
-
-    err = NULL;
-    char *gbtext = g_convert(big5, wn, "GB2312", "big5", &rn, &wn, &err);
-    g_free(big5);
-
-    if (err) {
-      dbg("big5 -> gb  convert error %d %d\n", rn, wn);
-      return;
-    }
-
-    err = NULL;
-    utf8_gbtext = g_convert(gbtext, wn, "UTF-8", "GB2312", &rn, &wn, &err);
-    g_free(gbtext);
-
-    if (err) {
-      dbg("gb -> utf8  convert error %d %d\n", rn, wn);
-      return;
-    }
-
-    text = utf8_gbtext;
-    len = wn;
-  }
-
   append_str(&output_buffer, &output_bufferN, text, len);
-
-  g_free(utf8_gbtext);
 }
 
 void send_output_buffer_bak()
 {
-  send_text(output_buffer_raw_bak);
+  send_text(output_buffer_bak);
 }
 
 void sendkey_b5(char *bchar)
@@ -133,6 +91,42 @@ void sendkey_b5(char *bchar)
 
   send_text(tt);
 }
+
+static char *utf8_gbtext = NULL;
+
+void gb_output_proc()
+{
+  if (gb_output) {
+    u_int rn = 0 , wn = 0;
+    GError *err = NULL;
+    int len = strlen(output_buffer);
+    char *big5 = g_convert(output_buffer, len, "big5", "UTF-8", &rn, &wn, &err);
+
+    if (err) {
+      dbg("utf8 -> gb  convert error %d %d\n", rn, wn);
+      return NULL;
+    }
+
+    err = NULL;
+    char *gbtext = g_convert(big5, wn, "GB2312", "big5", &rn, &wn, &err);
+    g_free(big5);
+
+    if (err) {
+      dbg("big5 -> gb  convert error %d %d\n", rn, wn);
+      return NULL;
+    }
+
+    err = NULL;
+    utf8_gbtext = g_convert(gbtext, wn, "UTF-8", "GB2312", &rn, &wn, &err);
+    g_free(gbtext);
+
+    if (err) {
+      dbg("gb -> utf8  convert error %d %d\n", rn, wn);
+      return NULL;
+    }
+  }
+}
+
 
 #if USE_XIM
 void export_text_xim()

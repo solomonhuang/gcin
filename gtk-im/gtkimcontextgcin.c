@@ -371,9 +371,10 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
       keysym, xevent.state, &rstr);
 
 #if NEW_GTK_IM
-    // this one is for mozilla
-    if (context_xim->is_mozilla && (rstr || !result))
+    // this one is for mozilla, I know it is very dirty
+    if (context_xim->is_mozilla && (rstr || !result)) {
       add_cursor_timeout(context_xim);
+    }
 #endif
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f
         && !(xevent.state & (Mod1Mask|ControlMask))) {

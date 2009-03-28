@@ -135,15 +135,16 @@ static void callback_button_clicked_tsin_space_opt( GtkWidget *widget, gpointer 
 static int get_current_kbm_idx()
 {
   char kbm_str[32];
-  get_gcin_conf_str("phonetic-keyboard", kbm_str, "zo");
+  get_gcin_conf_fstr(PHONETIC_KEYBOARD, kbm_str, "zo-asdf");
 
-  int i;
+  int i, rval;
   for(i=0; kbm_sel[i].kbm; i++)
-    if (!strcmp(kbm_sel[i].kbm, kbm_str))
+    if (!strcmp(kbm_sel[i].kbm, kbm_str)) {
       return i;
+    }
 
   p_err("phonetic-keyboard->%s is not valid", kbm_str);
-  return -1;
+  return 0;
 }
 
 static int get_currnet_eng_ch_sw_idx()

@@ -1,0 +1,3 @@
+Xnest :20 &
+export DISPLAY=:20
+firefox

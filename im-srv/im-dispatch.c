@@ -136,9 +136,13 @@ void process_client_req(int fd)
         status = ProcessKeyRelease(req.keyeve.key, req.keyeve.state);
       }
 
-      if (status) {
+      if (status)
         reply.flag |= GCIN_reply_key_processed;
-      }
+#if 0
+      if (cs->im_state == GCIN_STATE_DISABLED)
+        reply.flag |= GCIN_reply_key_state_disabled;
+#endif
+//      dbg("srv flag %x\n", reply.flag);
 
       int datalen = reply.datalen =
         output_bufferN ? output_bufferN + 1 : 0; // include '\0'
@@ -176,7 +180,7 @@ void process_client_req(int fd)
     case GCIN_req_set_flags:
       if (BITON(req.flag, FLAG_GCIN_client_handle_raise_window)) {
         cs->b_raise_window = TRUE;
-        dbg("********* raise * window\n");
+//        dbg("********* raise * window\n");
       }
       break;
     default:

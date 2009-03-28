@@ -11,12 +11,7 @@ static GdkGC *gc;
 
 static char gcin_icon[]=GCIN_ICON_DIR"/gcin-tray.png";
 static char pixbuf_ch_fname[128];
-
-static void
-cb_pref ()
-{
-  system(GCIN_BIN_DIR"/gcin-setup &");
-}
+void exec_gcin_setup();
 
 void toggle_gb_output();
 extern gboolean gb_output;
@@ -144,7 +139,7 @@ struct {
   char *stock_id;
   void (*cb)();
 } mitems[] = {
-  {"設定", GTK_STOCK_PREFERENCES, cb_pref},
+  {"設定", GTK_STOCK_PREFERENCES, exec_gcin_setup},
   {"正->簡體", NULL, cb_trad2sim},
   {"簡->正體", NULL, cb_sim2trad},
 };

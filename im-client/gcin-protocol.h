@@ -10,9 +10,6 @@ typedef enum {
   GCIN_req_set_flags = 0x20
 } GCIN_req_t;
 
-enum {
-  GCIN_flag_has_key_release = 1,
-};
 
 typedef struct {
 #if 0
@@ -48,6 +45,7 @@ typedef struct {
 
 enum {
   GCIN_reply_key_processed = 1,
+  GCIN_reply_key_state_disabled = 2,
 };
 
 

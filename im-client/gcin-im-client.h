@@ -40,6 +40,10 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle,
 int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr);
+// return some state bits instead of TRUE/FALSE
+int gcin_im_client_forward_key_press2(GCIN_client_handle *handle,
+                                          KeySym key, u_int state,
+                                          char **rstr);
 int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr);

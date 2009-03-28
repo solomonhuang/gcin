@@ -11,19 +11,18 @@
 #include "IMdkit.h"
 #include "Xi18n.h"
 
-
-/* change 3 to 4 if you want to use 4-byte UTF-8 characters, but you must
-   regenerate *.gtab tsin
-*/
-#define CH_SZ (4)
-
-
 typedef enum {
   GCIN_STATE_DISABLED = 0,
   GCIN_STATE_ENG_FULL = 1,
   GCIN_STATE_CHINESE = 2
 } GCIN_STATE_E;
 
+
+
+/* change 3 to 4 if you want to use 4-byte UTF-8 characters, but you must
+   regenerate *.gtab tsin
+*/
+#define CH_SZ (4)
 
 
 #include "IC.h"
@@ -54,6 +53,7 @@ extern Window root;
 void loadIC();
 IC *FindIC(CARD16 icid);
 extern ClientState *current_CS;
+
 
 
 enum {

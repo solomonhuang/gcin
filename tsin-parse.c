@@ -146,6 +146,9 @@ next:
 
 void tsin_parse(TSIN_PARSE out[])
 {
+  if (c_len <= 1)
+    return;
+
   cache = tmalloc(CACHE, c_len);
   cacheN = 0;
 
@@ -176,9 +179,6 @@ void tsin_parse(TSIN_PARSE out[])
 #endif
   }
 
-#if 0
-  dbg("i:%d\n", i);
-#endif
   i--;
   if ((out[i].flag & FLAG_TSIN_PARSE_PHRASE) && c_len - out[i].start > 1) {
     ph_sta = out[i].start;

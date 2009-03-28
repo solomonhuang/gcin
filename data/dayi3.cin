@@ -6,7 +6,8 @@
 %gen_inp
 %ename dayi3
 %cname 大易
-%selkey '[]-\6789
+#%selkey '[]-\6789
+%selkey '[]-\"{}_
 %space_style 1
 %keyname begin
 ,   力

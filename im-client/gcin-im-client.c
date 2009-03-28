@@ -409,7 +409,7 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
 
 //  dbg("gcin_im_client_forward_key_event %x\n", reply.flag);
 
-  return ((reply.flag & GCIN_reply_key_processed) !=0 );
+  return reply.flag;
 }
 
 
@@ -427,9 +427,32 @@ int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
   }
 
 //  dbg("gcin_im_client_forward_key_press\n");
+ int flag = gcin_im_client_forward_key_event(
+             handle, GCIN_req_key_press, key, state, rstr);
+
+  return ((flag & GCIN_reply_key_processed) !=0);
+}
+
+
+#if 0
+// return TRUE if the key is accepted
+int gcin_im_client_forward_key_press2(GCIN_client_handle *handle,
+                                          KeySym key, u_int state,
+                                          char **rstr)
+{
+  // in case client didn't send focus in event
+  if (!BITON(handle->flag, FLAG_GCIN_client_handle_has_focus)) {
+    gcin_im_client_focus_in(handle);
+    handle->flag |= FLAG_GCIN_client_handle_has_focus;
+    gcin_im_client_set_cursor_location(handle, handle->spot_location.x,
+       handle->spot_location.y);
+  }
+
+//  dbg("gcin_im_client_forward_key_press\n");
   return gcin_im_client_forward_key_event(
              handle, GCIN_req_key_press, key, state, rstr);
 }
+#endif
 
 
 // return TRUE if the key is accepted
@@ -439,8 +462,9 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
 {
   handle->flag |= FLAG_GCIN_client_handle_has_focus;
 //  dbg("gcin_im_client_forward_key_release\n");
-  return gcin_im_client_forward_key_event(
+  int flag = gcin_im_client_forward_key_event(
              handle, GCIN_req_key_release, key, state, rstr);
+  return ((flag & GCIN_reply_key_processed) !=0);
 }
 
 

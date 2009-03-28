@@ -33,37 +33,48 @@ void get_gcin_conf_fname(char *name, char fname[])
   strcat(strcat(fname,"/config/"),name);
 }
 
-void get_gcin_conf_str(char *name, char rstr[], char *default_str)
+void get_gcin_conf_str(char *name, char **rstr, char *default_str)
 {
   char fname[MAX_GCIN_STR];
+  char out[256];
+
+  if (*rstr)
+    free(*rstr);
 
   get_gcin_conf_fname(name, fname);
 
   FILE *fp;
 
   if ((fp=fopen(fname, "r")) == NULL) {
-    strcpy(rstr, default_str);
+    *rstr = strdup(default_str);
     return;
   }
 
-  fgets(rstr, MAX_GCIN_STR, fp);
-
-  int len = strlen(rstr);
-
-  if (len && rstr[len-1]=='\n')
-    rstr[len-1] = 0;
+  fgets(out, sizeof(out), fp);
+  int len = strlen(out);
+  if (len && out[len-1]=='\n')
+    out[len-1] = 0;
 
   fclose(fp);
+
+  *rstr = strdup(out);
 }
 
+void get_gcin_conf_fstr(char *name, char rstr[], char *default_str)
+{
+  char *tt = NULL;
+  get_gcin_conf_str(name, &tt, default_str);
+  strcpy(rstr, tt);
+  free(tt);
+}
 
 int get_gcin_conf_int(char *name, int default_value)
 {
-  char tt[MAX_GCIN_STR];
+  char tt[32];
   char default_value_str[MAX_GCIN_STR];
 
   sprintf(default_value_str, "%d", default_value);
-  get_gcin_conf_str(name, tt, default_value_str);
+  get_gcin_conf_fstr(name, tt, default_value_str);
 
   return atoi(tt);
 }
