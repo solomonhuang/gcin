@@ -794,65 +794,6 @@ gboolean timeout_raise_window()
 
 extern Window xwin_pho, xwin0, xwin_gtab;
 
-long alloc_color(Colormap colormap, char *s)
-{
-  XColor color;
-
-  if (!XParseColor(dpy, colormap, s, &color))
-    p_err("invalid color %s", s);
-  if (!XAllocColor(dpy,colormap,&color)) {
-    error("can't allocate color %s, will use private colormap.",
-      s);
-  }
-
-  return color.pixel;
-}
-
-void draw_cross()
-{
-  puts("draw_cross");
-  Window inpwin;
-
-  switch (current_CS->in_method) {
-    case 3:
-      inpwin = xwin_pho;
-      break;
-    case 6:
-      inpwin = xwin0;
-      break;
-    case 12:
-      break;
-    default:
-      inpwin = xwin_gtab;
-  }
-
-  Screen *screen = DefaultScreenOfDisplay(dpy);
-  Colormap colormap = DefaultColormapOfScreen(screen);
-  XFontStruct *afont;
-
-  if (!(afont=XLoadQueryFont(dpy, "fixed")))
-    p_err("Cannot load ascii font %s", "10x20");
-
-  XGCValues gcv;
-  gcv.foreground = alloc_color(colormap, "red");
-  gcv.background = alloc_color(colormap, "black");
-  gcv.graphics_exposures = False;
-  gcv.font=afont->fid;
-
-  GC      gc;
-  gc = XCreateGC(dpy, inpwin, GCForeground|GCBackground|GCFont|
-  GCGraphicsExposures,&gcv);
-
-  XWindowAttributes att;
-  bzero(&att, sizeof(att));
-  XGetWindowAttributes(dpy, inpwin, &att);
-  int w = att.width - 1;
-  int h = att.height - 1;
-
-  printf("%x %x Draw line %d %d\n",xwin0, inpwin, w, h);
-  XDrawLine(dpy, inpwin, gc, 0,0, w,h);
-  XDrawLine(dpy, inpwin, gc, 0,h, w,0);
-}
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
@@ -919,12 +860,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       send_output_buffer_bak();
       return TRUE;
     }
-
-    if (keysym==' ') {
-      draw_cross();
-      return TRUE;
-    }
-
 
     if (keysym == ',') {
 

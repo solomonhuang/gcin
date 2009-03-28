@@ -668,6 +668,69 @@ net 上網</tt></pre>
 <h4 id="_gcin_4">2.5.5. gcin 的拼音輸入法可以不打音調嗎？</h4>
 <div class="para"><p>pinyin 輸入法必需打音調。輸入拼音後，按 <em>1/2/3/4/5/空白鍵</em> 會進入選字狀態，其中，按 1 或空白鍵時，都只會顯示第一聲的字。</p></div>
 <div class="para"><p>gcin 另有一個 <em>通用拼音輸入法</em> ，可以不必打音調，可於 <a href="http://hyperrate.com/thread.php?tid=7692">Hyperrate: 通用拼音</a> 找到 cin 檔與相關討論。這個通用拼音輸入法的改編版，輸入拼音後，按 <em>空白鍵</em> 會顯示 <em>1/2/3/4/5</em> 聲的字，且支援以前導字元的方式輸入符號。</p></div>
+<h3 id="__8">2.6. 按鍵功能一覽表</h3><div style="clear:left"></div>
+<div class="para"><p>部份按鍵在某些 Window Manager 或 Application 中可能無法作用。本頁沒有「剪貼區管理視窗(gcb)」的用法。</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*                               gtab輸入法拆碼中代表任意數量字元 非gtab輸入法中輸出*或＊
+?                               gtab輸入法拆碼中代表任意單一字元 輸出?或？
+`                               gtab輸入法中開啟同音字選擇視窗
+&lt;                               注音輸入法顯示上一頁重覆字
+'                               詞音中輸出全形、符號
+h                               詞音 vi 編輯模式遊標左移一個字元
+l                               詞音 vi 編輯模式遊標右移一個字元
+Q                               詞音許氏鍵盤排列時可選擇同音字(跟向下鍵一樣)
+q                               詞音許氏鍵盤排列時可選擇同音字(跟向下鍵一樣)
+x                               詞音 vi 編輯模式刪除一個字元
+Alt+Shift+按鍵                        輸出phrase.table定義的字串
+Alt+Space                       可設定為輸入法狀態切換開關
+BackSpace                       清除一個拆碼 清除緩衝區的一個字元
+CapsLock                        詞音/日本anthy 切換中英文狀態
+Ctrl+Alt+Space                  在輸入視窗畫紅色的 X 用以協助除錯
+Ctrl+Alt+,                      符號視窗開關切換
+Ctrl+Alt+0                      切換為內碼輸入法
+Ctrl+Alt+3                      切換為注音輸入法
+Ctrl+Alt+6                      切換為詞音輸入法
+Ctrl+Alt+=                      切換為日本anthy輸入法
+Ctrl+Alt+g                      輸出前一次的字串
+Ctrl+Alt+r                      輸出前一次的字串
+Ctrl+Alt+【-1245789=[\]`】    切換為gtab輸入法
+Ctrl+Shift                      循環切換輸入法
+Ctrl+Shift+;                    在非XIM模式輸出全形：符號
+Ctrl+Space                      輸入法狀態切換開關
+Ctrl+e                          詞音切換 vi 編輯模式
+Ctrl+u                          清除詞音緩衝區
+Ctrl+按鍵                     輸出phrase-ctrl.table定義的字串
+Delete                          刪除緩衝區遊標所在的字 刪除內碼輸入法的一個拆碼
+Down                            詞音中選擇同音字
+End                             關閉選擇視窗並移動到緩衝區末端
+Enter                           輸出緩衝區內容
+Escape                          清除所有拆碼 關閉gtab同音字選擇視窗
+F11                             日本anthy輸入法中呼叫 kasumi 管理模式
+F12                             日本anthy輸入法中呼叫 kasumi 加詞模式(先圈選想加的詞再按 F12)
+Home                            關閉選擇視窗並移動到緩衝區最前端
+Left                            關閉選擇視窗並在緩衝區左移一個字元
+PageDown                        gtab/日本anthy 輸入法顯示下一頁重覆字(若在末頁則回到第一頁)
+PageUp                          gtab/日本anthy 輸入法顯示上一頁重覆字(到第一頁為止)
+數字盤的+鍵                        gtab輸入法顯示下一頁重覆字(若在末頁則回到第一頁)
+數字盤的-鍵                        gtab輸入法顯示上一頁重覆字(到第一頁為止)
+Right                           關閉選擇視窗並在緩衝區右移一個字元
+Shift                           可設定為 詞音/日本anthy 切換中英文狀態
+Shift+Enter                     詞音新增詞(從遊標所在位置到緩衝區末端)
+Shift+Space                     全形狀態切換開關 可設定為輸入法狀態切換開關
+Shift+按鍵                    可設定在gtab狀態中取代「Alt+Shift+按鍵」
+Shift+數字                    詞音中選擇候選詞
+Shift+標點                    詞音中輸出全形標點符號
+Space                           拆碼輸入完成顯示候選字 翻頁顯示重覆字 輸出第一個候選字 輸出半形或全形空白 注音及詞音狀態下表示音調的一聲
+Tab                             可在詞音中代替Enter鍵輸出緩衝區內容 可設定為詞音切換中英文狀態
+Up                              詞音中選擇近音字
+Windows+Space                   可設定為輸入法狀態切換開關
+滑鼠左鍵                            符號視窗開關切換 系統列繁體轉簡體開關切換
+滑鼠中鍵                            選擇輸入法
+滑鼠右鍵                            執行gcin-setup 系統列顯示選單
+滑鼠滾輪往上                      符號視窗循環切換成上一組符號表(滑鼠遊標須在符號視窗範圍內)
+滑鼠滾輪往下                      符號視窗循環切換成下一組符號表(滑鼠遊標須在符號視窗範圍內)</tt></pre>
+</div></div>
 </div>
 <h2 id="_gcin_faq">3. gcin FAQ</h2>
 <div class="sectionbody">
@@ -677,9 +740,8 @@ net 上網</tt></pre>
 <div class="para"><p>執行  gnome-theme-manager 可以選擇主題, 修改外觀. 但是必須在 KDE startup
 script 中執行 gnome-settings-daemon.</p></div>
 <h3 id="_gcin_6">3.3. 可以啟動多個 gcin 嗎？</h3><div style="clear:left"></div>
-<div class="para"><p>現在可以用 GCIN_XIM 這個環境變數來控制 gcin XIM 的名字
-(內定值是由環境變數中的 XMODIFIERS=@im=XXXX 裏面的 XXXX自動設定)
-export GCIN_XIM=gcin_test</p></div>
+<div class="para"><p>XIM name 是由環境變數中 XMODIFIERS=@im=XXXX 裏面的 XXXX自動設定
+export XMODIFIERS=@im=gcin_test</p></div>
 <div class="para"><p>一般程式就可以用 以下方式來控制要連接到那一個 XIM server</p></div>
 <div class="listingblock">
 <div class="content">
@@ -783,16 +845,15 @@ $ iconv -f big5 -t utf-8 file.cin.big5 &gt; file.cin</tt></pre>
 </ol></div>
 <div class="para"><p>gaim 裏面有選項可以設定成用 ctrl-Enter 送出內容，這樣就可以在 gcin 內用 Enter。</p></div>
 <h3 id="_utf8_encoding">3.9. 如何使用 utf8 encoding？</h3><div style="clear:left"></div>
-<div class="para"><p>若使用單一 XIM：</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>export XMODIFIERS=@im=$GCIN_XIM
+<pre><tt>export XMODIFIERS=@im=gcin_utf8
 export LC_ALL=zh_TW.UTF-8
 gcin &amp;
 gedit</tt></pre>
 </div></div>
 <div class="para"><p>這個 gedit 就可以以注音輸入(方方土)</p></div>
-<h3 id="__8">3.10. 我想使用倉頡行列的重複字選擇鈴聲，但是嫌聲音太長，有辨法解決嗎？</h3><div style="clear:left"></div>
+<h3 id="__9">3.10. 我想使用倉頡行列的重複字選擇鈴聲，但是嫌聲音太長，有辨法解決嗎？</h3><div style="clear:left"></div>
 <div class="para"><p>gcin 的嗶聲是呼叫 X 的 XBell() 函式，你可以用 <em>xset b 30 1000 100</em> 設定鈴聲音量、頻率、與長短，但這個方法會影響到整個系統的鈴聲。</p></div>
 <div class="para"><p>如果只想設定 gcin 的鈴聲音量，可升級到 gcin 1.4.4 以後的版本。gcin 1.4.4 以後的版本支援在 <em>~/.gcin/config/gcin-bell-volume</em> 內自訂鈴聲音量，值必需介於 -100 至 100 之間 (內定值是 -97)。例如：</p></div>
 <div class="listingblock">
@@ -817,7 +878,7 @@ gedit</tt></pre>
 <div class="para"><p>另外，如果字的某部份忘了如何拆，你可以用 <em>*</em> or <em>?</em> 萬用字元 (wildcard) 來幫助你選字。</p></div>
 <div class="para"><p>gcin 0.6.2 後的版本有類似嘸蝦米的同音字查詢，按 <em>`</em> (backquote) 後就會出現注音的視窗，輸入要查詢的同音字就可以了。</p></div>
 <div class="para"><p>如果需要查詢許多字的讀音，可使用 <em>設定</em> (<em>gcin-setup</em>) → <em>剪貼區 注音查詢</em> 來大量查詢。從網頁或文章中直接選取整段文字，開啟 <em>剪貼區 注音查詢</em> 後即可標示注音，也可在裡面輸入字，用滑鼠選取後，按 <em>自剪貼區更新</em> 。</p></div>
-<h3 id="__9">3.12. 為什麼倉頡按第二鍵後會跑出一些字，選字視窗中數字的順序還會跳？</h3><div style="clear:left"></div>
+<h3 id="__10">3.12. 為什麼倉頡按第二鍵後會跑出一些字，選字視窗中數字的順序還會跳？</h3><div style="clear:left"></div>
 <div class="para"><p>譬如：按 AA日日後</p></div>
 <div class="listingblock">
 <div class="content">
@@ -828,7 +889,7 @@ gedit</tt></pre>
 <div class="para"><p>如果是嘸蝦米，則顯示的號碼必須加一。</p></div>
 <h3 id="_gtab_2">3.13. gtab(倉頡、行列) 輸入法中要如何加入新詞？</h3><div style="clear:left"></div>
 <div class="para"><p>用詞音輸入法加入。在中文輸入的狀態下，把 cursor (游標) 移至要存的詞句的開頭，按下 shift-Enter，則會自 cursor 所在位置存到編輯區的結尾，cursor 也會自動跳到結尾，方便繼續輸入。</p></div>
-<h3 id="__10">3.14. 許氏鍵盤注意事項：</h3><div style="clear:left"></div>
+<h3 id="__11">3.14. 許氏鍵盤注意事項：</h3><div style="clear:left"></div>
 <div class="para"><p>如果使用許氏鍵盤，<em>q</em> 是用來選字詞。</p></div>
 <h3 id="_kde_gcin_window_cursor">3.15. KDE 中 gcin 的 window 為什麼不會跟著 cursor 移動？</h3><div style="clear:left"></div>
 <div class="para"><p>你可以用 qtconfig 把 XIM input style 設定成 over-the-spot 就可以了。</p></div>
@@ -842,7 +903,7 @@ diff your gcin-0.x.x/data/tsin.src &gt; diff.txt
 gedit diff.txt</tt></pre>
 </div></div>
 <div class="para"><p>注意看你的詞庫是否有那些現代人用不到的詞，這些沒用的詞只會增加詞音錯誤的機率。</p></div>
-<h3 id="__11">3.17. 詞音輸入的視窗在打滿注音後會縮回去，看起來有點討厭。</h3><div style="clear:left"></div>
+<h3 id="__12">3.17. 詞音輸入的視窗在打滿注音後會縮回去，看起來有點討厭。</h3><div style="clear:left"></div>
 <div class="para"><p>注音輸入的區域的字型必須比編輯區的小個幾點就沒有這個問題。如果你有安裝日文字型，且使用 12/23/2004 以前的 fonts.conf，則還是會有縮回去的問題，請下載最新的 fonts.conf。</p></div>
 <h3 id="_gcin_coredump_debug">3.18. gcin coredump 如果要幫忙 debug，該怎麼做？</h3><div style="clear:left"></div>
 <div class="olist"><ol>
@@ -1122,7 +1183,7 @@ gcin:  gcin 1.0.4</p></div>
 <div class="para"><p>其實很簡單，修改 <em>/usr/bin/mozilla-firefox</em> or <em>/usr/bin/firefox</em> 執行的 script
 加入 <em>unset XMODIFIERS</em> 。原理是 gcin 如果沒有設定 XMODIFIERS 內定的 XIM name 就是 gcin，
 把 XMODIFIERS unset 後，gcin 用 <em>GTK_IM_MODULE=gcin</em> 仍然可以輸入，但是 XIM 需要 XMODIFIERS 才能，這樣就達到防止 flash player open XIM。</p></div>
-<h3 id="__12">3.29. 請問一下內定輸入法，是由那個設定檔來決定的？</h3><div style="clear:left"></div>
+<h3 id="__13">3.29. 請問一下內定輸入法，是由那個設定檔來決定的？</h3><div style="clear:left"></div>
 <div class="para"><p><em>~/.gcin/config/default-input-method</em></p></div>
 <h3 id="_su_sudo_gcin">3.30. 使用 su 或 sudo 後，無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
 <div class="para"><p>如果使用的 gcin 是 1.4.3 pre7 之前的版本(含 1.4.3 pre7)，可以這麼做：</p></div>
@@ -1198,7 +1259,7 @@ gcin 1.4.4 後支援以 shift 切換日/英文輸入模式。
 <div class="para"><p>在 BBS 輸入日文時，請參考 <a href="http://cle.linux.org.tw/trac/wiki/GcinBBSHiragana">在 BBS 輸入日文</a>。</p></div>
 <div class="para"><p>(如果不想使用 anthy，系統裡可完全不安裝 anthy 相關檔案。)</p></div>
 </div>
-<h2 id="__13">4. 注意事項</h2>
+<h2 id="__14">4. 注意事項</h2>
 <div class="sectionbody">
 <div class="para"><p>gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，目前好像只有行列有使用，如果有需求時，可以加在 %quick 段落內。</p></div>
 <div class="para"><p>把 gcin 一類的 XIM server kill 掉再重新啟動，容易造成 X window 底下程式運作不正常(特別是 mozilla)，最好還是 logout 再 login。</p></div>
@@ -1214,11 +1275,10 @@ gcin 1.4.4 後支援以 shift 切換日/英文輸入模式。
 <div class="para"><div class="title">各種輸入法表格下載<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinTables">http://cle.linux.org.tw/trac/wiki/GcinTables</a></p></div>
 <div class="para"><div class="title">安裝額外的輸入法<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinInstallTables">http://cle.linux.org.tw/trac/wiki/GcinInstallTables</a></p></div>
 <div class="para"><div class="title">製作新的輸入法 cin 檔<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinMakeCin">http://cle.linux.org.tw/trac/wiki/GcinMakeCin</a></p></div>
-<div class="para"><div class="title">gcin 按鍵功能一覽表<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinHotKeys">http://cle.linux.org.tw/trac/wiki/GcinHotKeys</a></p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-03 22:45:30 CST
+Last updated 2009-02-22 16:59:06 CST
 </div>
 </div>
 </body>

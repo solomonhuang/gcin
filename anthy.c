@@ -357,7 +357,7 @@ void parse_key()
   int i;
   int preN=0, eqN=0, sendpreN=0;
   unsigned char eq, sendpre_i = 255;
-  static char ch2[]="xlkstzdhbrpfgv";
+  static char ch2[]="kstzdhbrpfgvcjmwy";
 
   if (keysN==2 && keys[0]==keys[1] && strchr(ch2, keys[0])) {
     append_jp(0);

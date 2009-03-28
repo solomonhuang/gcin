@@ -8,7 +8,7 @@ gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
 gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o gtab-buf.o
 
-GCIN_SO= gcin1.so gcin2.so
+GCIN_SO= gcin1.so gcin2.so gtk_bug_fix.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o \
@@ -89,7 +89,7 @@ PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
-all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
+all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec gtk_bug_fix.so
 	$(MAKE) -C data
 	$(MAKE) -C im-client
 	$(MAKE) -C gtk-im
@@ -184,6 +184,9 @@ gcin1.so: $(gcin1_so)
 gcin2_so= t2s-lookup.pico
 gcin2.so: $(gcin2_so)
 	$(CC) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
+
+gtk_bug_fix.so: gtk_bug_fix.pico
+	$(CC) $(SO_FLAGS) -o $@ gtk_bug_fix.pico
 
 ### making the following as .so actuall makes the RSS larger
 gcin_gtab_so = gtab.pico win-gtab.pico gtab-util.pico
