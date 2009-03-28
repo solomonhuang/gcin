@@ -1,10 +1,17 @@
 ** UTF-8 encoding **
-1.2.1:(2006/5/9)
+1.2.2:
+- 新增整句斷詞的功能。
+- 現在可以增加一個單字的詞如(是、與、及、不、誰)，如果沒有加，整句斷詞的功效會比較差。
+- 現在 gcin 在 panel notification area 終於有 status icon 了。裏面的 menu 也可以選擇功能，按mouse左鍵可切換正/簡體字輸出，也可以顯示目前是否處於簡體字輸入的狀態。按中鍵可以切換輸入法。可以用 gcin-setup 切換是否要開啟，設定完後要自行 restart gcin。
+- 新增正體字->簡體字的翻譯功能(trad2sim)。
+- 注音輸入新增輸入希臘字母的功能(ㄚ/α，ㄅ/β，ㄍ/γ)，需要使用的自行更新 ~/.gcin/pho.tab。
+
+1.2.1: (2006/5/9)
 - 內碼輸入法現在可以用 menu 切換 Big5 or UTF-32(U+)。
 - gcin2tab skip %encoding
 - gedit 中無法使用 alt-F 的問題。
 
-1.2.0: (2006/5/8)
+1.2.0:
 - 錯誤訊息：GLib-CRITICAL **: g_source_remove: assertion `tag > 0' failed"
 - candyz 提供的  patch gtk im module for MacOS Darwin fink。
 - NEW_GTK_IM 改成內定是 'N'

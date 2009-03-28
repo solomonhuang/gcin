@@ -54,5 +54,3 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event)
 
   return FALSE;
 }
-
-

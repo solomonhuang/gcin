@@ -53,6 +53,12 @@ void clear_output_buffer()
 
 gboolean gb_output = FALSE;
 
+void toggle_gb_output()
+{
+  gb_output = !gb_output;
+}
+
+
 void send_text(char *text)
 {
   if (!text)

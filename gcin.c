@@ -340,7 +340,9 @@ static int xerror_handler(Display *d, XErrorEvent *eve)
   return 0;
 }
 
+
 Atom gcin_atom;
+void cb_trad_sim_toggle();
 
 static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
                                      GdkEvent *event,
@@ -370,8 +372,7 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
          change_font_size();
        } else
        if (!strcmp(message, GB_OUTPUT_TOGGLE)) {
-         extern gboolean gb_output;
-         gb_output = !gb_output;
+         cb_trad_sim_toggle();
        } else
          reload_data();
 
@@ -439,7 +440,7 @@ static void exec_setup_scripts()
 
 char *get_gcin_xim_name();
 void load_phrase(), init_TableDir(),  load_gtab_list();
-void init_im_serv();
+void init_im_serv(), create_tray();
 void init_gcin_im_serv(Window win);
 
 int main(int argc, char **argv)
@@ -540,6 +541,11 @@ int main(int argc, char **argv)
 
 #if 1
   init_gcin_im_serv(xim_arr[0].xim_xwin);
+#endif
+
+#if TRAY_ENABLED
+  if (gcin_status_tray)
+    create_tray();
 #endif
 
   gtk_main();

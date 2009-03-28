@@ -121,6 +121,16 @@ void utf8_putchar(char *s)
     putchar(s[i]);
 }
 
+void utf8_putcharn(char *s, int n)
+{
+  int i, ofs;
+
+  for(ofs=i=0; i < n; i++) {
+    utf8_putchar(&s[ofs]);
+    ofs+= utf8_sz(&s[ofs]);
+  }
+}
+
 gboolean utf8_eq(char *a, char *b)
 {
   int ta = utf8_sz(a);

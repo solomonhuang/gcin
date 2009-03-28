@@ -2,7 +2,7 @@ include ../config.mak
 QTIM=$(QT)/plugins/inputmethods
 IMMODULES=$(libdir)/$(QTIM)
 ifeq ($(LIB), lib64)
-	IMMODULES_LOCAL=/usr/lib/qt3/plugins/lib64/inputmethods
+	IMMODULES_LOCAL=/usr/lib/$(QT)/plugins/lib64/inputmethods
 else
 	IMMODULES_LOCAL=/usr/lib/$(QTIM)
 endif
@@ -33,4 +33,4 @@ install:
                 install -m 755 libqgcin.so $(IMMODULES); \
 	fi
 clean:
-	rm -f $(OBJS) libqgcin.so *~ core.* *moc*.cpp
+	rm -f $(OBJS) libqgcin.so *~ core.* *moc*.cpp *.E

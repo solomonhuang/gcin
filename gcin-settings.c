@@ -41,6 +41,9 @@ int tsin_tab_phrase_end;
 int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 int gcin_inner_frame;
 char gcin_font_name[64];
+#if TRAY_ENABLED
+int gcin_status_tray;
+#endif
 
 int pho_hide_row2, pho_in_row1;
 
@@ -75,6 +78,9 @@ void load_setttings()
   default_input_method = get_gcin_conf_int(DEFAULT_INPUT_METHOD, 6);
   left_right_button_tips = get_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 1);
   gcin_im_toggle_keys = get_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, 0);
+#if TRAY_ENABLED
+  gcin_status_tray = get_gcin_conf_int(GCIN_STATUS_TRAY, 1);
+#endif
 
   gtab_dup_select_bell = get_gcin_conf_int(GTAB_DUP_SELECT_BELL, 0);
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);

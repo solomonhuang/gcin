@@ -19,6 +19,9 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gcin_pop_up_win,
                  *check_button_gcin_pop_up_win_abs_corner,
                  *check_button_gcin_inner_frame;
+#if TRAY_ENABLED
+                 *check_button_gcin_status_tray;
+#endif
 
 static GtkWidget *opt_spc_opts;
 
@@ -279,7 +282,9 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GCIN_INPUT_STYLE, style);
 
   save_gcin_conf_int(GCIN_INNER_FRAME, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_inner_frame)));
-
+#if TRAY_ENABLED
+  save_gcin_conf_int(GCIN_STATUS_TRAY, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray)));
+#endif
 
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
@@ -449,6 +454,16 @@ void create_appearance_conf_window()
        gcin_inner_frame);
   gtk_box_pack_start (GTK_BOX(hbox_gcin_inner_frame), check_button_gcin_inner_frame, FALSE, FALSE, 0);
 
+#if TRAY_ENABLED
+  GtkWidget *hbox_gcin_status_tray = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX(vbox_top), hbox_gcin_status_tray, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_status_tray = gtk_label_new("面板狀態(tray)");
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), label_gcin_status_tray, FALSE, FALSE, 0);
+  check_button_gcin_status_tray = gtk_check_button_new ();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray),
+       gcin_status_tray);
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_status_tray, FALSE, FALSE, 0);
+#endif
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

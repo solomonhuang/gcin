@@ -474,6 +474,7 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
 void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
 {
   int sti, edi;
+//  dbg("inc_dec_tsin_use_count:%d\n", N);
 
   if (!tsin_seek(pho, N, &sti, &edi))
     return;
@@ -482,13 +483,12 @@ void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
   int tlen = utf8_tlen(ch, N);
 
 #if 0
-  dbg("otlen %d\n", tlen);
+  dbg("otlen %d  ", tlen);
   int i;
   for(i=0; i < tlen; i++)
     putchar(ch[i]);
   puts("");
 #endif
-
 
   for(idx=sti; idx < edi; idx++) {
     char len, usecount, n_usecount;
@@ -508,7 +508,7 @@ void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
     if (!utf8_str_eq(stch, ch, N))
       continue;
 #if 0
-    dbg("found match ");
+    dbg("found match\n");
 #endif
     int ph_ofs=phidx[idx];
     fseek(fph, ph_ofs + 1, SEEK_SET);

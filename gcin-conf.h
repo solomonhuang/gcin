@@ -23,6 +23,7 @@
 #define GCIN_FLAGS_IM_ENABLED "gcin-flags-im-enabled"
 #define GCIN_REMOTE_CLIENT "gcin-remote-client"
 #define GCIN_SHIFT_SPACE_ENG_FULL "gcin-shift-space-eng-full"
+#define GCIN_STATUS_TRAY "gcin-status-tray"
 
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
@@ -82,6 +83,7 @@ extern int gtab_shift_phrase_key;
 extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
 extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
+extern int gcin_status_tray;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;
@@ -98,3 +100,5 @@ void get_gcin_conf_str(char *name, char rstr[], char *default_str);
 void save_gcin_conf_str(char *name, char *str);
 void save_gcin_conf_int(char *name, int val);
 void load_setttings();
+
+#define TRAY_ENABLED 1

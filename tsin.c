@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 2004	Edward Liu, Taiwan
 */
 #include <string.h>
 
@@ -24,23 +24,8 @@ extern PHOKBM phkbm;
 extern char tsidxfname[64];
 extern int hashidx[TSIN_HASH_N];
 
-typedef struct {
-  phokey_t pho;
-  char ch[CH_SZ];
-  char och[CH_SZ];
-  char ph1ch[CH_SZ]; // char selected by 1st pho
-  u_char flag;
-  char psta; // phrase start index
-} CHPHO;
-
-enum {
-  FLAG_CHPHO_FIXED=1,    // user selected the char, so it should not be changed
-  FLAG_CHPHO_PHRASE_HEAD=2,
-  FLAG_CHPHO_PHRASE_VOID=4
-};
-
-static CHPHO chpho[MAX_PH_BF_EXT];
-static int c_idx, c_len, ph_sta=-1, ph_sta_last=-1;
+CHPHO chpho[MAX_PH_BF_EXT];
+int c_idx, c_len, ph_sta=-1, ph_sta_last=-1;
 static int sel_pho;
 static gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
 static int save_frm, save_to;
@@ -151,11 +136,13 @@ static void putbuf(int len)
   u_char tt[CH_SZ * (MAX_PH_BF_EXT+1) + 1];
   int i,idx;
 
+//  dbg("putbuf:%d\n", len);
 
 #if 1
   // update phrase reference count
   if (len >= 2) {
     for(i=0; i < len; i++) {
+//      dbg("flag %d %x\n", i, chpho[i].flag);
       if (!BITON(chpho[i].flag, FLAG_CHPHO_PHRASE_HEAD)) {
         continue;
       }
@@ -177,7 +164,7 @@ static void putbuf(int len)
       puts("");
 #endif
 
-      if (phrlen < 2)
+      if (phrlen < 1)
         continue;
 
       phokey_t pho[MAX_PHRASE_LEN];
@@ -416,14 +403,11 @@ gboolean save_phrase_to_db2(CHPHO *chph, int len);
 
 static void save_phrase()
 {
-  int tt, i;
+  int i;
   u_char len;
 
-  if (save_frm==save_to)
-    return;
-
   if (save_frm > save_to) {
-    tt=save_frm;
+    int tt=save_frm;
     save_frm=save_to;
     save_to=tt;
   }
@@ -432,7 +416,9 @@ static void save_phrase()
     save_to--;
 
   len= save_to- save_frm+ 1;
-  if (len < 2 || len > MAX_PHRASE_LEN)
+
+  dbg("len %d\n", len);
+  if (len <= 0 || len > MAX_PHRASE_LEN)
     return;
 
   for(i=save_frm;i<=save_to;i++) {
@@ -672,7 +658,7 @@ static int fetch_user_selection(int val, char **seltext)
 
 int phokey_t_seq(phokey_t *a, phokey_t *b, int len);
 
-static void extract_pho(int chpho_idx, int plen, phokey_t *pho)
+void extract_pho(int chpho_idx, int plen, phokey_t *pho)
 {
   int i;
 
@@ -682,7 +668,6 @@ static void extract_pho(int chpho_idx, int plen, phokey_t *pho)
 }
 
 
-gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi);
 void mask_key_typ_pho(phokey_t *key);
 
 static int qcmp_pre_sel_usecount(const void *aa, const void *bb)
@@ -693,6 +678,27 @@ static int qcmp_pre_sel_usecount(const void *aa, const void *bb)
   return b->usecount - a->usecount;
 }
 
+gboolean check_fixed_mismatch(int chpho_idx, char *mtch, int plen)
+{
+  int j;
+  char *p = mtch;
+
+  for(j=0; j < plen; j++) {
+    int u8sz = utf8_sz(p);
+    if (!(chpho[chpho_idx+j].flag & FLAG_CHPHO_FIXED))
+      continue;
+
+    if (memcmp(chpho[chpho_idx+j].ch, p, u8sz))
+      break;
+
+    p+= u8sz;
+  }
+
+  if (j < plen)
+    return TRUE;
+
+  return FALSE;
+}
 
 static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 {
@@ -776,21 +782,7 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 #endif
 
 #if 1
-    int j;
-    char *p = mtch;
-
-    for(j=0; j < plen; j++) {
-      int u8sz = utf8_sz(p);
-      if (!(chpho[chpho_idx+j].flag & FLAG_CHPHO_FIXED))
-        continue;
-
-      if (memcmp(chpho[chpho_idx+j].ch, p, u8sz))
-        break;
-
-      p+= u8sz;
-    }
-
-    if (j < plen)
+    if (check_fixed_mismatch(chpho_idx, mtch, plen))
       continue;
 #endif
 
@@ -819,7 +811,7 @@ static void disp_pre_sel_page()
     return;
   }
 
-  if (pre_selN==0 || (pre_selN==1 && pre_sel[0].len==2))
+  if (pre_selN==0 || (pre_selN==1 && pre_sel[0].len<=2))
     return;
 
   clear_sele();
@@ -975,23 +967,6 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     if (c_idx < 0 || c_len + len >= MAX_PH_BF_EXT)
       return 0;
 
-
-    char *pp = str;
-#if 0
-    for(i=0; i < len; i++) {
-      if (pho[i])
-        continue;
-
-      phokey_t tpho[32];
-      tpho[0]=0;
-      int u8len = utf8_sz(pp);
-
-      utf8_pho_keys(pp, tpho);
-      pho[i] = tpho[0];
-      pp += u8len;
-    }
-#endif
-
     if (c_idx < c_len) {
       for(i=c_len-1; i >= c_idx; i--) {
         chpho[i+len] = chpho[i];
@@ -1014,10 +989,10 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
       chpho[c_idx+i].psta= c_idx;
     }
 #endif
-
-    if (len > 1)
+#if 0
+    if (len > 0)
       chpho[c_idx].flag |= FLAG_CHPHO_PHRASE_HEAD;
-
+#endif
     drawcursor();
     disp_ph_sta();
     hide_pre_sel();
@@ -1029,11 +1004,12 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     return TRUE;
 }
 
+#if 0
 static void set_phrase_link(int idx, int len)
 {
     int j;
 
-    if (len < 2)
+    if (len < 1)
       return;
 
     for(j=1;j < len; j++) {
@@ -1042,6 +1018,7 @@ static void set_phrase_link(int idx, int len)
 
     chpho[idx].flag |= FLAG_CHPHO_PHRASE_HEAD;
 }
+#endif
 
 // should be used only if it is a real phrase
 gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
@@ -1066,9 +1043,9 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     disp_in_area_pho_tsin();
 
     prbuf();
-
+#if 0
     set_phrase_link(idx, len);
-
+#endif
     drawcursor();
     disp_ph_sta();
     hide_pre_sel();
@@ -1216,7 +1193,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
   key_press_time = 0;
 
    if (kbstate & (Mod1Mask|Mod1Mask)) {
-       return 0;
+     return 0;
    }
 
 
@@ -1532,13 +1509,15 @@ other_keys:
              set_chpho_ch2(&chpho[c_idx], sel_text, len);
 
            chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
+#if 0
            set_phrase_link(c_idx, len);
+#endif
            raise_phr(c);
            if (c_idx + len == c_len) {
              ph_sta = -1;
 
              for(i=c_idx; i < c_len; i++) {
-               draw_underline(i);
+                draw_underline(i);
              }
            }
          } else
@@ -1630,9 +1609,8 @@ asc_char:
           }
         }
 
-
         if (xkey > 127)
-          return 1;
+          return 0;
 
         u_char tt=xkey;
         shift_ins();
@@ -1662,8 +1640,9 @@ asc_char:
         drawcursor();
         return 1;
    } else { /* pho */
-     if (xkey > 127)
+     if (xkey > 127) {
        return 0;
+     }
 
      // for hsu & et26
      if (strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num)
@@ -1746,11 +1725,17 @@ llll2:
 
    put_b5_char(ch_pho[start_idx].ch, key);
 
+   TSIN_PARSE parse[MAX_PH_BF_EXT+1];
+   bzero(parse, sizeof(parse));
+   tsin_parse(parse);
+   prbuf();
+
    disp_ph_sta();
    clrin_pho_tsin();
    clr_in_area_pho_tsin();
    drawcursor();
    hide_pre_sel();
+
 
    if (ph_sta < 0) {
 restart:
@@ -1858,8 +1843,9 @@ restart:
        }
 
        full_match = TRUE;
+#if 0
        chpho[ph_sta].flag |= FLAG_CHPHO_PHRASE_HEAD;
-
+#endif
        if (mdist==max_match_phrase_len) { // tstr: 選擇視窗
 //         dbg("full match .......... %d\n", ph_sta);
          ph_sta_last = ph_sta;

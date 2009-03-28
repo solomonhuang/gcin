@@ -7,7 +7,7 @@ include config.mak
 OBJS=gcin.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
      gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o \
-     gcin-switch.o win-status.o
+     gcin-switch.o win-status.o tray.o eggtrayicon.o tsin-parse.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
@@ -44,9 +44,10 @@ im-srv = im-srv/im-srv.a
 	$(CC) $(CFLAGS) -E -o $@ $<
 
 PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup gcin2tab juyin-learn sim2trad
+PROGS_SYM=trad2sim
 PROGS_CV=kbmcv
 
-all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
+all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C im-client
 	$(MAKE) -C gtk-im
@@ -66,6 +67,8 @@ juyin-learn:        $(OBJS_JUYIN_LEARN)
 sim2trad:        $(OBJS_sim2trad)
 	$(CC) -o $@ $(OBJS_sim2trad) $(LDFLAGS)
 	rm -f core.*
+trad2sim:	sim2trad
+	ln -s sim2trad trad2sim
 
 gcin-setup:     $(OBJS_gcin_steup)
 	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
@@ -96,11 +99,12 @@ $(im-srv):
 	$(MAKE) -C im-srv
 
 ibin:
-	   install $(PROGS) $(bindir)
+	   install $(PROGS) $(bindir); \
+	   rm -f $(bindir)/trad2sim; ln -s sim2trad $(bindir)/trad2sim
 
 install:
 	install -d $(datadir)/icons
-	install gcin.png $(datadir)/icons
+	install gcin.png gcin-tray-sim.png gcin-tray.png $(datadir)/icons
 	install -d $(GCIN_ICON_DIR_i)
 	install -m 644 icons/* $(GCIN_ICON_DIR_i)
 	install -d $(bindir)
@@ -113,10 +117,12 @@ install:
 	   install -d $(DOC_DIR); \
 	   install -m 644 README Changelog $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
+	   rm -f $(bindir)/trad2sim; ln -s sim2trad $(bindir)/trad2sim; \
 	else \
 	   install -d $(DOC_DIR_i); \
 	   install -m 644 README Changelog $(DOC_DIR_i); \
 	   install -s $(PROGS) $(bindir); \
+	   rm -f $(bindir)/trad2sim; ln -s sim2trad $(bindir)/trad2sim; \
 	fi
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install

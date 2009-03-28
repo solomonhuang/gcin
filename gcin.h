@@ -112,6 +112,7 @@ void utf8cpy(char *t, char *s);
 int u8cpy(char *t, char *s);
 int utf8_tlen(char *s, int N);
 void utf8_putchar(char *s);
+void utf8_putcharn(char *s, int n);
 gboolean utf8_eq(char *a, char *b);
 gboolean utf8_str_eq(char *a, char *b, int len);
 void utf8cpyN(char *t, char *s, int N);

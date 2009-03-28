@@ -127,7 +127,7 @@ int qcmp2(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  u_int d;
+  int d;
   if ((d = a->key - b->key)) return d;
 
   return memcmp(a->ch ,b->ch, CH_SZ);
@@ -147,10 +147,17 @@ int qcmp(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  u_int d;
+  int d;
   if ((d = a->key - b->key)) return d;
-
+#if 0
   return a->oseq - b->oseq;
+#else
+  if (a->oseq < b->oseq)
+    return -1;
+  if (a->oseq > b->oseq)
+    return 1;
+  return 0;
+#endif
 }
 
 
