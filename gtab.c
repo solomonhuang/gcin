@@ -347,7 +347,7 @@ time_t file_mtime(char *fname)
   return st.st_mtime;
 }
 
-void init_gtab(int inmdno, int usenow)
+void init_gtab(int inmdno)
 {
   FILE *fp;
   char ttt[128],uuu[128];
@@ -605,12 +605,10 @@ void init_gtab(int inmdno, int usenow)
 
   fclose(fp);
 
-  if (usenow) {
-    cur_inmd=inp;
+  cur_inmd=inp;
 //    reset_inp();
-    set_gtab_input_method_name(inp->cname);
-    DispInArea();
-  }
+  set_gtab_input_method_name(inp->cname);
+  DispInArea();
 
   dbg("key64: %d\n", inp->key64);
 

@@ -28,6 +28,52 @@ void all_wrap()
 static char *A = "GB2312";
 static char *B = "big5";
 
+int utf8sz(char *s)
+{
+  if (!(*s & 0x80))
+    return 1;
+
+  if ((*s & 0xe0) == 0xc0)
+    return 2;
+
+  if ((*s & 0xf0) == 0xe0)
+    return 3;
+
+  if ((*s & 0xf8) == 0xf0)
+    return 4;
+
+  return 1;
+}
+
+char *m_conv(char *txt, char *to, char *frm)
+{
+  int rn,wn;
+  GError *err;
+  char *out;
+  int len=strlen(txt);
+
+  do {
+    rn = wn = 0;
+    err = NULL;
+    out = g_convert(txt, len, to , frm, &rn, &wn, &err);
+
+    if (err) {
+      dbg("%s -> %s  convert error %d %d\n", frm, to, rn, wn);
+      if (!strcmp(frm, "UTF-8")) {
+        int sz = utf8sz(&txt[rn]);
+        dbg("sz %d\n", sz);
+        memset(&txt[rn], ' ', sz);
+      } else {
+        txt[rn]=' ';
+        txt[rn+1]=' ';
+      }
+    }
+  } while (err);
+  free(txt);
+
+  return out;
+}
+
 
 static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
 {
@@ -36,43 +82,13 @@ static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer 
     return;
   }
 
-  char *txt = strdup(text);
-
+  char *txt = g_strdup(text);
   int len = strlen(text);
-  GError *err = NULL;
   u_int rn = 0, wn = 0;
 
-  char *gb;
-
-  do {
-    rn = wn = 0;
-    err = NULL;
-    gb = g_convert(txt, len, A , "UTF-8", &rn, &wn, &err);
-
-    if (err) {
-      dbg("utf8 -> %s  convert error %d %d\n", A, rn, wn);
-      txt[rn]=' ';
-    }
-  } while (err);
-
-  free(txt);
-
-  char *big5 = g_convert(gb, strlen(gb), B, A, &rn, &wn, &err);
-  g_free(gb);
-
-  if (err) {
-    dbg("%s -> %s  convert error %d %d\n", A, B, rn, wn);
-    return;
-  }
-
-  char *big5utf8 = g_convert(big5, strlen(big5), "UTF-8", B, &rn, &wn, &err);
-  g_free(big5);
-
-  if (err) {
-    dbg("%s -> %sutf8  convert error %d %d\n", B, B, rn, wn);
-    return;
-  }
-
+  char *gb = m_conv(txt, A, "UTF-8");
+  char *big5 = m_conv(gb, B, A);
+  char *big5utf8 = m_conv(big5, "UTF-8", B);
 
   gtk_text_buffer_set_text (buffer, big5utf8, -1);
 

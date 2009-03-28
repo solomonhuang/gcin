@@ -12,20 +12,20 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
 fi
 
 MAKE=make
-which gmake >& /dev/null
+which gmake > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   MAKE=gmake
 fi
 
 FREEBSD=0
-uname | grep FreeBSD >& /dev/null
+uname | grep FreeBSD > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   FREEBSD=1
 fi
 
 SO_FLAGS="-shared"
 MAC_OS=0
-uname | grep Darwin >& /dev/null
+uname | grep Darwin > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   FREEBSD=1
   MAC_OS=1

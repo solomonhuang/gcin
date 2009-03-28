@@ -434,7 +434,7 @@ void change_win_gtab_style()
 }
 
 
-void init_gtab(int inmdno, int usenow);
+void init_gtab(int inmdno);
 gboolean gtab_has_input(), force_show;
 
 void show_win_gtab()
@@ -449,7 +449,7 @@ void show_win_gtab()
       move_win_gtab(0,0);
   }
 
-  init_gtab(current_CS->in_method, True);
+  init_gtab(current_CS->in_method);
 
   if (gcin_pop_up_win && !gtab_has_input() && !force_show)
     return;

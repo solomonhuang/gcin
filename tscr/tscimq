@@ -3,5 +3,5 @@
 export LC_ALL=zh_TW.Big5
 export QT_IM_MODULE=scim
 export XMODIFIERS=@im=SCIM
-kedit
+/usr/lib/qt4/bin/qtconfig
 #kedit

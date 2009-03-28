@@ -16,6 +16,8 @@ DUAL_XIM_ENTRY xim_arr[1];
 DUAL_XIM_ENTRY *pxim_arr;
 #endif
 
+gboolean win_kbm_inited;
+
 char *fullchar[]=
 {"　","！","”","＃","＄","％","＆","’","（","）","＊","＋",
 "，","－","．","／","０","１","２","３","４","５","６","７","８","９","：","；","＜","＝","＞","？",
@@ -288,6 +290,8 @@ static void reload_data()
   change_win_pho_style();
   load_tab_pho_file();
   change_tsin_color();
+  if (win_kbm_inited)
+    update_win_kbm();
 }
 
 void change_tsin_font_size();
@@ -513,11 +517,13 @@ int main(int argc, char **argv)
   init_gcin_im_serv(xim_arr[0].xim_xwin);
 #endif
 
+//  show_win_kbm();
 #if TRAY_ENABLED
   if (gcin_status_tray) {
     init_tray();
   }
 #endif
+
 
   gtk_main();
 

@@ -46,8 +46,10 @@ static void shutdown_client(int fd)
 //  dbg("client shutdown rn %d\n", rn);
   gdk_input_remove(gcin_clients[fd].tag);
 
-  if (gcin_clients[fd].cs == current_CS)
+  if (gcin_clients[fd].cs == current_CS) {
+    hide_in_win(current_CS);
     current_CS = NULL;
+  }
 
   free(gcin_clients[fd].cs);
   gcin_clients[fd].cs = NULL;

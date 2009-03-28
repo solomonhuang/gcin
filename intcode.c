@@ -13,7 +13,7 @@ static char inch[MAX_INTCODE];
 static int cin;
 
 void create_win_intcode();
-void init_inter_code(int usenow)
+void init_inter_code()
 {
   cin=0;
   create_win_intcode();

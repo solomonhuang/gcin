@@ -11,23 +11,24 @@ extern Display *dpy;
 extern XIMS current_ims;
 static IMForwardEventStruct *current_forward_eve;
 #endif
+extern gboolean win_kbm_inited;
 
 static char *callback_str_buffer;
 Window focus_win;
 static int timeout_handle;
 
-static void send_fake_key_eve()
+void send_fake_key_eve(KeySym key)
 {
-  KeyCode kc_shift_l = XKeysymToKeycode(dpy, XK_Shift_L);
-  XTestFakeKeyEvent(dpy, kc_shift_l, True, CurrentTime);
-  XTestFakeKeyEvent(dpy, kc_shift_l, False, CurrentTime);
+  KeyCode kc = XKeysymToKeycode(dpy, key);
+  XTestFakeKeyEvent(dpy, kc, True, CurrentTime);
+  XTestFakeKeyEvent(dpy, kc, False, CurrentTime);
 }
 
 void send_text_call_back(char *text)
 {
   callback_str_buffer = realloc(callback_str_buffer, strlen(text));
   strcpy(callback_str_buffer, text);
-  send_fake_key_eve();
+  send_fake_key_eve(XK_Shift_L);
 }
 
 
@@ -511,9 +512,7 @@ void toggle_im_enabled(u_int kev_state)
     if (current_CS->im_state != GCIN_STATE_DISABLED) {
       if (current_CS->in_method== 6 && (kev_state & LockMask) != orig_caps_state &&
           tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
-        KeyCode caps = XKeysymToKeycode(dpy, XK_Caps_Lock);
-        XTestFakeKeyEvent(dpy, caps, True, CurrentTime);
-        XTestFakeKeyEvent(dpy, caps, False, CurrentTime);
+        send_fake_key_eve(XK_Caps_Lock);
       }
 
       if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
@@ -614,9 +613,9 @@ void toggle_half_full_char(u_int kev_state)
 //  dbg("half full toggle\n");
 }
 
-void init_gtab(int inmdno, int usenow);
-void init_inter_code(int usenow);
-void init_tab_pp(int usenow);
+void init_gtab(int inmdno);
+void init_inter_code();
+void init_tab_pp();
 void init_tab_pho();
 
 void check_CS()
@@ -661,15 +660,15 @@ gboolean init_in_method(int in_no)
 #if USE_TSIN
     case 6:
       current_CS->in_method = in_no;
-      init_tab_pp(True);
+      init_tab_pp();
       break;
 #endif
     case 10:
       current_CS->in_method = in_no;
-      init_inter_code(True);
+      init_inter_code();
       break;
     default:
-      init_gtab(in_no, True);
+      init_gtab(in_no);
       if (!inmd[in_no].DefChars)
         return FALSE;
       current_CS->in_method = in_no;
@@ -682,6 +681,10 @@ gboolean init_in_method(int in_no)
 #endif
 
   update_in_win_pos();
+
+  if (win_kbm_inited)
+    update_win_kbm();
+
   return TRUE;
 }
 
@@ -735,11 +738,6 @@ gboolean timeout_raise_window()
   timeout_handle = 0;
   show_in_win(current_CS);
   return FALSE;
-}
-
-
-gboolean control_punc(KeySym keysym)
-{
 }
 
 // return TRUE if the key press is processed
@@ -813,7 +811,8 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       create_win_sym();
       if (win_sym_enabled) {
         force_show = TRUE;
-        show_in_win(current_CS);
+        if (current_CS->im_state == GCIN_STATE_CHINESE)
+          show_in_win(current_CS);
         force_show = FALSE;
       }
       return TRUE;

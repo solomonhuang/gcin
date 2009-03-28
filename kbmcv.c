@@ -79,9 +79,9 @@ int main(int argc, char **argv)
   phkb.selkeyN = strlen(s);
 
   while (!feof(fp)) {
+    s[0]=0;
     fgets(s,sizeof(s),fp);
     len=strlen(s);
-
     if (!len)
       break;
 

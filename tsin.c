@@ -36,6 +36,7 @@ static int current_page;
 static int startf;
 static gboolean full_match;
 static gboolean tsin_half_full;
+static int bufferEditing = 0; //0 = buffer editing mode is disabled
 
 typedef struct {
   phokey_t phokey[MAX_PHRASE_LEN];
@@ -384,7 +385,7 @@ static void dump_tsidx_all()
 void load_tab_pho_file();
 void show_win0();
 
-void init_tab_pp(int usenow)
+void init_tab_pp()
 {
   if (!ch_pho)
     load_tab_pho_file();
@@ -1219,9 +1220,96 @@ static KeySym keypad_proc(KeySym xkey)
   return xkey;
 }
 
+static int cursor_left()
+{
+  close_selection_win();
+  if (c_idx) {
+    clrcursor();
+    c_idx--;
+    drawcursor();
+    return 1;
+  }
+  // Thanks to PCMan.bbs@bbs.sayya.org for the suggestion
+  return c_len;
+}
+static int cursor_right()
+{
+  close_selection_win();
+  if (c_idx < c_len) {
+    clrcursor();
+    c_idx++;
+    drawcursor();
+    return 1;
+  }
+
+  // Thanks to PCMan.bbs@bbs.sayya.org for the suggestion
+  return c_len;
+}
+
+static int cursor_delete()
+{
+  if (c_idx == c_len)
+    return 0;
+  close_selection_win();
+  clear_disp_ph_sta();
+  ityp3_pho=0;
+  pre_selN = 0;
+
+  int j;
+  for(j=3;j>=0;j--)
+    if (typ_pho[j]) {
+      typ_pho[j]=0;
+      disp_in_area_pho_tsin();
+      return 1;
+    }
+
+  clrcursor();
+  int k;
+  int pst=k=chpho[c_idx].psta;
+
+  for(k=c_idx;k<c_len;k++) {
+    chpho[k] = chpho[k+1];
+    chpho[k].psta=chpho[k+1].psta-1;
+  }
+
+  c_len--;
+  hide_char(c_len);
+  init_chpho_i(c_len);
+
+  prbuf();
+
+  compact_win0_x();
+
+  if (!c_idx)
+    clear_match();
+  else {
+    k=c_idx-1;
+    pst=chpho[k].psta;
+
+    while (k>0 && chpho[k].psta==pst)
+      k--;
+
+    if (chpho[k].psta!=pst)
+      k++;
+
+    int match_len= c_idx - k;
+    if (!(match_len=scanphr(k, match_len, FALSE)))
+      ph_sta=-1;
+    else
+      ph_sta=k;
+
+    if (ph_sta < 0 || c_idx - ph_sta < 2)
+      pre_selN = 0;
+  }
+
+  if (!c_len && gcin_pop_up_win)
+    hide_win0();
+
+  disp_ph_sta();
+  return 1;
+}
 
 void case_inverse();
-
 void pho_play(phokey_t key);
 
 int feedkey_pp(KeySym xkey, int kbstate)
@@ -1290,31 +1378,9 @@ int feedkey_pp(KeySym xkey, int kbstate)
         drawcursor();
         return 1;
      case XK_Left:
-        close_selection_win();
-        if (c_idx) {
-          clrcursor();
-          c_idx--;
-          drawcursor();
-          return 1;
-        }
-        // Thanks to PCMan.bbs@bbs.sayya.org for the suggestion
-        if (c_len)
-          return 1;
-        return 0;
+        return cursor_left();
      case XK_Right:
-        close_selection_win();
-        if (c_idx < c_len) {
-          clrcursor();
-          c_idx++;
-          drawcursor();
-          return 1;
-        }
-
-        // Thanks to PCMan.bbs@bbs.sayya.org for the suggestion
-        if (c_len)
-          return 1;
-
-        return 0;
+        return cursor_right();
      case XK_Caps_Lock:
         if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
           close_selection_win();
@@ -1349,65 +1415,7 @@ tab_phrase_end:
         key_press_time = current_time();
         return 1;
      case XK_Delete:
-        if (c_idx == c_len)
-          return 0;
-
-        close_selection_win();
-        clear_disp_ph_sta();
-        ityp3_pho=0;
-        pre_selN = 0;
-
-        for(j=3;j>=0;j--)
-          if (typ_pho[j]) {
-            typ_pho[j]=0;
-            disp_in_area_pho_tsin();
-            return 1;
-          }
-
-        clrcursor();
-        pst=k=chpho[c_idx].psta;
-
-        for(k=c_idx;k<c_len;k++) {
-          chpho[k] = chpho[k+1];
-          chpho[k].psta=chpho[k+1].psta-1;
-        }
-
-        c_len--;
-        hide_char(c_len);
-        init_chpho_i(c_len);
-
-        prbuf();
-
-        compact_win0_x();
-
-        if (!c_idx) {
-          clear_match();
-        }
-        else {
-          k=c_idx-1;
-          pst=chpho[k].psta;
-
-          while (k>0 && chpho[k].psta==pst)
-            k--;
-
-          if (chpho[k].psta!=pst)
-            k++;
-
-          match_len= c_idx - k;
-          if (!(match_len=scanphr(k, match_len, FALSE)))
-            ph_sta=-1;
-          else
-            ph_sta=k;
-
-//          if (ph_sta < 0 || c_idx - ph_sta < 2)
-            pre_selN = 0;
-        }
-
-        if (!c_len && gcin_pop_up_win)
-          hide_win0();
-
-        disp_ph_sta();
-        return 1;
+        return cursor_delete();
      case XK_BackSpace:
         close_selection_win();
         clear_disp_ph_sta();
@@ -1560,23 +1568,35 @@ other_keys:
            if (gcin_pop_up_win)
              hide_win0();
            return 1;
-         } else
-         if (xkey>=XK_1 && xkey<=XK_3) {
+         } else if (xkey == XK_e) {
+           //trigger
+           bufferEditing ^= 1;
            return 1;
-         } else {
+         } else if (xkey>=XK_1 && xkey<=XK_3) {
+           return 1;
+         } else
            return 0;
-         }
        }
-
-       char *pp;
 
        char xkey_lcase = xkey;
        if ('A' <= xkey && xkey <= 'Z')
           xkey_lcase = tolower(xkey);
 
+       if (bufferEditing) {
+         if (xkey_lcase=='h')
+           return cursor_left();
+         else
+         if (xkey_lcase=='l')
+           return cursor_right();
+         else
+         if (xkey_lcase=='x')
+           return cursor_delete();
+       }
+
        if (tsin_space_opt == TSIN_SPACE_OPT_INPUT)
          xkey_lcase = keypad_proc(xkey);
 
+       char *pp;
        if ((pp=strchr(phkbm.selkey,xkey_lcase)) && sel_pho) {
          int c=pp-phkbm.selkey;
          char *sel_text;
