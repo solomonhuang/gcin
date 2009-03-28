@@ -68,6 +68,8 @@ static void create_char(int index)
 
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
+  GdkColor color_bg;
+  gdk_color_parse(tsin_phrase_line_color, &color_bg);
 
   for(i=index; i<=index+1 && i < MAX_PH_BF_EXT; i++) {
     if (chars[i].vbox)
@@ -84,8 +86,6 @@ static void create_char(int index)
 
     chars[i].label = label;
     GtkWidget *separator =  gtk_drawing_area_new();
-    GdkColor color_bg;
-    gdk_color_parse(tsin_phrase_line_color, &color_bg);
     gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
     gtk_widget_set_size_request(separator, 8, 2);
     gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
@@ -105,12 +105,12 @@ static void change_tsin_line_color()
 
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
+  GdkColor color_bg;
+  gdk_color_parse(tsin_phrase_line_color, &color_bg);
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     if (!chars[i].line)
       continue;
-    GdkColor color_bg;
-    gdk_color_parse(tsin_phrase_line_color, &color_bg);
     gtk_widget_modify_bg(chars[i].line, GTK_STATE_NORMAL, &color_bg);
     gtk_widget_modify_fg(chars[i].label, GTK_STATE_NORMAL, gcin_win_color_use ? &fg:NULL);
   }
@@ -127,16 +127,15 @@ void disp_char(int index, char *ch)
 {
   char tt[CH_SZ+1];
 
-//  dbg("disp_char %d %c%c\n", index, ch[0], ch[1]);
+//  dbg("disp_char %d %c%c%c\n", index, ch[0], ch[1], ch[2]);
   create_char(index);
   GtkWidget *label = chars[index].label;
 
-  int u8len = u8cpy(tt, ch);
+  utf8cpy(tt, ch);
 
   if (ch[0]==' ' && ch[1]==' ')
       set_label_space(label);
   else {
-    tt[u8len] = 0;
     gtk_label_set_text(GTK_LABEL(label), tt);
   }
 
@@ -200,9 +199,6 @@ void clr_tsin_cursor(int index)
 
   gtk_label_set_attributes(GTK_LABEL(label), attr_list_blank);
 }
-
-
-
 
 
 void disp_pho_sub();
@@ -278,7 +274,7 @@ void move_win_char_index(GtkWidget *win1, int index)
   gtk_window_move(GTK_WINDOW(win1), x, y);
 }
 
-#define MIN_X_SIZE 16
+#define MIN_X_SIZE 32
 
 static int best_win_x, best_win_y;
 

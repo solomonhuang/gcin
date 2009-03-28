@@ -36,7 +36,7 @@ static int current_page;
 static int startf;
 static gboolean full_match;
 static gboolean tsin_half_full;
-static int bufferEditing = 0; //0 = buffer editing mode is disabled
+static gboolean tsin_buffer_editing = 0;
 
 typedef struct {
   phokey_t phokey[MAX_PHRASE_LEN];
@@ -245,13 +245,10 @@ static void disp_in_area_pho_tsin()
 void clear_chars_all();
 
 
-static void clear_disp_ph_sta();
 static void clear_match()
 {
   ph_sta=-1;
-  clear_disp_ph_sta();
-//  bzero(psta, sizeof(psta));
-//  dbg("clear_match\n");
+  clear_tsin_line();
 }
 
 static void clr_ch_buf()
@@ -272,7 +269,7 @@ static void clear_ch_buf_sel_area()
   full_match = FALSE;
   clr_ch_buf();
   drawcursor();
-  clear_disp_ph_sta();
+  clear_tsin_line();
 }
 
 static void close_selection_win();
@@ -282,6 +279,7 @@ static void clear_tsin_buffer()
   clear_ch_buf_sel_area();
   close_selection_win();
   pre_selN = 0;
+  tsin_buffer_editing = 0; //buffer editing is finished
 }
 
 void clr_in_area_pho_tsin();
@@ -557,6 +555,9 @@ static void get_sel_phrase()
   phrase_count = 0;
 
   mlen=c_len-c_idx;
+
+  if (!mlen)
+    return;
 
   if (mlen > MAX_PHRASE_LEN)
     mlen=MAX_PHRASE_LEN;
@@ -907,12 +908,6 @@ static void hide_pre_sel()
 }
 
 
-void clear_tsin_line();
-
-static void clear_disp_ph_sta()
-{
-  clear_tsin_line();
-}
 
 void draw_underline(int index);
 
@@ -926,7 +921,7 @@ static void draw_ul(start, stop)
 void disp_ph_sta_idx(int idx)
 {
 //  dbg("ph_sta:%d\n", ph_sta);
-  clear_disp_ph_sta();
+  clear_tsin_line();
 
   if (ph_sta < 0)
     return;
@@ -1257,7 +1252,7 @@ static int cursor_delete()
   if (c_idx == c_len)
     return 0;
   close_selection_win();
-  clear_disp_ph_sta();
+  clear_tsin_line();
   ityp3_pho=0;
   pre_selN = 0;
 
@@ -1424,7 +1419,7 @@ tab_phrase_end:
         return cursor_delete();
      case XK_BackSpace:
         close_selection_win();
-        clear_disp_ph_sta();
+        clear_tsin_line();
         ityp3_pho=0;
         pre_selN = 0;
 
@@ -1574,9 +1569,9 @@ other_keys:
            if (gcin_pop_up_win)
              hide_win0();
            return 1;
-         } else if (xkey == XK_e) {
-           //trigger
-           bufferEditing ^= 1;
+         } else if (tsin_buffer_editing_mode && xkey == XK_e) { //ctrl+e only works when user enabled tsin_buffer_editing_mode
+           //toggler
+           tsin_buffer_editing ^= 1;
            return 1;
          } else if (xkey>=XK_1 && xkey<=XK_3) {
            return 1;
@@ -1588,7 +1583,7 @@ other_keys:
        if ('A' <= xkey && xkey <= 'Z')
           xkey_lcase = tolower(xkey);
 
-       if (bufferEditing) {
+       if (tsin_buffer_editing) {
          if (xkey_lcase=='h')
            return cursor_left();
          else

@@ -30,6 +30,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_tsin_tone_char_input,
                  *check_button_tsin_tab_phrase_end,
                  *check_button_tsin_tail_select_key,
+		 *check_button_tsin_buffer_editing_mode,
                  *check_button_gcin_capslock_lower,
                  *spinner_tsin_buffer_size;
 
@@ -121,6 +122,9 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(TSIN_TAIL_SELECT_KEY,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_tail_select_key)));
+
+  save_gcin_conf_int(TSIN_BUFFER_EDITING_MODE,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_buffer_editing_mode)));
 
   save_gcin_conf_int(GCIN_CAPSLOCK_LOWER,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower)));
@@ -499,6 +503,14 @@ void create_kbm_window()
   gtk_toggle_button_set_active(
      GTK_TOGGLE_BUTTON(check_button_tsin_tail_select_key), tsin_tail_select_key);
 
+  GtkWidget *hbox_tsin_buffer_editing_mode = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_buffer_editing_mode , TRUE, TRUE, 1);
+  GtkWidget *label_tsin_buffer_editing_mode = gtk_label_new(_("啟用詞音緩衝區編輯模式"));
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_buffer_editing_mode), label_tsin_buffer_editing_mode, TRUE, TRUE, 0);
+  check_button_tsin_buffer_editing_mode = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_buffer_editing_mode), check_button_tsin_buffer_editing_mode, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_tsin_buffer_editing_mode), tsin_buffer_editing_mode);
 
   GtkWidget *hbox_gcin_capslock_lower = gtk_hbox_new(FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_r), hbox_gcin_capslock_lower , TRUE, TRUE, 1);

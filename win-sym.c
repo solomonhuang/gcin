@@ -316,7 +316,7 @@ gboolean  button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer 
   syms = pages[idx].syms;
   symsN = pages[idx].symsN;
   destory_win();
-  win_sym_enabled = 0;
+//  win_sym_enabled = 0;
   create_win_sym();
 }
 

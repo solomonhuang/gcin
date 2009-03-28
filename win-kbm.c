@@ -194,9 +194,21 @@ static void set_kbm_key(KeySym keysym, char *str)
   for(i=0;i<keysN;i++) {
     int j;
     for(j=0;j<COLN;j++) {
+      if (keysym >='A' && keysym<='Z')
+        keysym += 0x20;
+
       if (keys[i][j].keysym!=keysym)
         continue;
+
       GtkWidget *lab = keys[i][j].lab;
+      char *t = gtk_label_get_text(lab);
+      char tt[64];
+
+      if (t && strcmp(t, str)) {
+        strcat(strcpy(tt, t), str);
+        str = tt;
+      }
+
       gtk_label_set_text(GTK_LABEL(lab), str);
     }
   }
@@ -253,9 +265,12 @@ void update_win_kbm()
         char k=cur_inmd->keymap[i];
         if (!k)
           continue;
+
         char *keyname = &cur_inmd->keyname[k * CH_SZ];
         if (!keyname)
           continue;
+
+
         char tt[64];
 
         if (keyname[0] & 128)
@@ -264,6 +279,7 @@ void update_win_kbm()
           memcpy(tt, keyname, 2);
           tt[2]=0;
         }
+
         set_kbm_key(i, tt);
       }
 

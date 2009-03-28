@@ -479,7 +479,7 @@ void hide_win_gtab()
 
 void minimize_win_gtab()
 {
-  gtk_window_resize(GTK_WINDOW(gwin_gtab), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin_gtab), 32, 12);
 }
 
 

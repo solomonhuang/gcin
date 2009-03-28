@@ -63,6 +63,7 @@
 #define TSIN_TONE_CHAR_INPUT "tsin-tone-char-input"
 #define TSIN_TAB_PHRASE_END "tsin-tab-phrase-end"
 #define TSIN_TAIL_SELECT_KEY "tsin-tail-select-key"
+#define TSIN_BUFFER_EDITING_MODE "tsin-buffer-editing-mode"
 
 #define PHO_HIDE_ROW2 "pho-hide-row2"
 #define PHO_IN_ROW1 "pho-in-row1"
@@ -103,6 +104,7 @@ extern int gcin_status_tray;
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;
 extern int tsin_tab_phrase_end, tsin_tail_select_key;
+extern int tsin_buffer_editing_mode;
 
 extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab, phonetic_speak;

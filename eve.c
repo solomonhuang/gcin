@@ -563,6 +563,8 @@ extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab;
 
 gboolean win_is_visible()
 {
+  if (!current_CS)
+    return FALSE;
   switch (current_CS->in_method) {
     case 3:
       return GTK_WIDGET_VISIBLE(gwin_pho);
@@ -574,6 +576,8 @@ gboolean win_is_visible()
     case 10:
       break;
     default:
+      if (!gwin_gtab)
+        return FALSE;
       return GTK_WIDGET_VISIBLE(gwin_gtab);
   }
 }
@@ -813,10 +817,14 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
     if (keysym == ',') {
       extern gboolean win_sym_enabled;
-      if (!win_is_visible())
-        win_sym_enabled=1;
-      else
-        win_sym_enabled^=1;
+
+      if (current_CS->im_state == GCIN_STATE_CHINESE) {
+        if (!win_is_visible())
+          win_sym_enabled=1;
+        else
+          win_sym_enabled^=1;
+      } else
+        win_sym_enabled==0;
 
       create_win_sym();
       if (win_sym_enabled) {

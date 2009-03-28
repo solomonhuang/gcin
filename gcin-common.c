@@ -129,11 +129,9 @@ void change_tsin_font_size(){}
 void change_win0_style(){}
 void clear_ch_buf_sel_area(){}
 void clear_tsin_buffer(){}
-void compact_win0_x(){}
 void destroy_win0(){}
 void destroy_win1(){}
 void free_tsin(){}
-void hide_win0(){}
 void load_ts_gtab(){}
 void load_tsin_db(){}
 void putbuf(){}
