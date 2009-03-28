@@ -190,9 +190,9 @@ clean:
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
 	$(MAKE) -C menu clean
-	rm -f *.o *~ *.E *.db *.pico *.so config.mak tags core.* $(PROGS) $(PROGS_CV) \
-	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.* tscr/*~ \
-	trad2sim gcin.spec.tmp gcin.log
+	rm -f *.o *.E *.db *.pico *.so config.mak tags $(PROGS) $(PROGS_CV) \
+	$(DATA) .depend gcin.spec trad2sim gcin.spec.tmp gcin.log
+	find . -name '.ted*' -o -name '*~' -o -name 'core.*' -exec rm {} \;
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

@@ -54,6 +54,8 @@ void loadIC();
 IC *FindIC(CARD16 icid);
 extern ClientState *current_CS;
 
+
+
 enum {
   InputStyleOverSpot = 1,
   InputStyleRoot = 2,
@@ -67,6 +69,8 @@ enum {
   Windows_Space=3,
 } IM_TOGGLE_KEYS;
 
+
+
 enum {
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock=1,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab=2,
@@ -74,6 +78,7 @@ enum {
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL=8,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR=16,
 } TSIN_CHINESE_ENGLISH_TOGGLE_KEY;
+
 
 enum {
   TSIN_SPACE_OPT_SELECT_CHAR = 1,

@@ -96,7 +96,7 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
       if (i < plen)
         continue;
 
-      int score;
+      float score;
 
       score = plen;
       if (match_len > plen) {
@@ -116,7 +116,7 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
         continue;
       }
 
-      score = usecount + 50 * plen * plen;
+      score = (float)usecount + 200 * plen * plen * plen;
 
       if (pbestscore >= score)
         continue;

@@ -119,6 +119,8 @@ void lookup_gtabn(char *ch)
   int n = utf8_str_N(ch);
   gboolean phrase = n > 1 || !(ch[0] & 0x80);
 
+  dbg("hh %s\n", ch);
+
   if (!tinmd->DefChars)
     tinmd = cur_inmd;
 

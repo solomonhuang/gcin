@@ -134,6 +134,7 @@ void inc_pho_count(phokey_t key, int ch_idx);
 int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5);
 void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int prlen, int N);
 
+
 static void putbuf(int len)
 {
   u_char tt[CH_SZ * (MAX_PH_BF_EXT+1) + 1];
@@ -202,6 +203,7 @@ static void putbuf(int len)
 
   tt[idx]=0;
   send_text(tt);
+  lookup_gtabn(tt);
 }
 
 
@@ -1891,8 +1893,13 @@ int feedkey_pp_release(KeySym xkey, int kbstate)
   switch (xkey) {
      case XK_Shift_L:
      case XK_Shift_R:
-        if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift &&
-            current_time() - key_press_time < 300000) {
+        if (
+(  (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) ||
+   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL
+     && xkey == XK_Shift_L) ||
+   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
+     && xkey == XK_Shift_R))
+          &&  current_time() - key_press_time < 300000) {
           key_press_time = 0;
           close_selection_win();
           tsin_toggle_eng_ch();

@@ -80,7 +80,7 @@ int utf8cpy(char *t, char *s)
   return utf8sz;
 }
 
-
+// copy N utf-8 chars
 void utf8cpyN(char *t, char *s, int N)
 {
   int len = utf8_tlen(s, N);
@@ -164,4 +164,21 @@ int utf8_str_N(char *str)
   }
 
   return N;
+}
+
+// copy at most n utf-8 chars
+void utf8cpyn(char *t, char *s, int n)
+{
+  int tn=0;
+  int i;
+
+  for (i=0; i < n && *s; i++) {
+    int sz = utf8_sz(s);
+
+    memcpy(t+tn, s, sz);
+    tn+=sz;
+    s+=sz;
+  }
+
+  t[tn]=0;
 }

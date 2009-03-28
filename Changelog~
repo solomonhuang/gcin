@@ -5,7 +5,7 @@
 - 在不同的 gtab 輸入法切換輸入會造成當掉的問題。
 - gtab 內用片語有時候會無法按數字鍵選擇的問題。
 - gtab 詞的顯示長度限制在6個字。
-- gtab 現在可以顯示詞的拆碼。也可以用詞音輸入詞後按 Enter 查詢 gtab 字/詞的拆碼，結果在 gtab 拆碼顯示區。
+- gtab 現在可以顯示詞的拆碼。也可以用詞音輸入詞後按 Enter 查詢 gtab 字/詞的拆碼。
 - 萬用字元如果顯示的字數過多，會導致 coredump 的問題。
 - FreeBSD & MacOS gcin2tab 內改用 mergesort 以避免順序亂掉的問題。
 - 詞音新增可以設定 shiftL, shiftR 或皆可切換中英的選項。

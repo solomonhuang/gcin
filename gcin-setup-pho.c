@@ -40,6 +40,8 @@ static struct {
   {"CapsLock", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock},
   {"Tab", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
   {"Shift(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
+  {"ShiftL(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL},
+  {"ShiftR(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR},
 };
 int tsin_eng_ch_swN = sizeof(tsin_eng_ch_sw) / sizeof(tsin_eng_ch_sw[0]);
 

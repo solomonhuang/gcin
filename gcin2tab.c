@@ -13,7 +13,7 @@
 #include <string.h>
 #include "gcin.h"
 #include "gtab.h"
-
+#include "gcin-endian.h"
 
 FILE *fr, *fw;
 int lineno;
@@ -149,13 +149,7 @@ int qcmp(const void *aa, const void *bb)
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
 
-#if FREEBSD
-  if (a->oseq > b->oseq) return 1;
-  if (a->oseq < b->oseq) return -1;
-  return 0;
-#else
   return a->oseq - b->oseq;
-#endif
 }
 
 
@@ -166,13 +160,7 @@ int qcmp_64(const void *aa, const void *bb)
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
 
-#if FREEBSD
-  if (a->oseq > b->oseq) return 1;
-  if (a->oseq < b->oseq) return -1;
-  return 0;
-#else
   return a->oseq - b->oseq;
-#endif
 }
 
 
@@ -423,7 +411,6 @@ int main(int argc, char **argv)
 
     if ((len=strlen(arg)) <= CH_SZ && (arg[0] & 0x80)) {
       char out[CH_SZ+1];
-      int u8len = utf8_sz(arg);
 
       bzero(out, sizeof(out));
       memcpy(out, arg, len);
@@ -446,7 +433,7 @@ int main(int argc, char **argv)
       }
 
       if (len > MAX_CIN_PHR)
-        p_err("phrase too long: %s\n", arg);
+        p_err("phrase too long: %s  max:%d bytes\n", arg, MAX_CIN_PHR);
 
       phridx = trealloc(phridx, int, phr_cou+1);
       phridx[phr_cou++]=prbf_cou;
@@ -467,7 +454,6 @@ int main(int argc, char **argv)
     qsort(itar, chno,sizeof(ITEM2), qcmp2);
 
 
-
   if (key64) {
     for(i=0;i<chno;i++) {
       if (!i || memcmp(&itar64[i], &itar64[i-1], sizeof(ITEM64))) {
@@ -486,20 +472,23 @@ int main(int argc, char **argv)
   th.DefC=chno;
   cur_inmd->DefChars = chno;
 
-  if (key64)
-    qsort(itmp64,chno,sizeof(ITEM2_64),qcmp_64);
-  else
-    qsort(itmp,chno,sizeof(ITEM2),qcmp);
+#if FREEBSD
+#define _sort mergesort
+#else
+#define _sort qsort
+#endif
 
+  if (key64)
+    _sort(itmp64,chno,sizeof(ITEM2_64),qcmp_64);
+  else
+    _sort(itmp,chno,sizeof(ITEM2),qcmp);
 
   if (key64) {
-    for(i=0;i<chno;i++) {
+    for(i=0;i<chno;i++)
       memcpy(&itout64[i],&itmp64[i],sizeof(ITEM64));
-    }
   } else {
-    for(i=0;i<chno;i++) {
+    for(i=0;i<chno;i++)
       memcpy(&itout[i],&itmp[i],sizeof(ITEM));
-    }
   }
 
 
@@ -526,24 +515,49 @@ int main(int argc, char **argv)
 
   printf("Defined Characters:%d\n", chno);
 
+#if NEED_SWAP
+  to_gcin_endian_4(&th.version);
+  to_gcin_endian_4(&th.flag);
+  to_gcin_endian_4(&th.space_style);
+  to_gcin_endian_4(&th.KeyS);
+  to_gcin_endian_4(&th.MaxPress);
+  to_gcin_endian_4(&th.M_DUP_SEL);
+  to_gcin_endian_4(&th.DefC);
+#endif
   fwrite(&th,1,sizeof(th),fw);
   fwrite(keymap, 1, KeyNum, fw);
   fwrite(kname, CH_SZ, KeyNum, fw);
   fwrite(idx1, sizeof(gtab_idx1_t), KeyNum+1, fw);
 
   if (key64) {
+#if NEED_SWAP
+    for(i=0; i < chno; i++) {
+      to_gcin_endian_8(&itout64[i].key);
+    }
+#endif
     fwrite(itout64, sizeof(ITEM64), chno, fw);
 #if 0
     for(i=0; i < 100; i++)
       dbg("%d] %c%c%c\n", i, itout64[i].ch[0], itout64[i].ch[1], itout64[i].ch[2]);
 #endif
   }
-  else
+  else {
+#if NEED_SWAP
+    for(i=0; i < chno; i++) {
+      to_gcin_endian_4(&itout[i].key);
+    }
+#endif
     fwrite(itout, sizeof(ITEM), chno, fw);
+  }
 
   if (phr_cou) {
     phridx[phr_cou++]=prbf_cou;
     printf("phrase count:%d\n", phr_cou);
+#if NEED_SWAP
+    for(i=0; i < 100; i++)
+      to_gcin_endian_4(&phridx[i]);
+    to_gcin_endian_4(&phr_cou);
+#endif
     fwrite(&phr_cou, sizeof(int), 1, fw);
     fwrite(phridx, sizeof(int), phr_cou, fw);
     fwrite(phrbuf,1,prbf_cou,fw);

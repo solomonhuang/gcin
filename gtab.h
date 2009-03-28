@@ -102,3 +102,9 @@ extern INMD *cur_inmd;
 #define LAST_K_bitN (cur_inmd->key64 ? 54:24)
 
 #define GTAB_LIST "gtab.list"
+
+#if 1
+#define NEED_SWAP (__BYTE_ORDER == __BIG_ENDIAN && 1)
+#else
+#define NEED_SWAP (1)
+#endif
