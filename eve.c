@@ -31,25 +31,42 @@ ClientState temp_CS;
 
 gboolean init_in_method(int in_no);
 
-char *output_buffer;
-int  output_bufferN, output_bufferN_a;
+char *output_buffer, *output_buffer_bak;
+int  output_bufferN;
+
+void clear_output_buffer()
+{
+  char *t;
+
+  t = output_buffer;
+  output_buffer = output_buffer_bak;
+  output_buffer_bak = t;
+
+  if (output_buffer)
+    output_buffer[0] = 0;
+
+  output_bufferN = 0;
+}
 
 
 void send_text(char *text)
 {
+  if (!text)
+    return;
   int len = strlen(text);
   int requiredN = len + 1 + output_bufferN;
 
-  if (requiredN >= output_bufferN_a) {
-    output_bufferN_a = requiredN;
-    output_buffer = realloc(output_buffer, output_bufferN_a);
-    output_buffer[output_bufferN] = 0;
-  }
+  output_buffer = realloc(output_buffer, requiredN);
+  output_buffer[output_bufferN] = 0;
 
   strcat(output_buffer, text);
   output_bufferN += len;
 }
 
+void send_output_buffer_bak()
+{
+  send_text(output_buffer_bak);
+}
 
 void sendkey_b5(char *bchar)
 {
@@ -93,7 +110,7 @@ void export_text_xim()
   ((IMCommitStruct*)current_forward_eve)->commit_string = tp.value;
   IMCommitString(current_ims, (XPointer)current_forward_eve);
 
-  output_bufferN = 0; output_buffer[0] = 0;
+  clear_output_buffer();
 
   XFree(tp.value);
 }
@@ -530,11 +547,16 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
 
   if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
-    current_CS->im_state = GCIN_STATE_CHINESE;
+    if (keysym == 'g') {
+      send_output_buffer_bak();
+      return TRUE;
+    }
+
     int kidx = gcin_switch_keys_lookup(keysym);
     if (kidx < 0)
       return FALSE;
 
+    current_CS->im_state = GCIN_STATE_CHINESE;
     init_in_method(kidx);
     return TRUE;
   }
@@ -579,10 +601,7 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 
   if (current_CS->im_state == GCIN_STATE_DISABLED)
     return FALSE;
-#if 0
-  if (current_CS->client_win)
-    focus_win = current_CS->client_win;
-#endif
+
   switch(current_CS->in_method) {
     case 6:
       return feedkey_pp_release(keysym, kev_state);
@@ -676,12 +695,9 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 
 int gcin_FocusOut(ClientState *cs)
 {
-#if 1
     if (cs == current_CS) {
       hide_in_win(cs);
-//      focus_win = 0;
     }
-#endif
 
     reset_current_in_win_xy();
 

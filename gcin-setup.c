@@ -202,9 +202,9 @@ struct {
   char *str;
   int num;
 } spc_opts[] = {
-  {"按空白立即送出第一字(嘸蝦米)", GTAB_space_auto_first_any},
+  {"按空白立即送出第一字(嘸蝦米、大易)", GTAB_space_auto_first_any},
   {"按滿按空白送出第一字(內定)", GTAB_space_auto_first_full},
-  {"按滿按空白不送出第一字(Windows 行列)", GTAB_space_auto_first_nofull},
+  {"按滿按空白不送出第一字(行列)", GTAB_space_auto_first_nofull},
   { NULL, 0},
 };
 
@@ -304,7 +304,7 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_gtab_in, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_gtab_in), 3);
   GtkAdjustment *adj_gtab_in =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 8.0, 24.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 0.0, 24.0, 1.0, 1.0, 0.0);
   spinner_gtab_in = gtk_spin_button_new (adj_gtab_in, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_font_size_gtab_in), spinner_gtab_in);
 

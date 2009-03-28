@@ -1,6 +1,15 @@
 ** UTF-8 encoding **
+0.9.7:
+- 嘸蝦米用 wildcard (*?) 符合的字超過10個沒有辦法顯示的問題。
+- 新增 ctrl-alt-G 重複送出的字串。
+- 找到 input focus 錯亂的原因，如果 mozilla/firefox 裏面有 Macromedia flash plugin，會 open root style 的 XIM，這邊 concurrent 處理有問題。雖然情況有改善，flash plugin 仍然有問題。如果你正在用某個程式用 gcin 輸入，然後 firefox 剛好開了一個 新的flash，會造成 gcin 的 window 不見，這是 flash 第一次開啟時亂送 focus-in 的問題，必須把 flash 的 bug 解掉。
+- 如果候選字超過10個，就不使用嘸蝦米的空白鍵方式，以免無法選字。
+- gtab 輸入區的字型大小現在最小可以設定成 0。
+- 許氏注音鍵盤無法輸入 「hwf好  hnf很  hid還」 的問題。
+- 新增 files of man page gcin.1 gcin2tab.1, 由某位熱心人士提供。
+
 0.9.6:
-- 注音現在也可以用精簡視窗了，gcin-setup 中的顯示狀態列的部份也有些變動，注音與詞音是共用此設定，喜歡大視窗的人自己精簡視窗關閉。
+- 注音現在也可以用精簡視窗了，gcin-setup 中的顯示狀態列的部份也有些變動，注音與詞音是共用此設定，喜歡大視窗的人自己把精簡視窗選項關閉。
 - 注音現在現在也可以設定注音輸入區的字型大小，而且可以馬上作用，不必重新執行 gcin。
 - 許氏注音鍵盤無法輸入【kgf可  gxij怪  nef你   mef米】 的問題。
 - 加回 focus-out 關閉 gcin Window，因為並沒有解決某些人 OO 的問題，而且造成某些人 gcin window 不會自動關掉的問題。

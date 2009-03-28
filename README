@@ -482,7 +482,7 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
  gcin 的XMODIFIERS 可以不設定，但應用程式的就必須設定成 XMODIFIERS=@im=xcin
    如果有設定，就必須一致，例如都設定成 XMODIFIERS=@im=gcin 也可以。
 
-4. gtk2 程式檢查事項。
+4. gtk2(gnome) 程式檢查事項。
      $ gtk-query-immodules-2.0
 是否有底下的內容，     
 "/usr/lib/gtk-2.0/immodules/im-gcin.so" 

@@ -1,0 +1,7 @@
+pkill gcin.test
+export LC_ALL=zh_TW.Big5
+export XMODIFIERS=@im=gcin_test
+../gcin.test &
+sleep 1
+mozilla-firefox
+pkill gcin.test

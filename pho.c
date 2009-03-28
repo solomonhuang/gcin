@@ -67,29 +67,39 @@ static void find_match_phos(u_char mtyp_pho[4], int *mcount, int newkey)
 
       mask_key_typ_pho(&key);
 #if TKBM
+      dbg("-------------------- %d --", typ_pho[3]);
       prph(key);
       dbg("\n");
 #endif
-      for (vv = hash_pho[typ_pho[0]]; vv < idxnum_pho; vv++) {
+      for (vv = hash_pho[typ_pho[0]]; vv < hash_pho[typ_pho[0]+1]; vv++) {
         phokey_t ttt=idx_pho[vv].key;
 
-        if (newkey!=' ')
+        if (newkey!=' ' && !typ_pho[3])
           mask_key_typ_pho(&ttt);
+
+        if (ttt > key)
+          break;
 
         int count = 0;
 
         int i;
-        for(i=idx_pho[vv].start; i < idx_pho[vv+1].start; i++)
-          if (utf8_sz(ch_pho[i].ch) > 1)
+        for(i=idx_pho[vv].start; i < idx_pho[vv+1].start; i++) {
+          if (utf8_sz(ch_pho[i].ch) > 1) {
+#if 0
+            utf8_putchar(ch_pho[i].ch);
+            dbg(" ");
+#endif
             count++;
+          }
+        }
 
-        if (ttt == key && *mcount < count) {
+        if (*mcount < count) {
           *mcount = count;
           memcpy(mtyp_pho, typ_pho, sizeof(typ_pho));
 #if TKBM
           dbg("count %d\n", count);
 #endif
-          if (mcount > MIN_M_PHO)
+          if (*mcount > MIN_M_PHO)
             break;
         }
       }
@@ -139,6 +149,8 @@ gboolean inph_typ_pho(int newkey)
   }
 
 
+//  dbg("newkey %c\n", newkey);
+
   int mcount = 0;
   u_char mtyp_pho[4];
 
@@ -148,18 +160,17 @@ gboolean inph_typ_pho(int newkey)
     char num = phkbm.phokbm[(int)inph[0]][a].num;
     char typ = phkbm.phokbm[(int)inph[0]][a].typ;
 
-    if (num && typ!=3) {
-      if (typ_pho[3] || newkey==' ' || typ == 0) {
-        if (typ==2 && (typ_pho[3] || newkey==' ') && !inph[2])
-          typ_pho[0] = 0;
-        typ_pho[(int)typ] = num;
-      }
+    if (typ == 3)
+      continue;
+
+    if (num) {
+      if (typ==2 && typ_pho[0])
+        typ_pho[0] = 0;
+      typ_pho[(int)typ] = num;
 #if TKBM
       dbg("%d num %d\n",a, num);
 #endif
       find_match_phos(mtyp_pho, &mcount, newkey);
-      if (mcount > MIN_M_PHO)
-        return TRUE;
     }
 
     for(i=0; i < 3; i++) {
@@ -168,17 +179,25 @@ gboolean inph_typ_pho(int newkey)
 
       if (!num)
         break;
-#if TKBM
-      dbg("i:%d\n",i);
-#endif
+
       if (typ!=2)
         continue;
 
       typ_pho[(int)typ] = num;
 
       find_match_phos(mtyp_pho, &mcount, newkey);
+
+      if (mcount > MIN_M_PHO) {
+        return TRUE;
+      }
     }
 
+
+    find_match_phos(mtyp_pho, &mcount, newkey);
+
+    if (mcount > MIN_M_PHO) {
+      return TRUE;
+    }
   }
 
   if (mcount) {

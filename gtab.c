@@ -227,7 +227,7 @@ void load_gtab_list()
   get_sys_table_file_name("gtab.list", ttt);
 
   if ((fp=fopen(ttt, "r"))==NULL)
-    exit(-1);
+    p_err("cannot open %s", ttt);
 
   dbg("load_gtab_list %s\n", ttt);
 
@@ -383,7 +383,7 @@ void init_gtab(int inmdno, int usenow)
   strcpy(inp->selkey,th.selkey);
   inp->M_DUP_SEL=th.M_DUP_SEL;
 
-  dbg("MaxPress:%d\n", th.MaxPress);
+  dbg("MaxPress:%d  M_DUP_SEL:%d\n", th.MaxPress, th.M_DUP_SEL);
 
   for(i=0;i<th.KeyS;i++) {
     inp->keymap[(int)ttt[i]]=i;
@@ -672,7 +672,7 @@ void wildcard()
   char tt[MAX_SEL_BUF];
   tt[0]=0;
 
-  for(t=0; t< cur_inmd->DefChars && defselN < strlen(cur_inmd->selkey); t++) {
+  for(t=0; t< cur_inmd->DefChars && defselN < cur_inmd->M_DUP_SEL; t++) {
     kk=CONVT2(cur_inmd, t);
     match=1;
     char ts[32];
@@ -775,7 +775,7 @@ static void disp_selection(gboolean phrase_selected)
 
   int ofs;
 
-  if (exa_match && (gtab_space_auto_first & GTAB_space_auto_first_any)) {
+  if (exa_match && (gtab_space_auto_first & GTAB_space_auto_first_any) && !more_pg) {
     strcat(tt, seltab[0]);
     strcat(tt, " ");
     ofs = 1;
@@ -979,7 +979,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       } else
       if (!has_wild) {
 //        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);
-        if (gtab_space_auto_first == GTAB_space_auto_first_any && seltab[0][0] &&
+        if (gtab_space_auto_first == GTAB_space_auto_first_any && !more_pg && seltab[0][0] &&
             sel1st_i==MAX_SELKEY-1 && exa_match<=cur_inmd->M_DUP_SEL) {
           sel1st_i = 0;
         }

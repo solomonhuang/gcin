@@ -47,6 +47,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/*
 %{_includedir}/*
 %{_datadir}/gcin/*
+%{_datadir}/man/man1/*
 %{_datadir}/icons/*
 %{_libdir}/menu/*
 %{_libdir}/gtk-2.0/*

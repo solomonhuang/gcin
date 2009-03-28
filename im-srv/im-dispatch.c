@@ -110,6 +110,7 @@ void process_client_req(int fd)
   switch (req.req_no) {
     case GCIN_req_key_press:
     case GCIN_req_key_release:
+      current_CS = cs;
 #if 1
       {
         char tt[128];
@@ -148,8 +149,7 @@ void process_client_req(int fd)
 
       if (output_bufferN) {
         write_enc(fd, output_buffer, datalen);
-        output_buffer[0] = 0;
-        output_bufferN = 0;
+        clear_output_buffer();
       }
 
       break;

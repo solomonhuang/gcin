@@ -100,6 +100,7 @@ install:
 	fi
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install
+	$(MAKE) -C man install
 clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean
@@ -107,6 +108,7 @@ clean:
 	$(MAKE) -C im-srv clean
 	$(MAKE) -C im-client clean
 	$(MAKE) -C gtk-im clean
+	$(MAKE) -C man clean
 	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
 
 .depend:

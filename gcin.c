@@ -136,6 +136,9 @@ void GetIC(IMChangeICStruct *call_data);
 int xim_gcin_FocusIn(IMChangeFocusStruct *call_data);
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
 
+#define DEBUG 0
+
+
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
 //  dbg("gcin_ProtoHandler %x ims\n", ims);
@@ -440,7 +443,8 @@ int main(int argc, char **argv)
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
   strcpy(xim_arr[1].xim_server_name, xim_server_name);
 
-  if ((lc_ctype && !strcasecmp(lc_ctype, "zh_TW.UTF-8")) || (lc_all && !strcasecmp(lc_all, "zh_TW.UTF-8")) ||
+  if ((lc_ctype && (strstr(lc_ctype, ".utf-8") || strstr(lc_ctype, ".UTF-8"))) ||
+      (lc_all && (strstr(lc_all, ".utf-8") || strstr(lc_all, ".UTF-8"))) ||
        (lang && !strcasecmp(lang, "zh_TW.UTF-8"))) {
     xim_arr[0].b_send_utf8_str = TRUE;
     xim_arr[1].b_send_utf8_str = FALSE;

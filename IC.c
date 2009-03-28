@@ -197,8 +197,7 @@ void load_IC(IC *rec)
    ClientState *cs = &rec->cs;
    Window win = cs->client_win;
 
-#if 1
-   if (win == focus_win || !current_CS)
+   if (win == focus_win && !current_CS)
      current_CS = cs;
 
    if (win == focus_win) {
@@ -208,7 +207,6 @@ void load_IC(IC *rec)
      if (cs->im_state != GCIN_STATE_DISABLED)
        show_in_win(cs);
    }
-#endif
 
    if (cs->input_style & InputStyleOnSpot) {
 #if 0
@@ -221,7 +219,6 @@ void load_IC(IC *rec)
        move_IC_in_win(cs);
    } else
    if (cs->input_style & InputStyleRoot) {
-//     update_in_win_pos();
      move_IC_in_win(cs);
    }
 }
@@ -236,7 +233,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 	XICAttribute *sts_attr = call_data->status_attr;
 	register int i;
 
-	if (cs)
+	if (!current_CS)
           current_CS = cs;
 #if DEBUG
         dbg(".... StoreIC\n");
@@ -450,7 +447,7 @@ void GetIC(IMChangeICStruct *call_data)
             *(XPoint*)pre_attr->value = cs->spot_location;
 	    pre_attr->value_length = sizeof(XPoint);
 #if DEBUG
-            dbg("over splot %d %d\n", cs->spot_location.x,  cs->spot_location.y);
+            dbg("over spot %d %d\n", cs->spot_location.x,  cs->spot_location.y);
 #endif
 	} else if (Is (XNFontSet, pre_attr)) {
 	    CARD16 base_len = (CARD16)strlen(rec->pre_attr.base_font);
