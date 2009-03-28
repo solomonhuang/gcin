@@ -52,10 +52,6 @@ msgstr "Auto-send when keycodes are filled"
 msgid "預選列中顯示部份符合的字"
 msgstr "Preview keycode-partial-matched choices"
 
-#: ../gcin-setup-gtab.c:244
-msgid "較小視窗"
-msgstr "Smaller input window"
-
 #: ../gcin-setup-gtab.c:255
 msgid "顯示拆字"
 msgstr "Show keycodes"
@@ -183,10 +179,6 @@ msgstr "Enable preselection window in Tsin"
 #: ../gcin-setup-pho.c:392
 msgid "依使用頻率調整字的順序"
 msgstr "Resorting choices by user's usage frequency"
-
-#: ../gcin-setup-pho.c:402
-msgid "詞音/注音精簡視窗"
-msgstr "Smaller input window for Tsin and Bopomofo"
 
 #: ../gcin-setup-pho.c:412
 msgid "注音隱藏第二列(按鍵顯示)"

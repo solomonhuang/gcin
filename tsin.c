@@ -1654,6 +1654,9 @@ other_keys:
            return cursor_delete();
        }
 
+       if (xkey >= XK_KP_0 && xkey<=XK_KP_9)
+         xkey_lcase = xkey - XK_KP_0 + '0';
+
        char *pp;
        if ((pp=strchr(phkbm.selkey,xkey_lcase)) && sel_pho) {
          int c=pp-phkbm.selkey;

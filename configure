@@ -106,6 +106,18 @@ else
   echo " found."
 fi
 
+echo -n ".... Testing anthy    :  "
+
+USE_ANTHY=`pkg-config --libs anthy`
+
+if [ $? != 0 ]; then
+  USE_ANTHY=N
+  echo "It's ok if you don't want anthy support."
+else
+  USE_ANTHY=Y
+  echo "found."
+fi
+
 LIB='lib'
 if [ -d /lib64 ]; then
 LIB='lib64'
@@ -218,6 +230,7 @@ echo "SO_FLAGS=$SO_FLAGS" >> config.mak
 echo "USE_TRAY=$use_tray" >> config.mak
 echo "USE_I18N=$use_i18n" >> config.mak
 echo "USE_TSIN=$use_tsin" >> config.mak
+echo "USE_ANTHY=$USE_ANTHY" >> config.mak
 
 
 cd menu

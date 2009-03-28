@@ -40,13 +40,12 @@ int pho_simple_win=1;
 int tsin_space_opt;
 int tsin_buffer_size, tsin_tail_select_key;
 int tsin_buffer_editing_mode;
-int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
 char *tsin_phrase_line_color;
 char *tsin_cursor_color, *gcin_sel_key_color;
 int tsin_tab_phrase_end;
-int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
+int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
 int gcin_inner_frame;
 char *gcin_font_name, *gcin_win_color_fg, *gcin_win_color_bg;
 #if TRAY_ENABLED
@@ -55,7 +54,7 @@ int gcin_status_tray;
 
 int pho_hide_row2, pho_in_row1;
 int gcb_position, gcb_position_x, gcb_position_y, gcin_bell_volume;
-int gcin_sound_play_overlap;
+int gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch;
 
 
 int get_gcin_conf_int(char *name, int default_value);
@@ -76,14 +75,7 @@ void load_setttings()
   gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 0);
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
   gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 0);
-#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 4
-#define ABS_VAL 0
-#else
-#define ABS_VAL 1
-#endif
-  gcin_pop_up_win_abs_corner = get_gcin_conf_int(GCIN_POP_UP_WIN_ABS_CORNER, ABS_VAL);
 
-  gcin_chars_big5_only = get_gcin_conf_int(GCIN_CHARS_BIG5_ONLY,0);
   gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);
   gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 0);
   gcin_shift_space_eng_full = get_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL, 1);
@@ -103,7 +95,6 @@ void load_setttings()
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
-  gtab_simple_win = get_gcin_conf_int(GTAB_SIMPLE_WIN, 1);
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
   gtab_disp_im_name = get_gcin_conf_int(GTAB_DISP_IM_NAME, 1);
   gtab_invalid_key_in = get_gcin_conf_int(GTAB_INVALID_KEY_IN, 1);
@@ -120,7 +111,6 @@ void load_setttings()
                                     TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock);
   tsin_tone_char_input = get_gcin_conf_int(TSIN_TONE_CHAR_INPUT, 0);
 
-  pho_simple_win = get_gcin_conf_int(PHO_SIMPLE_WIN, 1);
   tsin_space_opt = get_gcin_conf_int(TSIN_SPACE_OPT, TSIN_SPACE_OPT_SELECT_CHAR);
   tsin_buffer_size = get_gcin_conf_int(TSIN_BUFFER_SIZE, 40);
   tsin_tab_phrase_end = get_gcin_conf_int(TSIN_TAB_PHRASE_END, 0);
@@ -149,4 +139,5 @@ void load_setttings()
   gcb_position_y = get_gcin_conf_int(GCB_POSITION_Y, 0);
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
+  gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);
 }

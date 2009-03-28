@@ -207,7 +207,7 @@ int main(int argc, char **argv)
   bzero(itout64,sizeof(itout64));
 
   cmd_arg(&cmd, &arg);
-  if (sequ(cmd, "%gen_inp") || sequ(cmd, "%encoding")) {
+  if (sequ(cmd, "%gen_inp")) {
     dbg("skip gen_inp\n");
     cmd_arg(&cmd, &arg);
   }

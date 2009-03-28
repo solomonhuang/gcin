@@ -6,7 +6,7 @@ export LC_ALL=zh_TW.UTF-8
 export GCIN_TABLE_DIR=./data
 echo "GCIN_TABLE_DIR=$GCIN_TABLE_DIR"
 pkill gcin.test
-export XMODIFIERS=@im=$GCIN_XIM
+export XMODIFIERS=@im=gcin_test
 locale
 
 ##  Why does gcin get Big5 with the setting above ?

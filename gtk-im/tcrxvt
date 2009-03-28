@@ -1,12 +1,11 @@
 rm -f core.*
 
 make
-export GCIN_XIM=gcin_test
+export XMODIFIERS=@im=gcin_test
 pkill gcin.test
 ../gcin.test &
 
 export LC_ALL=zh_TW.Big5
-export XMODIFIERS=@im=$GCIN_XIM
 
 crxvt
 

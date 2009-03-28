@@ -12,47 +12,60 @@ extern int eng_ph;
 extern gint64 key_press_time;
 static GtkWidget *event_box_anthy;
 
+
 struct {
   char *en;
   char *ro;
 } anthy_romaji_map[] = {
+{"xtu",	"っ"},
+{"xtsu",	"っ"},
+{"ltu",	"っ"},
+{"ltsu",	"っ"},
+
 {"-",	"ー"},
 {"a",	"あ"},
 {"i",	"い"},
 {"u",	"う"},
 {"e",	"え"},
 {"o",	"お"},
+
 {"xa",	"ぁ"},
 {"xi",	"ぃ"},
 {"xu",	"ぅ"},
 {"xe",	"ぇ"},
 {"xo",	"ぉ"},
+
 {"la",	"ぁ"},
 {"li",	"ぃ"},
 {"lu",	"ぅ"},
 {"le",	"ぇ"},
 {"lo",	"ぉ"},
+
 {"wi",	"うぃ"},
 {"we",	"うぇ"},
 {"wha",	"うぁ"},
 {"whi",	"うぃ"},
 {"whe",	"うぇ"},
 {"who",	"うぉ"},
+
 {"va",	"う゛ぁ"},
 {"vi",	"う゛ぃ"},
 {"vu",	"う゛"},
 {"ve",	"う゛ぇ"},
 {"vo",	"う゛ぉ"},
+
 {"ka",	"か"},
 {"ki",	"き"},
 {"ku",	"く"},
 {"ke",	"け"},
 {"ko",	"こ"},
+
 {"ga",	"が"},
 {"gi",	"ぎ"},
 {"gu",	"ぐ"},
 {"ge",	"げ"},
 {"go",	"ご"},
+
 {"kya",	"きゃ"},
 {"kyi",	"きぃ"},
 {"kyu",	"きゅ"},
@@ -63,16 +76,19 @@ struct {
 {"gyu",	"ぎゅ"},
 {"gye",	"ぎぇ"},
 {"gyo",	"ぎょ"},
+
 {"sa",	"さ"},
 {"si",	"し"},
 {"su",	"す"},
 {"se",	"せ"},
 {"so",	"そ"},
+
 {"za",	"ざ"},
 {"zi",	"じ"},
 {"zu",	"ず"},
 {"ze",	"ぜ"},
 {"zo",	"ぞ"},
+
 {"sya",	"しゃ"},
 {"syi",	"しぃ"},
 {"syu",	"しゅ"},
@@ -104,42 +120,44 @@ struct {
 {"tsu",	"つ"},
 {"te",	"て"},
 {"to",	"と"},
+
 {"da",	"だ"},
 {"di",	"ぢ"},
 {"du",	"づ"},
 {"de",	"で"},
 {"do",	"ど"},
-{"xtu",	"っ"},
-{"xtsu","っ"	""},
-{"ltu",	"っ"},
-{"ltsu","っ"},
-{"s",	"っ"}, // ni[s]sin
-{"p",	"っ"}, // ni[p]pon
+
+
 {"tya",	"ちゃ"},
 {"tyi",	"ちぃ"},
 {"tyu",	"ちゅ"},
 {"tye",	"ちぇ"},
 {"tyo",	"ちょ"},
+
 {"cha",	"ちゃ"},
 {"chi",	"ち"},
 {"chu",	"ちゅ"},
 {"che",	"ちぇ"},
 {"cho",	"ちょ"},
+
 {"dya",	"ぢゃ"},
 {"dyi",	"ぢぃ"},
 {"dyu",	"ぢゅ"},
 {"dye",	"ぢぇ"},
 {"dyo",	"ぢょ"},
+
 {"tha",	"てゃ"},
 {"thi",	"てぃ"},
 {"thu",	"てゅ"},
 {"the",	"てぇ"},
 {"tho",	"てょ"},
+
 {"dha",	"でゃ"},
 {"dhi",	"でぃ"},
 {"dhu",	"でゅ"},
 {"dhe",	"でぇ"},
 {"dho",	"でょ"},
+
 {"na",	"な"},
 {"ni",	"に"},
 {"nu",	"ぬ"},
@@ -150,22 +168,25 @@ struct {
 {"nyu",	"にゅ"},
 {"nye",	"にぇ"},
 {"nyo",	"にょ"},
+
 {"ha",	"は"},
 {"hi",	"ひ"},
 {"hu",	"ふ"},
-{"fu",	"ふ"},
 {"he",	"へ"},
 {"ho",	"ほ"},
+
 {"ba",	"ば"},
 {"bi",	"び"},
 {"bu",	"ぶ"},
 {"be",	"べ"},
 {"bo",	"ぼ"},
+
 {"pa",	"ぱ"},
 {"pi",	"ぴ"},
 {"pu",	"ぷ"},
 {"pe",	"ぺ"},
 {"po",	"ぽ"},
+
 {"hya",	"ひゃ"},
 {"hyi",	"ひぃ"},
 {"hyu",	"ひゅ"},
@@ -181,16 +202,19 @@ struct {
 {"pyu",	"ぴゅ"},
 {"pye",	"ぴぇ"},
 {"pyo",	"ぴょ"},
+
 {"fa",	"ふぁ"},
 {"fi",	"ふぃ"},
 {"fu",	"ふ"},
 {"fe",	"ふぇ"},
 {"fo",	"ふぉ"},
+
 {"ma",	"ま"},
 {"mi",	"み"},
 {"mu",	"む"},
 {"me",	"め"},
 {"mo",	"も"},
+
 {"mya",	"みゃ"},
 {"myi",	"みぃ"},
 {"myu",	"みゅ"},
@@ -205,11 +229,13 @@ struct {
 {"lyo",	"ょ"},
 {"xyo",	"ょ"},
 {"yo",	"よ"},
+
 {"ra",	"ら"},
 {"ri",	"り"},
 {"ru",	"る"},
 {"re",	"れ"},
 {"ro",	"ろ"},
+
 {"rya",	"りゃ"},
 {"ryi",	"りぃ"},
 {"ryu",	"りゅ"},
@@ -331,6 +357,15 @@ void parse_key()
   int i;
   int preN=0, eqN=0, sendpreN=0;
   unsigned char eq, sendpre_i = 255;
+  static char ch2[]="xlkstzdhbrpfgv";
+
+  if (keysN==2 && keys[0]==keys[1] && strchr(ch2, keys[0])) {
+    append_jp(0);
+    keys[1]=0;
+    keysN=1;
+    return;
+  }
+
   for(i=0; i < anthy_romaji_mapN; i++) {
     char *en = anthy_romaji_map[i].en;
     char *ro = anthy_romaji_map[i].ro;
@@ -545,7 +580,9 @@ static void load_seg()
         }
 
         state=STATE_CONVERT;
-        cursor = 0;
+//        cursor = 0;
+        if (cursor >= acs.nr_segment)
+          cursor = acs.nr_segment - 1;
         disp_convert();
       }
       keysN=0;
@@ -598,6 +635,12 @@ gboolean feedkey_anthy(int kv, int kvstate)
 //  printf("empty %d\n", is_empty);
 
   switch (kv) {
+    case XK_F11:
+      system("kasumi &");
+      return TRUE;
+    case XK_F12:
+      system("kasumi -a &");
+      return TRUE;
     case XK_Return:
       if (is_empty)
         return FALSE;
@@ -856,7 +899,7 @@ int init_win_anthy()
     GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
                                      GTK_MESSAGE_ERROR,
                                      GTK_BUTTONS_CLOSE,
-                                     "Cannot init anthy. Please install anthy.");
+                                     "Cannot init anthy. incompatible anthy.so ?");
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
     return FALSE;

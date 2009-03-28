@@ -1,9 +1,8 @@
 export GCIN_TABLE_DIR=./data
-export GCIN_XIM=gcin_test
 export GCIN_IM_CLIENT_NO_AUTO_EXEC=
 pkill gcin.test
 export LC_ALL=zh_TW.Big5
-export XMODIFIERS=@im=$GCIN_XIM
+export XMODIFIERS=@im=gcin_test
 export GCIN_OUTPUT_FILTER=./gcin_filter
 #valgrind --tool memcheck --leak-check=yes ./gcin.test &
 valgrind --tool=memcheck --leak-check=yes ./gcin.test &

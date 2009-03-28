@@ -7,7 +7,6 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_press_full_auto_send,
                  *check_button_gtab_pre_select,
                  *check_button_gtab_disp_partial_match,
-                 *check_button_gtab_simple_win,
                  *check_button_gtab_disp_key_codes,
                  *check_button_gtab_disp_im_name,
                  *check_button_gtab_invalid_key_in,
@@ -51,10 +50,6 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 
   save_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_partial_match)));
-#if 0
-  save_gcin_conf_int(GTAB_SIMPLE_WIN,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_simple_win)));
-#endif
   save_gcin_conf_int(GTAB_DISP_KEY_CODES,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_key_codes)));
 
@@ -221,16 +216,6 @@ void create_gtab_conf_window()
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_disp_partial_match),
      gtab_disp_partial_match);
 
-#if 0
-  GtkWidget *hbox_gtab_simple_win = gtk_hbox_new (FALSE, SPC);
-  gtk_box_pack_start (GTK_BOX (vbox_gtab_l), hbox_gtab_simple_win, FALSE, FALSE, 0);
-  GtkWidget *label_gtab_gtab_simple_win = gtk_label_new(_("較小視窗"));
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_simple_win), label_gtab_gtab_simple_win,  FALSE, FALSE, 0);
-  check_button_gtab_simple_win = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_simple_win), check_button_gtab_simple_win,  FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_simple_win),
-     gtab_simple_win);
-#endif
 
   GtkWidget *hbox_gtab_disp_key_codes = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_l), hbox_gtab_disp_key_codes, FALSE, FALSE, 0);

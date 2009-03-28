@@ -419,8 +419,7 @@ function generateToc(toclevels) {
 <div id="header">
 <h1>gcin 使用手冊</h1>
 <span id="author">eliu</span><br />
-<span id="email"><tt>&lt;<a href="mailto:aaa@bbb.ccc">aaa@bbb.ccc</a>&gt;</tt></span><br />
-2008-11-24
+2009-02-03
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -433,7 +432,7 @@ function generateToc(toclevels) {
 </div>
 <h2 id="_">1. 各平台上的安裝方式</h2>
 <div class="sectionbody">
-<h3 id="_mandrake">1.1. Mandrake</h3><div style="clear:left"></div>
+<h3 id="_mandriva">1.1. Mandriva</h3><div style="clear:left"></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt># urpmi gcin-X.X.X-liu_mdk.i586.rpm</tt></pre>
@@ -443,13 +442,6 @@ function generateToc(toclevels) {
 <div class="content">
 <pre><tt># rpm -i gcin-X.X.X-liu_mdk.i586.rpm</tt></pre>
 </div></div>
-<div class="para"><p>如果是用 Mandrake， rpm 安裝完成之後會自動修改 <em>/etc/X11/xinit/XIM</em> ，在 login 時
-會執行 gcin 而不是 xcin。 原來的 <em>/etc/X11/xinit/XIM</em> 會被重新命名為
-<em>/etc/X11/xinit/XIM/XIM.orig.gcin</em>  。在 <em>rpm -e</em> 解除安裝時不會自動還原。</p></div>
-<div class="para"><p>在 Mandrake 10.1 中，會自動修改 <em>/etc/sysconfig/i18n</em> 與 <em>/usr/X11R6/bin/crxvt</em> 把原
-來給 SCIM 用的設定改成給 gcin 用。</p></div>
-<div class="para"><p>其他的 distribution 可能會失敗, 因為檔案位置或內容不一樣.  請自行修改 X 中有關
-的 XIM startup script，把原來執行 xcin 的部份改成執行 gcin。</p></div>
 <h3 id="_debian">1.2. Debian</h3><div style="clear:left"></div>
 <h4 id="_gcin">1.2.1. gcin 的安裝方式</h4>
 <div class="listingblock">
@@ -462,7 +454,10 @@ function generateToc(toclevels) {
 <pre><tt># dpkg -i gcin_X.X.X-X~X_iX86.deb gcin-qt3-immodule_X.X.X-1~X_iX86.deb</tt></pre>
 </div></div>
 <h3 id="_fedora">1.3. Fedora</h3><div style="clear:left"></div>
-<div class="para"><p>gcin 的 FC3 FC4 FC5 FC6 (Development) 等版本，都已經正式進入 Fedora Extras 了。因此，直接使用 <em>yum install gcin</em> 即可。至於 REHL4 的 rpm 則仍可在 gcin 同好會的 <a href="http://cle.linux.org.tw/trac/wiki/GcinDistros">下載情報區</a> 裡下載。</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt># yum install gcin</tt></pre>
+</div></div>
 <h3 id="_tarball_gcin">1.4. 下載 tarball 自行編譯 gcin</h3><div style="clear:left"></div>
 <div class="para"><p>如果使用 .tar.bz2 安裝者， table path 是 <em>/usr/local/share/gcin/table</em> ，而不是 <em>/usr/share/gcin/table</em> ，預設的 compile flags 是 -g，這樣如果 gcin 如果有 coredump 時可以方便 debug 且回報給作者 (gcin 的 source code 不要 remove 掉)，不過 compile 出來的可執行檔的大小大很多，如果不喜歡，可以在 <em>./configure</em> 後修改 <em>config.mak</em> ，把 <em>OPTFLAGS=-g</em> 改成 <em>OPTFLAGS=-O</em> 。</p></div>
 <h4 id="_gcin_x_x_x_tar_bz2">1.4.1. gcin-x.x.x.tar.bz2 的安裝步驟 (適用於各平台)</h4>
@@ -513,7 +508,7 @@ $ cp gcin-x.x.x.tar.bz2 ~/rpm/SOURCES
 <li>
 <p>
 在 gcin-x.x.x 裏面執行./configure 完後，會有一個 gcin.spec
-(這是給 Mandrake 用的，其它的 distribution 可能要稍微修改一下。)
+(這是給 Mandriva 用的，其它的 distribution 可能要稍微修改一下。)
 </p>
 </li>
 <li>
@@ -636,21 +631,7 @@ $ phoa2d pho.tab.src            (轉成 gcin 的 pho.tab)</tt></pre>
 <div class="para"><p>如要修改 Alt-Shift-key 送出的字串，修改  <em>~/.gcin/phrase.table</em> 即可。</p></div>
 <h3 id="_gtab">2.5. gtab 輸入法</h3><div style="clear:left"></div>
 <h4 id="__6">2.5.1. 行列輸入法說明</h4>
-<div class="para"><p>From <a href="mailto:cherico.bbs@ptt.cc">cherico.bbs@ptt.cc</a>:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>行列同時輸入Unicode中所有的漢字，
-包括簡體，繁體，日文漢字等。
-
-http://home.pchome.com.tw/web/cherico/array-utf8.png
-
-ar30.cin ar30.gtab 和簡體字根表：
-
-http://home.pchome.com.tw/web/cherico/ar30utf8.tgz
-
-已經變成 gcin 內建的行列輸入法 table</tt></pre>
-</div></div>
-<div class="para"><p>葉光哲(老刀)先生根據行列輸入法發明人–廖明德先生提供的對照檔，為 OpenVanilla 整理了支援 CJK 七萬餘字的行列輸入法表格 (包含 Unicode 前 20902 字、一些特殊符號、與 Extension A &amp; B)。原本 OpenVanilla 的行列為了實作簡碼功能, 將七萬餘字拆成三個檔案，現在葉光哲先生已為 gcin 將三個檔整理成一個 cin 檔（有支援簡碼）, gcin 1.4.3 pre9 以後的版本已加入此表格。相關討論可見 <a href="http://hyperrate.com/thread.php?tid=7757">Hyperrate| 新版 OpenVanilla 行列輸入法表格</a>。</p></div>
+<div class="para"><p>葉光哲(老刀)先生根據行列輸入法發明人–廖明德先生提供的對照檔，整理了支援 CJK 七萬餘字的行列輸入法表格 (包含 Unicode 前 20902 字、一些特殊符號、與 Extension A &amp; B), gcin 1.4.3 pre9 以後的版本已加入此表格。相關討論可見 <a href="http://hyperrate.com/thread.php?tid=7757">Hyperrate| 新版 OpenVanilla 行列輸入法表格</a>。</p></div>
 <div class="para"><p>如要使用此表格，請編輯 gtab.list (位於 <em>/usr/share/gcin/table/gtab.list</em> 或 <em>$HOME/.gcin</em> )，將：</p></div>
 <div class="listingblock">
 <div class="content">
@@ -678,24 +659,9 @@ net 上網</tt></pre>
 <div class="para"><p>可以的，在按空白鍵後就可以選字 or 詞。</p></div>
 <h4 id="_gcin_3">2.5.4. gcin 有嘸蝦米輸入法可用嗎？</h4>
 <div class="para"><p>以下的 嘸蝦米 table 僅供測試用，如果有長期使用，請購買合法版權。</p></div>
-<div class="para"><p>下載：</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-<a href="http://edt1023.sayya.org/misc/noseeing-2.tar.gz">http://edt1023.sayya.org/misc/noseeing-2.tar.gz</a> (正體中文)
-</p>
-<div class="para"><p>(因為 .gtab format 有變，裏面的 .gtab 無法直接使用，必須執行 gcin2tab noseeing 重新產生 noseeing.gtab)</p></div>
-</li>
-<li>
-<p>
-<a href="http://edt1023.sayya.org/misc/noseeing-6.tar.gz">http://edt1023.sayya.org/misc/noseeing-6.tar.gz</a> (正/簡體中文 &amp; 日文 綜合版)
-</p>
-</li>
-</ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ tar xvfz noseeing-6.tar.gz
-$ cp noseeing.gtab /usr/share/gcin/table</tt></pre>
+<pre><tt>$ /usr/share/gcin/script/noseeing-inst</tt></pre>
 </div></div>
 <div class="para"><p>logout &amp; login 按 ctrl-alt-9 就可以開始用。
 可以用 gcin-setup 把嘸蝦米設定成內定的輸入法。</p></div>
@@ -827,7 +793,13 @@ gedit</tt></pre>
 </div></div>
 <div class="para"><p>這個 gedit 就可以以注音輸入(方方土)</p></div>
 <h3 id="__8">3.10. 我想使用倉頡行列的重複字選擇鈴聲，但是嫌聲音太長，有辨法解決嗎？</h3><div style="clear:left"></div>
-<div class="para"><p>你可以在用 xset b 1 設定鈴聲長短。</p></div>
+<div class="para"><p>gcin 的嗶聲是呼叫 X 的 XBell() 函式，你可以用 <em>xset b 30 1000 100</em> 設定鈴聲音量、頻率、與長短，但這個方法會影響到整個系統的鈴聲。</p></div>
+<div class="para"><p>如果只想設定 gcin 的鈴聲音量，可升級到 gcin 1.4.4 以後的版本。gcin 1.4.4 以後的版本支援在 <em>~/.gcin/config/gcin-bell-volume</em> 內自訂鈴聲音量，值必需介於 -100 至 100 之間 (內定值是 -97)。例如：</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>echo 50 &gt; ~/.gcin/config/gcin-bell-volume</tt></pre>
+</div></div>
+<div class="para"><p><a href="http://hyperrate.com/thread.php?tid=8462">hyperrate 上關於鈴聲的相關討論</a></p></div>
 <h3 id="_gcin_8">3.11. gcin 可以在使用某種輸入法時，顯示另一種輸入法的拆碼，以幫助使用者學習輸入法嗎？</h3><div style="clear:left"></div>
 <div class="para"><p>有人反應：</p></div>
 <div class="listingblock">
@@ -858,24 +830,9 @@ gedit</tt></pre>
 <div class="para"><p>用詞音輸入法加入。在中文輸入的狀態下，把 cursor (游標) 移至要存的詞句的開頭，按下 shift-Enter，則會自 cursor 所在位置存到編輯區的結尾，cursor 也會自動跳到結尾，方便繼續輸入。</p></div>
 <h3 id="__10">3.14. 許氏鍵盤注意事項：</h3><div style="clear:left"></div>
 <div class="para"><p>如果使用許氏鍵盤，<em>q</em> 是用來選字詞。</p></div>
-<h3 id="_crxvt_gcin">3.15. 為什麼 crxvt 內 不能用 gcin？</h3><div style="clear:left"></div>
-<div class="para"><p>這是因為你在某個地方有設定 <em>XMODIFIERS=@im=gcin</em> ，gcin 就用 這個來當 XIM name， <em>/usr/X11R6/bin/crxvt</em> 這個 shell script 會設定 <em>XMODIFIERS=@im=xcin</em> ， 所以 crxvt 連不到。</p></div>
-<div class="para"><p>解決方式有兩種：</p></div>
-<div class="olist"><ol>
-<li>
-<p>
-設定 <em>XMODIFIERS=@im=xcin</em>
-</p>
-</li>
-<li>
-<p>
-修改 <em>/usr/X11R6/bin/crxvt</em> ， 把 <em>XIM=xcin</em> 拿掉。
-</p>
-</li>
-</ol></div>
-<h3 id="_kde_gcin_window_cursor">3.16. KDE 中 gcin 的 window 為什麼不會跟著 cursor 移動？</h3><div style="clear:left"></div>
+<h3 id="_kde_gcin_window_cursor">3.15. KDE 中 gcin 的 window 為什麼不會跟著 cursor 移動？</h3><div style="clear:left"></div>
 <div class="para"><p>你可以用 qtconfig 把 XIM input style 設定成 over-the-spot 就可以了。</p></div>
-<h3 id="_gcin_gcin_2">3.17. gcin 的詞庫不夠多，想貢獻給 gcin 作者自己的詞庫，要怎麼做呢？</h3><div style="clear:left"></div>
+<h3 id="_gcin_gcin_2">3.16. gcin 的詞庫不夠多，想貢獻給 gcin 作者自己的詞庫，要怎麼做呢？</h3><div style="clear:left"></div>
 <div class="para"><p>這樣就可以看到兩個 file 的差異：</p></div>
 <div class="listingblock">
 <div class="content">
@@ -884,24 +841,10 @@ tsd2a tsin &gt; your
 diff your gcin-0.x.x/data/tsin.src &gt; diff.txt
 gedit diff.txt</tt></pre>
 </div></div>
-<div class="para"><p>注意看你的詞庫是否有那些現代人用不到的詞，這些沒用的詞只會增加詞音錯誤的機率，刪除以後再寄給我 (<a href="mailto:cp76@csie.nctu.edu.tw">cp76@csie.nctu.edu.tw</a>)。</p></div>
-<h3 id="_mandrake_10_1_em_em_em_em">3.18. 在 Mandrake 10.1 中出現輸入區出現方框的亂碼，注音的 <em>一</em> 變成 <em>|</em> 一直線。</h3><div style="clear:left"></div>
-<div class="para"><p>請來 <a href="http://www.csie.nctu.edu.tw/~cp76/linux/fontconfig">這裡</a> 下載暫時修正，這是 Mandrake 的問題。</p></div>
-<div class="olist"><ol>
-<li>
-<p>
-chmod 755 libpango-1.0.so.0.400.1; cp libpango-1.0.so.0.400.1  /usr/lib
-</p>
-</li>
-<li>
-<p>
-cp fonts.conf /etc/fonts
-</p>
-</li>
-</ol></div>
-<h3 id="__11">3.19. 詞音輸入的視窗在打滿注音後會縮回去，看起來有點討厭。</h3><div style="clear:left"></div>
+<div class="para"><p>注意看你的詞庫是否有那些現代人用不到的詞，這些沒用的詞只會增加詞音錯誤的機率。</p></div>
+<h3 id="__11">3.17. 詞音輸入的視窗在打滿注音後會縮回去，看起來有點討厭。</h3><div style="clear:left"></div>
 <div class="para"><p>注音輸入的區域的字型必須比編輯區的小個幾點就沒有這個問題。如果你有安裝日文字型，且使用 12/23/2004 以前的 fonts.conf，則還是會有縮回去的問題，請下載最新的 fonts.conf。</p></div>
-<h3 id="_gcin_coredump_debug">3.20. gcin coredump 如果要幫忙 debug，該怎麼做？</h3><div style="clear:left"></div>
+<h3 id="_gcin_coredump_debug">3.18. gcin coredump 如果要幫忙 debug，該怎麼做？</h3><div style="clear:left"></div>
 <div class="olist"><ol>
 <li>
 <p>
@@ -958,7 +901,7 @@ r 指令會開始執行 gcin， 在跑出來的 gedit 輸入一些字，gcin 掛
 </div></div>
 </li>
 </ol></div>
-<h3 id="_gtk_im_module_qt_im_module_qt_4_0_or_mandriva_2006_gcin_so_xim">3.21. GTK_IM_MODULE/QT_IM_MODULE(qt 4.0 or Mandriva 2006) 使用 gcin 自己的 .so，和XIM相比，有何好處？</h3><div style="clear:left"></div>
+<h3 id="_gtk_im_module_qt_im_module_qt_4_0_or_mandriva_2006_gcin_so_xim">3.19. GTK_IM_MODULE/QT_IM_MODULE(qt 4.0 or Mandriva 2006) 使用 gcin 自己的 .so，和XIM相比，有何好處？</h3><div style="clear:left"></div>
 <div class="olist"><ol>
 <li>
 <p>
@@ -991,7 +934,7 @@ client 直接 對 gcin server 互傳資料，不透過 X server，延遲會比�
 </p>
 </li>
 </ol></div>
-<h3 id="_mdk_10_0_10_1_gcin">3.22. 大部份(Mdk 10.0,10.1) 安裝 gcin 後即可直接使用，如果不行該怎麼辨？</h3><div style="clear:left"></div>
+<h3 id="_mandrake_10_0_10_1_gcin">3.20. 大部份(Mandrake 10.0,10.1) 安裝 gcin 後即可直接使用，如果不行該怎麼辨？</h3><div style="clear:left"></div>
 <div class="para"><p>執行</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1004,7 +947,7 @@ client 直接 對 gcin server 互傳資料，不透過 X server，延遲會比�
 <div class="para"><p>目前支援很簡單的編碼以避免 plaintext 在傳送，未來可能會支援 SSL。</p></div>
 <div class="para"><p>雖然目前是用很簡單的 encoding，如果 gcin 搭配 ssh X11 forwarding 應該是非常安全的，而且 data 不像 SSL 會變大，更適合在 low bandwidth 使用。</p></div>
 <div class="para"><p>目前支援 GTK2 &amp; QT，gcin 有提供非常容易使用的 API 介面供其他 terminal 使用，歡迎來把這部份完成，詳細的介面，請看 <em>/usr/local/include/gcin-im-client.h</em> 。</p></div>
-<h3 id="_gcin_im_module_em_export_gcin_connect_msg_on_tty_em_console">3.23. gcin 如果使用到自己的 IM_MODULE 時，且用 <em>export GCIN_CONNECT_MSG_ON=tty</em> (console) 會出現錯誤訊息：</h3><div style="clear:left"></div>
+<h3 id="_gcin_im_module_em_export_gcin_connect_msg_on_tty_em_console">3.21. gcin 如果使用到自己的 IM_MODULE 時，且用 <em>export GCIN_CONNECT_MSG_ON=tty</em> (console) 會出現錯誤訊息：</h3><div style="clear:left"></div>
 <div class="olist2"><ol>
 <li>
 <p>
@@ -1035,7 +978,7 @@ gcin client connected to server 172.x.x.x:9999
 <div class="para"><p>如果你因為 install 其他的輸入法把 gcin 的設定弄亂，可以用 root 執行看看
 /usr/share/gcin/script/modify-XIM</p></div>
 <div class="para"><p>tsd2a 新增 "-nousecount" 的參數。由於現在 gcin 會統計詞的使用頻率，dump出來的 file 會有 usecount，如果你要比較兩個詞庫時會造成困擾，這時候就可以用這個參數。</p></div>
-<h3 id="_ctrl_space_gcin">3.24. Ctrl-Space 無法叫出 gcin 的視窗，檢查事項</h3><div style="clear:left"></div>
+<h3 id="_ctrl_space_gcin">3.22. Ctrl-Space 無法叫出 gcin 的視窗，檢查事項</h3><div style="clear:left"></div>
 <div class="para"><p>一般看 environ variable 的內容可以用 printenv，由於可以設定 environ variable 的地方太多了，用開 terminal 的方式看，不見得一定符合應用程式用的實際值，所以還是直接用 proc file system 最準。</p></div>
 <div class="olist"><ol>
 <li>
@@ -1093,9 +1036,9 @@ gtk2 (gnome) 程式檢查事項。
 </p>
 </li>
 </ol></div>
-<h3 id="_gcin_9">3.25. 覺得 gcin 的釘子不好看，想要換掉。</h3><div style="clear:left"></div>
+<h3 id="_gcin_9">3.23. 覺得 gcin 的釘子不好看，想要換掉。</h3><div style="clear:left"></div>
 <div class="para"><p>有此需求的的人自己 替換 <em>/usr/share/icons/gcin</em> 。</p></div>
-<h3 id="_gcin_0_9_8_cin_em_space_style_em">3.26. gcin 0.9.8 替 .cin 新增 <em>%space_style</em> 的選項，後面的數字代表的意義：</h3><div style="clear:left"></div>
+<h3 id="_gcin_0_9_8_cin_em_space_style_em">3.24. gcin 0.9.8 替 .cin 新增 <em>%space_style</em> 的選項，後面的數字代表的意義：</h3><div style="clear:left"></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>1:      嘸蝦米、大易
@@ -1109,16 +1052,16 @@ gtk2 (gnome) 程式檢查事項。
 %space_style 2
 %keyname begin</tt></pre>
 </div></div>
-<h3 id="_gtab_em_keep_key_case_em">3.27. gtab 中 <em>%keep_key_case</em> 選項是做什麼用的？</h3><div style="clear:left"></div>
+<h3 id="_gtab_em_keep_key_case_em">3.25. gtab 中 <em>%keep_key_case</em> 選項是做什麼用的？</h3><div style="clear:left"></div>
 <div class="para"><p>gcin 0.9.8 替 gtab 新增 <em>%keep_key_case</em> 的選項。</p></div>
-<div class="para"><p>用在需要分別大小寫的輸入法，例如：日文。</p></div>
+<div class="para"><p>用在需要分別大小寫的輸入法，例如舊版的日文輸入表格。</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        %space_style 4
         %keep_key_case          &lt;---------------------------
         %keyname begin</tt></pre>
 </div></div>
-<div class="para"><p>如何確定目前是使用 gcin 自己的 gtk/qt im module？</p></div>
+<h3 id="_gcin_gtk_qt_im_module">3.26. 如何確定目前是使用 gcin 自己的 gtk/qt im module？</h3><div style="clear:left"></div>
 <div class="olist"><ol>
 <li>
 <p>
@@ -1135,7 +1078,7 @@ gtk2 (gnome) 程式檢查事項。
 <div class="content">
 <pre><tt>   connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin</tt></pre>
 </div></div>
-<h3 id="_gcin_scim_memory">3.28. gcin 與 scim memory 使用比較</h3><div style="clear:left"></div>
+<h3 id="_gcin_scim_memory">3.27. gcin 與 scim memory 使用比較</h3><div style="clear:left"></div>
 <div class="para"><p>分別以 gcin 的詞音與 scim chewing 用 kedit/gedit/leafpad 輸入「測試」兩個字，
 由於 scim 有數個 process，必須全部加起來。這個測試也比較 qt-im-module/gtk-im-module 的 memory 使用。</p></div>
 <div class="literalblock">
@@ -1153,7 +1096,7 @@ gcin  61008      14924      26880        7884</tt></pre>
 <div class="para"><p>kedit: 3.4.1
 scim:  scim 1.4.2 + scim-chewing 0.2.1
 gcin:  gcin 1.0.4</p></div>
-<h3 id="_mozilla_firefox_coredump_gtk_im_module">3.29. Mozilla Firefox 中 coredump，想看是不是 gtk-im module 造成的。</h3><div style="clear:left"></div>
+<h3 id="_mozilla_firefox_coredump_gtk_im_module">3.28. Mozilla Firefox 中 coredump，想看是不是 gtk-im module 造成的。</h3><div style="clear:left"></div>
 <div class="olist"><ol>
 <li>
 <p>
@@ -1179,21 +1122,81 @@ gcin:  gcin 1.0.4</p></div>
 <div class="para"><p>其實很簡單，修改 <em>/usr/bin/mozilla-firefox</em> or <em>/usr/bin/firefox</em> 執行的 script
 加入 <em>unset XMODIFIERS</em> 。原理是 gcin 如果沒有設定 XMODIFIERS 內定的 XIM name 就是 gcin，
 把 XMODIFIERS unset 後，gcin 用 <em>GTK_IM_MODULE=gcin</em> 仍然可以輸入，但是 XIM 需要 XMODIFIERS 才能，這樣就達到防止 flash player open XIM。</p></div>
-<h3 id="__12">3.30. 請問一下內定輸入法，是由那個設定檔來決定的？</h3><div style="clear:left"></div>
+<h3 id="__12">3.29. 請問一下內定輸入法，是由那個設定檔來決定的？</h3><div style="clear:left"></div>
 <div class="para"><p><em>~/.gcin/config/default-input-method</em></p></div>
-<h3 id="_su_sudo_gcin">3.31. 使用 su 或 sudo 後，無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
+<h3 id="_su_sudo_gcin">3.30. 使用 su 或 sudo 後，無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
 <div class="para"><p>如果使用的 gcin 是 1.4.3 pre7 之前的版本(含 1.4.3 pre7)，可以這麼做：</p></div>
 <div class="para"><p>設定 (<em>gcin-setup</em>) →  內定輸入法 &amp; 開啟/關閉 →  遠端 client 程式支援 (port 9999-)</p></div>
 <div class="para"><p>或</p></div>
 <div class="para"><p><em>gcin-setup-tab</em> →  通用 →  遠端 client 程式支援 (port 9999-)</p></div>
 <div class="para"><p>完成這個動作後，重新登入 X Window System 試試看。</p></div>
 <div class="para"><p>如果用的 gcin 是 1.4.3 pre8 後的版本(含 1.4.3 pre8)，已支援 su root 的中文輸入，注意—要配合新的 libgcin-im-client.so.1.1.0 才可！</p></div>
-<h3 id="_kde_gcin">3.32. 在 KDE 的系統管理頁面無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
+<h3 id="_kde_gcin">3.31. 在 KDE 的系統管理頁面無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
 <div class="para"><p>問題同上。開啟設定中的 <em>遠端 client 程式支援 (port 9999-)</em> 並重新登入 X Window System 試試看。</p></div>
-<h3 id="_gcin_1_4_3">3.33. 升級到 gcin 1.4.3 後，桌面多出三個方格是什麼東西？</h3><div style="clear:left"></div>
+<h3 id="_gcin_1_4_3">3.32. 升級到 gcin 1.4.3 後，桌面多出三個方格是什麼東西？</h3><div style="clear:left"></div>
 <div class="para"><p>gcin 1.4.3 pre 8 後的版本，整合了 gcb，gcb 是一個管理剪貼簿 (clipboard) 的小工具。</p></div>
 <div class="para"><p>一般 X Window 會自動複製選取的內容，但如果你不小心再次選取到其他內容，原本複製的東西就會被新選取的內容所覆蓋，gcb 可以避免這種狀況發生。</p></div>
 <div class="para"><p>gcb 提供了三個儲存格，在 gcb 的任一個儲存格上按右鍵可以設定儲存按鈕，每5秒鐘從剪貼區更新。按左鍵把儲存格的內容存到剪貼區。按中鍵可以選擇之前的剪貼區內容的改變。如果不想用，可以在 gcin-setup 內關掉。</p></div>
+<h3 id="_gcin_10">3.33. gcin 支援輸入日文嗎？</h3><div style="clear:left"></div>
+<div class="para"><p>gcin 1.4.3 pre13 以後的版本支援使用 <a href="http://sourceforge.jp/projects/anthy/">anthy</a> 來輸入日文。</p></div>
+<div class="para"><p><a href="http://hyperrate.com/thread.php?tid=8338#8338">使用方法</a>：</p></div>
+<div class="olist"><ol>
+<li>
+<p>
+切換到「日本anthy」（廢話）
+</p>
+</li>
+<li>
+<p>
+開始打羅馬拼音
+</p>
+</li>
+<li>
+<p>
+按 enter 可輸出 buffer 中的內容
+</p>
+</li>
+<li>
+<p>
+按空白鍵可自動轉換「假名←→漢字」 「平假名←→片假名」「假名←→符號」（依 anthy dictionary 內容決定）
+</p>
+</li>
+<li>
+<p>
+再按一次空白鍵可選擇其它想轉換的內容 (當可轉換內容不止一種時)
+</p>
+</li>
+<li>
+<p>
+選字的選單設定與詞音的相同（可修改成用 1234 選詞）。
+</p>
+</li>
+<li>
+<p>
+與 UIM 一樣，可以用 Shift-Left/Right 調整詞的範圍。
+</p>
+</li>
+<li>
+<p>
+gcin 1.4.4 後支援以 shift 切換日/英文輸入模式。
+</p>
+</li>
+</ol></div>
+<div class="para"><p>加字加詞的方法：</p></div>
+<div class="olist"><ol>
+<li>
+<p>
+可手動編輯純文字檔 $HOME/.anthy/private_words_default 例如加入「としば #T35*500 東芝」
+</p>
+</li>
+<li>
+<p>
+可用 <a href="http://sourceforge.jp/projects/kasumi/">kasumi</a> ，如 <a href="http://hyperrate.com/topic-files-dir/38/8338-eQTwr1J0qF/toshiba.gif">圖</a> 。
+</p>
+</li>
+</ol></div>
+<div class="para"><p>在 BBS 輸入日文時，請參考 <a href="http://cle.linux.org.tw/trac/wiki/GcinBBSHiragana">在 BBS 輸入日文</a>。</p></div>
+<div class="para"><p>(如果不想使用 anthy，系統裡可完全不安裝 anthy 相關檔案。)</p></div>
 </div>
 <h2 id="__13">4. 注意事項</h2>
 <div class="sectionbody">
@@ -1203,7 +1206,7 @@ gcin:  gcin 1.0.4</p></div>
 <div class="para"><p>gcin 0.9.8 的 .gtab format 有變動，如果你不是使用 gcin 內附的 .gtab file，一定要用 gcin2tab 重新產生新的 .gtab file，否則會 coredump。</p></div>
 <div class="para"><p>gcin 0.6.5 新增關掉 gcin remote client 支援的選項 ，如果你是 su 成另外一個 user，這個選項仍然必須打開，否則無法輸入中文。</p></div>
 </div>
-<h2 id="_gcin_10">5. 更多 gcin 相關資源</h2>
+<h2 id="_gcin_11">5. 更多 gcin 相關資源</h2>
 <div class="sectionbody">
 <div class="para"><div class="title">gcin 論壇<br /></div><p><a href="http://hyperrate.com/dir.php?eid=67">http://hyperrate.com/dir.php?eid=67</a></p></div>
 <div class="para"><div class="title">gcin 原始碼<br /></div><p><a href="http://www.csie.nctu.edu.tw/~cp76/gcin/download/">http://www.csie.nctu.edu.tw/~cp76/gcin/download/</a></p></div>
@@ -1211,10 +1214,11 @@ gcin:  gcin 1.0.4</p></div>
 <div class="para"><div class="title">各種輸入法表格下載<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinTables">http://cle.linux.org.tw/trac/wiki/GcinTables</a></p></div>
 <div class="para"><div class="title">安裝額外的輸入法<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinInstallTables">http://cle.linux.org.tw/trac/wiki/GcinInstallTables</a></p></div>
 <div class="para"><div class="title">製作新的輸入法 cin 檔<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinMakeCin">http://cle.linux.org.tw/trac/wiki/GcinMakeCin</a></p></div>
+<div class="para"><div class="title">gcin 按鍵功能一覽表<br /></div><p><a href="http://cle.linux.org.tw/trac/wiki/GcinHotKeys">http://cle.linux.org.tw/trac/wiki/GcinHotKeys</a></p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-11-24 23:22:03 CST
+Last updated 2009-02-03 22:45:30 CST
 </div>
 </div>
 </body>

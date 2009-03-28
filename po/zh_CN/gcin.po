@@ -52,10 +52,6 @@ msgstr "按满自动送字"
 msgid "預選列中顯示部份符合的字"
 msgstr "预选列中显示部份符合的字"
 
-#: ../gcin-setup-gtab.c:244
-msgid "較小視窗"
-msgstr "较小视窗"
-
 #: ../gcin-setup-gtab.c:255
 msgid "顯示拆字"
 msgstr "显示拆字"
@@ -183,10 +179,6 @@ msgstr "智能拼音输入预选词视窗"
 #: ../gcin-setup-pho.c:392
 msgid "依使用頻率調整字的順序"
 msgstr "依使用频率调整字的顺序"
-
-#: ../gcin-setup-pho.c:402
-msgid "詞音/注音精簡視窗"
-msgstr "智能拼音/注音精简视窗"
 
 #: ../gcin-setup-pho.c:412
 msgid "注音隱藏第二列(按鍵顯示)"

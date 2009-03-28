@@ -272,7 +272,9 @@ void update_win_kbm()
       }
       break;
     case 10:
+#if USE_ANTHY
     case 12:
+#endif
       break;
     default:
       if (!cur_inmd || !cur_inmd->DefChars)

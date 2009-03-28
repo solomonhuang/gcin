@@ -14,6 +14,7 @@
 #define GCIN_ROOT_X      "gcin-root-x"
 #define GCIN_ROOT_Y      "gcin-root-y"
 #define GCIN_POP_UP_WIN "gcin-pop-up-win"
+#define GCIN_POP_UP_WIN_ABS_CORNER "gcin-pop-up-win-abs-corner"
 #define GCIN_INNER_FRAME "gcin-inner-frame"
 #define GCIN_INIT_IM_ENABLED "gcin-init-im-enabled"
 #define GCIN_BELL_VOLUME "gcin-bell-volume"
@@ -23,6 +24,7 @@
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
 #define LEFT_RIGHT_BUTTON_TIPS "left-right-button-tips"
+#define GCIN_CHARS_BIG5_ONLY "gcin-chars-big5-only"
 #define GCIN_FLAGS_IM_ENABLED "gcin-flags-im-enabled"
 #define GCIN_REMOTE_CLIENT "gcin-remote-client"
 #define GCIN_SHIFT_SPACE_ENG_FULL "gcin-shift-space-eng-full"
@@ -41,6 +43,7 @@
 #define GTAB_PRE_SELECT "gtab-pre-select"
 #define GTAB_PRESS_FULL_AUTO_SEND "gtab-press-full-auto-send"
 #define GTAB_DISP_PARTIAL_MATCH "gtab-disp-partial-match"
+#define GTAB_SIMPLE_WIN "gtab-simple-win"
 #define GTAB_DISP_KEY_CODES "gtab-disp-key-codes"
 #define GTAB_DISP_IM_NAME "gtab-disp-im-name"
 #define GTAB_INVALID_KEY_IN "gtab-invalid-key-in"
@@ -51,9 +54,12 @@
 #define GTAB_VERTICAL_SELECT "gtab-vertical-select"
 #define GTAB_UNIQUE_AUTO_SEND "gtab-unique-auto-send"
 #define GTAB_QUE_WILD_CARD "gtab-que-wild-card"
+#define GTAB_EDIT_BUFFER "gtab-edit-buffer"
 
+#define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
 #define TSIN_CHINESE_ENGLISH_TOGGLE_KEY "tsin-chinese-english-toggle_key"
+#define TSIN_CHINESE_ENGLISH_SWITCH "tsin-chinese-english-switch"
 #define TSIN_SPACE_OPT "tsin-space-opt"
 #define TSIN_BUFFER_SIZE "tsin-buffer-size"
 #define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
@@ -77,7 +83,7 @@
 #define GCB_POSITION_Y "gcb-position-y"
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
-           gcin_font_size_tsin_pho_in, gcin_font_size_pho_near,
+           gcin_font_size_tsin_pho_in, gcin_font_size_pho_near, gcin_chars_big5_only,
            gcin_font_size_gtab_in, gcin_inner_frame,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
@@ -96,9 +102,10 @@ extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;
-extern int gtab_vertical_select, gtab_unique_auto_send;
+extern int gtab_vertical_select, gtab_unique_auto_send, gtab_edit_buffer;
+extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
-extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
+extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 extern int gcin_status_tray;
 
 extern int tsin_phrase_pre_select;

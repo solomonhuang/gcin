@@ -72,6 +72,10 @@ CFLAGS += -DUSE_TSIN=1
 OBJS += $(gcin_tsin_o)
 endif
 
+ifeq ($(USE_ANTHY),Y)
+CFLAGS += -DUSE_ANTHY=1
+endif
+
 im-srv = im-srv/im-srv.a
 
 .c.E:
@@ -168,8 +172,12 @@ pin-juyin:	$(OBJS_pin_juyin)
 #	$(CC) -o $@ $(OBJS_ANTHY) $(LDFLAGS)
 
 gcin1_so= intcode.pico win-int.pico win-message.pico win-sym.pico \
-win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico tsin-char.pico \
-anthy.pico
+win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico tsin-char.pico
+
+ifeq ($(USE_ANTHY),Y)
+gcin1_so += anthy.pico
+endif
+
 gcin1.so: $(gcin1_so)
 	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
 

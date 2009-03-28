@@ -7,7 +7,7 @@ sleep 1
 rxvt.bin &
 
 export LC_ALL=zh_TW.UTF-8
-export XMODIFIERS=@im=$GCIN_XIM.UTF-8
+export XMODIFIERS=@im=gcin_test.UTF-8
 gedit
 
 pkill gcin.test

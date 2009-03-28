@@ -1,13 +1,12 @@
 rm -f core.*
 make
-export GCIN_XIM=gcin_test
+export XMODIFIERS=@im=gcin_test
 pkill gcin.test
 ../gcin.test &
 
 export LC_ALL=zh_TW.Big5
 export LD_LIBRARY_PATH="../im-client"
 
-export XMODIFIERS=@im=$GCIN_XIM
 export LD_PRELOAD=../gtk-im/im-gcin.so
 #valgrind --tool=memcheck gedit
 valgrind --tool=memcheck leafpad

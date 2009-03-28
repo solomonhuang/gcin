@@ -181,8 +181,10 @@ static void cb_button_sym(GtkButton *button, char *str)
        tsin_reset_in_pho();
        break;
 #endif
+#if USE_ANTHY
     case 12:
        break;
+#endif
     default:
        reset_gtab_all();
        break;

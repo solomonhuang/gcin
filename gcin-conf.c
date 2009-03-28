@@ -123,10 +123,6 @@ char *get_gcin_xim_name()
 {
   char *xim_name;
 
-  if ((xim_name=getenv("GCIN_XIM"))) {
-//    dbg("GCIN_XIM is set with %s\n", xim_name);
-    return xim_name;
-  }
   if ((xim_name=getenv("XMODIFIERS"))) {
     static char find[] = "@im=";
     static char sstr[32];

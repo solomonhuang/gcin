@@ -1,5 +1,5 @@
 rm -f core.*
 make
-export GCIN_XIM=gcin_test
+export XMODIFIERS=@im=gcin_test
 pkill gcin.test
 gdb ../gcin.test

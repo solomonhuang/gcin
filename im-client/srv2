@@ -1,4 +1,4 @@
 rm -f core.*
 make
-export GCIN_XIM=gcin_test2
+export XMODIFIERS=@im=gcin_test2
 ../gcin.test &
