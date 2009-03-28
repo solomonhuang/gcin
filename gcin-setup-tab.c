@@ -7,6 +7,7 @@
 
 static GdkColor gcin_win_gcolor_fg,
                 gcin_win_gcolor_bg,
+                gcin_sel_key_gcolor,
                 tsin_phrase_line_gcolor,
                 tsin_cursor_gcolor;
 
@@ -24,7 +25,9 @@ static GtkWidget *check_button_gcin_eng_phrase_enabled,
                  *check_button_phonetic_speak,
                  *event_box_win_color_test,
                  *font_sel,
-                 *da,
+                 *da_phrase_line,
+                 *da_cursor,
+                 *da_sel_key,
                  *label_win_color_test,
                  *opt_eng_ch_opts,
                  *opt_im_toggle_keys,
@@ -69,8 +72,9 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_in_row1,
                  *check_button_gtab_capslock_in_eng,
                  *check_button_gtab_vertical_select,
-                 *check_button_gtab_unique_auto_send;
-                 *check_button_gcin_init_im_enabled;
+                 *check_button_gtab_unique_auto_send,
+                 *check_button_gcin_init_im_enabled,
+		 *check_button_gcin_win_sym_click_close;
 
 char *pho_speaker[16];
 int pho_speakerN;
@@ -134,7 +138,7 @@ static void cb_save_tsin_cursor_color(GtkWidget *widget, gpointer user_data)
   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
   gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &tsin_cursor_gcolor);
 
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+  gtk_widget_modify_bg(da_cursor, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
 }
 
 
@@ -488,7 +492,44 @@ static void cb_save_tsin_phrase_line_color(GtkWidget *widget, gpointer user_data
   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
   gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &tsin_phrase_line_gcolor);
 
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+  gtk_widget_modify_bg(da_phrase_line, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+}
+
+
+static void cb_save_gcin_sel_key_color(GtkWidget *widget, gpointer user_data)
+{
+  GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
+  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &gcin_sel_key_gcolor);
+
+  gtk_widget_modify_bg(da_sel_key, GTK_STATE_NORMAL, &gcin_sel_key_gcolor);
+}
+
+
+static gboolean cb_gcin_sel_key_color( GtkWidget *widget, gpointer data)
+{
+   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)gtk_color_selection_dialog_new (_("選擇鍵的顏色"));
+
+   gtk_color_selection_set_current_color(
+           GTK_COLOR_SELECTION(color_selector->colorsel),
+           &gcin_sel_key_gcolor);
+
+   g_signal_connect (GTK_OBJECT (color_selector->ok_button),
+                     "clicked",
+                     G_CALLBACK (cb_save_gcin_sel_key_color),
+                     (gpointer) color_selector);
+#if 1
+   g_signal_connect_swapped (GTK_OBJECT (color_selector->ok_button),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             (gpointer) color_selector);
+#endif
+   g_signal_connect_swapped (GTK_OBJECT (color_selector->cancel_button),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             (gpointer) color_selector);
+
+   gtk_widget_show((GtkWidget*)color_selector);
+   return TRUE;
 }
 
 
@@ -1181,6 +1222,15 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(PHONETIC_SPEAK,
      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_speak)));
 
+  save_gcin_conf_int(GCIN_WIN_SYM_CLICK_CLOSE,
+     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close)));
+
+  cstr = gtk_color_selection_palette_to_string(&gcin_sel_key_gcolor, 1);
+  dbg("selkey color %s\n", cstr);
+  save_gcin_conf_str(GCIN_SEL_KEY_COLOR, cstr);
+  g_free(cstr);
+
+
   send_gcin_message(GDK_DISPLAY(), "reload");
 
   exit(0);
@@ -1444,6 +1494,20 @@ static void create_main_win()
   gdk_color_parse(gcin_win_color_bg, &gcin_win_gcolor_bg);
   gtk_widget_modify_bg(event_box_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_bg);
 
+  GtkWidget *hbox_gcin_sel_key_color = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_sel_key_color , FALSE, FALSE, 0);
+  GtkWidget *label_gcin_sel_key_color = gtk_label_new(_("選擇鍵的顏色"));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_sel_key_color), label_gcin_sel_key_color , FALSE, FALSE, 0);
+  GtkWidget *button_gcin_sel_key_color = gtk_button_new();
+  g_signal_connect (G_OBJECT (button_gcin_sel_key_color), "clicked",
+                    G_CALLBACK (cb_gcin_sel_key_color), G_OBJECT (main_window));
+  da_sel_key =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_gcin_sel_key_color), da_sel_key);
+  gdk_color_parse(gcin_sel_key_color, &gcin_sel_key_gcolor);
+  gtk_widget_modify_bg(da_sel_key, GTK_STATE_NORMAL, &gcin_sel_key_gcolor);
+  gtk_widget_set_size_request(da_sel_key, 16, 2);
+  gtk_container_add (GTK_CONTAINER (hbox_gcin_sel_key_color), button_gcin_sel_key_color);
+
   gtk_box_pack_start (GTK_BOX (vbox), create_im_toggle_keys(), FALSE, FALSE, 0);
 
   GtkWidget *hbox_gcin_remote_client = gtk_hbox_new (FALSE, 0);
@@ -1522,6 +1586,15 @@ static void create_main_win()
       gtk_container_add (GTK_CONTAINER (hbox_phonetic_speak), create_speaker_opts());
     }
   }
+
+  GtkWidget *hbox_gcin_win_sym_click_close = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_win_sym_click_close, FALSE, FALSE, 0);
+  check_button_gcin_win_sym_click_close = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close),check_button_gcin_win_sym_click_close,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close),
+     gcin_win_sym_click_close);
+  GtkWidget *label_gcin_win_sym_click_close = gtk_label_new(_("符號視窗點選後自動關閉"));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_win_sym_click_close,  FALSE, FALSE, 0);
 
 /* label 3 */
 
@@ -1655,11 +1728,11 @@ static void create_main_win()
   GtkWidget *button_tsin_phrase_line_color = gtk_button_new();
   g_signal_connect (G_OBJECT (button_tsin_phrase_line_color), "clicked",
                     G_CALLBACK (cb_tsin_phrase_line_color), G_OBJECT (main_window));
-  da =  gtk_drawing_area_new();
-  gtk_container_add (GTK_CONTAINER (button_tsin_phrase_line_color), da);
+  da_phrase_line =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_phrase_line_color), da_phrase_line);
   gdk_color_parse(tsin_phrase_line_color, &tsin_phrase_line_gcolor);
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
-  gtk_widget_set_size_request(da, 16, 2);
+  gtk_widget_modify_bg(da_phrase_line, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+  gtk_widget_set_size_request(da_phrase_line, 16, 2);
   gtk_container_add (GTK_CONTAINER (hbox_tsin_phrase_line_color), button_tsin_phrase_line_color);
 
   GtkWidget *hbox_tsin_cursor_color = gtk_hbox_new(FALSE, 0);
@@ -1669,11 +1742,11 @@ static void create_main_win()
   GtkWidget *button_tsin_cursor_color = gtk_button_new();
   g_signal_connect (G_OBJECT (button_tsin_cursor_color), "clicked",
                     G_CALLBACK (cb_tsin_cursor_color), G_OBJECT (main_window));
-  da =  gtk_drawing_area_new();
-  gtk_container_add (GTK_CONTAINER (button_tsin_cursor_color), da);
+  da_cursor =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_cursor_color), da_cursor);
   gdk_color_parse(tsin_cursor_color, &tsin_cursor_gcolor);
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
-  gtk_widget_set_size_request(da, 16, 2);
+  gtk_widget_modify_bg(da_cursor, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+  gtk_widget_set_size_request(da_cursor, 16, 2);
   gtk_container_add (GTK_CONTAINER (hbox_tsin_cursor_color), button_tsin_cursor_color);
 
 /* label 4 */

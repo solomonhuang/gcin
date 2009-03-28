@@ -31,6 +31,7 @@
 #define GCIN_CAPSLOCK_LOWER "gcin-capslock-lower"
 #define GCIN_ENG_PHRASE_ENABLED "gcin-eng-phrase-enabled"
 #define GCIN_WIN_SYM_CLICK_CLOSE "gcin-win-sym-click-close"
+#define GCIN_SEL_KEY_COLOR "gcin-sel-key-color"
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
 #define GTAB_SPACE_AUTO_FIRST "gtab-space-auto-first"
@@ -107,7 +108,7 @@ extern int phonetic_huge_tab, phonetic_speak;
 extern char *phonetic_speak_sel;
 extern int tsin_space_opt, tsin_tone_char_input;
 
-extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name;
+extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name, *gcin_sel_key_color;
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use;
 extern int gcin_init_im_enabled;

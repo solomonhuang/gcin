@@ -392,6 +392,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 extern char file_pin_float[];
 
+#if 0
 static void set_currenet_IC_pin_image_pin()
 {
   if (!image_pin)
@@ -402,6 +403,7 @@ static void set_currenet_IC_pin_image_pin()
   else
     gtk_image_set_from_file(GTK_IMAGE(image_pin), file_pin_float);
 }
+#endif
 
 static void cb_clicked_fixed_pos()
 {
@@ -418,7 +420,7 @@ static void cb_clicked_fixed_pos()
     current_CS->fixed_x = win_x;  current_CS->fixed_y = win_y;
   }
 
-  set_currenet_IC_pin_image_pin();
+//  set_currenet_IC_pin_image_pin();
 }
 
 void tsin_toggle_eng_ch();
@@ -602,16 +604,16 @@ void get_win0_geom()
   get_win_size(gwin0, &win_xl, &win_yl);
 }
 
-gboolean tsin_has_input();
+gboolean tsin_has_input(), force_show;
 
 void show_win0()
 {
 //  dbg("show_win0\n");
   create_win0();
   create_win0_gui();
-  set_currenet_IC_pin_image_pin();
+//  set_currenet_IC_pin_image_pin();
 
-  if (gcin_pop_up_win && !tsin_has_input())
+  if (gcin_pop_up_win && !tsin_has_input() && !force_show)
     return;
 
   gtk_widget_show(gwin0);

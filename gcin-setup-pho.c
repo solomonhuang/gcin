@@ -205,14 +205,14 @@ static gboolean close_kbm_window( GtkWidget *widget,
   return TRUE;
 }
 
-static GtkWidget *da;
+static GtkWidget *da_phrase_line, *da_cursor, *da_sel_key;
 
 static void cb_save_tsin_phrase_line_color(GtkWidget *widget, gpointer user_data)
 {
   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
   gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &tsin_phrase_line_gcolor);
 
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+  gtk_widget_modify_bg(da_phrase_line, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
 }
 
 
@@ -251,7 +251,7 @@ static void cb_save_tsin_cursor_color(GtkWidget *widget, gpointer user_data)
   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
   gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &tsin_cursor_gcolor);
 
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+  gtk_widget_modify_bg(da_cursor, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
 }
 
 
@@ -283,8 +283,6 @@ static gboolean cb_tsin_cursor_color( GtkWidget *widget,
    gtk_widget_show((GtkWidget*)color_selector);
    return TRUE;
 }
-
-
 
 static GtkWidget *create_kbm_opts()
 {
@@ -526,11 +524,11 @@ void create_kbm_window()
   GtkWidget *button_tsin_phrase_line_color = gtk_button_new();
   g_signal_connect (G_OBJECT (button_tsin_phrase_line_color), "clicked",
                     G_CALLBACK (cb_tsin_phrase_line_color), G_OBJECT (gcin_kbm_window));
-  da =  gtk_drawing_area_new();
-  gtk_container_add (GTK_CONTAINER (button_tsin_phrase_line_color), da);
+  da_phrase_line =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_phrase_line_color), da_phrase_line);
   gdk_color_parse(tsin_phrase_line_color, &tsin_phrase_line_gcolor);
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
-  gtk_widget_set_size_request(da, 16, 2);
+  gtk_widget_modify_bg(da_phrase_line, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
+  gtk_widget_set_size_request(da_phrase_line, 16, 2);
   gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
 
   GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_("詞音游標的顏色"));
@@ -539,14 +537,12 @@ void create_kbm_window()
   GtkWidget *button_tsin_cursor_color = gtk_button_new();
   g_signal_connect (G_OBJECT (button_tsin_cursor_color), "clicked",
                     G_CALLBACK (cb_tsin_cursor_color), G_OBJECT (gcin_kbm_window));
-  da =  gtk_drawing_area_new();
-  gtk_container_add (GTK_CONTAINER (button_tsin_cursor_color), da);
+  da_cursor =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_cursor_color), da_cursor);
   gdk_color_parse(tsin_cursor_color, &tsin_cursor_gcolor);
-  gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
-  gtk_widget_set_size_request(da, 16, 2);
+  gtk_widget_modify_bg(da_cursor, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+  gtk_widget_set_size_request(da_cursor, 16, 2);
   gtk_container_add (GTK_CONTAINER (frame_tsin_cursor_color), button_tsin_cursor_color);
-
-
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok , FALSE, FALSE, 5);

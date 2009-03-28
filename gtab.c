@@ -856,28 +856,37 @@ static void page_no_str(char tstr[])
   }
 }
 
-char *add_backslash(char *s, char out[])
+char *htmlspecialchars(char *s, char out[])
 {
-  int outn=0;
+  struct {
+    char c;
+    char *str;
+  } chs[]= {{'>',"gt"}, {'<',"lt"}, {'&',"amp"}};
+  int chsN=sizeof(chs)/sizeof(chs[0]);
 
-  for(;*s; s++) {
-    if (*s=='<') {
-      char t[]="&lt;";
-      int len=strlen(t);
-      memcpy(out+outn, t, len);
+  int outn=0;
+  while (*s) {
+    int sz = utf8_sz(s);
+    int i;
+    for(i=0; i<chsN; i++)
+      if (chs[i].c==*s)
+        break;
+    if (i==chsN) {
+      memcpy(&out[outn],s, sz);
+      outn+=sz;
+      s+=sz;
+    }
+    else {
+      out[outn++]='&';
+      int len=strlen(chs[i].str);
+      memcpy(&out[outn], chs[i].str, len);
       outn+=len;
-    } else
-    if (*s=='&') {
-      char t[]="&amp;";
-      int len=strlen(t);
-      memcpy(out+outn, t, len);
-      outn+=len;
-    } else
-      out[outn++]=*s;
+      out[outn++]=';';
+      s++;
+    }
   }
 
   out[outn]=0;
-
   return out;
 }
 
@@ -900,9 +909,8 @@ static void disp_selection(gboolean phrase_selected)
   char uu[MAX_CIN_PHR];
 
   int ofs;
-
   if (!wild_mode && exa_match && (_gtab_space_auto_first & GTAB_space_auto_first_any)) {
-    strcat(tt, add_backslash(seltab[0], uu));
+    strcat(tt, htmlspecialchars(seltab[0], uu));
     if (gtab_vertical_select)
       strcat(tt, "\n");
     else
@@ -916,12 +924,13 @@ static void disp_selection(gboolean phrase_selected)
   for(i=ofs; i< cur_inmd->M_DUP_SEL + ofs; i++) {
     if (seltab[i][0]) {
       char selback[MAX_CIN_PHR+16];
-      add_backslash(seltab[i], selback);
+      htmlspecialchars(seltab[i], selback);
 
       utf8cpy(uu, &cur_inmd->selkey[i - ofs]);
       char vvv[16];
-      add_backslash(uu, vvv);
-      strcat(tt, vvv);
+      char www[32];
+      sprintf(www, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, htmlspecialchars(uu, vvv));
+      strcat(tt, www);
 
       if (gtab_vertical_select)
         strcat(tt, ". ");

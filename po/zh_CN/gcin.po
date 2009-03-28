@@ -440,3 +440,12 @@ msgstr "行为"
 #: ../gcin-setup-list.c:477 ../gcin-setup-tab.c:1468
 msgid "直接進入中文輸入狀態(限非XIM)"
 msgstr "直接进入中文输入模态(限非XIM)"
+
+#: ../gcin-setup-list.c:520
+msgid "符號視窗點選後自動關閉"
+msgstr "符号视窗点击后自动关闭"
+
+#: ../gcin-setup-tab.c:510 ../gcin-setup-tab.c:1587 ../gcin-setup.c:370
+#: ../gcin-setup.c:577
+msgid "選擇鍵的顏色"
+msgstr "选择键的颜色"

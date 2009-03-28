@@ -255,17 +255,6 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 extern char file_pin_float[];
 
-static void set_currenet_IC_pin_image_pin()
-{
-  if (!image_pin)
-    return;
-
-  if (current_CS->fixed_pos)
-    gtk_image_set_from_file(GTK_IMAGE(image_pin), GCIN_ICON_DIR"/pin-fixed24.png");
-  else
-    gtk_image_set_from_file(GTK_IMAGE(image_pin), file_pin_float);
-}
-
 void get_win_gtab_geom();
 
 static void cb_clicked_fixed_pos()
@@ -283,7 +272,7 @@ static void cb_clicked_fixed_pos()
     current_CS->fixed_x = win_x;  current_CS->fixed_y = win_y;
   }
 
-  set_currenet_IC_pin_image_pin();
+//  set_currenet_IC_pin_image_pin();
 }
 
 
@@ -291,90 +280,6 @@ void toggle_half_full_char();
 
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 char full_char_str[]="全";
-
-#if 0
-void create_win_gtab_gui_full()
-{
-//  dbg("create_win_gtab_gui .....\n");
-  if (top_bin)
-    return;
-
-  GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-
-  if (gcin_inner_frame) {
-    GtkWidget *frame = top_bin = gtk_frame_new(NULL);
-    gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
-    gtk_container_add (GTK_CONTAINER(gwin_gtab), frame);
-    gtk_container_set_border_width (GTK_CONTAINER (gwin_gtab), 0);
-    gtk_container_add (GTK_CONTAINER (frame), vbox_top);
-  } else {
-    gtk_container_add (GTK_CONTAINER(gwin_gtab), vbox_top);
-    top_bin = vbox_top;
-  }
-
-  GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), align, FALSE, FALSE, 0);
-
-  label_gtab_sele = gtk_label_new(NULL);
-  gtk_container_add (GTK_CONTAINER (align), label_gtab_sele);
-
-  hbox_row2 = gtk_hbox_new (FALSE, 0);
-  /* This packs the button into the gwin_gtab (a gtk container). */
-  gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
-
-  label_full = gtk_label_new(full_char_str);
-
-  GtkWidget *button_input_method_name = gtk_button_new();
-  label_input_method_name = gtk_label_new("");
-  gtk_container_add (GTK_CONTAINER (button_input_method_name), label_input_method_name);
-  g_signal_connect_swapped (GTK_OBJECT (button_input_method_name), "button_press_event",
-        G_CALLBACK (inmd_switch_popup_handler), NULL);
-  gtk_container_set_border_width (GTK_CONTAINER (button_input_method_name), 0);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), button_input_method_name, FALSE, FALSE, 0);
-
-  box_gtab_im_name = button_input_method_name;
-
-
-  GtkWidget *button_gtab = gtk_button_new();
-  gtk_container_set_border_width (GTK_CONTAINER (button_gtab), 0);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), button_gtab, FALSE, FALSE, 0);
-
-  g_signal_connect(G_OBJECT(button_gtab),"button-press-event",
-                   G_CALLBACK(mouse_button_callback), NULL);
-
-  if (left_right_button_tips) {
-    GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), button_gtab, _("左鍵符號，右鍵設定"),NULL);
-  }
-
-  GtkWidget *hbox_gtab = gtk_hbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (button_gtab), hbox_gtab);
-
-  int i;
-  for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
-    GtkWidget *label = gtk_label_new(NULL);
-    labels_gtab[i] = label;
-    gtk_box_pack_start (GTK_BOX (hbox_gtab), label, FALSE, FALSE, 0);
-  }
-
-  image_pin = gtk_image_new_from_file(file_pin_float);
-  GtkWidget *event_box_pin = gtk_event_box_new();
-  gtk_container_add (GTK_CONTAINER (event_box_pin), image_pin);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), event_box_pin, FALSE, FALSE, 0);
-  g_signal_connect (G_OBJECT (event_box_pin), "button_press_event",
-      G_CALLBACK (cb_clicked_fixed_pos), (gpointer) NULL);
-
-  label_key_codes  = gtk_label_new(NULL);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), label_key_codes, FALSE, FALSE, 2);
-
-  change_gtab_font_size();
-
-  gtk_widget_show_all (gwin_gtab);
-  gtk_widget_hide (gwin_gtab);
-
-  set_disp_im_name();
-}
-#endif
 
 
 void create_win_gtab_gui_simple()
@@ -530,14 +435,14 @@ void change_win_gtab_style()
 
 
 void init_gtab(int inmdno, int usenow);
-gboolean gtab_has_input();
+gboolean gtab_has_input(), force_show;
 
 void show_win_gtab()
 {
 //  dbg("show_win_gtab %d ..\n", current_CS->in_method);
   create_win_gtab();
   create_win_gtab_gui();
-  set_currenet_IC_pin_image_pin();
+//  set_currenet_IC_pin_image_pin();
 
   if (current_CS) {
     if (current_CS->fixed_pos)
@@ -546,7 +451,7 @@ void show_win_gtab()
 
   init_gtab(current_CS->in_method, True);
 
-  if (gcin_pop_up_win && !gtab_has_input())
+  if (gcin_pop_up_win && !gtab_has_input() && !force_show)
     return;
 
   gtk_widget_show(gwin_gtab);

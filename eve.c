@@ -283,6 +283,8 @@ void show_win0();
 void show_win_int();
 void show_win_gtab();
 
+gboolean force_show;
+
 void show_in_win(ClientState *cs)
 {
   if (!cs) {
@@ -805,8 +807,13 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     }
 
     if (keysym == ',') {
+      extern gboolean win_sym_enabled;
       create_win_sym();
-
+      if (win_sym_enabled) {
+        force_show = TRUE;
+        show_in_win(current_CS);
+        force_show = FALSE;
+      }
       return TRUE;
     }
 

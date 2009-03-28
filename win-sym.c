@@ -238,16 +238,16 @@ void move_win_sym()
   gtk_window_move(GTK_WINDOW(gwin_sym), wx, wy);
 }
 
-static gboolean win_sym_enabled=0;
+gboolean win_sym_enabled=0;
 
 void hide_win_sym()
 {
   if (!gwin_sym)
     return;
-
-  win_sym_enabled=0;
-
   gtk_widget_hide(gwin_sym);
+
+  if (gcin_win_sym_click_close)
+    win_sym_enabled=0;
 }
 
 void show_win_sym()
@@ -349,7 +349,6 @@ void create_win_sym()
       show_win_sym();
     else
       hide_win_sym();
-
     return;
   }
 

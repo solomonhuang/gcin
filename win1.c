@@ -84,7 +84,7 @@ void clear_sele()
   gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
 }
 
-
+char *htmlspecialchars(char *s, char out[]);
 
 void set_sele_text(int i, char *text, int len)
 {
@@ -93,18 +93,25 @@ void set_sele_text(int i, char *text, int len)
 
   memcpy(utf8, text, len);
   utf8[len]=0;
+  char uu[32], selma[128];
+
+  char cc[2];
+  cc[0]=phkbm.selkey[i];
+  cc[1]=0;
+
+  sprintf(selma, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, htmlspecialchars(cc, uu));
 
   if (tsin_tail_select_key) {
-    snprintf(tt, sizeof(tt), "%s %c", utf8, phkbm.selkey[i]);
-  }
-  else {
+    char vv[128];
+    snprintf(tt, sizeof(tt), "%s %s", htmlspecialchars(utf8, vv), selma);
+  } else {
     gtk_label_set_text(GTK_LABEL(labels_seleR[i]), utf8);
     gtk_widget_show(labels_seleR[i]);
-    snprintf(tt, sizeof(tt), "%c ", phkbm.selkey[i]);
+    snprintf(tt, sizeof(tt), "%s ", selma);
   }
 
   gtk_widget_show(labels_sele[i]);
-  gtk_label_set_text(GTK_LABEL(labels_sele[i]), tt);
+  gtk_label_set_markup(GTK_LABEL(labels_sele[i]), tt);
 }
 
 

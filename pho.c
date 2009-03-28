@@ -479,10 +479,6 @@ int feedkey_pho(KeySym xkey, int kbstate)
   char out_buffer[(CH_SZ+2) * 10 + 4];
   int out_bufferN;
 
-  if ((kbstate & ShiftMask)) {
-    return shift_char_proc(xkey, kbstate);
-  }
-
 
   if (xkey >= 'A' && xkey <='Z')
     xkey+=0x20;
@@ -576,6 +572,9 @@ int feedkey_pho(KeySym xkey, int kbstate)
    default:
       if (xkey >= 127 || xkey < ' ')
         return 0;
+
+      if ((kbstate & ShiftMask))
+        return shift_char_proc(xkey, kbstate);
 
       if ((pp=strchr(phkbm.selkey, xkey)) && maxi && ityp3_pho) {
         int c=pp-phkbm.selkey;

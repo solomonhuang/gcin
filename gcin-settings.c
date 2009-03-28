@@ -43,7 +43,7 @@ int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
 char *tsin_phrase_line_color;
-char *tsin_cursor_color;
+char *tsin_cursor_color, *gcin_sel_key_color;
 int tsin_tab_phrase_end;
 int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 int gcin_inner_frame;
@@ -132,6 +132,7 @@ void load_setttings()
 
   get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, &tsin_phrase_line_color, "blue");
   get_gcin_conf_str(TSIN_CURSOR_COLOR, &tsin_cursor_color, "blue");
+  get_gcin_conf_str(GCIN_SEL_KEY_COLOR, &gcin_sel_key_color, "blue");
 
   get_gcin_conf_str(GCIN_WIN_COLOR_FG, &gcin_win_color_fg, "white");
   get_gcin_conf_str(GCIN_WIN_COLOR_BG, &gcin_win_color_bg, "#005BFF");
