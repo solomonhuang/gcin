@@ -188,8 +188,10 @@ void hide_in_win(ClientState *cs)
   dbg("hide_in_win %d\n", ic->in_method);
 #endif
 
-  g_source_remove(timeout_handle);
-  timeout_handle = 0;
+  if (timeout_handle) {
+    g_source_remove(timeout_handle);
+    timeout_handle = 0;
+  }
 
   switch (cs->in_method) {
     case 3:

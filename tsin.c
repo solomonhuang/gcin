@@ -1291,9 +1291,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
           return 1;
         }
 
-        if (c_len) {
-          flush_tsin_buffer();
+        if (tsin_tab_phrase_end) {
+          ph_sta = -1;
           return 1;
+        } else {
+          if (c_len) {
+            flush_tsin_buffer();
+            return 1;
+          }
         }
         return 0;
      case XK_Shift_L:

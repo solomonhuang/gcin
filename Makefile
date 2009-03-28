@@ -34,6 +34,10 @@ CFLAGS += -DUSE_XIM=1
 OBJS+=IC.o
 endif
 
+ifeq ($(MAC_OS),1)
+EXTRA_LDFLAGS=-bind_at_load
+endif
+
 im-srv = im-srv/im-srv.a
 
 .c.E:
@@ -49,7 +53,7 @@ all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
-	$(CC) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
+	$(CC) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 	ln -sf $@ $@.test
 

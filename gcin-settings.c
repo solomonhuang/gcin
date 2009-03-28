@@ -37,6 +37,7 @@ int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
 char tsin_phrase_line_color[16];
 char tsin_cursor_color[16];
+int tsin_tab_phrase_end;
 int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 int gcin_inner_frame;
 char gcin_font_name[64];
@@ -98,6 +99,7 @@ void load_setttings()
   pho_simple_win = get_gcin_conf_int(PHO_SIMPLE_WIN, 1);
   tsin_space_opt = get_gcin_conf_int(TSIN_SPACE_OPT, TSIN_SPACE_OPT_SELECT_CHAR);
   tsin_buffer_size = get_gcin_conf_int(TSIN_BUFFER_SIZE, 40);
+  tsin_tab_phrase_end = get_gcin_conf_int(TSIN_TAB_PHRASE_END, 0);
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);

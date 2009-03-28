@@ -49,6 +49,8 @@
 #define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
 #define TSIN_CURSOR_COLOR "tsin-cursor-color"
 #define TSIN_TONE_CHAR_INPUT "tsin-tone-char-input"
+#define TSIN_TAB_PHRASE_END "tsin-tab-phrase-end"
+
 #define PHO_HIDE_ROW2 "pho-hide-row2"
 #define PHO_IN_ROW1 "pho-in-row1"
 
@@ -83,6 +85,7 @@ extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;
+extern int tsin_tab_phrase_end;
 
 extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;

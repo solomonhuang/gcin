@@ -24,6 +24,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_pho_in_row1,
                  *check_button_phonetic_huge_tab,
                  *check_button_tsin_tone_char_input,
+                 *check_button_tsin_tab_phrase_end,
                  *spinner_tsin_buffer_size;
 
 static GtkWidget *opt_kbm_opts;
@@ -91,6 +92,10 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(TSIN_TONE_CHAR_INPUT,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input)));
+
+
+  save_gcin_conf_int(TSIN_TAB_PHRASE_END,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_tab_phrase_end)));
 
 
   tsin_buffer_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_buffer_size));
@@ -429,6 +434,16 @@ void create_kbm_window()
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tone_char_input), check_button_tsin_tone_char_input, FALSE, FALSE, 0);
   gtk_toggle_button_set_active(
      GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input), tsin_tone_char_input);
+
+
+  GtkWidget *hbox_tsin_tab_phrase_end = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_tab_phrase_end , TRUE, TRUE, 1);
+  GtkWidget *label_tsin_tab_phrase_end = gtk_label_new("詞音 Tab 斷詞");
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_tab_phrase_end), label_tsin_tab_phrase_end , TRUE, TRUE, 0);
+  check_button_tsin_tab_phrase_end = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_tab_phrase_end), check_button_tsin_tab_phrase_end, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_tsin_tab_phrase_end), tsin_tab_phrase_end);
 
 
   GtkWidget *frame_tsin_buffer_size = gtk_frame_new("詞音編輯緩衝區大小");
