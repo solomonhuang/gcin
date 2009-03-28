@@ -292,6 +292,7 @@ void toggle_half_full_char();
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 char full_char_str[]="全";
 
+#if 0
 void create_win_gtab_gui_full()
 {
 //  dbg("create_win_gtab_gui .....\n");
@@ -373,6 +374,7 @@ void create_win_gtab_gui_full()
 
   set_disp_im_name();
 }
+#endif
 
 
 void create_win_gtab_gui_simple()
@@ -494,10 +496,14 @@ void create_win_gtab_gui_simple()
 
 static void create_win_gtab_gui()
 {
+#if 0
   if (gtab_simple_win)
     create_win_gtab_gui_simple();
   else
     create_win_gtab_gui_full();
+#else
+  create_win_gtab_gui_simple();
+#endif
 
   current_gtab_simple_win = gtab_simple_win;
   current_gtab_in_row1 = gtab_in_row1;

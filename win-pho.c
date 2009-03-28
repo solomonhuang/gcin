@@ -124,7 +124,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 }
 
-
+#if 0
 void create_win_pho_gui_full()
 {
 //  dbg("create_win_pho .....\n");
@@ -190,6 +190,7 @@ void create_win_pho_gui_full()
 
   gtk_widget_hide(label_full);
 }
+#endif
 
 
 void create_win_pho_gui_simple()
@@ -271,10 +272,14 @@ void create_win_pho_gui_simple()
 
 void create_win_pho_gui()
 {
+#if 0
   if (pho_simple_win)
     create_win_pho_gui_simple();
   else
     create_win_pho_gui_full();
+#else
+    create_win_pho_gui_simple();
+#endif
 
   if (pho_hide_row2) {
     gtk_widget_hide(hbox_row2);

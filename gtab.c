@@ -518,8 +518,10 @@ void init_gtab(int inmdno, int usenow)
     inp->keycol[i]=key_col(ttt[i]);
   }
 
+
   inp->keymap[(int)'?']=WILD_QUES;
-  inp->keymap[(int)'*']=WILD_STAR;
+  if (!strchr(th.selkey, '*'))
+    inp->keymap[(int)'*']=WILD_STAR;
 
   free(inp->idx1);
   inp->idx1 = tmalloc(gtab_idx1_t, th.KeyS+1);
@@ -859,9 +861,14 @@ char *add_backslash(char *s, char out[])
   int outn=0;
 
   for(;*s; s++) {
-
     if (*s=='<') {
       char t[]="&lt;";
+      int len=strlen(t);
+      memcpy(out+outn, t, len);
+      outn+=len;
+    } else
+    if (*s=='&') {
+      char t[]="&amp;";
       int len=strlen(t);
       memcpy(out+outn, t, len);
       outn+=len;
@@ -911,7 +918,11 @@ static void disp_selection(gboolean phrase_selected)
       char selback[MAX_CIN_PHR+16];
       add_backslash(seltab[i], selback);
 
-      b1_cat(tt, cur_inmd->selkey[i - ofs]);
+      utf8cpy(uu, &cur_inmd->selkey[i - ofs]);
+      char vvv[16];
+      add_backslash(uu, vvv);
+      strcat(tt, vvv);
+
       if (gtab_vertical_select)
         strcat(tt, ". ");
 
@@ -1337,6 +1348,8 @@ direct_select:
       if (!gtab_que_wild_card)
         return 0;
     case '*':
+      if (cur_inmd->keymap[key] || ptr_selkey(key))
+        goto next;
       if (ci< cur_inmd->MaxPress) {
         inkey=cur_inmd->keymap[key];
         inch[ci++]=inkey;

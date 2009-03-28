@@ -413,10 +413,6 @@ msgstr "Convert clipboard's Traditional Chinese to Simplified Chinese"
 msgid "通用"
 msgstr "General"
 
-#: ../gcin-setup-tab.c:1383
-msgid "固定視窗位置"
-msgstr "Fixed input window"
-
 #: ../gcin-setup-tab.c:1511
 msgid "，發音選擇"
 msgstr ", speaker:"
@@ -440,3 +436,7 @@ msgstr "Appearance Settings"
 #: ../gcin-setup-gtab.c:196
 msgid "行為"
 msgstr "Behavior Settings"
+
+#: ../gcin-setup-list.c:477 ../gcin-setup-tab.c:1468
+msgid "直接進入中文輸入狀態(限非XIM)"
+msgstr "Toggle On inputing mode by default (non-XIM only)"

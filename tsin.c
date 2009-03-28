@@ -913,6 +913,13 @@ static void clear_disp_ph_sta()
 
 void draw_underline(int index);
 
+static void draw_ul(start, stop)
+{
+  int i;
+  for(i=start; i < stop; i++)
+    draw_underline(i);
+}
+
 void disp_ph_sta_idx(int idx)
 {
 //  dbg("ph_sta:%d\n", ph_sta);
@@ -921,11 +928,7 @@ void disp_ph_sta_idx(int idx)
   if (ph_sta < 0)
     return;
 
-  int i;
-
-  for(i=idx; i < c_idx; i++) {
-    draw_underline(i);
-  }
+  draw_ul(idx, c_idx);
 }
 
 void disp_ph_sta()
@@ -1257,6 +1260,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
         if (shift_m) {
           save_frm=c_idx;
           save_to=c_len-1;
+          draw_ul(c_idx, c_len);
           save_phrase();
           return 1;
         } else
@@ -1431,8 +1435,7 @@ tab_phrase_end:
 
         if (!c_idx) {
           clear_match();
-        }
-        else {
+        } else {
           k=c_idx-1;
           pst=chpho[k].psta;
 
@@ -1453,6 +1456,10 @@ tab_phrase_end:
         }
 
         disp_ph_sta();
+
+        if (!c_len && gcin_pop_up_win)
+          hide_win0();
+
         return 1;
      case XK_Up:
        if (!sel_pho) {
@@ -1579,10 +1586,7 @@ other_keys:
 
            if (c_idx + len == c_len) {
              ph_sta = -1;
-
-             for(i=c_idx; i < c_len; i++) {
-                draw_underline(i);
-             }
+             draw_ul(i, c_len);
            }
          } else
          if (len == 1) { // single chinese char
@@ -1598,9 +1602,7 @@ other_keys:
            }
 
            set_fixed(i, 1);
-#if 1
            call_tsin_parse();
-#endif
          }
 
          if (len) {

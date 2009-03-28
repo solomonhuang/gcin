@@ -547,7 +547,7 @@ static void create_win0_gui()
   set_label_font_size(label_pho, gcin_font_size_tsin_pho_in);
   gtk_container_add (GTK_CONTAINER (button_pho), label_pho);
 
-
+#if 0
   if (!pho_simple_win) {
     GtkWidget *hbox_row2 = gtk_hbox_new (FALSE, 0);
   //  gtk_container_set_border_width (GTK_CONTAINER (hbox_row2), 0);
@@ -570,6 +570,7 @@ static void create_win0_gui()
     g_signal_connect (G_OBJECT (event_box_pin), "button_press_event",
         G_CALLBACK (cb_clicked_fixed_pos), (gpointer) NULL);
   }
+#endif
 
   clr_in_area_pho_tsin();
 
