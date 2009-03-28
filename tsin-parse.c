@@ -4,37 +4,7 @@
 #include "tsin.h"
 #include "gcin-conf.h"
 #include <math.h>
-
-typedef struct {
-  int start;
-  int usecount;
-  short match_phr_N, no_match_ch_N;
-  TSIN_PARSE best[MAX_PH_BF_EXT+1];
-} CACHE ;
-
-static CACHE *cache;
-static int cacheN;
-
-static CACHE *cache_lookup(int start)
-{
-  int i;
-
-  for(i=0; i < cacheN; i++)
-    if (cache[i].start == start)
-      return &cache[i];
-  return NULL;
-}
-
-static void add_cache(int start, int usecount, TSIN_PARSE *out,
-                      short match_phr_N, short no_match_ch_N)
-{
-  cache[cacheN].start = start;
-  cache[cacheN].usecount = usecount;
-  cache[cacheN].match_phr_N = match_phr_N;
-  cache[cacheN].no_match_ch_N = no_match_ch_N;
-  memcpy(cache[cacheN].best, out, sizeof(TSIN_PARSE) * (c_len - start));
-  cacheN++;
-}
+#include "tsin-parse.h"
 
 #define DBG (0)
 
@@ -155,7 +125,7 @@ next:
       } else {
         uc = tsin_parse_recur(next, &pbest[1], &smatch_phr_N, &sno_match_ch_N);
 //        dbg("   gg %d\n", smatch_phr_N);
-        add_cache(next, uc, &pbest[1], smatch_phr_N, sno_match_ch_N);
+        add_cache(next, uc, &pbest[1], smatch_phr_N, sno_match_ch_N, c_len);
       }
 
       match_phr_N += smatch_phr_N;
@@ -201,15 +171,18 @@ next:
 
 void disp_ph_sta_idx(int idx);
 
-void tsin_parse(TSIN_PARSE out[])
+
+void tsin_parse()
 {
+  TSIN_PARSE out[MAX_PH_BF_EXT+1];
+  bzero(out, sizeof(out));
+
   int i, ofsi;
 
   if (c_len <= 1)
     return;
 
-  cache = tmalloc(CACHE, c_len);
-  cacheN = 0;
+  init_cache(c_len);
 
   short smatch_phr_N, sno_match_ch_N;
   tsin_parse_recur(0, out, &smatch_phr_N, &sno_match_ch_N);
@@ -236,8 +209,12 @@ void tsin_parse(TSIN_PARSE out[])
       ofsj += u8cpy(chpho[ofsi].ch, &out[i].str[ofsj]);
 
       if (out[i].flag & FLAG_TSIN_PARSE_PHRASE)
+#if 1
         chpho[ofsi].psta = psta;
 
+#else
+        chpho[ofsi].psta = out[i].start;
+#endif
       ofsi++;
     }
   }
@@ -256,5 +233,6 @@ void tsin_parse(TSIN_PARSE out[])
     utf8_putchar(chpho[i].ch);
   puts("");
 #endif
-  free(cache); cache = NULL;
+
+  free_cache();
 }

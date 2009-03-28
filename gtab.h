@@ -1,6 +1,3 @@
-#define MAX_CIN_PHR (100*CH_SZ + 1)
-
-
 
 typedef enum {
   GTAB_space_auto_first_none=0,   // use the value set by .cin

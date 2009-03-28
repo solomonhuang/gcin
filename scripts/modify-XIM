@@ -69,7 +69,7 @@ fi
 #fi
 
 
-cd /usr/X11R6/bin
+cd /usr/bin
 grep -i scim crxvt >& /dev/null
 if [ $? = 0 ]; then
   [ -f crxvt.orig.cin ] || mv crxvt crxvt.orig.cin

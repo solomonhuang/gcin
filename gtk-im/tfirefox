@@ -5,8 +5,9 @@ export LD_LIBRARY_PATH="../im-client"
 export LD_PRELOAD=./im-gcin.so
 
 pkill gcin.test
-#../gcin.test &
+../gcin.test &
 
 #/usr/lib/firefox
-export LD_LIBRARY_PATH=/usr/lib/mozilla-firefox-1.5.0.7
-/usr/lib/mozilla-firefox-1.5.0.7/mozilla-firefox-bin
+export LD_LIBRARY_PATH=/usr/lib/firefox-2.0.0.14
+/usr/lib/firefox-2.0.0.14/mozilla-firefox-bin
+pkill gcin.test

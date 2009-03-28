@@ -34,6 +34,14 @@ void get_gcin_conf_fname(char *name, char fname[])
   strcat(strcat(fname,"/config/"),name);
 }
 
+void get_gcin_user_or_sys_fname(char *name, char fname[])
+{
+  if (!getenv("GCIN_TABLE_DIR"))
+    get_gcin_user_fname(name, fname);
+  else
+    get_sys_table_file_name(name, fname);
+}
+
 void get_gcin_conf_str(char *name, char **rstr, char *default_str)
 {
   char fname[MAX_GCIN_STR];

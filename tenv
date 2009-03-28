@@ -11,6 +11,7 @@ export LC_CTYPE=zh_TW.UTF-8
 #export LANG=zh_TW
 export XMODIFIERS=@im=gcin_test
 #export GCIN_OUTPUT_FILTER=./gcin_filter
+export GCIN_ERR_COREDUMP
 ./gcin.test &
 gcinpid=$!
 sleep 1

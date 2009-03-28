@@ -600,16 +600,13 @@ gboolean tsin_has_input(), force_show;
 
 void show_win0()
 {
-//  dbg("show_win0\n");
   create_win0();
   create_win0_gui();
-//  set_currenet_IC_pin_image_pin();
 
   if (gcin_pop_up_win && !tsin_has_input() && !force_show)
     return;
 
   gtk_widget_show(gwin0);
-//  dbg("show_win0 b\n");
 
   show_win_sym();
   if (current_CS->b_raise_window) {

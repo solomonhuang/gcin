@@ -7,6 +7,7 @@
 #include "pho.h"
 #include "tsin.h"
 #include "gcin-conf.h"
+#include "tsin-parse.h"
 
 static gint64 key_press_time;
 extern gboolean b_hsu_kbm;
@@ -63,7 +64,11 @@ gboolean pho_has_input();
 
 gboolean tsin_has_input()
 {
-  return c_len || pho_has_input() || !eng_ph;
+#if 0
+  return c_len || pho_has_input() || !eng_ph ;
+#else
+  return c_len || pho_has_input();
+#endif
 }
 
 
@@ -1193,9 +1198,7 @@ gint64 current_time();
 
 static void call_tsin_parse()
 {
-  TSIN_PARSE parse[MAX_PH_BF_EXT+1];
-  bzero(parse, sizeof(parse));
-  tsin_parse(parse);
+  tsin_parse();
   prbuf();
 }
 
@@ -1680,7 +1683,13 @@ other_keys:
    if (xkey > 0x7e && !key_pad)
      return 0;
 
+
    if (!eng_ph || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {
+       if (eng_ph && !shift_m && strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num) {
+         if (pre_punctuation_hsu(xkey))
+           return 1;
+       }
+
        if (key_pad)
          xkey = key_pad;
 asc_char:
@@ -1749,8 +1758,6 @@ asc_char:
 
 
      // for hsu & et26
-     if (strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num && typ_pho[0]!=BACK_QUOTE_NO)
-       return pre_punctuation_hsu(xkey);
 
      if (xkey >= 'A' && xkey <='Z' && typ_pho[0]!=BACK_QUOTE_NO)
        xkey+=0x20;

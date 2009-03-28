@@ -1490,7 +1490,7 @@ static void create_main_win()
   event_box_win_color_test = gtk_event_box_new();
   gtk_box_pack_start (GTK_BOX(vbox), event_box_win_color_test, FALSE, FALSE, 0);
   label_win_color_test = gtk_label_new(_("測試目前狀態"));
-  gtk_container_add (GTK_BOX(event_box_win_color_test), label_win_color_test);
+  gtk_container_add (GTK_CONTAINER(event_box_win_color_test), label_win_color_test);
 
   GdkColor color;
   gdk_color_parse(gcin_win_color_fg, &gcin_win_gcolor_fg);

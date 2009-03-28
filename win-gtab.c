@@ -130,6 +130,7 @@ void change_win_fg_bg(GtkWidget *win, GtkWidget *label)
   GdkColor col;
   gdk_color_parse(gcin_win_color_fg, &col);
   gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &col);
+  gtk_widget_modify_fg(label_edit, GTK_STATE_NORMAL, &col);
 
   change_win_bg(win);
 }
@@ -142,6 +143,7 @@ void change_gtab_font_size()
     return;
 
   set_label_font_size(label_gtab_sele, gcin_font_size);
+  set_label_font_size(label_edit, gcin_font_size);
 
   int i;
   for(i=0; i < MAX_TAB_KEY_NUM64_6; i++) {
@@ -282,6 +284,10 @@ void toggle_half_full_char();
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 char full_char_str[]="全";
 
+void disp_label_edit(char *str)
+{
+  gtk_label_set_markup(GTK_LABEL(label_edit), str);
+}
 
 void create_win_gtab_gui_simple()
 {
@@ -291,9 +297,11 @@ void create_win_gtab_gui_simple()
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
 
-  if (gtab_edit_buffer) {
-    label_edit = gtk_label_new("wwwww");
-    gtk_container_add (GTK_CONTAINER (vbox_top), label_edit);
+  if (gtab_auto_select_by_phrase) {
+    label_edit = gtk_label_new(NULL);
+    GtkWidget *align = gtk_alignment_new (0, 0.0, 0, 0);
+    gtk_container_add (GTK_CONTAINER (align), label_edit);
+    gtk_container_add (GTK_CONTAINER (vbox_top), align);
   }
 
   GtkWidget *event_box_gtab = gtk_event_box_new();

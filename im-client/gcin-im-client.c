@@ -428,6 +428,8 @@ int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr)
 {
+  if (!handle)
+    return 0;
   // in case client didn't send focus in event
   if (!BITON(handle->flag, FLAG_GCIN_client_handle_has_focus)) {
     gcin_im_client_focus_in(handle);
@@ -449,6 +451,8 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr)
 {
+  if (!handle)
+    return 0;
   handle->flag |= FLAG_GCIN_client_handle_has_focus;
 //  dbg("gcin_im_client_forward_key_release\n");
   int flag = gcin_im_client_forward_key_event(

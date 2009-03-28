@@ -523,6 +523,7 @@ int main(int argc, char **argv)
 
   fwrite(idx1, sizeof(gtab_idx1_t), KeyNum+1, fw);
 
+
   if (key64) {
 #if NEED_SWAP
     for(i=0; i < chno; i++) {

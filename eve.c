@@ -506,6 +506,7 @@ void toggle_im_enabled(u_int kev_state)
 #endif
       }
       else {
+        output_gbuf();
         reset_gtab_all();
       }
 
@@ -656,7 +657,8 @@ gboolean init_in_method(int in_no)
 #if USE_TSIN
       flush_tsin_buffer();
 #endif
-      }
+      } else
+        output_gbuf();
 
       hide_in_win(current_CS);
     }
@@ -788,7 +790,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     dbg("%x\n", Mod4Mask);
 #endif
     if (
-      ((kev_state & ControlMask) && gcin_im_toggle_keys==Control_Space) ||
+      ((kev_state & (ControlMask|Mod1Mask|ShiftMask))==ControlMask && gcin_im_toggle_keys==Control_Space) ||
       ((kev_state & Mod1Mask) && gcin_im_toggle_keys==Alt_Space) ||
       ((kev_state & ShiftMask) && gcin_im_toggle_keys==Shift_Space) ||
       ((kev_state & Mod4Mask) && gcin_im_toggle_keys==Windows_Space)
@@ -852,7 +854,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     }
 
     int kidx = gcin_switch_keys_lookup(keysym);
-    if (kidx < 0)
+    if (kidx <= 0)
       return FALSE;
 
     current_CS->im_state = GCIN_STATE_CHINESE;

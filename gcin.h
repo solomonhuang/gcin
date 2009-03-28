@@ -148,3 +148,5 @@ extern char gcin_switch_keys[];
 #endif
 
 typedef int usecount_t;
+
+#define MAX_CIN_PHR (100*CH_SZ + 1)

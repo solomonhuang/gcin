@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 static void exec_script(char *name)
 {
   char scr[512];

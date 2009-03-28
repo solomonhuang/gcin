@@ -11,7 +11,6 @@ char file_pin_float[] = GCIN_ICON_DIR"/pin-float16.png";
 
 int c_len;
 int text_pho_N=3;
-int ts_gtabN;
 
 gboolean b_use_full_space = TRUE;
 

@@ -11,7 +11,7 @@ gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o gtab-buf.o
 GCIN_SO= gcin1.so gcin2.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
-     gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o \
+     gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \

@@ -1,0 +1,17 @@
+OPTFLAGS=-g
+
+include config.mak
+
+CFLAGS= -DTEST=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include \
+-DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" -DUSE_TSIN=1
+
+
+OBJS=gtab-buf.o tsin-util.o util.o locale.o cache.o gcin-conf.o gt.o
+gt:	$(OBJS)
+	rm -f core.*
+	cc -o $@ $(OBJS) $(LDFLAGS)
+
+.depend:
+	$(CC) $(CFLAGS) -MM *.c > $@
+
+include .depend

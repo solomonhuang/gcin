@@ -339,8 +339,9 @@ static void
 gtk_im_context_gcin_set_client_window (GtkIMContext          *context,
 				      GdkWindow             *client_window)
 {
-//  printf("gtk_im_context_gcin_set_client_window\n");
-
+#if DBG
+  printf("gtk_im_context_gcin_set_client_window\n");
+#endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 #if NEW_GTK_IM
   if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
@@ -353,7 +354,9 @@ gtk_im_context_gcin_set_client_window (GtkIMContext          *context,
 GtkIMContext *
 gtk_im_context_gcin_new (void)
 {
-//  printf("gtk_im_context_gcin_new\n");
+#if DBG
+  printf("gtk_im_context_gcin_new\n");
+#endif
   GtkIMContextGCIN *result;
 
   result = GTK_IM_CONTEXT_GCIN (g_object_new (GTK_TYPE_IM_CONTEXT_GCIN, NULL));
@@ -453,7 +456,9 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     num_bytes, rstr);
 #endif
   if (rstr) {
-//    printf("emit %s\n", rstr);
+#if DBG
+    printf("emit %s\n", rstr);
+#endif
     g_signal_emit_by_name (context, "commit", rstr);
     free(rstr);
   }
@@ -466,8 +471,9 @@ static void
 gtk_im_context_gcin_focus_in (GtkIMContext *context)
 {
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-
-//  printf("gtk_im_context_gcin_focus_in\n");
+#if DBG
+  printf("gtk_im_context_gcin_focus_in\n");
+#endif
   if (context_xim->gcin_ch) {
 #if NEW_GTK_IM
     if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
@@ -500,7 +506,9 @@ static void
 gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
 					GdkRectangle *area)
 {
-//  printf("gtk_im_context_gcin_set_cursor_location %d\n", area->x);
+#if DBG
+  printf("gtk_im_context_gcin_set_cursor_location %d\n", area->x);
+#endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 
   if (context_xim->gcin_ch) {
