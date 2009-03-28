@@ -8,7 +8,7 @@ gmo:
 	$(MAKE) -C zh_TW
 
 pot:
-	xgettext --from-code=UTF-8 --keyword=_ -o ./gcin.pot ../*.c
+	xgettext --from-code=UTF-8 --keyword=_ --keyword=N_ -o ./gcin.pot ../*.c
 
 install:
 	install -d $(datadir)/locale/en_US/LC_MESSAGES

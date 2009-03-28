@@ -24,6 +24,8 @@ typedef struct {
 GEDIT gbuf[MAX_GBUF+1];
 short gbufN;
 short gbuf_cursor;
+extern int pg_idx, total_matchN;
+extern char seltab[MAX_SELKEY][MAX_CIN_PHR];
 
 void dump_gbuf()
 {
@@ -126,6 +128,7 @@ void disp_gbuf()
 void clear_gbuf_sel()
 {
   gtab_buf_select = 0;
+  total_matchN = 0;
   ClrSelArea();
 }
 
@@ -135,6 +138,7 @@ int gbuf_cursor_left()
     return gbufN;
   if (gtab_buf_select)
     clear_gbuf_sel();
+  ClrIn();
   gbuf_cursor--;
   disp_gbuf();
   return 1;
@@ -485,8 +489,6 @@ void insert_gbuf_cursor(char **sel, int selN)
   char_play(pbuf->ch);
 }
 
-extern int pg_idx, total_matchN;
-extern char seltab[MAX_SELKEY][MAX_CIN_PHR];
 
 void set_gbuf_c_sel(int v)
 {

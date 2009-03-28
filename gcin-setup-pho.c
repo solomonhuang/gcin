@@ -6,18 +6,18 @@ static struct {
   char *name;
   char *kbm;
 }  kbm_sel[]= {
- {"標準 standard", "zo"},
- {"標準 standard 使用 asdf 選擇", "zo-asdf"},
- {"倚天 Eten", "et"},
- {"倚天 Eten 使用 asdf 選擇", "et-asdf"},
- {"倚天 26 鍵", "et26"},
- {"倚天 26 鍵,使用 asdf 選擇", "et26-asdf"},
- {"許氏(國音,自然)", "hsu"},
- {"聲調拼音", "pinyin"},
- {"聲調拼音, 使用 asdf 選擇", "pinyin-asdf"},
-{"Dvorak", "dvorak"},
- {"IBM", "ibm"},
- {"神通", "mitac"},
+ {N_("標準 standard"), "zo"},
+ {N_("標準 standard 使用 asdf 選擇"), "zo-asdf"},
+ {N_("倚天 Eten"), "et"},
+ {N_("倚天 Eten 使用 asdf 選擇"), "et-asdf"},
+ {N_("倚天 26 鍵"), "et26"},
+ {N_("倚天 26 鍵,使用 asdf 選擇"), "et26-asdf"},
+ {N_("許氏(國音,自然)"), "hsu"},
+ {N_("聲調拼音"), "pinyin"},
+ {N_("聲調拼音, 使用 asdf 選擇"), "pinyin-asdf"},
+ {N_("Dvorak"), "dvorak"},
+ {N_("IBM"), "ibm"},
+ {N_("神通"), "mitac"},
  {NULL, NULL}
 };
 
@@ -41,11 +41,11 @@ static struct {
   char *name;
   int key;
 } tsin_eng_ch_sw[]={
-  {"CapsLock", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock},
-  {"Tab", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
-  {"Shift(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
-  {"ShiftL(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL},
-  {"ShiftR(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR},
+  {N_("CapsLock"), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock},
+  {N_("Tab"), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
+  {N_("Shift(限非 XIM)"), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
+  {N_("ShiftL(限非 XIM)"), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL},
+  {N_("ShiftR(限非 XIM)"), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR},
 };
 int tsin_eng_ch_swN = sizeof(tsin_eng_ch_sw) / sizeof(tsin_eng_ch_sw[0]);
 
@@ -54,8 +54,8 @@ static struct {
   char *name;
   int key;
 } tsin_space_options[]={
-  {"選擇同音字", TSIN_SPACE_OPT_SELECT_CHAR},
-  {"輸入空白", TSIN_SPACE_OPT_INPUT}
+  {N_("選擇同音字"), TSIN_SPACE_OPT_SELECT_CHAR},
+  {N_("輸入空白"), TSIN_SPACE_OPT_INPUT}
 };
 int tsin_space_optionsN = sizeof(tsin_space_options) / sizeof(tsin_space_options[0]);
 
@@ -301,7 +301,7 @@ static GtkWidget *create_kbm_opts()
   int current_idx = get_current_kbm_idx();
 
   for(i=0; kbm_sel[i].name; i++) {
-    GtkWidget *item = gtk_menu_item_new_with_label (kbm_sel[i].name);
+    GtkWidget *item = gtk_menu_item_new_with_label (_(kbm_sel[i].name));
 
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_kbm_opts), item);
   }
@@ -327,7 +327,7 @@ static GtkWidget *create_eng_ch_opts()
   int current_idx = get_currnet_eng_ch_sw_idx();
 
   for(i=0; i < tsin_eng_ch_swN; i++) {
-    GtkWidget *item = gtk_menu_item_new_with_label (tsin_eng_ch_sw[i].name);
+    GtkWidget *item = gtk_menu_item_new_with_label (_(tsin_eng_ch_sw[i].name));
 
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_eng_ch_opts), item);
   }
@@ -402,7 +402,7 @@ void create_kbm_window()
 
   int i;
   for(i=0; i< tsin_space_optionsN; i++) {
-    GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_space_opt, tsin_space_options[i].name);
+    GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_space_opt, _(tsin_space_options[i].name));
     gtk_box_pack_start (GTK_BOX (box_tsin_space_opt), button, TRUE, TRUE, 0);
 
     group_tsin_space_opt = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));

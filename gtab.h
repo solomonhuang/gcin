@@ -27,6 +27,7 @@ enum {
   FLAG_KEEP_KEY_CASE=1,
   FLAG_GTAB_SYM_KBM=2, // auto close, auto switch to default input method
   FLAG_PHRASE_AUTO_SKIP_ENDKEY=4,
+  FLAG_AUTO_SELECT_BY_PHRASE=8,
 };
 
 struct TableHead {

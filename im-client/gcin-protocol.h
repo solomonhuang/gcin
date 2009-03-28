@@ -69,6 +69,9 @@ typedef struct {
   GCIN_PASSWD passwd;
 } Server_IP_port;
 
+typedef struct {
+  char sock_path[80];
+} Server_sock_path;
 
 void __gcin_enc_mem(u_char *p, int n, GCIN_PASSWD *passwd, u_int *seed);
 

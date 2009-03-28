@@ -15,6 +15,7 @@
 #else
 #define _(STRING) (STRING)
 #endif
+#define N_(STRING) STRING
 
 typedef enum {
   GCIN_STATE_DISABLED = 0,

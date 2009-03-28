@@ -91,12 +91,43 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
     goto next;
   }
 
+  Atom actual_type;
+  int actual_format;
+  u_long nitems,bytes_after;
+  char *message_sock = NULL;
+  Atom gcin_sockpath_atom = get_gcin_sockpath_atom(dpy);
+
+//  printf("gcin_sockpath_atom %d\n", gcin_sockpath_atom);
+
+  if (!gcin_sockpath_atom || XGetWindowProperty(dpy, gcin_win, gcin_sockpath_atom, 0, 64,
+     False, AnyPropertyType, &actual_type, &actual_format,
+     &nitems,&bytes_after,(u_char **)&message_sock) != Success) {
+#if DBG || 1
+    dbg("XGetWindowProperty 2: old version of gcin or gcin is not running ??\n");
+#endif
+    goto next;
+  }
+
+  Server_sock_path srv_sock_path;
+  srv_sock_path.sock_path[0] = 0;
+  if (message_sock) {
+    memcpy(&srv_sock_path, message_sock, sizeof(srv_sock_path));
+    XFree(message_sock);
+  } else
+    goto next;
+
   struct sockaddr_un serv_addr;
   bzero((char *) &serv_addr,sizeof(serv_addr));
   serv_addr.sun_family = AF_UNIX;
   char sock_path[128];
 
-  get_gcin_im_srv_sock_path(sock_path, sizeof(sock_path));
+  if (srv_sock_path.sock_path[0]) {
+    strcpy(sock_path, srv_sock_path.sock_path);
+  }
+  else {
+    get_gcin_im_srv_sock_path(sock_path, sizeof(sock_path));
+  }
+
   addr = sock_path;
   strcpy(serv_addr.sun_path, sock_path);
 #ifdef SUN_LEN
@@ -121,12 +152,11 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   goto next;
 
   struct sockaddr_in in_serv_addr;
-  Atom actual_type;
-  int actual_format;
-  u_long nitems,bytes_after;
-  char *message = NULL;
+  char *message;
 
 tcp:
+  message = NULL;
+
   if (!gcin_addr_atom || XGetWindowProperty(dpy, gcin_win, gcin_addr_atom, 0, 64,
      False, AnyPropertyType, &actual_type, &actual_format,
      &nitems,&bytes_after,(u_char **)&message) != Success) {
@@ -136,12 +166,12 @@ tcp:
     goto next;
   }
 
-
   if (message) {
     memcpy(&srv_ip_port, message, sizeof(srv_ip_port));
     XFree(message);
   } else
     goto next;
+
 
 //  dbg("im server tcp port %d\n", ntohs(srv_ip_port.port));
 

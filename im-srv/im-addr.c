@@ -57,3 +57,22 @@ Atom get_gcin_addr_atom(Display *dpy)
 
   return atom;
 }
+
+
+
+Atom get_gcin_sockpath_atom(Display *dpy)
+{
+  if (!dpy) {
+    dbg("dpy is null\n");
+    return 0;
+  }
+
+  char *xim_name = get_gcin_xim_name();
+  char tt[128];
+
+  snprintf(tt, sizeof(tt), "GCIN_SOCKPATH_ATOM_%s", xim_name);
+
+  Atom atom = XInternAtom(dpy, tt, False);
+
+  return atom;
+}

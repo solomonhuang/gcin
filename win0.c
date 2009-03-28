@@ -233,15 +233,20 @@ void get_char_index_xy(int index, int *rx, int *ry)
 #endif
 #if 0
   GtkWidget *widget = chars[index].label;
-#endif
-#if 1
+#else
   GtkWidget *widget = chars[index].vbox;
 #endif
 
-  gtk_widget_show(widget);
+  gtk_widget_show_all(widget);
+  gdk_flush();
 
   GtkRequisition sz;
   gtk_widget_size_request(widget, &sz);
+
+  wx=wy=0;
+
+  gtk_widget_translate_coordinates(widget, gwin0,
+         0, sz.height, &wx, &wy);
 
   gtk_widget_translate_coordinates(widget, gwin0,
          0, sz.height, &wx, &wy);
@@ -251,6 +256,11 @@ void get_char_index_xy(int index, int *rx, int *ry)
   int win_x, win_y;
 
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
+  int win_xl, win_yl;
+  get_win_size(gwin0, &win_xl, &win_yl);
+
+  if (wx > win_xl)
+    wx = win_xl;
 
   *rx = win_x + wx;
   *ry = win_y + wy + ofs;

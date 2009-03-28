@@ -284,7 +284,7 @@ static void reload_data()
 {
   dbg("reload_data\n");
   load_setttings();
-  load_tsin_db();
+//  load_tsin_db();
   change_win0_style();
   change_win_gtab_style();
   change_win_pho_style();

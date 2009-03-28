@@ -38,7 +38,7 @@ install:
                 install -m 755 im-gcin.so $(IMMODULES); \
 	fi
 clean:
-	rm -f $(OBJS) im-gcin.so *~ core.* *moc*.cpp *.E
+	rm -f $(OBJS) im-gcin.so *~ core.* *moc*.cpp *.E .depend
 
 .depend:
 	$(CXX) $(CXXFLAGS) -MM *.cpp > $@

@@ -1166,7 +1166,12 @@ static gboolean pre_punctuation(KeySym xkey)
     int c = p - shift_punc;
     phokey_t key=0;
 
-    return add_to_tsin_buf(chars[c], &key, 1);
+    if (c_len)
+      return add_to_tsin_buf(chars[c], &key, 1);
+    else {
+      send_text(chars[c]);
+      return 1;
+    }
   }
 
   return 0;
@@ -1718,13 +1723,6 @@ asc_char:
           if (!(kbstate&LockMask) && ppp && !((ppp-ochars) & 1))
             xkey=*(ppp+1);
 
-#if 0
-          if (kbstate&LockMask && islower(xkey))
-            xkey-=0x20;
-          else
-            if (!(kbstate&LockMask) && isupper(xkey))
-              xkey+=0x20;
-#endif
         } else {
           if (!eng_ph && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock
               && gcin_capslock_lower) {
@@ -1734,15 +1732,25 @@ asc_char:
 
         if (xkey > 127)
           return 0;
+        char tstr[CH_SZ + 1];
+        bzero(tstr, sizeof(tstr));
 
         u_char tt=xkey;
-        shift_ins();
 
         if (tsin_half_full) {
-          bchcpy(chpho[c_idx].ch, half_char_to_full_char(xkey));
+          strcpy(tstr, half_char_to_full_char(xkey));
         } else {
-          chpho[c_idx].ch[0]=tt;
+          tstr[0] = tt;
         }
+
+        if (!c_len) {
+          send_text(tstr);
+          return 1;
+        }
+
+        shift_ins();
+
+        memcpy(chpho[c_idx].ch, tstr, CH_SZ);
 
         set_fixed(c_idx, 1);
         phokey_t tphokeys[32];
@@ -1963,11 +1971,6 @@ restart:
 
        if (j < mdist)
          continue;
-#if 0
-       ch_pho_cpy(&chpho[ph_sta], pre_sel[i].str, pre_sel[i].phokey, mdist);
-       if (chpho[ph_sta].psta < 0)
-         set_chpho_ch2(&chpho[ph_sta], pre_sel[i].str, mdist);
-#endif
 
        int j;
        for(j=0;j < mdist; j++) {

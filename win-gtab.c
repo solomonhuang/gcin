@@ -36,6 +36,9 @@ void disp_gtab(int index, char *gtabchar)
 {
   char utf8[512];
 
+   if (!labels_gtab[index])
+     return;
+
   if (gtabchar[0]==' ') {
     if (gcin_pop_up_win) {
       gtk_widget_hide(labels_gtab[index]);
@@ -123,14 +126,17 @@ void change_win_bg(GtkWidget *win)
 void change_win_fg_bg(GtkWidget *win, GtkWidget *label)
 {
   if (!gcin_win_color_use) {
-    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, NULL);
+    if (label)
+      gtk_widget_modify_fg(label, GTK_STATE_NORMAL, NULL);
     return;
   }
 
   GdkColor col;
   gdk_color_parse(gcin_win_color_fg, &col);
-  gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &col);
-  gtk_widget_modify_fg(label_edit, GTK_STATE_NORMAL, &col);
+  if (label)
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &col);
+  if (label_edit)
+    gtk_widget_modify_fg(label_edit, GTK_STATE_NORMAL, &col);
 
   change_win_bg(win);
 }
@@ -174,7 +180,7 @@ void set_key_codes_label(char *s, int better)
   if (s && strlen(s))
     gtk_widget_show(hbox_row2);
   else {
-    if (gtab_hide_row2) {
+    if (gtab_hide_row2 && hbox_row2) {
       gtk_widget_hide(hbox_row2);
     }
   }
@@ -190,6 +196,8 @@ void set_key_codes_label(char *s, int better)
 
 void set_page_label(char *s)
 {
+  if (!label_page)
+    return;
   gtk_label_set_text(GTK_LABEL(label_page), s);
 }
 
@@ -219,6 +227,8 @@ void move_win_gtab(int x, int y)
 void set_gtab_input_method_name(char *s)
 {
 //  dbg("set_gtab_input_method_name '%s'\n", s);
+  if (!label_input_method_name)
+    return;
   gtk_label_set(GTK_LABEL(label_input_method_name), s);
 }
 
@@ -540,13 +550,17 @@ char *get_full_str()
 
 void win_gtab_disp_half_full()
 {
-  if (current_CS->im_state == GCIN_STATE_CHINESE && current_CS->b_half_full_char) {
-    gtk_widget_show(label_full);
-  } else {
-    gtk_widget_hide(label_full);
+  if (label_full) {
+    if (current_CS->im_state == GCIN_STATE_CHINESE && current_CS->b_half_full_char) {
+      gtk_widget_show(label_full);
+    } else {
+      gtk_widget_hide(label_full);
+    }
   }
 
-  gtk_label_set_text(GTK_LABEL(labels_gtab[0]), get_full_str());
+  if (labels_gtab[0])
+    gtk_label_set_text(GTK_LABEL(labels_gtab[0]), get_full_str());
+
   int i;
 
   for(i=1; i < MAX_TAB_KEY_NUM64_6; i++) {

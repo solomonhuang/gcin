@@ -24,10 +24,10 @@ struct {
   char *str;
   int num;
 } spc_opts[] = {
-  {"由 .gtab 指定", GTAB_space_auto_first_none},
-  {"按空白立即送出第一字(嘸蝦米、大易)", GTAB_space_auto_first_any},
-  {"按滿按空白送出第一字", GTAB_space_auto_first_full},
-  {"按滿按空白不送出第一字(倉頡, 行列)", GTAB_space_auto_first_nofull},
+  {N_("由 .gtab 指定"), GTAB_space_auto_first_none},
+  {N_("按空白立即送出第一字(嘸蝦米、大易)"), GTAB_space_auto_first_any},
+  {N_("按滿按空白送出第一字"), GTAB_space_auto_first_full},
+  {N_("按滿按空白不送出第一字(倉頡, 行列)"), GTAB_space_auto_first_nofull},
   { NULL, 0},
 };
 
@@ -145,7 +145,7 @@ static GtkWidget *create_spc_opts()
   int i, current_idx=0;
 
   for(i=0; spc_opts[i].str; i++) {
-    GtkWidget *item = gtk_menu_item_new_with_label (spc_opts[i].str);
+    GtkWidget *item = gtk_menu_item_new_with_label (_(spc_opts[i].str));
 
     if (spc_opts[i].num == gtab_space_auto_first)
       current_idx = i;

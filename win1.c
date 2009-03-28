@@ -147,8 +147,9 @@ void disp_selections(int idx)
 {
   if (idx < 0)
     p_err("err");
-
+#if 0
   move_win_char_index(gwin1, idx);
+#endif
   gtk_widget_show(gwin1);
 #if 1 // strange bug in gtk
   move_win_char_index(gwin1, idx);
@@ -197,8 +198,10 @@ void change_win1_font()
   for(i=0; i < SELEN; i++) {
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
     set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
-    gtk_widget_modify_fg(labels_sele[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
-    gtk_widget_modify_fg(labels_seleR[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
+    if (labels_sele[i])
+      gtk_widget_modify_fg(labels_sele[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
+    if (labels_seleR[i])
+      gtk_widget_modify_fg(labels_seleR[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
     change_win_bg(eve_sele[i]);
     change_win_bg(eve_seleR[i]);
   }

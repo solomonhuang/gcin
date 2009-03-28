@@ -60,10 +60,10 @@ static void cb_ret(GtkWidget *widget, gpointer user_data)
 
 static void create_result_win(int res)
 {
-  char *restr = res ? "結果失敗":"結果成功";
+  char *restr = res ? N_("結果失敗"):N_("結果成功");
   main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-  GtkWidget *button = gtk_button_new_with_label(restr);
+  GtkWidget *button = gtk_button_new_with_label(_(restr));
   gtk_container_add (GTK_CONTAINER (main_window), button);
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_ret), main_window);
@@ -156,6 +156,7 @@ static void cb_ts_import()
 }
 
 char utf8_edit[]=GCIN_SCRIPT_DIR"/utf8-edit";
+char html_browse[]=GCIN_SCRIPT_DIR"/html-browser";
 
 static void cb_ts_edit()
 {
@@ -205,9 +206,19 @@ int utf8_editor(char *fname)
 }
 
 
+int html_browser(char *fname)
+{
+  char tt[256];
+
+  sprintf(tt, "%s %s", html_browse, fname);
+  dbg("%s\n", tt);
+  return system(tt);
+}
+
+
 static void cb_help()
 {
-  utf8_editor(DOC_DIR"/README");
+  html_browser(DOC_DIR"/README.html");
 }
 
 static GtkWidget *spinner_gcin_font_size, *spinner_gcin_font_size_tsin_presel,

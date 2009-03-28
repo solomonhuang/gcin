@@ -174,11 +174,11 @@ struct {
   void (*cb)();
   int *check_dat;
 } mitems[] = {
-  {"設定", GTK_STOCK_PREFERENCES, exec_gcin_setup},
-  {"念出發音", NULL, cb_tog_phospeak, &phonetic_speak},
-  {"正->簡體", NULL, cb_trad2sim},
-  {"簡->正體", NULL, cb_sim2trad},
-  {"小鍵盤", NULL, kbm_toggle},
+  {N_("設定"), GTK_STOCK_PREFERENCES, exec_gcin_setup},
+  {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
+  {N_("正->簡體"), NULL, cb_trad2sim},
+  {N_("簡->正體"), NULL, cb_sim2trad},
+  {N_("小鍵盤"), NULL, kbm_toggle},
 };
 
 
@@ -194,16 +194,16 @@ static void create_menu()
     GtkWidget *item;
 
     if (mitems[i].stock_id) {
-      item = gtk_image_menu_item_new_with_label (mitems[i].name);
+      item = gtk_image_menu_item_new_with_label (_(mitems[i].name));
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), gtk_image_new_from_stock(mitems[i].stock_id, GTK_ICON_SIZE_MENU));
     }
     else
     if (mitems[i].check_dat) {
-      item = gtk_check_menu_item_new_with_label (mitems[i].name);
+      item = gtk_check_menu_item_new_with_label (_(mitems[i].name));
       gtk_check_menu_item_set_active(item, *mitems[i].check_dat);
     }
     else
-      item = gtk_menu_item_new_with_label (mitems[i].name);
+      item = gtk_menu_item_new_with_label (_(mitems[i].name));
 
     g_signal_connect (G_OBJECT (item), "activate",
                       G_CALLBACK (mitems[i].cb), NULL);

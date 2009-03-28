@@ -449,3 +449,127 @@ msgstr "Close symbols window after selection"
 #: ../gcin-setup.c:577
 msgid "選擇鍵的顏色"
 msgstr "Color of selection key"
+
+#: ../gcin-setup-gtab.c:27 ../gcin-setup-tab.c:129
+msgid "由 .gtab 指定"
+msgstr "Assigned by .gtab"
+
+#: ../gcin-setup-gtab.c:28 ../gcin-setup-tab.c:130
+msgid "按空白立即送出第一字(嘸蝦米、大易)"
+msgstr "Send first character within Liu's IM"
+
+#: ../gcin-setup-gtab.c:29 ../gcin-setup-tab.c:131
+msgid "按滿按空白送出第一字"
+msgstr "Send first character within character-selection area"
+
+#: ../gcin-setup-gtab.c:30 ../gcin-setup-tab.c:132
+msgid "按滿按空白不送出第一字(倉頡, 行列)"
+msgstr "Does not send first character"
+
+#: ../gcin-setup-pho.c:9 ../gcin-setup-tab.c:584
+msgid "標準 standard"
+msgstr "Standard style"
+
+#: ../gcin-setup-pho.c:10 ../gcin-setup-tab.c:585
+msgid "標準 standard 使用 asdf 選擇"
+msgstr "Standard style with asdf selection"
+
+#: ../gcin-setup-pho.c:11 ../gcin-setup-tab.c:586
+msgid "倚天 Eten"
+msgstr "Eten style"
+
+#: ../gcin-setup-pho.c:12 ../gcin-setup-tab.c:587
+msgid "倚天 Eten 使用 asdf 選擇"
+msgstr "Eten style with asdf selection"
+
+#: ../gcin-setup-pho.c:13 ../gcin-setup-tab.c:588
+msgid "倚天 26 鍵"
+msgstr "Eten 26 keys style"
+
+#: ../gcin-setup-pho.c:14 ../gcin-setup-tab.c:589
+msgid "倚天 26 鍵,使用 asdf 選擇"
+msgstr "Eten 26 keys style with asdf selection"
+
+#: ../gcin-setup-pho.c:15 ../gcin-setup-tab.c:590
+msgid "許氏(國音,自然)"
+msgstr "Mr. Hsu's style"
+
+#: ../gcin-setup-pho.c:16 ../gcin-setup-tab.c:591
+msgid "聲調拼音"
+msgstr "Phonetic Pinyin style"
+
+#: ../gcin-setup-pho.c:17 ../gcin-setup-tab.c:592
+msgid "聲調拼音, 使用 asdf 選擇"
+msgstr "Phonetic Pinyin style with asdf selection"
+
+#: ../gcin-setup-pho.c:18 ../gcin-setup-tab.c:593
+msgid "Dvorak"
+msgstr "Dvorak style"
+
+#: ../gcin-setup-pho.c:19 ../gcin-setup-tab.c:594
+msgid "IBM"
+msgstr "IBM's style"
+
+#: ../gcin-setup-pho.c:20 ../gcin-setup-tab.c:595
+msgid "神通"
+msgstr "Mitac's style"
+
+#: ../gcin-setup-pho.c:44 ../gcin-setup-tab.c:541
+msgid "CapsLock"
+msgstr "CapsLock"
+
+#: ../gcin-setup-pho.c:45 ../gcin-setup-tab.c:542
+msgid "Tab"
+msgstr "Tab"
+
+#: ../gcin-setup-pho.c:46 ../gcin-setup-tab.c:543
+msgid "Shift(限非 XIM)"
+msgstr "Shift key(Not available under XIM mode)"
+
+#: ../gcin-setup-pho.c:47 ../gcin-setup-tab.c:544
+msgid "ShiftL(限非 XIM)"
+msgstr "Left Shift key(Not available under XIM mode)"
+
+#: ../gcin-setup-pho.c:48 ../gcin-setup-tab.c:545
+msgid "ShiftR(限非 XIM)"
+msgstr "Right Shift key(Not available under XIM mode)"
+
+#: ../gcin-setup-pho.c:57 ../gcin-setup-tab.c:101
+msgid "選擇同音字"
+msgstr "Select other same phonetic characters"
+
+#: ../gcin-setup-pho.c:58 ../gcin-setup-tab.c:102
+msgid "輸入空白"
+msgstr "Send space to Tsin buffer"
+
+#: ../gcin-setup-pho.c:508 ../gcin-setup-tab.c:1725
+msgid "啟用詞音緩衝區編輯模式"
+msgstr "Enable Tsin VI editing mode"
+
+#: ../gcin-setup-tab.c:779 ../gcin-setup.c:63
+msgid "結果失敗"
+msgstr "Success"
+
+#: ../gcin-setup-tab.c:779 ../gcin-setup.c:63
+msgid "結果成功"
+msgstr "Failed"
+
+#: ../tray.c:177
+msgid "設定"
+msgstr "Configuration"
+
+#: ../tray.c:178
+msgid "念出發音"
+msgstr "Text-to-speech"
+
+#: ../tray.c:179
+msgid "正->簡體"
+msgstr "Traditional Chinese -> Simplified Chinese"
+
+#: ../tray.c:180
+msgid "簡->正體"
+msgstr "Simplified Chinese -> Traditional Chinese"
+
+#: ../tray.c:181
+msgid "小鍵盤"
+msgstr "Virtual keyboard"

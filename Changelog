@@ -3,8 +3,11 @@
 - 詞音 Firefox 用 Shift 切到英數仍有 window 跑出來的問題。
 - 修正許氏鍵盤無法輸入 ,./ 的問題。
 - 修正 gdm 輸入密碼錯誤時 greeter coredump 的問題。
-- gtab 輸入法由詞庫自動選字改成與詞音一樣用輸入緩衝區的方式。輸入法如嘸蝦米等按空白自動送出第一字的就不支援。
+- gtab 輸入法由詞庫自動選字改成與詞音一樣用輸入緩衝區的方式。輸入法如嘸蝦米等按空白自動送出第一字的就不支援，如果想要用，可以在 gcin-setup 設定空白鍵的選項。
 - qt4 IM module 的支援，skype 上也可以用 Shift 切換中英了
+- gcin-setup help 改成用 coolcd 編輯過的 html, 感謝 coolcd
+- gcin 現在支援 su root 的中文輸入，必須配合最新的 libgcin-im-client.so.1.1.0
+- 詞音在編輯區是空的時候按 Shift+xxxx 鍵輸入標點符號，回直接送出不會放到編輯區。
 
 1.4.2:
 - 詞音空白鍵選項設定成輸入空白時，選字會選錯的問題。

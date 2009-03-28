@@ -2,7 +2,7 @@ include ../config.mak
 
 
 SOFILE=libgcin-im-client.so
-SOFILEVER=libgcin-im-client.so.1.0.2
+SOFILEVER=libgcin-im-client.so.1.1.0
 
 .SUFFIXES:      .c .o .E
 WALL=-Wall

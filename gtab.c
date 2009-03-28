@@ -37,6 +37,7 @@ extern short gbufN;
 gboolean gtab_buf_select;
 
 #define gtab_full_space_auto_first (_gtab_space_auto_first & (GTAB_space_auto_first_any|GTAB_space_auto_first_full))
+#define AUTO_SELECT_BY_PHRASE (cur_inmd->flag & FLAG_AUTO_SELECT_BY_PHRASE)
 
 /* for array30-like quick code */
 static char keyrow[]=
@@ -292,7 +293,7 @@ void ClrSelArea()
 void disp_gtab(int index, char *gtabchar);
 void clear_gtab_input_error_color();
 
-static clr_seltab()
+static void clr_seltab()
 {
   bzero(seltab,sizeof(seltab));
 }
@@ -367,6 +368,12 @@ void init_gtab(int inmdno)
   struct TableHead th;
 
 //  current_CS->b_half_full_char = FALSE;
+
+  if (gtab_auto_select_by_phrase && inp->DefChars>500)
+    inp->flag |= FLAG_AUTO_SELECT_BY_PHRASE;
+  else
+    inp->flag &= ~FLAG_AUTO_SELECT_BY_PHRASE;
+
 
   if (!inmd[inmdno].filename || !strcmp(inmd[inmdno].filename,"-")) {
     dbg("filename is empty\n");
@@ -656,6 +663,11 @@ void init_gtab(int inmdno)
   inp->last_k_bitn = (((cur_inmd->key64 ? 64:32) / inp->keybits) - 1) * inp->keybits;
   inp->kmask = (1 << th.keybits) - 1;
 
+
+  if (gtab_auto_select_by_phrase && th.DefC>500)
+    inp->flag |= FLAG_AUTO_SELECT_BY_PHRASE;
+  else
+    inp->flag &= ~FLAG_AUTO_SELECT_BY_PHRASE;
 
 #if 0
   for(i='A'; i < 127; i++)
@@ -1240,7 +1252,7 @@ shift_proc:
       clear_gtab_input_error_color();
 
       if (ci==0) {
-        if (gtab_auto_select_by_phrase)
+        if (AUTO_SELECT_BY_PHRASE)
           return gtab_buf_backspace();
         else
           return 0;
@@ -1280,12 +1292,12 @@ shift_proc:
 
       break;
     case XK_Return:
-      if (gtab_auto_select_by_phrase)
+      if (AUTO_SELECT_BY_PHRASE)
         return output_gbuf();
       else
         return 0;
     case XK_Down:
-      if (gtab_auto_select_by_phrase)
+      if (AUTO_SELECT_BY_PHRASE)
         return show_buf_select();
       else
         return 0;
@@ -1378,14 +1390,14 @@ next_page:
         }
 
         if (_gtab_space_auto_first == GTAB_space_auto_first_nofull && exa_match > 1
-            && !gtab_auto_select_by_phrase)
+            && !AUTO_SELECT_BY_PHRASE)
           bell();
 
         if (seltab[sel1st_i][0]) {
 //          dbg("last_full %d %d\n", last_full,spc_pressed);
           if (gtab_full_space_auto_first || spc_pressed) {
 direct_select:
-            if (gtab_auto_select_by_phrase)
+            if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
               insert_gbuf_cursor1(seltab[sel1st_i]);
             else
               putstr_inp((u_char *)&seltab[sel1st_i]);  /* select 1st */
@@ -1406,8 +1418,12 @@ direct_select:
 
       break;
     case '?':
-      if (!gtab_que_wild_card)
+      if (!gtab_que_wild_card) {
+        inkey=cur_inmd->keymap[key];
+        if ((inkey && (inkey!=cur_inmd->WILD_QUES && inkey!=cur_inmd->WILD_STAR)) || ptr_selkey(key))
+          goto next;
         return 0;
+      }
     case '*':
       inkey=cur_inmd->keymap[key];
       if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {
@@ -1479,7 +1495,7 @@ next:
       if (!pselkey && (key < 32 || key > 0x7e) && (gtab_full_space_auto_first || spc_pressed)) {
 //        dbg("%x %x sel1st_i:%d  '%c'\n", pselkey, key, sel1st_i, seltab[sel1st_i][0]);
         if (seltab[sel1st_i][0]) {
-          if (gtab_auto_select_by_phrase)
+          if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
             insert_gbuf_cursor1(seltab[sel1st_i]);
           else
             putstr_inp(seltab[sel1st_i]);  /* select 1st */
@@ -1503,8 +1519,8 @@ next:
           vv=9;
 
         if (seltab[vv][0]) {
-          if (gtab_auto_select_by_phrase) {
-            if (gtab_buf_select)
+          if (AUTO_SELECT_BY_PHRASE) {
+            if (gtab_buf_select && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
               set_gbuf_c_sel(vv);
             else
               insert_gbuf_cursor1(seltab[vv]);
@@ -1519,7 +1535,7 @@ next:
 //      dbg("iii %x\n", pselkey);
       if (seltab[sel1st_i][0] && !wild_mode &&
            (gtab_full_space_auto_first||spc_pressed||last_full) ) {
-        if (gtab_auto_select_by_phrase)
+        if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
           insert_gbuf_cursor1(seltab[sel1st_i]);
         else
           putstr_inp(seltab[sel1st_i]);  /* select 1st */
@@ -1536,7 +1552,7 @@ next:
         if (current_CS->b_half_full_char)
           return full_char_proc(key);
         else {
-          if (gbufN) {
+          if (gbufN && same_pho_query_state != SAME_PHO_QUERY_gtab_input) {
             insert_gbuf_cursor_char(key);
             return 1;
           }
@@ -1676,7 +1692,7 @@ YYYY:
         vv=9;
 
       if (seltab[vv][0]) {
-        if (gtab_auto_select_by_phrase)
+        if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
           insert_gbuf_cursor1(seltab[vv]);
         else
           putstr_inp(seltab[vv]);
@@ -1775,7 +1791,7 @@ refill:
       }
 
       if (match_cnt==1 && first_str) {
-        if (gtab_auto_select_by_phrase)
+        if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
           insert_gbuf_cursor1(first_str);
         else
           putstr_inp(first_str);
@@ -1787,12 +1803,13 @@ refill:
 next_pg:
     defselN=0;
     clr_seltab();
-    if (pendkey && (!(cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY) || !gtab_auto_select_by_phrase))
+    if (pendkey && (!(cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY) || !AUTO_SELECT_BY_PHRASE || ci==1))
       spc_pressed = 1;
 
     int full_send = gtab_press_full_auto_send && last_full;
 
-    if (gtab_auto_select_by_phrase && (spc_pressed||full_send)) {
+    if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input &&
+       (spc_pressed||full_send)) {
       j = S1;
       int selN=0;
       char **sel = NULL;
@@ -1829,7 +1846,7 @@ next_pg:
 
     if (defselN==1 && !more_pg) {
       if (spc_pressed || full_send || gtab_unique_auto_send) {
-        if (gtab_auto_select_by_phrase)
+        if (AUTO_SELECT_BY_PHRASE && same_pho_query_state != SAME_PHO_QUERY_gtab_input)
           insert_gbuf_cursor1(seltab[0]);
         else
           putstr_inp(seltab[0]);

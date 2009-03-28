@@ -157,7 +157,16 @@ void init_gcin_im_serv(Window win)
   gdk_input_add(im_sockfd, GDK_INPUT_READ, cb_new_gcin_client,
                 GINT_TO_POINTER(Connection_type_unix));
 
-  addr_atom = get_gcin_addr_atom(GDK_DISPLAY());
+  Display *dpy = GDK_DISPLAY();
+
+  Server_sock_path srv_sockpath;
+  strcpy(srv_sockpath.sock_path, sock_path);
+  Atom sockpath_atom = get_gcin_sockpath_atom(dpy);
+  XChangeProperty(dpy, prop_win , sockpath_atom, XA_STRING, 8,
+     PropModeReplace, (char *)&srv_sockpath, sizeof(srv_sockpath));
+
+
+  addr_atom = get_gcin_addr_atom(dpy);
   XSetSelectionOwner(dpy, addr_atom, win, CurrentTime);
 
   if (!gcin_remote_client) {

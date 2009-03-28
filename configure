@@ -128,7 +128,7 @@ fi
 QT4_IM='N'
 QT4_IM_DIR=/usr/lib/qt4/plugins/lib/inputmethods
 echo "testing if you have qt4 support"
-if [ -d  $QT_IM_DIR ]; then
+if [ -d  $QT4_IM_DIR ]; then
   QT4_IM='Y'
 fi
 
