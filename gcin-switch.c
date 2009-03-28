@@ -1,8 +1,8 @@
 #include "gcin.h"
 #include "gtab.h"
 
-char gcin_switch_keys[MAX_GTAB_NUM_KEY]="0123456789-=`";
-int gcin_switch_keysN=sizeof(gcin_switch_keys);
+char gcin_switch_keys[]=" 1234567890-=`";
+int gcin_switch_keysN=sizeof(gcin_switch_keys) - 1;
 
 int gcin_switch_keys_lookup(int key)
 {

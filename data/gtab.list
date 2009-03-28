@@ -6,7 +6,7 @@
 #帶調粵拼 4 jyutping.gtab
 標點倉頡 4 cj-punc.gtab
 拼音 5 pinyin.gtab
-詞音 6 -
+詞音 6 - tsin.png
 大易 7 dayi3.gtab
 行列 8 ar30.gtab
 #嘸蝦米 9 liu5new.gtab
@@ -15,5 +15,5 @@
 嘸蝦米 9 noseeing.gtab
 簡易 - simplex.gtab
 日本式 =  kana-nippon.gtab
-greek ` greek.gtab
+greek ` greek.gtab greek.png
 #latin-letters ` latin-letters.gtab

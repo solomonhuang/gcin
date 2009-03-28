@@ -54,7 +54,7 @@ struct TableHead {
 #define KeyBits (6)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
-#define MAX_GTAB_NUM_KEY (13)
+#define MAX_GTAB_NUM_KEY (14)
 #define MAX_SELKEY 16
 
 #define MAX_TAB_KEY_NUM 5
@@ -91,6 +91,7 @@ typedef struct {
   int max_keyN;
   char *endkey;       // only pinin/ar30 use it
   GTAB_space_pressed_E space_style;
+  char *icon;
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];

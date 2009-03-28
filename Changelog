@@ -1,4 +1,18 @@
 ** UTF-8 encoding **
+1.2.3:
+- 現在會自動複製一份單字的詞到使用者的詞庫。
+- 如果有單字的詞時，預選詞視窗不會出現的問題。
+- 詞音在選擇預選詞後仍然會變的問題。
+- 詞音的資料格式有變動，使用次數統計由 8->32 bit，為避免造成相容的問題，gcin 現在使用的 db 是 ~/gcin/tsin32*。tsd2a 不變，gcin 的詞庫管理程式現在全部改成 tsa2d32, tsd2a32。gcin 會自動轉換，一般使用者不需要任何處理。
+- freebsd .gtab 相同 keys，順序會亂掉的問題。Thanks to LGJ for testing
+- 新增 command gcin-gb-toggle 程式，這樣就可以加在 hot keys 一類的程式切換簡/正體字。Thanks to caleb. 切換的 delay 縮短至 0.1 second.
+- 注音新增希臘字母 ㄡ(Ω,ω) ㄉ(δ,Δ) ㄇ(μ) ㄒ(θ) ㄙ(Σ,σ)。
+- gtab.list 新增 icon file name 的欄位，可以在 tray 顯示輸入法的 icon，icon file 可以放在 ~/.gcin or /usr/{local}/share/icons/gcin。目前缺各輸入法的 icons，詞音有一個測試的 icon，不怎麼好看。icon 的背景最好是透明的。
+- 如果使用簡體字輸出則無法用 ctrl-alt-r or g 重複字串的問題。
+- 內碼輸入法中按空白鍵關閉再按一次會切至內定輸入法的問題。
+- updated man page from caleb
+- 使用 pop-up 的視窗，右下角狀態視窗刪除，改成直接從 tray 顯示。
+
 1.2.2:
 - 新增整句斷詞的功能。
 - 現在可以增加一個單字的詞如(是、與、及、不、誰)，如果沒有加，整句斷詞的功效會比較差。

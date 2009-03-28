@@ -176,6 +176,7 @@ void process_client_req(int fd)
     case GCIN_req_set_flags:
       if (BITON(req.flag, FLAG_GCIN_client_handle_raise_window)) {
         cs->b_raise_window = TRUE;
+        dbg("********* raise * window\n");
       }
       break;
     default:

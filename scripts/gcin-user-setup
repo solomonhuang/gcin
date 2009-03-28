@@ -14,6 +14,21 @@ if [ ! -d .gcin/config ]; then
   mkdir .gcin/config
 fi
 
+cd ~/.gcin
+
+if [ -f tsin -a ! -f tsin32 ]; then
+  echo "covert to new tsin32"
+  $2/tsd2a tsin > tmpfile
+  $2/tsa2d32 tmpfile
+fi
+
+if [ ! -f tsin-1.src ]; then
+  cp $1/tsin-1.src .
+  $2/tsd2a32 tsin32 > tmpfile
+  cat tsin-1.src >> tmpfile
+  $2/tsa2d32 tmpfile
+fi
+
 cd $1 || echo "$1 is not a gcin table dir"
 
 for i in pho.tab pho-huge.tab tsin* symbol-table phrase.table

@@ -17,7 +17,6 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_capslock_in_eng,
                  *check_button_root_style_use,
                  *check_button_gcin_pop_up_win,
-                 *check_button_gcin_pop_up_win_abs_corner,
                  *check_button_gcin_inner_frame;
 #if TRAY_ENABLED
                  *check_button_gcin_status_tray;
@@ -86,7 +85,7 @@ static void cb_file_ts_export(GtkWidget *widget, gpointer user_data)
    get_gcin_dir(gcin_dir);
 
    char cmd[256];
-   snprintf(cmd, sizeof(cmd), GCIN_BIN_DIR"/tsd2a %s/tsin > %s", gcin_dir, selected_filename);
+   snprintf(cmd, sizeof(cmd), GCIN_BIN_DIR"/tsd2a32 %s/tsin32 > %s", gcin_dir, selected_filename);
    int res = system(cmd);
    create_result_win(res);
 }
@@ -125,7 +124,7 @@ static void cb_file_ts_import(GtkWidget *widget, gpointer user_data)
 
    char cmd[256];
    snprintf(cmd, sizeof(cmd),
-      "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a tsin > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d tmpfile",
+      "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile",
       getenv("HOME"), selected_filename);
    int res = system(cmd);
    create_result_win(res);
@@ -161,7 +160,7 @@ static void cb_ts_edit()
 {
   char tt[512];
 
-  sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a tsin > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d tmpfile ) &", utf8_edit);
+  sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile ) &", utf8_edit);
   dbg("exec %s\n", tt);
   system(tt);
 }
@@ -171,7 +170,7 @@ static void cb_ts_import_sys()
 {
   char tt[512];
 
-  sprintf(tt, "cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a tsin > tmpfile && "GCIN_BIN_DIR"/tsd2a %s/tsin >> tmpfile && "GCIN_BIN_DIR"/tsa2d tmpfile", GCIN_TABLE_DIR);
+  sprintf(tt, "cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && "GCIN_BIN_DIR"/tsd2a32 %s/tsin32 >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile", GCIN_TABLE_DIR);
   dbg("exec %s\n", tt);
   system(tt);
 }
@@ -267,9 +266,6 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   int gcin_pop_up_win = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win));
   save_gcin_conf_int(GCIN_POP_UP_WIN, gcin_pop_up_win);
-
-  int gcin_pop_up_win_abs_corner = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win_abs_corner));
-  save_gcin_conf_int(GCIN_POP_UP_WIN_ABS_CORNER, gcin_pop_up_win_abs_corner);
 
   int gcin_root_x = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_root_style_x));
   save_gcin_conf_int(GCIN_ROOT_X, gcin_root_x);
@@ -389,31 +385,14 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), font_sel, FALSE, FALSE, 0);
 #endif
 
-  GtkWidget *frame_gcin_pop_up_win = gtk_frame_new("彈出式輸入視窗");
-  gtk_box_pack_start (GTK_BOX(vbox_top), frame_gcin_pop_up_win, FALSE, FALSE, 0);
-
-  GtkWidget *hbox_gcin_pop_up_win0 = gtk_hbox_new (TRUE, 10);
-  gtk_container_add (GTK_CONTAINER (frame_gcin_pop_up_win), hbox_gcin_pop_up_win0);
-
   GtkWidget *hbox_gcin_pop_up_win = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win0), hbox_gcin_pop_up_win, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_pop_up_win = gtk_label_new("使用");
+  gtk_box_pack_start (GTK_BOX(vbox_top), hbox_gcin_pop_up_win, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_pop_up_win = gtk_label_new("彈出式輸入視窗");
   gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win), label_gcin_pop_up_win, FALSE, FALSE, 0);
   check_button_gcin_pop_up_win = gtk_check_button_new ();
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win),
        gcin_pop_up_win);
   gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win), check_button_gcin_pop_up_win, FALSE, FALSE, 0);
-
-
-  GtkWidget *hbox_gcin_pop_up_win_abs_corner = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win0), hbox_gcin_pop_up_win_abs_corner, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_pop_up_win_abs_corner = gtk_label_new("絕對右下角");
-  gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win_abs_corner), label_gcin_pop_up_win_abs_corner, FALSE, FALSE, 0);
-  check_button_gcin_pop_up_win_abs_corner = gtk_check_button_new ();
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win_abs_corner),
-       gcin_pop_up_win_abs_corner);
-  gtk_box_pack_start (GTK_BOX(hbox_gcin_pop_up_win_abs_corner), check_button_gcin_pop_up_win_abs_corner, FALSE, FALSE, 0);
-
 
   GtkWidget *frame_root_style = gtk_frame_new("固定 gcin 視窗位置");
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_root_style, FALSE, FALSE, 0);

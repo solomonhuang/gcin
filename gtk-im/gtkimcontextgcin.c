@@ -331,8 +331,6 @@ gtk_im_context_xim_new (void)
 }
 
 
-
-
 ///
 static gboolean
 gtk_im_context_gcin_filter_keypress (GtkIMContext *context,

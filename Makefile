@@ -7,7 +7,7 @@ include config.mak
 OBJS=gcin.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
      gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o \
-     gcin-switch.o win-status.o tray.o eggtrayicon.o tsin-parse.o
+     gcin-switch.o tray.o eggtrayicon.o tsin-parse.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
@@ -15,19 +15,22 @@ OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
 OBJS_sim2trad=sim2trad.o util.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
-OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
+OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
+OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o
+
+OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
-        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\"
+        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD)
 ifeq ($(USE_XIM),Y)
 IMdkitLIB = IMdkit/lib/libXimd.a
 CFLAGS += -DUSE_XIM=1
@@ -43,7 +46,8 @@ im-srv = im-srv/im-srv.a
 .c.E:
 	$(CC) $(CFLAGS) -E -o $@ $<
 
-PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup gcin2tab juyin-learn sim2trad
+PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
+	juyin-learn sim2trad gcin-gb-toggle
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv
 
@@ -68,7 +72,7 @@ sim2trad:        $(OBJS_sim2trad)
 	$(CC) -o $@ $(OBJS_sim2trad) $(LDFLAGS)
 	rm -f core.*
 trad2sim:	sim2trad
-	ln -s sim2trad trad2sim
+	ln -sf sim2trad trad2sim
 
 gcin-setup:     $(OBJS_gcin_steup)
 	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
@@ -82,8 +86,14 @@ phod2a: $(OBJS_phod2a)
 tsa2d:  $(OBJS_tsa2d)
 	$(CC) -o $@ $(OBJS_tsa2d) $(LDFLAGS)
 
+tsa2d32:  $(OBJS_tsa2d32)
+	$(CC) -o $@ $(OBJS_tsa2d32) $(LDFLAGS)
+
 tsd2a:  $(OBJS_tsd2a)
 	$(CC) -o $@ $(OBJS_tsd2a) $(LDFLAGS)
+
+tsd2a32:  $(OBJS_tsd2a32)
+	$(CC) -o $@ $(OBJS_tsd2a32) $(LDFLAGS)
 
 gcin2tab:  $(OBJS_gcin2tab)
 	$(CC) -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
@@ -91,6 +101,9 @@ gcin2tab:  $(OBJS_gcin2tab)
 
 kbmcv:  $(OBJS_kbmcv)
 	$(CC) -o $@ $(OBJS_kbmcv) $(LDFLAGS)
+
+gcin-gb-toggle:	$(OBJS_gcin_gb_toggle)
+	$(CC) -o $@ $(OBJS_gcin_gb_toggle) $(LDFLAGS)
 
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
@@ -100,11 +113,11 @@ $(im-srv):
 
 ibin:
 	   install $(PROGS) $(bindir); \
-	   rm -f $(bindir)/trad2sim; ln -s sim2trad $(bindir)/trad2sim
+	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim
 
 install:
 	install -d $(datadir)/icons
-	install gcin.png gcin-tray-sim.png gcin-tray.png $(datadir)/icons
+	install gcin.png $(datadir)/icons
 	install -d $(GCIN_ICON_DIR_i)
 	install -m 644 icons/* $(GCIN_ICON_DIR_i)
 	install -d $(bindir)
@@ -117,12 +130,12 @@ install:
 	   install -d $(DOC_DIR); \
 	   install -m 644 README Changelog $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
-	   rm -f $(bindir)/trad2sim; ln -s sim2trad $(bindir)/trad2sim; \
+	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim; \
 	else \
 	   install -d $(DOC_DIR_i); \
 	   install -m 644 README Changelog $(DOC_DIR_i); \
 	   install -s $(PROGS) $(bindir); \
-	   rm -f $(bindir)/trad2sim; ln -s sim2trad $(bindir)/trad2sim; \
+	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim; \
 	fi
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install
@@ -136,8 +149,10 @@ clean:
 	$(MAKE) -C gtk-im clean
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
+	$(MAKE) -C menu clean
 	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) \
-	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.* tscr/*~
+	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.* tscr/*~ \
+	trad2sim gcin.spec.tmp
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

@@ -139,3 +139,5 @@ extern char gcin_switch_keys[];
 #if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 4
 #define GTK_24 1
 #endif
+
+typedef int usecount_t;

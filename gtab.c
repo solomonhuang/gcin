@@ -266,15 +266,20 @@ void load_gtab_list()
   dbg("load_gtab_list %s\n", ttt);
 
   while (!feof(fp)) {
+    char line[256];
     char name[32];
     char key[32];
     char file[32];
+    char icon[128];
 
     name[0]=0;
     key[0]=0;
     file[0]=0;
+    icon[0]=0;
 
-    fscanf(fp, "%s %s %s", name, key, file);
+    fgets(line, sizeof(line), fp);
+
+    sscanf(line, "%s %s %s %s", name, key, file, icon);
     if (strlen(name) < 1)
       break;
     if (name[0]=='#')
@@ -289,6 +294,10 @@ void load_gtab_list()
 
     free(inmd[keyidx].cname);
     inmd[keyidx].cname = strdup(name);
+
+    free(inmd[keyidx].icon);
+    if (strlen(icon))
+      inmd[keyidx].icon = strdup(icon);
   }
 
   fclose(fp);

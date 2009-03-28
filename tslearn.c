@@ -32,7 +32,7 @@ void load_ts_phrase()
   phraseN = 0;
 
   get_gcin_dir(fname);
-  strcat(fname,"/tsin");
+  strcat(fname,"/tsin32");
 
   if ((fp=fopen(fname, "r"))==NULL) {
     printf("Cannot open %s", fname);
@@ -44,7 +44,7 @@ void load_ts_phrase()
     phokey_t phbuf[MAX_PHRASE_LEN];
     char chbuf[MAX_PHRASE_LEN * CH_SZ + 1];
     u_char clen;
-    char usecount;
+    usecount_t usecount;
 
     clen = 0;
 
@@ -53,7 +53,7 @@ void load_ts_phrase()
     if (clen > MAX_PHRASE_LEN)
       p_err("bad tsin db clen %d > MAX_PHRASE_LEN %d\n", clen, MAX_PHRASE_LEN);
 
-    fread(&usecount,1,1,fp);
+    fread(&usecount,sizeof(usecount_t), 1, fp);
     fread(phbuf,sizeof(phokey_t), clen, fp);
     int tlen = 0;
 

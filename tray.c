@@ -4,7 +4,13 @@
 #include "win-sym.h"
 #include "eggtrayicon.h"
 
-static GtkWidget *image;
+static GdkPixbuf *pixbuf, *pixbuf_ch;
+static PangoLayout* pango;
+static GtkWidget *da;
+static GdkGC *gc;
+
+static char gcin_icon[]=GCIN_ICON_DIR"/gcin-tray.png";
+static char pixbuf_ch_fname[128];
 
 static void
 cb_pref (GtkAction * action)
@@ -12,16 +18,105 @@ cb_pref (GtkAction * action)
   system(GCIN_BIN_DIR"/gcin-setup &");
 }
 
-char *gcin_icons[]={SYS_ICON_DIR"/gcin-tray.png", SYS_ICON_DIR"/gcin-tray-sim.png"};
-
-
 void toggle_gb_output();
 extern gboolean gb_output;
+
+
+static void draw_icon()
+{
+
+  GdkPixbuf *pix =  !current_CS ||
+    (current_CS->im_state == GCIN_STATE_DISABLED||current_CS->im_state == GCIN_STATE_ENG_FULL) ?
+    pixbuf : pixbuf_ch;
+
+  int dw = da->allocation.width, dh = da->allocation.height;
+  int w, h;
+
+  if (pix)
+    gdk_draw_pixbuf(da->window, NULL, pix, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
+  else {
+    pango_layout_set_text(pango, inmd[current_CS->in_method].cname, strlen(inmd[current_CS->in_method].cname));
+    pango_layout_get_pixel_size(pango, &w, &h);
+    gdk_draw_layout(da->window, gc, 0, 0, pango);
+  }
+
+  if (gb_output) {
+    static char sim[] = "简";
+    pango_layout_set_text(pango, sim, strlen(sim));
+    pango_layout_get_pixel_size(pango, &w, &h);
+    gdk_draw_layout(da->window, gc, 0, dh - h, pango);
+  }
+
+
+  if (current_CS) {
+    if (current_CS->b_half_full_char) {
+      static char full[] = "全";
+
+      pango_layout_set_text(pango, full, strlen(full));
+      pango_layout_get_pixel_size(pango, &w, &h);
+      gdk_draw_layout(da->window, gc, dw - w, dh - h, pango);
+    }
+
+    if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
+      static char efull[] = "英全";
+
+      pango_layout_set_text(pango, efull, strlen(efull));
+      pango_layout_get_pixel_size(pango, &w, &h);
+      gdk_draw_layout(da->window, gc, 0, 0, pango);
+    }
+  }
+}
+
+void update_tray_icon()
+{
+  gtk_widget_queue_draw(da);
+}
+
+void load_tray_icon()
+{
+  char *iconame = inmd[current_CS->in_method].icon;
+  char *fname = NULL;
+  char tt[128];
+
+  if (iconame) {
+    get_gcin_user_fname(iconame, tt);
+
+    fname = tt;
+    if (access(tt, R_OK)) {
+      sprintf(tt, GCIN_ICON_DIR"/%s", iconame);
+      if (access(tt, R_OK))
+        fname = NULL;
+    }
+  }
+
+#if 0
+  dbg("fname %x %s\n", fname, fname);
+#endif
+  if (!fname) {
+    if (pixbuf_ch)
+      gdk_pixbuf_unref(pixbuf_ch);
+
+    pixbuf_ch = NULL;
+    pixbuf_ch_fname[0] = 0;
+  } else
+  if (strcmp(fname, pixbuf_ch_fname)) {
+    strcpy(pixbuf_ch_fname, fname);
+
+    if (pixbuf_ch)
+      gdk_pixbuf_unref(pixbuf_ch);
+
+    GError *err = NULL;
+    pixbuf_ch = gdk_pixbuf_new_from_file(fname, &err);
+  }
+
+  update_tray_icon();
+}
+
 
 void cb_trad_sim_toggle()
 {
   toggle_gb_output();
-  gtk_image_set_from_file(GTK_IMAGE(image), gcin_icons[gb_output]);
+  update_tray_icon();
 }
 
 static void cb_sim2trad()
@@ -98,6 +193,12 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
   return TRUE;
 }
 
+gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
+{
+  draw_icon();
+}
+
+
 void create_tray()
 {
   EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
@@ -111,10 +212,28 @@ void create_tray()
   g_signal_connect (G_OBJECT (event_box), "button-press-event",
                     G_CALLBACK (tray_button_press_event_cb), NULL);
 
-  image = gtk_image_new_from_file(gcin_icons[gb_output]);
+  GError *err = NULL;
+  pixbuf = gdk_pixbuf_new_from_file(gcin_icon, &err);
+  int pwidth = gdk_pixbuf_get_width (pixbuf);
+  int pheight = gdk_pixbuf_get_height (pixbuf);
 
+  if (!pixbuf)
+    p_err("cannot load file");
 
-  gtk_container_add (GTK_CONTAINER (event_box), image);
+  da =  gtk_drawing_area_new();
+
+  g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(cb_expose), NULL);
+
+  gtk_container_add (GTK_CONTAINER (event_box), da);
+
+  gtk_widget_set_size_request(tray_icon, pwidth, pheight);
+
+  pango = gtk_widget_create_pango_layout(da, " ");
+  PangoFontDescription* desc = pango_font_description_new();
+  pango_font_description_set_size(desc, 10);
+  pango_layout_set_font_description(pango, desc);
 
   gtk_widget_show_all (GTK_WIDGET (tray_icon));
+
+  gc = gdk_gc_new (da->window);
 }

@@ -20,9 +20,9 @@ void load_tsin_db()
 {
   if (!tsfname[0]) {
     if (!getenv("GCIN_TABLE_DIR"))
-      get_gcin_user_fname("tsin", tsfname);
+      get_gcin_user_fname("tsin32", tsfname);
     else
-      get_sys_table_file_name("tsin", tsfname);
+      get_sys_table_file_name("tsin32", tsfname);
   }
 
 
@@ -80,7 +80,7 @@ static int phseq(u_char *a, u_char *b)
   phokey_t ka,kb;
 
   lena=*(a++); lenb=*(b++);
-  a++; b++;   // skip usecount
+  a+=sizeof(usecount_t); b+=sizeof(usecount_t);   // skip usecount
 
   mlen=Min(lena,lenb);
 
@@ -101,15 +101,15 @@ static int phseq(u_char *a, u_char *b)
 void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec);
 
 
-gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecount)
+gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t usecount)
 {
   int mid, ord = 0, ph_ofs, hashno, i;
   FILE *fw;
-  u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2],
-         sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) +2];
+  u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) + 1 + sizeof(usecount_t)],
+         sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) + 1 + sizeof(usecount_t)];
 
   tbuf[0]=len;
-  tbuf[1]=usecount;  // usecount
+  memcpy(&tbuf[1], &usecount, sizeof(usecount));  // usecount
   int tlen = utf8_tlen(utf8str, len);
 #if 0
   dbg("tlen %d  '", tlen);
@@ -118,8 +118,8 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecoun
   dbg("'\n");
 #endif
 
-  memcpy(&tbuf[2], phkeys, sizeof(phokey_t) * len);
-  memcpy(&tbuf[sizeof(phokey_t)*len + 2], utf8str, tlen);
+  memcpy(&tbuf[1 + sizeof(usecount_t)], phkeys, sizeof(phokey_t) * len);
+  memcpy(&tbuf[sizeof(phokey_t)*len + 1 + sizeof(usecount_t)], utf8str, tlen);
 
   hashno=phkeys[0] >> TSIN_HASH_SHIFT;
   if (hashno >= TSIN_HASH_N)
@@ -131,14 +131,14 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecoun
     ph_ofs=phidx[mid];
     fseek(fph, ph_ofs, SEEK_SET);
     fread(sbuf,1,1,fph);
-    fread(&sbuf[1], 1, 1,fph); // use count
-    fread(&sbuf[2], 1, (sizeof(phokey_t) + CH_SZ) * sbuf[0] + 2, fph);
+    fread(&sbuf[1], sizeof(usecount_t), 1, fph); // use count
+    fread(&sbuf[1+sizeof(usecount_t)], 1, (sizeof(phokey_t) + CH_SZ) * sbuf[0], fph);
     if ((ord=phseq(sbuf,tbuf)) >=0)
       break;
   }
 
 //  dbg("tlen:%d  ord:%d  %s\n", tlen, ord, utf8str);
-  if (!ord && !memcmp(&sbuf[sbuf[0]*sizeof(phokey_t)+1+1], utf8str, tlen)) {
+  if (!ord && !memcmp(&sbuf[sbuf[0]*sizeof(phokey_t)+1+sizeof(usecount_t)], utf8str, tlen)) {
 //    bell();
     dbg("Phrase already exists\n");
     inc_dec_tsin_use_count(phkeys, utf8str, len, FALSE);
@@ -159,7 +159,7 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, int usecoun
     }
   }
 
-  fwrite(tbuf, 1, sizeof(phokey_t)*len + tlen + 1+1, fph);
+  fwrite(tbuf, 1, sizeof(phokey_t)*len + tlen + 1+ sizeof(usecount_t), fph);
   fflush(fph);
 
   if (hashidx[hashno]>mid)
@@ -190,14 +190,14 @@ int ts_gtabN;
 int read_tsin_phrase(char *str)
 {
   u_char len;
-  char usecount;
+  usecount_t usecount;
   u_char pho[sizeof(phokey_t) * MAX_PHRASE_LEN];
   len = 0;
 
   fread(&len, 1, 1, fph);
   if (len > MAX_PHRASE_LEN || len <=0)
     return 0;
-  fread(&usecount, 1, 1,fph); // use count
+  fread(&usecount, sizeof(usecount_t), 1, fph); // use count
   fread(pho, sizeof(phokey_t), len, fph);
 
   int i;
@@ -364,7 +364,7 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
 }
 
 
-void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
+void load_tsin_entry(int idx, u_char *len, usecount_t *usecount, phokey_t *pho,
                     u_char *ch)
 {
   if (idx >= phcount) {
@@ -384,7 +384,7 @@ void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
     return;
   }
 
-  fread(usecount, 1, 1,fph); // use count
+  fread(usecount, sizeof(usecount_t), 1, fph); // use count
   fread(pho, sizeof(phokey_t), (int)(*len), fph);
   if (ch)
     fread(ch, CH_SZ, (int)(*len), fph);
@@ -474,7 +474,6 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
 void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
 {
   int sti, edi;
-//  dbg("inc_dec_tsin_use_count:%d\n", N);
 
   if (!tsin_seek(pho, N, &sti, &edi))
     return;
@@ -491,7 +490,8 @@ void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
 #endif
 
   for(idx=sti; idx < edi; idx++) {
-    char len, usecount, n_usecount;
+    char len;
+    usecount_t usecount, n_usecount;
     phokey_t phi[MAX_PHRASE_LEN];
     char stch[MAX_PHRASE_LEN * CH_SZ];
 
@@ -518,13 +518,13 @@ void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
         n_usecount--;
 //      dbg("dec %d\n", n_usecount);
     } else {
-      if (usecount < 126)
+      if (usecount < 0x3fffffff)
         n_usecount++;
 //      dbg("inc %d\n", n_usecount);
     }
 
     if (n_usecount != usecount) {
-      fwrite(&n_usecount, 1, 1, fph); // use count
+      fwrite(&n_usecount, sizeof(usecount_t), 1, fph); // use count
       fflush(fph);
     }
   }

@@ -1,7 +1,7 @@
 if [ -d /root2/$HOME/gcin ]; then
   rm -fr /root2/$HOME/gcin
   cp -a ~/gcin /root2/$HOME
-  cp ~/.gcin/tsin /root2/$HOME/.gcin
+  cp ~/.gcin/tsin32 /root2/$HOME/.gcin
 fi
 
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
@@ -13,7 +13,7 @@ cd $GCIN_VERSION
 make clean
 cd ..
 
-/usr/local/bin/tsd2a -nousecount ~/.gcin/tsin > $GCIN_VERSION/data/tsin.src
+/usr/local/bin/tsd2a32 -nousecount ~/.gcin/tsin32 > $GCIN_VERSION/data/tsin.src
 tar cvfj $GCIN_VERSION.tar.bz2 $GCIN_VERSION
 
 cd gcin; ./configure

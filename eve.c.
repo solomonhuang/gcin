@@ -59,7 +59,7 @@ void toggle_gb_output()
 }
 
 
-void send_text(char *text)
+void send_text_sub(char *text, gboolean gb_proc)
 {
   if (!text)
     return;
@@ -67,7 +67,7 @@ void send_text(char *text)
 
   char *utf8_gbtext = NULL;
 
-  if (gb_output) {
+  if (gb_proc) {
     u_int rn = 0 , wn = 0;
     GError *err = NULL;
     char *big5 = g_convert(text, len, "big5", "UTF-8", &rn, &wn, &err);
@@ -110,9 +110,15 @@ void send_text(char *text)
   g_free(utf8_gbtext);
 }
 
+void send_text(char *text)
+{
+  send_text_sub(text, gb_output);
+}
+
+
 void send_output_buffer_bak()
 {
-  send_text(output_buffer_bak);
+  send_text_sub(output_buffer_bak, FALSE);
 }
 
 void sendkey_b5(char *bchar)
@@ -207,7 +213,7 @@ void hide_in_win(ClientState *cs)
 //      flush_tsin_buffer();
       hide_win0();
       break;
-    case 10:
+    case 0:
       hide_win_int();
       break;
     default:
@@ -215,9 +221,7 @@ void hide_in_win(ClientState *cs)
   }
 
   reset_current_in_win_xy();
-#if 0
   hide_win_status();
-#endif
 }
 
 void show_win_pho();
@@ -241,15 +245,14 @@ void show_in_win(ClientState *cs)
     case 6:
       show_win0();
       break;
-    case 10:
+    case 0:
       show_win_int();
       break;
     default:
       show_win_gtab();
   }
-#if 0
+
   show_win_stautus();
-#endif
 }
 
 
@@ -288,7 +291,7 @@ void move_in_win(ClientState *cs, int x, int y)
     case 6:
       move_win0(x, y);
       break;
-    case 10:
+    case 0:
       move_win_int(x, y);
       break;
     default:
@@ -388,11 +391,9 @@ void win_pho_disp_half_full();
 void win_tsin_disp_half_full();
 void win_gtab_disp_half_full();
 extern char eng_full_str[], full_char_str[];
-void update_tray_icon();
 
 void disp_im_half_full()
 {
-#if 0
   if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
      set_win_status_half_full(eng_full_str);
   }
@@ -401,8 +402,6 @@ void disp_im_half_full()
      set_win_status_half_full(current_CS->b_half_full_char?full_char_str:"");
   else
      set_win_status_half_full("");
-#endif
-  update_tray_icon();
 
   switch (current_CS->in_method) {
     case 3:
@@ -419,6 +418,7 @@ void disp_im_half_full()
 
 gboolean flush_tsin_buffer();
 void reset_gtab_all();
+void update_tray_icon();
 
 void toggle_im_enabled(u_int kev_state)
 {
@@ -426,7 +426,7 @@ void toggle_im_enabled(u_int kev_state)
     check_CS();
 
     if (current_CS->in_method < 0 || current_CS->in_method >= gcin_switch_keysN)
-      p_err("err found");
+      return;
 
     static u_int orig_caps_state;
 
@@ -451,9 +451,7 @@ void toggle_im_enabled(u_int kev_state)
       }
 
       hide_in_win(current_CS);
-#if 0
       hide_win_status();
-#endif
       current_CS->im_state = GCIN_STATE_DISABLED;
 
       update_tray_icon();
@@ -461,9 +459,13 @@ void toggle_im_enabled(u_int kev_state)
       current_CS->im_state = GCIN_STATE_CHINESE;
       orig_caps_state = kev_state & LockMask;
 
-      if (!current_CS->in_method) {
-        init_in_method(default_input_method);
-      }
+      dbg("in_method:%d\n", current_CS->in_method);
+#if 0
+      init_in_method(current_CS->in_method);
+#else
+      if (!current_CS->in_method)
+         init_in_method(default_input_method);
+#endif
 
       reset_current_in_win_xy();
 #if 1
@@ -473,10 +475,10 @@ void toggle_im_enabled(u_int kev_state)
       update_in_win_pos();
       show_in_win(current_CS);
 #endif
-#if 0
+
       if (gcin_pop_up_win)
         show_win_stautus();
-#endif
+
       update_tray_icon();
     }
 }
@@ -495,7 +497,7 @@ void update_active_in_win_geom()
     case 6:
       get_win0_geom();
       break;
-    case 10:
+    case 0:
       break;
     default:
       get_win_gtab_geom();
@@ -585,7 +587,7 @@ gboolean init_in_method(int in_no)
     case 6:
       init_tab_pp(True);
       break;
-    case 10:
+    case 0:
       init_inter_code(True);
       break;
     default:
@@ -594,9 +596,7 @@ gboolean init_in_method(int in_no)
       break;
   }
 
-#if 0
   set_win_status_inmd(inmd[in_no].cname);
-#endif
   load_tray_icon();
 
   update_in_win_pos();
@@ -755,7 +755,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       return feedkey_pho(keysym, kev_state);
     case 6:
       return feedkey_pp(keysym, kev_state);
-    case 10:
+    case 0:
       return feedkey_intcode(keysym);
     default:
       return feedkey_gtab(keysym, kev_state);
@@ -845,9 +845,7 @@ int gcin_FocusIn(ClientState *cs)
       show_in_win(cs);
       move_IC_in_win(cs);
 #endif
-#if 0
       set_win_status_inmd(inmd[cs->in_method].cname);
-#endif
     } else
       hide_in_win(cs);
   }

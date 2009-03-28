@@ -39,7 +39,7 @@ typedef struct {
   int phidx;
   char str[MAX_PHRASE_LEN*CH_SZ+1];
   int len;
-  char usecount;
+  usecount_t usecount;
 } PRE_SEL;
 
 static PRE_SEL pre_sel[10];
@@ -320,8 +320,6 @@ void show_stat()
 
 void load_tsin_db();
 
-void load_tsin_entry(int idx, u_char *len, char *usecount, phokey_t *pho,
-                    u_char *ch);
 
 #if 0
 void nputs(u_char *s, u_char len)
@@ -338,7 +336,7 @@ static void dump_tsidx(int i)
 {
   phokey_t pho[MAX_PHRASE_LEN];
   u_char ch[MAX_PHRASE_LEN*CH_SZ];
-  char usecount;
+  usecount_t usecount;
   u_char len;
 
   load_tsin_entry(i, &len, &usecount, pho, ch);
@@ -417,7 +415,6 @@ static void save_phrase()
 
   len= save_to- save_frm+ 1;
 
-  dbg("len %d\n", len);
   if (len <= 0 || len > MAX_PHRASE_LEN)
     return;
 
@@ -547,7 +544,7 @@ static void get_sel_phrase()
   phrase_count = 0;
 
   while (sti < edi && phrase_count < MAX_PHRASE_SEL_N) {
-    char usecount=0;
+    usecount_t usecount=0;
     load_tsin_entry(sti, &len, &usecount, stk, stch);
 
     if (len > mlen) {
@@ -737,7 +734,7 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
     phokey_t mtk[MAX_PHRASE_LEN];
     u_char mtch[MAX_PHRASE_LEN*CH_SZ+1];
     u_char match_len;
-    char usecount;
+    usecount_t usecount;
 
     load_tsin_entry(sti, &match_len, &usecount, mtk, mtch);
 
@@ -1004,7 +1001,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     return TRUE;
 }
 
-#if 0
+#if 1
 static void set_phrase_link(int idx, int len)
 {
     int j;
@@ -1037,13 +1034,17 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     ch_pho_cpy(&chpho[idx], str, pho, len);
     set_chpho_ch2(&chpho[idx], str, len);
 
+    int i;
+    for(i=idx; i < idx+len; i++)
+      chpho[i].flag |= FLAG_CHPHO_FIXED;
+
     c_len=c_idx=idx + len;
 
     clrin_pho_tsin();
     disp_in_area_pho_tsin();
 
     prbuf();
-#if 0
+#if 1
     set_phrase_link(idx, len);
 #endif
     drawcursor();

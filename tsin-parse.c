@@ -5,16 +5,16 @@
 #include "tsin.h"
 #include "gcin-conf.h"
 
-int tsin_parse_recur(int start, TSIN_PARSE *out)
+float tsin_parse_recur(int start, TSIN_PARSE *out)
 {
   int plen;
-  int bestscore = 0;
+  float bestscore = 0;
 
   for(plen=1; start + plen <= c_len && plen <= MAX_PHRASE_LEN; plen++) {
     phokey_t pp[MAX_PHRASE_LEN + 1];
     int sti, edi;
     TSIN_PARSE pbest[MAX_PH_BF_EXT+1];
-    int pbestscore = 0;
+    float pbestscore = 0;
     int remlen;
 
     bzero(pbest, sizeof(TSIN_PARSE) * c_len);
@@ -37,7 +37,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out)
       phokey_t mtk[MAX_PHRASE_LEN];
       char mtch[MAX_PHRASE_LEN*CH_SZ+1];
       u_char match_len;
-      char usecount;
+      usecount_t usecount;
 
       load_tsin_entry(sti, &match_len, &usecount, mtk, mtch);
 
@@ -142,7 +142,7 @@ void tsin_parse(TSIN_PARSE out[])
   dbg("i:%d\n", i);
 #endif
   i--;
-  if ((out[i].flag & FLAG_TSIN_PARSE_PHRASE)) {
+  if ((out[i].flag & FLAG_TSIN_PARSE_PHRASE) && c_len - out[i].start > 1) {
     ph_sta = out[i].start;
   }
 #if 0

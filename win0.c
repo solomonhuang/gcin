@@ -622,6 +622,7 @@ gboolean tsin_has_input();
 void show_win0()
 {
 //  dbg("show_win0\n");
+  GtkWindow *owin = gwin0;
   create_win0();
   create_win0_gui();
   set_currenet_IC_pin_image_pin();
@@ -633,7 +634,7 @@ void show_win0()
 //  dbg("show_win0 b\n");
   show_win_sym();
 
-  if (current_CS->b_raise_window)
+  if (current_CS->b_raise_window /* && owin */)
     gtk_window_present(gwin0);
 }
 

@@ -23,8 +23,8 @@ static int qcmp(const void *a, const void *b)
   int i;
   u_short ka,kb;
 
-  lena=bf[idxa]; idxa+=2;
-  lenb=bf[idxb]; idxb+=2;
+  lena=bf[idxa]; idxa+=1 + sizeof(usecount_t);
+  lenb=bf[idxb]; idxb+=1 + sizeof(usecount_t);
   cha=idxa + lena * sizeof(phokey_t);
   chb=idxb + lenb * sizeof(phokey_t);
   len=Min(lena,lenb);
@@ -57,27 +57,24 @@ static int qcmp(const void *a, const void *b)
 
 static int qcmp_usecount(const void *a, const void *b)
 {
-  int idxa=*((int *)a);
-  int idxb=*((int *)b);
+  int idxa=*((int *)a);  char *pa = &sf[idxa];
+  int idxb=*((int *)b);  char *pb = &sf[idxb];
   u_char lena,lenb, len;
-  int cha, chb;
   int i;
   u_short ka,kb;
-  char usecounta, usecountb;
+  usecount_t usecounta, usecountb;
 
-  lena=sf[idxa++]; usecounta = sf[idxa++];
-  lenb=sf[idxb++]; usecountb = sf[idxb++];
-  cha=idxa + lena * sizeof(phokey_t);
-  chb=idxb + lenb * sizeof(phokey_t);
+  lena=*(pa++); usecounta = *((usecount_t *)pa); pa+= sizeof(usecount_t);
+  lenb=*(pb++); usecountb = *((usecount_t *)pb); pb+= sizeof(usecount_t);
   len=Min(lena,lenb);
 
   for(i=0;i<len;i++) {
-    memcpy(&ka, &sf[idxa], sizeof(phokey_t));
-    memcpy(&kb, &sf[idxb], sizeof(phokey_t));
+    memcpy(&ka, pa, sizeof(phokey_t));
+    memcpy(&kb, pb, sizeof(phokey_t));
     if (ka > kb) return 1;
     if (kb > ka) return -1;
-    idxa+=2;
-    idxb+=2;
+    pa+=sizeof(phokey_t);
+    pb+=sizeof(phokey_t);
   }
 
   if (lena > lenb)
@@ -85,8 +82,9 @@ static int qcmp_usecount(const void *a, const void *b)
   if (lena < lenb)
     return -1;
 
-  int tlena = utf8_tlen(&sf[cha], lena);
-  int tlenb = utf8_tlen(&sf[chb], lenb);
+  // now lena == lenb
+  int tlena = utf8_tlen(pa, lena);
+  int tlenb = utf8_tlen(pb, lenb);
 
   if (tlena > tlenb)
     return 1;
@@ -135,7 +133,7 @@ int main(int argc, char **argv)
   int lineCnt=0;
   phcount=ofs=0;
   while (!feof(fp)) {
-    char usecount=0;
+    usecount_t usecount=0;
 
     lineCnt++;
 
@@ -194,11 +192,10 @@ int main(int argc, char **argv)
     else
       usecount = atoi(&s[i]);
 
-
     /*      printf("len:%d\n", clen); */
     phidx[phcount++]=ofs;
     memcpy(&bf[ofs++],&clen,1);
-    memcpy(&bf[ofs++],&usecount,1);
+    memcpy(&bf[ofs],&usecount, sizeof(usecount_t)); ofs+=sizeof(usecount_t);
     memcpy(&bf[ofs],phbuf, clen * sizeof(phokey_t));
     ofs+=clen * sizeof(phokey_t);
     memcpy(&bf[ofs], chbuf, chbufN);
@@ -243,8 +240,8 @@ int main(int argc, char **argv)
     idx = phidx[i];
     sidx[j]=ofs;
     len=bf[idx];
-    int tlen = utf8_tlen(&bf[idx + 1 + 1 + sizeof(phokey_t)*len], len);
-    clen=sizeof(phokey_t)*len + tlen + 1 + 1;
+    int tlen = utf8_tlen(&bf[idx + 1 + sizeof(usecount_t) + sizeof(phokey_t)*len], len);
+    clen=sizeof(phokey_t)*len + tlen + 1 + sizeof(usecount_t);
 
     if (i && !qcmp(&phidx[i-1], &phidx[i]))
       continue;
@@ -267,7 +264,7 @@ int main(int argc, char **argv)
     phokey_t kk,jj;
 
     idx=sidx[i];
-    idx+=2;
+    idx+= 1 + sizeof(usecount_t);
     memcpy(&kk, &sf[idx], sizeof(phokey_t));
     jj=kk;
     kk>>=TSIN_HASH_SHIFT;
@@ -290,8 +287,8 @@ int main(int argc, char **argv)
       hashidx[i]=hashidx[i-1];
   }
 
-  printf("Writing data tsin %d\n", ofs);
-  if ((fw=fopen("tsin","w"))==NULL) {
+  printf("Writing data tsin32 %d\n", ofs);
+  if ((fw=fopen("tsin32","w"))==NULL) {
     puts("create err");
     exit(-1);
   }
@@ -299,8 +296,8 @@ int main(int argc, char **argv)
   fwrite(sf,1,ofs,fw);
   fclose(fw);
 
-  puts("Writing data tsin.idx");
-  if ((fw=fopen("tsin.idx","w"))==NULL) {
+  puts("Writing data tsin32.idx");
+  if ((fw=fopen("tsin32.idx","w"))==NULL) {
     puts("create err");
     exit(-1);
   }

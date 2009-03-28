@@ -468,6 +468,7 @@ gboolean gtab_has_input();
 void show_win_gtab()
 {
 //  dbg("show_win_gtab %d ..\n", current_CS->in_method);
+  GtkWindow *owin = gwin_gtab;
   create_win_gtab();
   create_win_gtab_gui();
   set_currenet_IC_pin_image_pin();
@@ -483,7 +484,7 @@ void show_win_gtab()
     return;
 
   gtk_widget_show(gwin_gtab);
-  if (current_CS->b_raise_window)
+  if (current_CS->b_raise_window && owin)
     gtk_window_present(gwin_gtab);
 
   show_win_sym();

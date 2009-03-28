@@ -25,7 +25,7 @@ void send_gcin_message(Display *dpy, char *s)
   eve.atom=atom;
   XSendEvent(dpy, gcin_win, False, 0, (XEvent *)&eve);
   XSync(dpy,0);
-  sleep(1);
+  usleep(100000);
 
   XDestroyWindow(dpy, mwin);
 }

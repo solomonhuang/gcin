@@ -56,7 +56,7 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   int loop;
   for(loop=0; loop < MAX_TRY; loop++) {
     if ((gcin_addr_atom && (gcin_win=XGetSelectionOwner(dpy, gcin_addr_atom))!=None)
-        || getenv("GCIN_IM_CLEINT_NO_AUTO_EXEC"))
+        || getenv("GCIN_IM_CLIENT_NO_AUTO_EXEC"))
       break;
     static time_t exec_time;
 

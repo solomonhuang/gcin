@@ -63,6 +63,12 @@ if [ $? != 0 ]; then
   exit -1;
 fi
 
+## problem in MacOS
+if [ $MAC_OS = 1 ]; then
+  GTKINC = "$GTKINC -I/sw/include"
+fi
+
+
 GTKLDFLAGS=`pkg-config --libs $GTK`
 
 if [ $? != 0 ]; then

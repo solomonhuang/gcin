@@ -75,7 +75,6 @@ void cmd_arg(char *s, char **cmd, char **arg)
     return;
   }
 
-
   s=skip_spc(s);
   t=to_spc(s);
   *cmd=s;
@@ -147,16 +146,15 @@ int qcmp(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  int d;
-  if ((d = a->key - b->key)) return d;
-#if 0
-  return a->oseq - b->oseq;
-#else
-  if (a->oseq < b->oseq)
-    return -1;
-  if (a->oseq > b->oseq)
-    return 1;
+  if (a->key > b->key) return 1;
+  if (a->key < b->key) return -1;
+
+#if FREEBSD
+  if (a->oseq > b->oseq) return 1;
+  if (a->oseq < b->oseq) return -1;
   return 0;
+#else
+  return a->oseq - b->oseq;
 #endif
 }
 
@@ -168,7 +166,13 @@ int qcmp_64(const void *aa, const void *bb)
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
 
+#if FREEBSD
+  if (a->oseq > b->oseq) return 1;
+  if (a->oseq < b->oseq) return -1;
+  return 0;
+#else
   return a->oseq - b->oseq;
+#endif
 }
 
 
