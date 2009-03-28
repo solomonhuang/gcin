@@ -279,7 +279,7 @@ void toggle_im_enabled(u_int kev_state)
 //    dbg("toggle_im_enabled\n");
     check_CS();
 
-    if (current_CS->in_method < 0 || current_CS->in_method > 10)
+    if (current_CS->in_method < 0 || current_CS->in_method >= gcin_switch_keysN)
       return;
 
     static u_int orig_caps_state;
@@ -323,6 +323,7 @@ void toggle_im_enabled(u_int kev_state)
 
 void get_win_gtab_geom();
 void get_win0_geom();
+void get_win_pho_geom();
 
 void update_active_in_win_geom()
 {
@@ -436,8 +437,8 @@ static void cycle_next_in_method()
 
   int i;
 
-  for(i=1; i <= 10; i++) {
-    int v = (current_CS->in_method + i) % 10;
+  for(i=1; i <= gcin_switch_keysN; i++) {
+    int v = (current_CS->in_method + i) % gcin_switch_keysN;
     if (!(gcin_flags_im_enabled & (1<<v)))
       continue;
     if (!inmd[v].cname[0])
@@ -528,7 +529,11 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
   if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
     current_CS->im_state = GCIN_STATE_CHINESE;
-    init_in_method(keysym- XK_0);
+    int kidx = gcin_switch_keys_lookup(keysym);
+    if (kidx < 0)
+      return FALSE;
+
+    init_in_method(kidx);
     return TRUE;
   }
 

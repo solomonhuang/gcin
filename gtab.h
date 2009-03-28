@@ -37,7 +37,7 @@ struct TableHead2 {
 #define KeyBits (6)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
-#define MAX_GTAB_NUM_KEY 10
+#define MAX_GTAB_NUM_KEY (12)
 #define MAX_SELKEY 16
 
 #define MAX_TAB_KEY_NUM 5

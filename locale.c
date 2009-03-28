@@ -122,6 +122,16 @@ void utf8_putchar(char *s)
     putchar(s[i]);
 }
 
+gboolean utf8_eq(char *a, char *b)
+{
+  int ta = utf8_sz(a);
+  int tb = utf8_sz(b);
+
+  if (ta != tb)
+    return FALSE;
+
+  return !memcmp(a,b, ta);
+}
 
 gboolean utf8_str_eq(char *a, char *b, int len)
 {
@@ -132,4 +142,16 @@ gboolean utf8_str_eq(char *a, char *b, int len)
     return FALSE;
 
   return !memcmp(a, b, ta);
+}
+
+int utf8_str_N(char *str)
+{
+  int N=0;
+
+  while (*str) {
+    str+= utf8_sz(str);
+    N++;
+  }
+
+  return N;
 }

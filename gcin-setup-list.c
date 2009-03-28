@@ -49,7 +49,7 @@ static int qcmp_key(const void *aa, const void *bb)
 {
   Item *a=(Item *)aa, *b=(Item *)bb;
 
-  return atoi(a->key) - atoi(b->key);
+  return gcin_switch_keys_lookup(a->key[0]) - gcin_switch_keys_lookup(b->key[0]);
 }
 
 extern char *TableDir;
@@ -90,7 +90,7 @@ add_items (void)
 
     foo.name = g_strdup(name);
     foo.key = g_strdup(key);
-    int in_no = atoi(foo.key);
+    int in_no = gcin_switch_keys_lookup(foo.key[0]);
     foo.file = g_strdup(file);
     foo.used = (gcin_flags_im_enabled & (1 << in_no)) != 0;
     foo.default_inmd = in_no == default_input_method;
@@ -221,7 +221,11 @@ static gboolean toggled_default_inmd(GtkCellRendererToggle *cell, gchar *path_st
   gtk_tree_model_get_iter (model, &iter, path);
   int i = gtk_tree_path_get_indices (path)[0];
   char *key=g_array_index (articles, Item, i).key;
-  default_input_method = atoi(key);
+  default_input_method = gcin_switch_keys_lookup(key[0]);
+  dbg("default_input_method %d %c\n", default_input_method, key[0]);
+
+  if (default_input_method < 0)
+    default_input_method = 6;
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_DEFAULT_INMD, TRUE, -1);
   gtk_tree_path_free (path);

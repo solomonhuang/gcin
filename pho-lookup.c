@@ -12,7 +12,7 @@ int lookup(u_char *s)
     return *s-'0';
 
   bchcpy(tt, s);
-  tt[CH_SZ]=0;
+  tt[PHO_CHAR_LEN]=0;
 
   for(i=0;i<3;i++)
     if ((pp=strstr(pho_chars[i],tt)))

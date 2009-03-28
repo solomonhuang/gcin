@@ -5,21 +5,21 @@ include ../config.mak
 DATA=pho.tab tsin.idx \
      cj.gtab ar30.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
      et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
-     ibm.kbm tsin hsu.kbm pho-huge.tab
+     ibm.kbm tsin hsu.kbm pho-huge.tab simplex.gtab
 DATAKEEP=symbol-table gtab.list phrase.table
 
 all:	$(DATA)
 
-tsin:	tsin.src
+tsin:	tsin.src ../tsa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../tsa2d $<
 
 tsin.idx:	tsin.src
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../tsa2d $<
 
-pho.tab:	 pho.tab.src
+pho.tab:	 pho.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
 
-pho-huge.tab:	 pho-huge.tab.src
+pho-huge.tab:	 pho-huge.tab.src ../phoa2d
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
 
 .cin.gtab:      ../gcin2tab

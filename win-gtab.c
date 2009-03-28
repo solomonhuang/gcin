@@ -69,7 +69,7 @@ void change_gtab_font_size()
 
   int i;
   for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
-    set_label_font_size(labels_gtab[i], gcin_font_size);
+    set_label_font_size(labels_gtab[i], gcin_font_size_gtab_in);
   }
 
   set_disp_im_name();

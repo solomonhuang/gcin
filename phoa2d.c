@@ -130,11 +130,6 @@ int main(int argc, char **argv)
     int l;
     for(l=i; l<j; l++) {
       bchcpy(pho_items[pho_itemsN].ch, items[l].ch);
-#if 0
-      char tt[4];
-      utf8cpy(tt, items[l].ch);
-      dbg("uuu %s\n", tt);
-#endif
       pho_items[pho_itemsN].count = items[l].count;
       pho_itemsN++;
     }

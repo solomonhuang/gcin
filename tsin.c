@@ -224,7 +224,7 @@ static void disp_in_area_pho_tsin()
   int i;
 
   for(i=0;i<4;i++) {
-    disp_tsin_pho(i, &pho_chars[i][typ_pho[i] * 3]);
+    disp_tsin_pho(i, &pho_chars[i][typ_pho[i] * PHO_CHAR_LEN]);
   }
 }
 
@@ -387,7 +387,7 @@ static void save_phrase()
   return;
 }
 
-#define PH_SHIFT_N (MAX_PH_BF - 1)
+#define PH_SHIFT_N (tsin_buffer_size - 1)
 void compact_win0_x();
 
 static void shift_ins()

@@ -73,7 +73,7 @@ void lookup_gtab(char *ch, char out[])
 
   int i;
   for(i=0; i < cur_inmd->DefChars; i++) {
-    if (bchcmp(tblch(i), ch))
+    if (!utf8_eq(tblch(i), ch))
       continue;
 
     u_int64_t key = CONVT2(cur_inmd, i);
@@ -98,7 +98,7 @@ void lookup_gtab(char *ch, char out[])
         keyname = &cur_inmd->keyname_lookup[k];
       } else {
         keyname = &cur_inmd->keyname[k * CH_SZ];
-        len = (*keyname & 0x80) ? CH_SZ : 2;
+        len = (*keyname & 0x80) ? utf8_sz(keyname) : 2;
       }
 //      dbg("uuuuuuuuuuuu %d %x len:%d\n", k, cur_inmd->keyname[k], len);
       memcpy(&t[tlen], keyname, len);
@@ -135,7 +135,7 @@ void free_gtab()
 {
   int i;
 
-  for(i=0; i < 10; i++) {
+  for(i=0; i < MAX_GTAB_NUM_KEY; i++) {
     INMD *inp = &inmd[i];
     free(inp->tbl); inp->tbl = NULL;
     free(inp->tbl64); inp->tbl64 = NULL;
@@ -159,8 +159,8 @@ char *b1_cat(char *s, char c)
 char *bch_cat(char *s, char *ch)
 {
   char t[CH_SZ + 1];
-  memcpy(t, ch, CH_SZ);
-  t[CH_SZ]=0;
+  int len = u8cpy(t, ch);
+  t[len]=0;
 
   return strcat(s, t);
 }
@@ -246,8 +246,8 @@ void load_gtab_list()
     if (name[0]=='#')
       continue;
 
-    int keyidx = atoi(key);
-    if (keyidx < 0 || keyidx>=10)
+    int keyidx = gcin_switch_keys_lookup(key[0]);
+    if (keyidx < 0)
       p_err("bad key value %s in %s\n", key, ttt);
     strcpy(inmd[keyidx].filename, file);
     strcpy(inmd[keyidx].cname, name);
@@ -267,10 +267,12 @@ void init_gtab(int inmdno, int usenow)
   struct TableHead th;
   struct TableHead2 th2;
 
-  current_CS->b_half_full_char = FALSE;
+//  current_CS->b_half_full_char = FALSE;
 
-  if (!inmd[inmdno].filename[0] || !strcmp(inmd[inmdno].filename,"-"))
+  if (!inmd[inmdno].filename[0] || !strcmp(inmd[inmdno].filename,"-")) {
+    dbg("filename is empty\n");
     return;
+  }
 
   strcat(strcpy(ttt,TableDir),"/");
   strcat(ttt, inmd[inmdno].filename);
@@ -486,9 +488,11 @@ static void clear_phrase_match_buf()
 
 static void putstr_inp(u_char *p)
 {
+  int plen = strlen(p);
+
   set_key_codes_label("");
 
-  if (strlen(p) > CH_SZ || p[0] < 128) {
+  if (utf8_str_N(p) > 1  || p[0] < 128) {
     send_text(p);
   }
   else {
@@ -511,29 +515,29 @@ static void putstr_inp(u_char *p)
 
     if (gtab_auto_select_by_phrase && !(gtab_space_auto_first & GTAB_space_auto_first_any)) {
       if (part_matched_len < strlen(match_phrase) &&
-          !memcmp(&match_phrase[part_matched_len], p, CH_SZ)) {
-          part_matched_len+=CH_SZ;
+          !memcmp(&match_phrase[part_matched_len], p, plen)) {
+          part_matched_len+=plen;
 #if DPHR
           dbg("inc\n");
 #endif
       } else {
-        memcpy(&match_phrase[part_matched_len], p, CH_SZ);
-        match_phrase[part_matched_len + CH_SZ] = 0;
+        memcpy(&match_phrase[part_matched_len], p, plen);
+        match_phrase[part_matched_len + plen] = 0;
 #if DPHR
         dbg("%d   zzz %s\n",part_matched_len, match_phrase);
 #endif
-        if (find_match(match_phrase, part_matched_len + CH_SZ, NULL, 0)) {
+        if (find_match(match_phrase, part_matched_len + plen, NULL, 0)) {
 #if DPHR
           dbg("cat match_phrase %s\n", match_phrase);
 #endif
-          part_matched_len += CH_SZ;
+          part_matched_len += plen;
         } else {
           strcpy(match_phrase, p);
-          if (find_match(match_phrase, CH_SZ, NULL, 0)) {
+          if (find_match(match_phrase, plen, NULL, 0)) {
 #if DPHR
             dbg("single match_phrase %s\n", match_phrase);
 #endif
-            part_matched_len = CH_SZ;
+            part_matched_len = plen;
           }
           else {
 #if DPHR
@@ -567,6 +571,8 @@ static gboolean set_sel1st_i()
   match_arr[N*CH_SZ] = 0;
   dbg("iii N:%d %s '%c%c%c'\n", N, match_arr, match_arr[0], match_arr[1], match_arr[2]);
 #endif
+  int ofs = 0;
+  char *pp = match_arr;
 
   for(i=0; i < N; i++) {
     int j;
@@ -575,15 +581,17 @@ static gboolean set_sel1st_i()
       if (!seltab[j][0])
         continue;
       int len = strlen(seltab[j]);
-      if (len!=CH_SZ)
-        continue;
-      if (!memcmp(seltab[j], &match_arr[i*CH_SZ], CH_SZ)) {
-        sel1st_i = j;
 
-//        dbg("%d\n", j);
+      if (utf8_str_N(seltab[j])!=1)
+        continue;
+
+      if (!memcmp(seltab[j], pp, len)) {
+        sel1st_i = j;
         return TRUE;
       }
     }
+
+    ofs+=utf8_sz(pp);
   }
 
   return FALSE;
@@ -776,9 +784,10 @@ static void disp_selection(gboolean phrase_selected)
   }
 
   int i;
-  for(i=ofs; i<10 + ofs; i++) {
+  for(i=ofs; i< cur_inmd->M_DUP_SEL + ofs; i++) {
     if (seltab[i][0]) {
       b1_cat(tt, cur_inmd->selkey[i - ofs]);
+//      dbg("yy %d '%s'\n", strlen(seltab[i]), seltab[i]);
 
       if (phrase_selected && i==sel1st_i) {
         strcat(tt, "<span foreground=\"blue\">");
@@ -913,7 +922,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
         bzero(seltab,sizeof(seltab));
         for(i=0;i<10;i++)
-          memcpy(seltab[i], &cur_inmd->qkeys.quick1[inch[0]-1][i][0], CH_SZ);
+          utf8cpy(seltab[i], cur_inmd->qkeys.quick1[inch[0]-1][i]);
 
         defselN=10;
         DispInArea();
@@ -932,7 +941,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         return 0;
     case '<':
       if (wild_mode) {
-        if (wild_page>=10) wild_page-=10;
+        if (wild_page >= cur_inmd->M_DUP_SEL) wild_page-=cur_inmd->M_DUP_SEL;
         wildcard();
         return 1;
       }
@@ -946,8 +955,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       has_wild = has_wild_card();
 
       if (wild_mode) {
-        if (defselN==10)
-          wild_page+=10;
+        if (defselN == cur_inmd->M_DUP_SEL)
+          wild_page+= cur_inmd->M_DUP_SEL;
         else
           wild_page=0;
         wildcard();
@@ -962,6 +971,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
           last_full=0;
           return 1;
         }
+
+        if (current_CS->b_half_full_char)
+          return full_char_proc(key);
+
         return 0;
       } else
       if (!has_wild) {
@@ -1075,14 +1088,19 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       if (wild_mode)
         goto XXXX;
 #endif
-      if (key > 0x7f)
+      if (key > 0x7f) {
         return 0;
+      }
 
       spc_pressed=0;
 
       // for cj & boshiamy to input digits
-      if (!ci && !inkey)
+      if (!ci && !inkey) {
+        if (current_CS->b_half_full_char)
+          return full_char_proc(key);
+        else
           return 0;
+      }
 
       if (wild_mode && inkey>=1 && ci< cur_inmd->MaxPress) {
         inch[ci++]=inkey;
@@ -1094,11 +1112,13 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         inch[ci++]=inkey;
         last_full=0;
         if (ci==1 && cur_inmd->use_quick) {
-          int i;
-          for(i=0;i<10;i++)
-            bchcpy(seltab[i], &cur_inmd->qkeys.quick1[inkey-1][i][0]);
 
-          defselN=10;
+          int i;
+          for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
+            utf8cpy(seltab[i], &cur_inmd->qkeys.quick1[inkey-1][i]);
+          }
+
+          defselN=cur_inmd->M_DUP_SEL;
           DispInArea();
           goto Disp_opt;
         }
@@ -1121,13 +1141,17 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
             return 1;
           }
-      }
-#if 1
-      if (!inkey && pselkey && defselN)
-        goto YYYY;
-#endif
-      if (!inkey && !pselkey)
-        return 0;
+      } else {
+        if (!pselkey) {
+          if (current_CS->b_half_full_char)
+            return full_char_proc(key);
+          else
+            return 0;
+        }
+
+        if (defselN)
+          goto YYYY;
+     }
   } /* switch */
 
 

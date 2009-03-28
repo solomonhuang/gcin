@@ -57,37 +57,6 @@ void mask_key_typ_pho(phokey_t *key)
   if (!typ_pho[3]) *key &= ~(7);
 }
 
-#define TKBM 0
-
-static void find_match_phos(u_char mtyp_pho[4], int *mcount, int newkey)
-{
-      int vv;
-      phokey_t key = pho2key(typ_pho);
-
-      mask_key_typ_pho(&key);
-#if TKBM
-      prph(key);
-      dbg("\n");
-#endif
-      for (vv = hash_pho[typ_pho[0]]; vv < idxnum_pho; vv++) {
-        phokey_t ttt=idx_pho[vv].key;
-
-        if (newkey!=' ')
-          mask_key_typ_pho(&ttt);
-
-        int count = idx_pho[vv+1].start - idx_pho[vv].start;
-
-        if (ttt == key && *mcount < count) {
-          *mcount = count;
-          memcpy(mtyp_pho, typ_pho, sizeof(typ_pho));
-#if TKBM
-          dbg("count %d\n", count);
-#endif
-          if (mcount > 5)
-            break;
-        }
-      }
-}
 
 
 gboolean inph_typ_pho(int newkey)
@@ -95,10 +64,43 @@ gboolean inph_typ_pho(int newkey)
   int i;
   int insert = -1;
 
+  if (newkey == ' ') {
+    insert = 3;
+    inph[3] = newkey;
+
+  }
+
+  if (b_hsu_kbm) {
+    if (typ_pho[1] && !typ_pho[2]) {
+      for(i=0; i < 3; i++)
+        if (phkbm.phokbm[(int)newkey][i].typ==2) {
+          insert = 2;
+          inph[2] = newkey;
+          typ_pho[2] = phkbm.phokbm[(int)newkey][i].num;
+        }
+    }
+  }
 
   int max_in_idx;
 
   for(max_in_idx=3; max_in_idx>=0 && !typ_pho[max_in_idx]; max_in_idx--);
+
+
+  if (insert < 0)
+  for(i=0; i < 3; i++) {
+    char num = phkbm.phokbm[(int)newkey][i].num;
+    int typ = phkbm.phokbm[(int)newkey][i].typ;
+#define TKBM 0
+    if (typ==3 && (typ_pho[0]||typ_pho[1]||typ_pho[2])) {
+      inph[typ] = newkey;
+      typ_pho[typ] = num;
+#if TKBM
+      dbg("insert0 typ %d\n", typ);
+#endif
+      insert = typ;
+      break;
+    }
+  }
 
   // try insert mode first
   if (insert < 0)
@@ -133,50 +135,94 @@ gboolean inph_typ_pho(int newkey)
   }
 
 
+  if (insert < 0)
+    return FALSE;
 
+
+  if (inph[3] && inph[0]=='c' && !typ_pho[1] && !typ_pho[2] &&
+      phkbm.phokbm['c'][1].num) {
+    typ_pho[0] = phkbm.phokbm['c'][1].num;
+  }
+
+  // v 吃
+  if (b_hsu_kbm && inph[3] && inph[0]=='v' && !typ_pho[1] && !typ_pho[2] &&
+      phkbm.phokbm['v'][1].num) {
+    typ_pho[0] = phkbm.phokbm['v'][1].num;
+  }
+
+
+  int idx = insert == 1 ? 0 : insert;
   int mcount = 0;
   u_char mtyp_pho[4];
 
-  int a;
 
-  for(a=0; a < 3; a++) {
-    char num = phkbm.phokbm[(int)inph[0]][a].num;
-    char typ = phkbm.phokbm[(int)inph[0]][a].typ;
-
-    if (num && typ!=3) {
-      if (typ_pho[3] || newkey==' ' || typ == 0) {
-        typ_pho[0] = 0;
-        typ_pho[(int)typ] = num;
-      }
-#if TKBM
-      dbg("%d num %d\n",a, num);
-#endif
-
-      find_match_phos(mtyp_pho, &mcount, newkey);
-    }
-
+  {
     for(i=0; i < 3; i++) {
-      char num = phkbm.phokbm[(int)inph[2]][i].num;
-      char typ = phkbm.phokbm[(int)inph[2]][i].typ;
+      char num = phkbm.phokbm[(int)inph[idx]][i].num;
+      char typ = phkbm.phokbm[(int)inph[idx]][i].typ;
 
       if (!num)
         break;
-#if TKBM
-      dbg("i:%d\n",i);
-#endif
-      if (typ!=2)
+
+      if (typ!=idx)
         continue;
+
+//      dbg("idx:%d i:%d\n", idx, i);
 
       typ_pho[(int)typ] = num;
 
-      find_match_phos(mtyp_pho, &mcount, newkey);
-    }
+      int vv=hash_pho[typ_pho[0]];
+      phokey_t ttt=0xffff;
+      phokey_t key = pho2key(typ_pho);
 
+      mask_key_typ_pho(&key);
+
+      while (vv < idxnum_pho) {
+        ttt=idx_pho[vv].key;
+        mask_key_typ_pho(&ttt);
+
+//        dbg("ttt:%x\n", ttt);
+#if 0
+        if (ttt>=key  && (!b_hsu_kbm ||
+           (ttt!=0x1002 && ttt!=0x604 && ttt!=0x603))) {
+                /* hsu, keys(ld) conflict with ㄌ2 –
+                             mj           with ㄇ2 》
+                 */
+          break;
+        }
+        else
+#else
+          vv++;
+#endif
+
+      }
+
+      if (ttt == key) {
+#if TKBM
+        dbg("match idx:%d %d %d\n",idx, typ, num);
+#endif
+        return TRUE;
+      }
+    }
   }
 
-  if (mcount) {
-    memcpy(typ_pho, mtyp_pho, sizeof(typ_pho));
-    return TRUE;
+  // forced to type 2
+  if (inph[0] && (newkey == ' '|| typ_pho[3]) &&
+      !typ_pho[1] && !typ_pho[2] && (!b_hsu_kbm || inph[0]!='a')) {
+    int midx = phkbm.phokbm[(int)inph[0]][2].typ==2 ? 2:1;
+    int mnum = phkbm.phokbm[(int)inph[0]][midx].num;
+
+    if (mnum) {
+      int mtyp = phkbm.phokbm[(int)inph[0]][midx].typ;
+#if TKBM
+       dbg("ooooooooooo %d %d %d\n", midx, mnum, mtyp);
+#endif
+      if (mtyp==2) {
+        typ_pho[0]=0;
+        typ_pho[mtyp] = mnum;
+        return TRUE;
+      }
+    }
   }
 
   return FALSE;

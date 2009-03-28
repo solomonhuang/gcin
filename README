@@ -119,7 +119,7 @@ logout & login
 ---------------------------------
 標點符號與特殊符號可不可以存成詞？
 
-只要字有在注音表內就可以存成詞，請參考前面的說明，但目前不支援半型字。
+只要字有在注音表內就可以存成詞，請參考前面的說明，支援半型字。
 
 ----------------------
 為什麼有時候gcin的輸入視窗不會跟著程式的游標 ? 這是因為有些程式只支援 root
@@ -462,3 +462,37 @@ rpmbuild -ba gcin.spec
 ----------------------------------------------------------------------------------------------------------
 tsd2a 新增 "-nousecount" 的參數。由於現在 gcin 會統計詞的使用頻率，dump出來的 file 會有 usecount，如果你要比較兩個詞庫時會造成困擾，這時候就可以用這個參數。
 ----------------------------------------------------------------------------------------------------------
+ctrl-space 無法叫出 gcin 的視窗，檢查事項
+
+
+一般看 environ variable 的內容可以用 printenv，由於可以設定 environ variable 的地方太多了，
+用開 terminal 的方式看，不見得一定符合應用程式用的實際值，所以還是直接用 proc file system 最準。
+
+1. pgrep gcin 是否可以看到 gcin 的 process Id(一個數字), 如果可以 goto 3
+2. 直接在 terminal 執行 gcin，看有什麼錯誤訊息。 如果最後一行出現的訊息是
+     IMOpenIM failed. Maybe another XIM server is running.
+     這表示 xcin 可能仍然在執行，試試 pkill xcin再執行 gcin 看看。當然，還是必須修改你的 X window 的 script把執行 xcin 的部份改成 gcin 才能把問題真正解決，也有可能你忘了 logout & login。
+3. 檢查 XMODIFIERS 是否設定成一致的內容。
+	$ pgrep gcin
+	7438
+	$ vi /proc/7438/environ
+        這個 file 是這個 process 所有的 environ variables 的內容，檢查 XMODIFIERS 內容
+         你可以用同樣的方法檢查應用程式的內容，例如 firefox
+         
+ gcin 的XMODIFIERS 可以不設定，但應用程式的就必須設定成 XMODIFIERS=@im=xcin
+   如果有設定，就必須一致，例如都設定成 XMODIFIERS=@im=gcin 也可以。
+
+4. gtk2 程式檢查事項。
+     $ gtk-query-immodules-2.0
+是否有底下的內容，     
+"/usr/lib/gtk-2.0/immodules/im-gcin.so" 
+"gcin" "gcin Input Method" "gtk20" "/usr/share/locale" "*" 
+
+如果沒有，以 root 執行底下的 script 看看
+/usr/share/gcin/script/modify-XIM
+5. 檢查是否有設定 GTK_IM_MODULE=gcin 這個 environ variable，設定成 GTK_IM_MODULE=xim 也是可以用，
+只是 over-the-spot 會有問題，gcin 視窗不會跟著程式的游標移動，除非有 install gtk2 xim over-the-spot 的 patch，還是用 GTK_IM_MODULE=gcin 最好。
+-------------------------------------------------------------------
+覺得 gcin 的釘子不好看，想要換掉。有此需求的的人自己 替換 /usr/share/icons/gcin
+
+

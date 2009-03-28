@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "gtab.h"
 
-int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
+int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol, gcin_font_size_gtab_in;
 int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
@@ -25,6 +25,7 @@ int tsin_chinese_english_toggle_key;
 int gcin_font_size_tsin_pho_in;
 int tsin_disp_status_row;
 int tsin_space_opt;
+int tsin_buffer_size;
 int gcin_chars_big5_only;
 int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
@@ -37,6 +38,8 @@ void load_setttings()
   gcin_font_size_tsin_presel = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PRESEL, 16);
   gcin_font_size_symbol = get_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, 12);
   gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
+  gcin_font_size_gtab_in = get_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, 10);
+
   gcin_chars_big5_only = get_gcin_conf_int(GCIN_CHARS_BIG5_ONLY,0);
   gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);
   gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 1);
@@ -62,6 +65,7 @@ void load_setttings()
                                     TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock);
   tsin_disp_status_row = get_gcin_conf_int(TSIN_DISP_STATUS_ROW, 1);
   tsin_space_opt = get_gcin_conf_int(TSIN_SPACE_OPT, TSIN_SPACE_OPT_SELECT_CHAR);
+  tsin_buffer_size = get_gcin_conf_int(TSIN_BUFFER_SIZE, 40);
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);

@@ -113,8 +113,10 @@ void utf8cpy(char *t, char *s);
 int u8cpy(char *t, char *s);
 int utf8_tlen(char *s, int N);
 void utf8_putchar(char *s);
+gboolean utf8_eq(char *a, char *b);
 gboolean utf8_str_eq(char *a, char *b, int len);
 void utf8cpyN(char *t, char *s, int N);
+int utf8_str_N(char *str);
 
 void get_gcin_dir(char *tt);
 Atom get_gcin_atom(Display *dpy);
@@ -130,3 +132,6 @@ void get_win_size(GtkWidget *win, int *width, int *height);
 
 
 #define BITON(flag, bit) ((flag) & (bit))
+
+extern int gcin_switch_keysN;
+extern char gcin_switch_keys[];

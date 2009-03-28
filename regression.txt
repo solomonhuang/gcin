@@ -2,3 +2,5 @@ cj:   yhmbc, then 2, should be able to select
       yhmbc, type a, should put the first one automatically and enter 'a'
 
 dayi: 6 space keypad6
+
+hsu.kbm: v吃  c失  a疵  ld兒   mj按      jel經   jem間

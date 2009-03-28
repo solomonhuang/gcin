@@ -118,7 +118,7 @@ static void cb_button_sym(GtkButton *button, char *str)
   bzero(pho, sizeof(pho));
 
   if (current_CS->in_method == 6)
-    add_to_tsin_buf(str, pho, strlen(str) / CH_SZ);
+    add_to_tsin_buf(str, pho, utf8_str_N(str));
   else
     send_text_call_back(str);
 }
@@ -194,17 +194,18 @@ static void sym_lookup_key(char *instr, char *outstr)
   if (current_CS->in_method == 3 || current_CS->in_method == 6) {
     str_to_all_phokey_chars(instr, outstr);
   } else {
-
     outstr[0]=0;
 
-    int i;
-    for(i=0; i < strlen(instr); i+= CH_SZ) {
+    while (*instr) {
       char tt[512];
 
       lookup_gtab(instr, tt);
       strcat(outstr, tt);
-      if (i < strlen(instr) - CH_SZ)
-        strcat(outstr, " | ");
+
+      instr+= utf8_sz(instr);
+
+      if (*instr)
+          strcat(outstr, " | ");
     }
   }
 }
@@ -280,7 +281,7 @@ void create_win_sym()
       gtk_container_set_border_width (GTK_CONTAINER (button), 0);
       gtk_box_pack_start (GTK_BOX (hbox_row), button, FALSE, FALSE, 0);
 
-      if (strlen(str) >= CH_SZ) {
+      if (utf8_str_N(str) > 0) {
         char phos[512];
 
         sym_lookup_key(str, phos);

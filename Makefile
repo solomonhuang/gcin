@@ -6,7 +6,8 @@ include config.mak
 
 OBJS=gcin.o IC.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
-     gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o
+     gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o \
+     gcin-switch.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
@@ -16,8 +17,8 @@ OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
-OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o gcin-setup-list.o \
-locale.o gcin-setup-pho.o about.o
+OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
+	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
@@ -64,6 +65,7 @@ tsd2a:  $(OBJS_tsd2a)
 
 gcin2tab:  $(OBJS_gcin2tab)
 	$(CC) -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
+	rm -f data/*.gtab
 
 kbmcv:  $(OBJS_kbmcv)
 	$(CC) -o $@ $(OBJS_kbmcv) $(LDFLAGS)

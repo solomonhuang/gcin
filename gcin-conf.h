@@ -4,6 +4,8 @@
 #define GCIN_FONT_SIZE_TSIN_PRESEL "gcin-font-size-tsin-presel"
 #define GCIN_FONT_SIZE_SYMBOL "gcin-font-size-symbol"
 #define GCIN_FONT_SIZE_TSIN_PHO_IN "gcin-font-size-tsin-pho-in"
+#define GCIN_FONT_SIZE_GTAB_IN "gcin-font-size-gtab-in"
+
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
 #define LEFT_RIGHT_BUTTON_TIPS "left-right-button-tips"
@@ -29,6 +31,7 @@
 #define TSIN_CHINESE_ENGLISH_SWITCH "tsin-chinese-english-switch"
 #define TSIN_DISP_STATUS_ROW "tsin-disp-status-row"
 #define TSIN_SPACE_OPT "tsin-space-opt"
+#define TSIN_BUFFER_SIZE "tsin-buffer-size"
 
 
 #define PHONETIC_KEYBOARD "phonetic-keyboard"
@@ -38,6 +41,7 @@
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_chars_big5_only,
+           gcin_font_size_gtab_in,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in;
@@ -52,7 +56,7 @@ extern int gtab_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int tsin_ec_toggle_key;
-extern int tsin_disp_status_row;
+extern int tsin_disp_status_row, tsin_buffer_size;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;

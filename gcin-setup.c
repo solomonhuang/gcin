@@ -154,6 +154,16 @@ static void cb_ts_edit()
 }
 
 
+static void cb_ts_import_sys()
+{
+  char tt[512];
+
+  sprintf(tt, "cd ~/.gcin && tsd2a tsin > tmpfile && tsd2a %s/tsin >> tmpfile && tsa2d tmpfile", GCIN_TABLE_DIR);
+  dbg("exec %s\n", tt);
+  system(tt);
+}
+
+
 static void cb_alt_shift()
 {
   char tt[512];
@@ -197,7 +207,8 @@ struct {
   { NULL, 0},
 };
 
-static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol, *spinner_tsin_pho_in;
+static GtkWidget *spinner, *spinner_tsin_presel, *spinner_symbol,
+                 *spinner_tsin_pho_in, *spinner_gtab_in;
 
 static gboolean cb_appearance_conf_ok( GtkWidget *widget,
                                    GdkEvent  *event,
@@ -215,6 +226,9 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   int font_size_tsin_pho_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_pho_in));
   save_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, font_size_tsin_pho_in);
+
+  int font_size_gtab_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gtab_in));
+  save_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, font_size_gtab_in);
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
   gtk_widget_destroy(gcin_appearance_conf_window); gcin_appearance_conf_window = NULL;
@@ -284,6 +298,14 @@ void create_appearance_conf_window()
    (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_pho_in, 8.0, 24.0, 1.0, 1.0, 0.0);
   spinner_tsin_pho_in = gtk_spin_button_new (adj_tsin_pho_in, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_font_size_tsin_pho_in), spinner_tsin_pho_in);
+
+  GtkWidget *frame_font_size_gtab_in = gtk_frame_new("gtab(倉頡…)輸入區字型大小");
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_font_size_gtab_in, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_font_size_gtab_in), 3);
+  GtkAdjustment *adj_gtab_in =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 8.0, 24.0, 1.0, 1.0, 0.0);
+  spinner_gtab_in = gtk_spin_button_new (adj_gtab_in, 0, 0);
+  gtk_container_add (GTK_CONTAINER (frame_font_size_gtab_in), spinner_gtab_in);
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
@@ -627,6 +649,10 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_ts_edit), "clicked",
                     G_CALLBACK (cb_ts_edit), NULL);
 
+  GtkWidget *button_ts_import_sys = gtk_button_new_with_label("匯入系統的詞庫");
+  gtk_box_pack_start (GTK_BOX (vbox), button_ts_import_sys, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_ts_import_sys), "clicked",
+                    G_CALLBACK (cb_ts_import_sys), NULL);
 
   GtkWidget *button_alt_shift = gtk_button_new_with_label("alt-shift 片語編輯");
   gtk_box_pack_start (GTK_BOX (vbox), button_alt_shift, TRUE, TRUE, 0);

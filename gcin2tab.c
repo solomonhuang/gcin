@@ -241,7 +241,7 @@ int main(int argc, char **argv)
 
   cmd_arg(tt,&cmd, &arg);
   if (!sequ(cmd,"%dupsel") || !(*arg) ) {
-    th.M_DUP_SEL = 10;
+    th.M_DUP_SEL = strlen(th.selkey);
   }
   else {
     th.M_DUP_SEL=atoi(arg);
@@ -285,10 +285,14 @@ int main(int argc, char **argv)
       cmd_arg(tt,&cmd, &arg);
       if (sequ(cmd,"%quick")) break;
       k=kno[mtolower(cmd[0])]-1;
-      len=strlen(arg);
 
-      for(i=0; i<len; i+=CH_SZ)
-        bchcpy(th.qkeys.quick1[(int)k][i/CH_SZ], &arg[i]);
+      int N = 0;
+      char *p = arg;
+
+      while (*p) {
+        bchcpy(th.qkeys.quick1[(int)k][N++], p);
+        p+=utf8_sz(p);
+      }
 
       quick_def++;
     }

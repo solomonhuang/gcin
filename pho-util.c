@@ -98,7 +98,7 @@ static int qcmp_pho_count(const void *aa, const void *bb)
 }
 
 
-int utf8_pho_keys(char *big5, phokey_t *phkeys)
+int utf8_pho_keys(char *utf8, phokey_t *phkeys)
 {
   int i;
   int ofs=0;
@@ -107,7 +107,7 @@ int utf8_pho_keys(char *big5, phokey_t *phkeys)
 
   do {
     for(; ofs < ch_phoN; ofs++)
-      if (!bchcmp(big5, ch_pho[ofs].ch))
+      if (utf8_eq(utf8, ch_pho[ofs].ch))
         break;
 
     if (ofs==ch_phoN)
@@ -125,6 +125,8 @@ int utf8_pho_keys(char *big5, phokey_t *phkeys)
   } while (ofs < ch_phoN);
 
 ret:
+
+  dbg("%s %d\n", utf8, phkeysN);
   qsort(phcou, phkeysN, sizeof(PH_COUNT), qcmp_pho_count);
 
   for(i=0; i < phkeysN; i++)
@@ -136,30 +138,30 @@ ret:
 char *phokey_to_str(phokey_t kk)
 {
   u_int k1,k2,k3,k4;
-  static u_char phchars[CH_SZ * 4 + 1];
+  static u_char phchars[PHO_CHAR_LEN * 4 + 1];
   int phcharsN=0;
 
   k4=(kk&7);
   kk>>=3;
-  k3=(kk&15) * CH_SZ;
+  k3=(kk&15) * PHO_CHAR_LEN;
   kk>>=4;
-  k2=(kk&3) * CH_SZ;
+  k2=(kk&3) * PHO_CHAR_LEN;
   kk>>=2;
-  k1=(kk&31) * CH_SZ;
+  k1=(kk&31) * PHO_CHAR_LEN;
 
   if (k1) {
     bchcpy(phchars, &pho_chars[0][k1]);
-    phcharsN+=CH_SZ;
+    phcharsN+=PHO_CHAR_LEN;
   }
 
   if (k2) {
     bchcpy(&phchars[phcharsN], &pho_chars[1][k2]);
-    phcharsN+=CH_SZ;
+    phcharsN+=PHO_CHAR_LEN;
   }
 
   if (k3)  {
     bchcpy(&phchars[phcharsN], &pho_chars[2][k3]);
-    phcharsN+=CH_SZ;
+    phcharsN+=PHO_CHAR_LEN;
   }
 
   if (k4)
@@ -172,16 +174,15 @@ char *phokey_to_str(phokey_t kk)
 
 void str_to_all_phokey_chars(char *b5_str, char *out)
 {
-  int len=strlen(b5_str);
-
   out[0]=0;
 
-  int h;
-
-  for(h=0; h < strlen(b5_str); h+=CH_SZ) {
+  while (*b5_str) {
     phokey_t phos[32];
 
-    int n=utf8_pho_keys(&b5_str[h], phos);
+    int n=utf8_pho_keys(b5_str, phos);
+
+//    utf8_putchar(b5_str);
+//    dbg("n %d\n", n);
 
     int i;
     for(i=0; i < n; i++) {
@@ -191,7 +192,9 @@ void str_to_all_phokey_chars(char *b5_str, char *out)
         strcat(out, " ");
     }
 
-    if (h < len - CH_SZ)
+    b5_str+=utf8_sz(b5_str);
+
+    if (*b5_str)
       strcat(out, " | ");
   }
 }
