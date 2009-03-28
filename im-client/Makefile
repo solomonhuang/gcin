@@ -21,16 +21,8 @@ libgcin-im-client.so:   $(OBJS)
 LOCALLIB=/usr/local/$(LIB)
 
 install:
-	install -d $(libdir)
-	if [ $(prefix) = /usr/local ]; then \
-	  ! [ -d $(LOCALLIB) ] && mkdir $(LOCALLIB) ; \
-	  install -m 755 libgcin-im-client.so $(LOCALLIB); \
-	  grep $(LOCALLIB) /etc/ld.so.conf > /dev/null 2>&1 || \
-	  echo $(LOCALLIB) >> /etc/ld.so.conf; \
-	  PATH=/sbin:/usr/sbin:$(PATH); ldconfig; \
-	else \
-	  install -m 755 libgcin-im-client.so $(libdir); \
-	fi; \
+	install -d $(gcinlibdir)
+	install -m 755 libgcin-im-client.so $(gcinlibdir)
 	install -d $(includedir); \
 	install -m 444 gcin-im-client.h $(includedir)
 

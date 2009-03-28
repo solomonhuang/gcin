@@ -38,8 +38,15 @@ static void create_win_message(char *icon, char *text, int duration)
   get_win_size(gwin_message, &width, &height);
 
   oy -= height;
+  if (oy + height > dpy_yl)
+    oy = dpy_yl - height;
   if (oy < 0)
     oy = 0;
+
+  if (ox + width > dpy_xl)
+    ox = dpy_xl - width;
+  if (ox < 0)
+    ox = 0;
 
   gtk_window_move(GTK_WINDOW(gwin_message), ox, oy);
 

@@ -16,8 +16,6 @@ void prph(phokey_t kk)
   int i;
 
   for(i=0; i < 3; i++) {
-    int j;
-
     if (!k[i])
       continue;
 

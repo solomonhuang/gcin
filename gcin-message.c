@@ -1,11 +1,19 @@
 #include "gcin.h"
 
+void print_help()
+{
+  p_err("usage: gcin-message -icon file_name -text string -duration milli_seconds\n");
+}
+
 int main(int argc, char **argv)
 {
   int i;
   char text[128];
   char icon[128];
   int duration = 3000;
+
+  if (argc < 3)
+    print_help();
 
   strcpy(text, "-");
   strcpy(icon, "-");
@@ -21,7 +29,6 @@ int main(int argc, char **argv)
       duration = atoi(argv[i+1]);
     } else {
       dbg("unknown opt %s", argv[i]);
-      p_err("usage: %s -icon file_name -text string -duration milli_seconds\n", argv[0]);
     }
   }
 

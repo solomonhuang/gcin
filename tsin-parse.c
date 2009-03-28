@@ -48,8 +48,9 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
     pbest[0].len = 1;
     pbest[0].start = start;
     utf8cpy(pbest[0].str, chpho[start].ch);
-//    utf8_putchar(chpho[start].ch); dbg("\n");
-    pbestscore = 0;
+#if 0
+    utf8_putchar(chpho[start].ch); dbg("\n");
+#endif
 
     extract_pho(start, plen, pp);
 
@@ -66,6 +67,9 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
       usecount_t usecount;
 
       load_tsin_entry(sti, &match_len, &usecount, mtk, mtch);
+
+      if (match_len < plen)
+        continue;
 
       if (check_fixed_mismatch(start, mtch, plen))
         continue;

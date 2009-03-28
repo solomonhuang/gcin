@@ -188,7 +188,6 @@ gboolean inph_typ_pho(int newkey)
   }
 
   int max_in_idx;
-
   for(max_in_idx=3; max_in_idx>=0 && !typ_pho[max_in_idx]; max_in_idx--);
 
   // try insert mode first
@@ -216,12 +215,12 @@ gboolean inph_typ_pho(int newkey)
 
       if (num) {
         inph[typ] = newkey;
+        typ_pho[typ] = num;
         insert = typ;
         break;
       }
     }
   }
-
 
 //  dbg("newkey %c\n", newkey);
 

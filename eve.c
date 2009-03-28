@@ -138,7 +138,6 @@ void send_text(char *text)
     }
 
     if (pid) {
-      signal(SIGPIPE, SIG_IGN);
       close(pfdw[0]);
       close(pfdr[1]);
       write(pfdw[1], text, len);

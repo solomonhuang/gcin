@@ -1,4 +1,16 @@
 ** UTF-8 encoding **
+1.2.8:
+- 注音只能依順序輸入的問題。例如輸入ㄅㄧㄠ，不行輸入ㄅㄠ後再加ㄧ。
+- gcin-message 不加任何參數去執行會導致 tray notification area coredump。現在會出現 usage。
+- gnome/gtk 的程式裏面，如果你用其他語系的鍵盤例如latin，現在可以用右邊的 Alt 輸入特殊字母了。
+- win-message 超出範圍的問題。
+- libgcin-im-client.so 及 部份功能搬到 /usr/local/lib/gcin 裡的.so，這樣就變成有需要才會 load 進來。gtk-im 及 qt-im 已經指定 /usr/local/lib/gcin 為 linking path，不會受到任何影響。如果有直接使用 libgcin-im-client.so 的 mrxvt/crxvt，可以直接 cd /usr/local/lib; rm libgcin-im-client.so; ln -s gcin/libgcin-im-client.so .，這樣可以減少memory 的使用且以後比較不會有不相容的問題。
+- 如果用 gcin filter，ps 會看到很多殘留 zombie process 的問題。
+   17424 tty3     00:00:00 gcin-filter <defunct>
+- 新增 /usr/share/gcin/script/noseeing-inst，執行後可以自動安裝 LGJ's noseeing(X蝦米)。
+- gtab.list 新增內碼輸入法的 filename intcode.png
+- new gtk-im 加入 "seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape"
+
 1.2.7:
 - 單字的詞現在不會在選詞時顯示了。
 - 某些時候在選詞的視窗詞會重複列出的問題。

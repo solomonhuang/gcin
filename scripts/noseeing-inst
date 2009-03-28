@@ -1,0 +1,14 @@
+nosee=noseeing-6.tar.gz
+cd
+[ -d tmp ] || mkdir tmp
+cd tmp
+wget http://edt1023.sayya.org/misc/$nosee
+[ -f $nosee ] || echo "file $nosee was not downloaded"
+tar xvfz noseeing-6.tar.gz
+if [ $? != 0 ]; then
+  echo "tar error, maybe the file $nosee is not complete"
+  exit -1
+fi
+mv noseeing.gtab ~/.gcin
+echo "*******************************"
+echo "Installation completed. Press ctrl-alt-9 to activate boshiamy"

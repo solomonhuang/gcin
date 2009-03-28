@@ -2,12 +2,18 @@ OPTFLAGS=-g
 
 include config.mak
 
-.SUFFIXES:	.c .o .E
+.SUFFIXES:	.c .o .E .pico
 
-OBJS=gcin.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
-     win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
-     gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o \
-     gcin-switch.o tray.o eggtrayicon.o tsin-parse.o win-message.o
+gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o win-pho-near.o tsin-parse.o
+gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
+gcin_gtab_o = gtab.o win-gtab.o gtab-util.o
+
+GCIN_SO= gcin1.so
+
+OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o \
+     gcin-switch.o tray.o eggtrayicon.o $(GCIN_SO) \
+     $(gcin_tsin_o) $(gcin_pho_o) $(gcin_gtab_o)
+
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
@@ -27,6 +33,8 @@ OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
 OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
+
+
 WALL=-Wall
 CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\"  -DDOC_DIR=\"$(DOC_DIR)\" \
@@ -47,6 +55,8 @@ im-srv = im-srv/im-srv.a
 
 .c.E:
 	$(CC) $(CFLAGS) -E -o $@ $<
+.c.pico:
+	$(CC) $(CFLAGS) -c -fpic -o $@ $<
 
 PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message
@@ -60,6 +70,7 @@ all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
+	export LD_RUN_PATH=.:$(gcinlibdir) ;\
 	$(CC) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 	ln -sf $@ $@.test
@@ -113,21 +124,42 @@ gcin-message:	$(OBJS_gcin_message)
 pin-juyin:	$(OBJS_pin_juyin)
 	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
 
+gcin1_so= intcode.pico win-int.pico win-message.pico phrase.pico win-sym.pico win-inmd-switch.pico
+gcin1.so: $(gcin1_so)
+	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
+
+### making the following as .so actuall makes the RSS larger
+gcin_gtab_so = gtab.pico win-gtab.pico gtab-util.pico
+gcin-gtab.so: $(gcin_gtab_so)
+	$(CC) $(SO_FLAGS) -o $@  $(gcin_gtab_so) $(LDFLAGS)
+
+gcin_tsin_so = tsin.pico tsin-util.pico win0.pico win1.pico win-pho-near.pico tsin-parse.pico
+gcin-tsin.so: $(gcin_tsin_so)
+	$(CC) -shared -o $@  $(gcin_tsin_so) $(LDFLAGS)
+
+gcin_pho_so=win-pho.pico pho.pico pho-util.pico pho-sym.pico table-update.pico pho-dbg.pico
+gcin-pho.so: $(gcin_pho_so)
+	$(CC) -shared -fPIC -o $@ $(gcin_pho_so) $(LDFLAGS)
+
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
 
 $(im-srv):
 	$(MAKE) -C im-srv
 
+
 ibin:
-	   install $(PROGS) $(bindir); \
-	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim
+	install $(PROGS) $(bindir); \
+	rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim
+	install $(GCIN_SO) $(gcinlibdir)
 
 install:
 	install -d $(datadir)/icons
 	install gcin.png $(datadir)/icons
 	install -d $(GCIN_ICON_DIR_i)
 	install -m 644 icons/* $(GCIN_ICON_DIR_i)
+	install -d $(gcinlibdir)
+	install $(GCIN_SO) $(gcinlibdir)
 	install -d $(bindir)
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
@@ -158,7 +190,7 @@ clean:
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
 	$(MAKE) -C menu clean
-	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) \
+	rm -f *.o *~ *.E *.db *.pico *.so config.mak tags core.* $(PROGS) $(PROGS_CV) \
 	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.* tscr/*~ \
 	trad2sim gcin.spec.tmp gcin.log
 

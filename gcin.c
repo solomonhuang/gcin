@@ -467,6 +467,9 @@ int main(int argc, char **argv)
   char *lc_utf8;
   char *lc;
 
+  signal(SIGCHLD, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
+
   if (lc_ctype && strstr(lc_ctype, "en") /* || lang && strstr(lang, "en") */){
     lc = "en_US";
     enc = "UTF-8";

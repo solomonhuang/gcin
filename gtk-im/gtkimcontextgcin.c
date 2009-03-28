@@ -173,7 +173,8 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 #if NEW_GTK_IM
   int pid = getpid();
 // probably only works for linux
-  static char *moz[]={"mozilla", "firefox", "thunderbird", "nvu"};
+  static char *moz[]={"mozilla", "firefox", "thunderbird", "nvu", "sunbird",
+		"seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape"};
   char tstr0[64];
   char exec[256];
   sprintf(tstr0, "/proc/%d/exe", pid);
@@ -195,7 +196,9 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 static void
 gtk_im_context_gcin_finalize (GObject *obj)
 {
-//  printf("gtk_im_context_gcin_finalize\n");
+#if 0
+  printf("gtk_im_context_gcin_finalize\n");
+#endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (obj);
 
   if (context_xim->gcin_ch) {
@@ -339,10 +342,11 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 
   gchar static_buffer[256];
-  gchar *buffer = static_buffer;
+  unsigned char *buffer = static_buffer;
+//  char *buffer = static_buffer;
   gint buffer_size = sizeof(static_buffer) - 1;
   gint num_bytes = 0;
-  KeySym keysym;
+  KeySym keysym = 0;
   Status status;
   gboolean result = FALSE;
   GdkWindow *root_window = gdk_screen_get_root_window (gdk_drawable_get_screen (event->window));
@@ -366,6 +370,21 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   char *rstr = NULL;
   num_bytes = XLookupString (&xevent, buffer, buffer_size, &keysym, NULL);
 
+#if 1
+  // If it is latin key, XLookupString only works for UTF-8 env
+  int uni = gdk_keyval_to_unicode(event->keyval);
+  if (uni) {
+    unsigned int rn;
+    GError *err = NULL;
+    char *utf8 = g_convert((char *)&uni, 4, "UTF-8", "UTF-32", &rn, &num_bytes, &err);
+
+    if (utf8) {
+      strcpy(buffer, utf8);
+      g_free(utf8);
+    }
+  }
+#endif
+
   if (xevent.type == KeyPress) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
@@ -376,6 +395,8 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
       add_cursor_timeout(context_xim);
     }
 #endif
+
+//    printf("jj %x %x %d %x\n", rstr, result, num_bytes, (unsigned int)buffer[0]);
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f
         && !(xevent.state & (Mod1Mask|ControlMask))) {
       rstr = (char *)malloc(num_bytes + 1);
@@ -388,9 +409,10 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
   }
-
-//  printf("event->type:%d iiiii %d\n", event->type, result);
-
+#if 0
+  printf("event->type:%d iiiii %d  %x %d rstr:%x\n", event->type, result, keysym,
+    num_bytes, rstr);
+#endif
   if (rstr) {
 //    printf("emit %s\n", rstr);
     g_signal_emit_by_name (context, "commit", rstr);
@@ -462,7 +484,9 @@ gtk_im_context_gcin_set_use_preedit (GtkIMContext *context,
 static void
 gtk_im_context_gcin_reset (GtkIMContext *context)
 {
-//  printf("gtk_im_context_gcin_reset\n");
+#if 0
+  printf("gtk_im_context_gcin_reset\n");
+#endif
 }
 
 /* Mask of feedback bits that we render
@@ -498,7 +522,8 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 void
 gtk_im_context_gcin_shutdown (void)
 {
+// printf("shutdown\n");
 #if NEW_GTK_IM && 0
-  cancel_timeout();
+  cancel_timeout(context_xim);
 #endif
 }

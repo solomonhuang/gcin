@@ -13,3 +13,4 @@ sleep 1
 export LD_PRELOAD=./im-client/libgcin-im-client.so
 #gedit
 leafpad
+pkill gcin.test

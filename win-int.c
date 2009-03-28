@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "intcode.h"
 
-GtkWidget *gwin_int;
+static GtkWidget *gwin_int;
 extern int current_intcode;
 
 static GtkWidget *button_int;
@@ -22,7 +22,7 @@ static void minimize_win()
   gtk_window_resize(GTK_WINDOW(gwin_int), 10, 10);
 }
 
-void adj_intcode_buttons()
+static void adj_intcode_buttons()
 {
   int i;
 
@@ -86,7 +86,7 @@ void clear_int_code(int index)
 
 
 
-void switch_intcode()
+static void switch_intcode()
 {
   current_intcode ^= 1;
   adj_intcode_buttons();

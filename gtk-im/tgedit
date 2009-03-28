@@ -3,4 +3,5 @@ export XMODIFIERS=@im=gcin
 export LD_LIBRARY_PATH="../im-client"
 
 export LD_PRELOAD=./im-gcin.so
-gedit
+#gedit
+valgrind gedit

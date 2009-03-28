@@ -22,6 +22,7 @@ all:	libqgcin.so
 	$(CXX) -c -pipe $(CXXFLAGS) $(INCS) $<_moc.cpp -o $@
 
 libqgcin.so: $(OBJS)
+	export LD_RUN_PATH=$(gcinlibdir) ;\
 	$(CXX) -fno-exceptions -shared -o $@ $(OBJS) $(LDFLAGS)
 	rm -f core.*
 install:
