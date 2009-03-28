@@ -105,48 +105,53 @@ void create_win_pho_near(phokey_t pho)
 
     for (group2=find_group(2, t_typ_pho[2]); *group2 >=0; group2++) {
       mtyp_pho[2] = *group2;
+      int pitch;
+
+      for (mtyp_pho[3]=0;  mtyp_pho[3]< 5; mtyp_pho[3]++) {
 //      dbg("  %d\n",mtyp_pho[2]);
-      phokey_t pk = pho2key(mtyp_pho);
-      char *pho_str = phokey_to_str(pk);
+        phokey_t pk = pho2key(mtyp_pho);
+        char *pho_str = phokey_to_str(pk);
+        int start_i, stop_i;
 
-      if (b_first) {
-        b_first = FALSE;
-      } else {
-        GtkWidget *separator = gtk_hseparator_new ();
-        gtk_box_pack_start (GTK_BOX (vbox_top), separator, FALSE, FALSE, 0);
-      }
+        if (!get_start_stop_idx(pk, &start_i, &stop_i))
+          continue;
 
-      GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
-      gtk_box_pack_start (GTK_BOX (vbox_top), hbox, FALSE, FALSE, 0);
+        if (b_first) {
+          b_first = FALSE;
+        } else {
+          GtkWidget *separator = gtk_hseparator_new ();
+          gtk_box_pack_start (GTK_BOX (vbox_top), separator, FALSE, FALSE, 0);
+        }
 
-      GtkWidget *label_pho = gtk_label_new(pho_str);
-      gtk_box_pack_start (GTK_BOX (hbox), label_pho, FALSE, FALSE, 0);
-      set_label_font_size(label_pho, gcin_font_size_pho_near);
+        GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (vbox_top), hbox, FALSE, FALSE, 0);
 
-      int start_i, stop_i;
-      if (!get_start_stop_idx(pk, &start_i, &stop_i))
-        continue;
-
-
-      int i;
-      for(i=start_i; i<stop_i; i++) {
-        char tt[CH_SZ+1];
-        bzero(tt, sizeof(tt));
-        utf8cpy(tt, ch_pho[i].ch);
-
-        GtkWidget *button = gtk_button_new();
-        gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
-
-        GtkWidget *label_pho = gtk_label_new(tt);
-        gtk_container_add (GTK_CONTAINER (button), label_pho);
+        GtkWidget *label_pho = gtk_label_new(pho_str);
+        gtk_box_pack_start (GTK_BOX (hbox), label_pho, FALSE, FALSE, 0);
         set_label_font_size(label_pho, gcin_font_size_pho_near);
 
-        near_entries = trealloc(near_entries, NEAR_ENTRY, near_entriesN);
-        near_entries[near_entriesN].label = label_pho;
-        near_entries[near_entriesN].pk = pk;
-        g_signal_connect (G_OBJECT (button), "clicked",
-                    G_CALLBACK (cb_sel), GINT_TO_POINTER(near_entriesN));
-        near_entriesN++;
+
+        int i;
+        for(i=start_i; i<stop_i; i++) {
+          char tt[CH_SZ+1];
+          bzero(tt, sizeof(tt));
+          utf8cpy(tt, ch_pho[i].ch);
+
+          GtkWidget *button = gtk_button_new();
+          gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+
+          GtkWidget *label_pho = gtk_label_new(tt);
+          gtk_container_add (GTK_CONTAINER (button), label_pho);
+          set_label_font_size(label_pho, gcin_font_size_pho_near);
+
+          near_entries = trealloc(near_entries, NEAR_ENTRY, near_entriesN);
+          near_entries[near_entriesN].label = label_pho;
+          near_entries[near_entriesN].pk = pk;
+          g_signal_connect (G_OBJECT (button), "clicked",
+                      G_CALLBACK (cb_sel), GINT_TO_POINTER(near_entriesN));
+
+          near_entriesN++;
+        }
       }
     }
   }

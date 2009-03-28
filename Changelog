@@ -1,5 +1,14 @@
 ** UTF-8 encoding **
-1.1.8: 
+1.1.9:
+- .gtab 新增CapsLock 打開輸入英數(大寫)的選項，內定是開啟的，可以在 gcin-setup 中設定。
+- 在 firefox search text entry 現在輸入時不會被 firefox 的 history window 擋住。必須 install新的 im-gcin.so & libgcin-im-client.so。
+- 符號視窗 (symbol-table) 現在可以用 # 當 comment。
+- symbol-table 現在可以定義不同的頁，用空白行分頁，用滑鼠滾輪捲動。
+- 近似音查詢會列出所有的聲調變化。
+- gcin-setup 叫出簡體字->正體字以後，gcin-setup 會自動結束。
+- 新增用 ctrl-alt-, 開啟/關閉符號輸入視窗。
+
+1.1.8: (2005/4/3)
 - 詞音英數的字在某些情況會與後來輸入的字結合變成詞的問題。
 - 倉頡(cj*.cin) 空白鍵的處理方式改成與行列一樣，在按滿 5 鍵後，按空白仍然不會送出第一字。目前 Windows 的倉頡也是這樣，如果想回復成以前的方式，可以用 gcin-setup 指定或是修改 cj*.cin。
 - 倉頡按 afmbc，如果預選及顯示部份符合的字關掉，只會在按空白鍵後才顯示。

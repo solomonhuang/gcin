@@ -5,6 +5,7 @@
 #include <string.h>
 #include <gcin.h>
 #include "gcin-protocol.h"
+#include "gcin-im-client.h"
 #include "im-srv.h"
 
 #define DBG 0
@@ -171,6 +172,11 @@ void process_client_req(int fd)
          cs->spot_location.x, cs->spot_location.y);
 #endif
       update_in_win_pos();
+      break;
+    case GCIN_req_set_flags:
+      if (BITON(req.flag, FLAG_GCIN_client_handle_raise_window)) {
+        cs->b_raise_window = TRUE;
+      }
       break;
     default:
       dbg_time("Invalid request %x from:", req.req_no);

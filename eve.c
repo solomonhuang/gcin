@@ -13,6 +13,7 @@ static IMForwardEventStruct *current_forward_eve;
 
 static char callback_str_buffer[32];
 Window focus_win;
+static int timeout_handle;
 
 static void send_fake_key_eve()
 {
@@ -187,6 +188,9 @@ void hide_in_win(ClientState *cs)
   dbg("hide_in_win %d\n", ic->in_method);
 #endif
 
+  g_source_remove(timeout_handle);
+  timeout_handle = 0;
+
   switch (cs->in_method) {
     case 3:
       hide_win_pho();
@@ -236,6 +240,7 @@ void show_in_win(ClientState *cs)
 
   show_win_stautus();
 }
+
 
 void move_win_gtab(int x, int y);
 void move_win_int(int x, int y);
@@ -614,6 +619,14 @@ int feedkey_intcode(KeySym key);
 void tsin_set_eng_ch(int nmod);
 static KeySym last_keysym;
 
+gboolean timeout_raise_window()
+{
+  timeout_handle = 0;
+  show_in_win(current_CS);
+  return FALSE;
+}
+
+
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
@@ -677,6 +690,12 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       return TRUE;
     }
 
+    if (keysym == ',') {
+      create_win_sym();
+
+      return TRUE;
+    }
+
     int kidx = gcin_switch_keys_lookup(keysym);
     if (kidx < 0)
       return FALSE;
@@ -701,6 +720,9 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
      return TRUE;
   }
 
+  if (current_CS->b_raise_window && !timeout_handle) {
+    timeout_handle = g_timeout_add(200, timeout_raise_window, NULL);
+  }
 
   switch(current_CS->in_method) {
     case 3:

@@ -632,6 +632,9 @@ void show_win0()
   gtk_widget_show(gwin0);
 //  dbg("show_win0 b\n");
   show_win_sym();
+
+  if (current_CS->b_raise_window)
+    gtk_window_present(gwin0);
 }
 
 void hide_selections_win();

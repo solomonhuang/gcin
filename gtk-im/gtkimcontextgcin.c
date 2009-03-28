@@ -139,6 +139,10 @@ get_im (GtkIMContextGCIN *context_xim)
 
     g_signal_connect (display, "closed",
                       G_CALLBACK (gcin_display_closed), context_xim);
+
+    if (context_xim->is_mozilla)
+      gcin_im_client_set_flags(context_xim->gcin_ch,
+        FLAG_GCIN_client_handle_raise_window);
   }
 }
 

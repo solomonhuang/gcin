@@ -14,6 +14,7 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_shift_phrase_key,
                  *check_button_gtab_hide_row2,
                  *check_button_gtab_in_row1,
+                 *check_button_gtab_capslock_in_eng,
                  *check_button_root_style_use,
                  *check_button_gcin_pop_up_win,
                  *check_button_gcin_pop_up_win_abs_corner,
@@ -517,6 +518,10 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_IN_ROW1,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_in_row1)));
 
+  save_gcin_conf_int(GTAB_CAPSLOCK_IN_ENG,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_capslock_in_eng)));
+
+
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
@@ -727,6 +732,17 @@ void create_gtab_conf_window()
        gtab_in_row1);
 
 
+    GtkWidget *hbox_gtab_capslock_in_eng = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_capslock_in_eng, FALSE, FALSE, 0);
+    GtkWidget *label_gtab_capslock_in_eng = gtk_label_new("CapsLock 打開輸入英數");
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_capslock_in_eng), label_gtab_capslock_in_eng,  FALSE, FALSE, 0);
+    check_button_gtab_capslock_in_eng = gtk_check_button_new ();
+    gtk_box_pack_start (GTK_BOX (hbox_gtab_capslock_in_eng), check_button_gtab_capslock_in_eng,  FALSE, FALSE, 0);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_capslock_in_eng),
+       gtab_capslock_in_eng);
+
+
     GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
 
@@ -777,6 +793,7 @@ static void cb_gb_output_toggle()
 static void cb_gb_translate_toggle()
 {
   system(GCIN_BIN_DIR"/sim2trad &");
+  exit(0);
 }
 
 

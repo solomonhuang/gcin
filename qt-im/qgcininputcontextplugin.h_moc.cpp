@@ -1,7 +1,7 @@
 /****************************************************************************
 ** QGCINInputContextPlugin meta object code from reading C++ file 'qgcininputcontextplugin.h'
 **
-** Created: Fri Mar 3 10:21:29 2006
+** Created: Tue Apr 25 16:30:52 2006
 **      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.5   edited Sep 2 14:41 $)
 **
 ** WARNING! All changes made in this file will be lost!

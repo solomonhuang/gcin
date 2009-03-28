@@ -3,5 +3,7 @@ export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
 ../gcin.test &
 sleep 1
+export LD_LIBRARY_PATH="../im-client"
+export LD_PRELOAD=../gtk-im/im-gcin.so
 mozilla-firefox
 pkill gcin.test

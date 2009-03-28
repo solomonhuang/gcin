@@ -483,6 +483,9 @@ void show_win_gtab()
     return;
 
   gtk_widget_show(gwin_gtab);
+  if (current_CS->b_raise_window)
+    gtk_window_present(gwin_gtab);
+
   show_win_sym();
 }
 

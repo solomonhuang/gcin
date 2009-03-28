@@ -5,6 +5,7 @@
 #include "win-sym.h"
 
 static GtkWidget *gwin_sym = NULL;
+static int cur_in_method;
 
 typedef struct {
   char **sym;
@@ -14,8 +15,16 @@ typedef struct {
 static SYM_ROW *syms;
 static int symsN;
 
+typedef struct {
+  SYM_ROW *syms;
+  int symsN;
+} PAGE;
+
+static PAGE *pages;
+static int pagesN;
+static int idx;
+
 extern char *TableDir;
-static GtkWidget *win_syms[MAX_GTAB_NUM_KEY+1];
 
 FILE *watch_fopen(char *filename, time_t *pfile_modify_time)
 {
@@ -46,6 +55,19 @@ FILE *watch_fopen(char *filename, time_t *pfile_modify_time)
   return fp;
 }
 
+static void save_page()
+{
+  if (!symsN)
+    return;
+
+  pages=trealloc(pages, PAGE, pagesN+1);
+  pages[pagesN].syms = syms;
+  pages[pagesN].symsN = symsN;
+  pagesN++;
+  syms = NULL;
+  symsN = 0;
+}
+
 
 static gboolean read_syms()
 {
@@ -56,15 +78,22 @@ static gboolean read_syms()
   if ((fp=watch_fopen(symbol_table, &file_modify_time))==NULL)
     return FALSE;
 
-  int i;
-  for(i=0; i < symsN; i++) {
-    int j;
-    for(j=0; j < syms[i].symN; j++)
-      if (syms[i].sym[j])
-        free(syms[i].sym[j]);
+  int pg;
+  for(pg=0; pg < pagesN; pg++) {
+    syms = pages[pg].syms;
+    symsN = pages[pg].symsN;
+
+    int i;
+    for(i=0; i < symsN; i++) {
+      int j;
+      for(j=0; j < syms[i].symN; j++)
+        if (syms[i].sym[j])
+          free(syms[i].sym[j]);
+    }
+    free(syms);
   }
-  free(syms); syms=NULL;
-  symsN=0;
+  pagesN = 0; pages = NULL;
+  syms = NULL; symsN = 0;
 
 
   while (!feof(fp)) {
@@ -72,16 +101,21 @@ static gboolean read_syms()
 
     bzero(tt, sizeof(tt));
     fgets(tt, sizeof(tt), fp);
+//    dbg(tt);
     int len=strlen(tt);
 
     if (!len)
       continue;
 
-    if (tt[len-1]=='\n')
+    if (tt[len-1]=='\n') {
       tt[len-1]=0;
-
-    if (!strlen(tt))
+      if (tt[0]==0)
+        save_page();
+    } else
       break;
+
+    if (tt[0]=='#')
+      continue;
 
     char *p=tt;
 
@@ -103,11 +137,26 @@ static gboolean read_syms()
 
       p = n + 1;
     }
+
+    if (!psym->symN) {
+      free(syms);
+      syms=NULL;
+      symsN=0;
+    }
   }
 
+  if (symsN)
+    save_page();
+
   fclose(fp);
+
+  idx = 0;
+  syms = pages[idx].syms;
+  symsN = pages[idx].symsN;
+
   return TRUE;
 }
+
 
 gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len);
 void send_text_call_back(char *text);
@@ -142,7 +191,6 @@ extern int win_status_y;
 
 void move_win_sym()
 {
-  gwin_sym = win_syms[current_CS->in_method];
 #if 0
   dbg("move_win_sym %d\n", current_CS->in_method);
 #endif
@@ -189,8 +237,6 @@ static gboolean win_sym_enabled=0;
 
 void hide_win_sym()
 {
-  gwin_sym = win_syms[current_CS->in_method];
-
   if (!gwin_sym)
     return;
 
@@ -201,8 +247,6 @@ void show_win_sym()
 {
   if (!current_CS)
     return;
-
-  gwin_sym = win_syms[current_CS->in_method];
 
   if (!gwin_sym || !win_sym_enabled || current_CS->im_state == GCIN_STATE_DISABLED)
     return;
@@ -238,6 +282,39 @@ static void sym_lookup_key(char *instr, char *outstr)
   }
 }
 
+static void destory_win()
+{
+  if (gwin_sym)
+    gtk_widget_destroy(gwin_sym);
+  gwin_sym = NULL;
+}
+
+
+gboolean  button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
+{
+  int winx,winy,i;
+
+  if (pagesN < 2)
+    return;
+
+  switch (event->direction) {
+    case GDK_SCROLL_UP:
+      idx--;
+      if (idx < 0)
+        idx = pagesN - 1;
+      break;
+    case GDK_SCROLL_DOWN:
+      idx = (idx+1) % pagesN;
+      break;
+  }
+
+  syms = pages[idx].syms;
+  symsN = pages[idx].symsN;
+  destory_win();
+  win_sym_enabled = 0;
+  create_win_sym();
+}
+
 
 void create_win_sym()
 {
@@ -250,27 +327,20 @@ void create_win_sym()
     p_err("bad current_CS %d\n", current_CS->in_method);
   }
 
-
-  gwin_sym = win_syms[current_CS->in_method];
-
   if (current_CS->in_method != 3 && current_CS->in_method != 6 && !cur_inmd)
     return;
 
-  if (read_syms()) {
-    if (gwin_sym)
-      gtk_widget_destroy(gwin_sym);
-    win_syms[current_CS->in_method] = gwin_sym = NULL;
+  if (read_syms() || cur_in_method != current_CS->in_method) {
+    destory_win();
   } else {
     if (!syms)
       return;
   }
 
-
   win_sym_enabled^=1;
 
   if (gwin_sym) {
     if (win_sym_enabled) {
-//      move_win_sym(gwin_sym);
       show_win_sym(gwin_sym);
     }
     else
@@ -280,6 +350,7 @@ void create_win_sym()
   }
 
   gwin_sym = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  cur_in_method = current_CS->in_method;
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (gwin_sym), vbox_top);
@@ -331,13 +402,13 @@ void create_win_sym()
   GdkWindow *gdkwin_sym = gwin_sym->window;
   gdk_window_set_override_redirect(gdkwin_sym, TRUE);
 
-  if (current_CS)
-    win_syms[current_CS->in_method] = gwin_sym;
-
   if (win_sym_enabled)
     gtk_widget_show_all(gwin_sym);
 
-  move_win_sym(gwin_sym);
+  g_signal_connect (G_OBJECT (gwin_sym), "scroll-event",
+    G_CALLBACK (button_scroll_event), NULL);
+
+ move_win_sym(gwin_sym);
 #if 0
   dbg("in_method:%d\n", current_CS->in_method);
 #endif

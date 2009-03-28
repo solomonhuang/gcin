@@ -14,7 +14,8 @@ typedef struct {
 } GCIN_client_handle;
 
 enum {
-  FLAG_GCIN_client_handle_has_focus = 1
+  FLAG_GCIN_client_handle_has_focus = 1,
+  FLAG_GCIN_client_handle_raise_window = 0x1000  // for mozilla, dirty fix
 };
 
 
@@ -42,6 +43,8 @@ int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
 int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr);
+
+void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags);
 #ifdef __cplusplus
 }
 #endif

@@ -42,7 +42,7 @@ su as root
 
 logout & login
 
-由 .tar.bz2 需要 install libgtk+2.0_0-devel 這個 .rpm，不過各家的名字可能不太一樣，可能要找一下。另外，你還需要 install pkg-config 這個 .rpm 。
+由 .tar.bz2 需要 install libgtk+2.0_0-devel & libqt3-devel 這兩個 .rpm，不過各家的名字可能不太一樣，可能要找一下。另外，你還需要 install pkgconfig 這個 .rpm 。
 
 -----------------
 
@@ -195,6 +195,14 @@ http://home.pchome.com.tw/web/cherico/array-utf8.png
 ar30.cin ar30.gtab 和簡體字根表：
 http://home.pchome.com.tw/web/cherico/ar30utf8.tgz
 已經變成 gcin 內建的行列輸入法 table
+
+葉光哲先生整理的行列 30，支援 CJK 七萬餘字，
+目前已是 openvanilla 預設的行列輸入法表格
+（根據行列輸入法發明人，廖明德先生提供的對照檔製作而成）
+openvanilla 的行列為了實作簡碼功能, 拆成三個檔案...
+現在葉光哲先生為 gcin 整理成一個 cin 檔（有支援簡碼）, 可在此處下載:
+http://www.calno.com/moto/gcin/cin/ar30.cin.bz2
+http://www.calno.com/moto/gcin/cin/ar30.gtab
 --------------------------------------------
 gcin 的行列 & 倉頡(.gtab) 可不可以輸入詞 ?
 只要把詞定義在 .cin 後面即可，然後執行上述的步驟，以下是幾行 examples
@@ -229,7 +237,7 @@ logout & login 按 ctrl-alt-9 就可以開始用。
 可以用 gcin-setup 把嘸蝦米設定成內定的輸入法。
 ----------------------------------------------
 如何修改 Alt-Shift-key 送出的字串。
-    修改 /usr/share/gcin/table/phrase.table
+    修改  ~/.gcin/phrase.table
 ---------------------------------------------
 gaim 及 gqview 內使用詞音時按 enter 無法送出編輯區內容。
 這是因為某些程式會把 enter 吃掉，沒有送給 gcin 處理，可能解決辦法有：

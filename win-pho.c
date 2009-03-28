@@ -331,6 +331,9 @@ void show_win_pho()
     return;
 
   gtk_widget_show(gwin_pho);
+  if (current_CS->b_raise_window)
+    gtk_window_present(gwin_pho);
+
   show_win_sym();
 
   if (pho_hide_row2)

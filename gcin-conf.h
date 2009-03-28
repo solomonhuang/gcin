@@ -38,6 +38,7 @@
 #define GTAB_SHIFT_PHRASE_KEY "gtab-shift-phrase-key"
 #define GTAB_HIDE_ROW2 "gtab-hide-row2"
 #define GTAB_IN_ROW1 "gtab-in-row1"
+#define GTAB_CAPSLOCK_IN_ENG "gtab-capslock-in-eng"
 
 #define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
@@ -62,7 +63,8 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_gtab_in, gcin_inner_frame,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
-           gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, pho_hide_row2,
+           gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
+           pho_hide_row2,
            pho_in_row1;
 
 extern int default_input_method;

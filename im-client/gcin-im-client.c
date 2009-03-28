@@ -469,3 +469,16 @@ void gcin_im_client_set_window(GCIN_client_handle *handle, Window win)
   }
   handle->client_win = win;
 }
+
+
+void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags)
+{
+  GCIN_req req;
+
+  gen_req(handle, GCIN_req_set_flags, &req);
+  req.flag |= flags;
+
+  if (handle_write(handle, &req, sizeof(req)) <=0) {
+    error_proc(handle,"gcin_im_client_set_flags error");
+  }
+}

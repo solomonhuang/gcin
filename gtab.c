@@ -960,18 +960,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (same_pho_query_state == SAME_PHO_QUERY_pho_select)
     return feedkey_pho(key, 0);
-#if 0
-  if (current_CS->b_half_full_char) {
-     char *s = half_char_to_full_char(key);
-     if (!s)
-       return 0;
-     char tt[CH_SZ+1];
-
-     memcpy(tt, s, CH_SZ); tt[CH_SZ]=0;
-     send_text(tt);
-     return 1;
-  }
-#endif
 
 
   if (key < 127 && cur_inmd->keymap[key]) {
@@ -981,7 +969,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
      char ucase = toupper(key);
      if (cur_inmd->keymap[lcase] != cur_inmd->keymap[ucase])
        goto next;
+
+     if (gtab_capslock_in_eng && (kbstate&LockMask))
+       return 0;
   }
+
 
 shift_proc:
   if ((kbstate & ShiftMask) && key!='*' && (key!='?' || gtab_shift_phrase_key && !ci)) {
@@ -1156,6 +1148,7 @@ shift_proc:
       }
     default:
 next:
+
       if (invalid_spc) {
         ClrIn();
       }
