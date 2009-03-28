@@ -1,7 +1,7 @@
 %define release liu_mdk
 %define prefix  /usr
 %define name	gcin
-%define version __gcin_version__
+%define version 1.0.3
 
 
 Summary:	gcin :  Chinese input method server

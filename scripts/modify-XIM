@@ -1,5 +1,10 @@
 #!/bin/bash
 
+QT_IM="xim"
+if [ -f /usr/lib/qt3/plugins/inputmethods/libqgcin.so ]; then
+  QT_IM="gcin"
+fi
+
 xinitdir=/etc/X11/xinit
 ximorig=XIM.orig.gcin
 if  [ -d $xinitdir ]; then
@@ -28,7 +33,7 @@ if  [ -d $xinitdir ]; then
     echo 'export XMODIFIERS="@im=gcin"' > xim
     echo "export GTK_IM_MODULE=gcin" >> xim
     echo "export QT_IM_SWITCHER=imsw-multi" >> xim
-    echo "export QT_IM_MODULE=xim" >> xim
+    echo "export QT_IM_MODULE=$QT_IM" >> xim
     echo "gcin &" >> xim
     chmod 755 xim
   # others
@@ -42,21 +47,23 @@ fi
 cd /etc/sysconfig
 
 ## below is for Mandrake 10.1
-grep -i scim i18n >& /dev/null
-if [ $? = 0 ]; then
-  [ -f i18n.orig.gcin ] || mv i18n i18n.orig.gcin
+[ -f i18n.orig.gcin ] || mv i18n i18n.orig.gcin
 
-  sed -e "s/im=SCIM/im=xcin/" < i18n.orig.gcin |
-  sed -e "s/scim -d/gcin/" | \
-  sed -e "s/GTK_IM_MODULE=scim/GTK_IM_MODULE=gcin/" | \
-  sed -e "s/QT_IM_MODULE=scim/QT_IM_MODULE=xim/" > i18n
-fi
+sed -e "s/im=SCIM/im=xcin/" < i18n.orig.gcin |
+sed -e "s/scim -d/gcin/" | \
+sed -e "s/GTK_IM_MODULE=scim/GTK_IM_MODULE=gcin/" | \
+sed -e "s/QT_IM_MODULE=.*/QT_IM_MODULE=$QT_IM/" > i18n
 
 
 #add GTK_IM_MODULE=gcin if necessary
 egrep '^GTK_IM_MODULE=gcin' i18n >& /dev/null
 if [ $? != 0 ]; then
   echo "GTK_IM_MODULE=gcin" >> i18n
+fi
+
+egrep '^QT_IM_MODULE' i18n
+if [ $? != 0 ]; then
+  echo "QT_IM_MODULE=$QT_IM" >> i18n
 fi
 
 egrep '^XIM_PROGRAM=gcin' i18n >& /dev/null

@@ -1,4 +1,10 @@
 ** UTF-8 encoding **
+1.0.3:
+- QT_IM_MODULE=gcin 的支援。如果你的系統有支援(qt4.0 or Mandriva 2006)，會自動修改 /etc/sysconfig/i18n 加上QT_IM_MODULE=gcin。
+- gtab.list 如果有拿掉一些，則會 coredump 無法 ctrl-shift 的問題。
+- bugfix: 按「口 尸手」之後就按了space 接下來後悔再補上個「火」雖然能讓gcin出現「嗎」 再按一次space卻仍是無法輸出。
+
+
 1.0.2:
 - .gtab 輸入法中 新增 「Shift 用來輸入片語，等同按 Alt-Shift」的選項。
 - xxx.gtab file name 超過 16 的問題。

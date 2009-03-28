@@ -400,10 +400,10 @@ r 指令會開始執行 gcin， 掛了之後，
 #4  0x40548e5d in poll () from /lib/tls/libc.so.6
 #5  0x404212e7 in g_main_loop_get_context () from /usr/lib/libglib-2.0.so.0
 ------------------------------------------------------------------------------------------------------
-GTK_IM_MODULE 使用 gcin 自己的 .so，和XIM相比，有何好處？
+GTK_IM_MODULE/QT_IM_MODULE(qt 4.0 or Mandriva 2006) 使用 gcin 自己的 .so，和XIM相比，有何好處？
   1. gcin 掛掉重新執行時比較不會有程式跟著一起掛掉的情形，現在可以直接在 gnome-terminal 下
       'pkill gcin'，不用擔心 gnome-terminal 會停在那邊不動 (mozilla-gtk2 除外，這是因為如果你有 install flash player，flash 會 open XIM 的 sesseion，X11 裏面的 XIM close 時在 server當掉時也會跟著當掉。)。
-  2. GTK2 的程式 locale 即使設定成 zh_TW.Big5 也還是可以輸入所有的 UTF-8 字。
+  2. GTK2/QT 的程式 locale 即使設定成 zh_TW.Big5 也還是可以輸入所有的 UTF-8 字。
   3. 詞音由於現在有了 key release event，現在也可以用 Shift 來切換中/英。
   3. gcin 的協定對 input focus 的處理比 XIM 好。
   4. client 直接 對 gcin server 互傳資料，不透過 X server，延遲會比較少。
@@ -419,7 +419,7 @@ gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000�
 雖然目前是用很簡單的 encoding，如果 gcin 搭配 ssh X11 forwarding 應該是非常安全的。
 而且 data 不像 SSL 會變大，更適合在 low bandwidth 使用。
 
-目前只支援 GTK2，但是 gcin 有提供非常容易使用的 API 介面供其他 terminal & QT_IM_MODULE
+目前支援 GTK2 & QT，gcin 有提供非常容易使用的 API 介面供其他 terminal
 使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
 
 gcin 如果使用到自己的 IM_MODULE 時，且用 export GCIN_CONNECT_MSG_ON=
@@ -428,7 +428,7 @@ a. connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin
 或是
 b.  gcin client connected to server 172.x.x.x:9999
 
-只需要一個 gcin 執行就可以，不需要為了同時支援 GTK_IM_MODULE & XIM 而執行兩個 gcin process。
+只需要一個 gcin 執行就可以，不需要為了同時支援 GTK_IM_MODULE/QT_IM_MODULE & XIM 而執行兩個 gcin process。
 
 目前 OpenOffice GTK2 的版本好像仍然是使用 XIM。
 
@@ -510,8 +510,8 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
 	%keep_key_case          <---------------------------
 	%keyname begin
 --------------------------------------------------------------------
-如何確定目前是使用 gcin 自己的 gtk im module。
-1. 可以先用 gedit 測試，在編輯區按 mouse 右鍵，menu 裏選輸入法，會顯示出目前正在使用的輸入法，如果是
+如何確定目前是使用 gcin 自己的 gtk/qt im module。
+1. 可以先用 gedit or kedit 測試，在編輯區按 mouse 右鍵，menu 裏選輸入法，會顯示出目前正在使用的輸入法，如果是
  'gcin Input Method' 就是對的，其他的是錯的。
 2. 在terminal 用 export GCIN_CONNECT_MSG_ON=， 再執行自己要的測試程式，
 terminal (console) 會出現以下 message 

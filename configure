@@ -48,6 +48,16 @@ else
   echo " found."
 fi
 
+QT_IM_DIR=/usr/lib/qt3/plugins/lib/inputmethods
+QT_IM='N'
+echo "testing if you have QT_IM_MODULE dir:$QT_IM_DIR support"
+if [ -d  $QT_IM_DIR ]; then
+  QT_IM='Y'
+  echo "-> Yes, you have QT_IM_MODULE support"
+else
+  echo "-> No, you don't have"
+fi
+
 bindir=$prefix/bin
 datadir=$prefix/share
 mandir=$datadir/man
@@ -55,6 +65,12 @@ libdir=$prefix/lib
 includedir=$prefix/include
 GCIN_VERSION=`cat VERSION.gcin`
 sed -e "s/__gcin_version__/$GCIN_VERSION/" < gcin.spec.in > gcin.spec
+
+
+if [ $QT_IM = 'N' ]; then
+  mv gcin.spec gcin.spec.tmp
+  grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
+fi
 
 OPTFLAGS="-g"
 if [ $prefix = /usr ]; then
@@ -88,6 +104,7 @@ echo "SYS_ICON_DIR=\$(datadir_r)/icons" >> config.mak
 echo "GCIN_ICON_DIR_i=\$(datadir)/icons/gcin" >> config.mak
 echo "GCIN_BIN_DIR=\$(bindir_r)" >> config.mak
 echo "FREEBSD=$FREEBSD" >> config.mak
+echo "QT_IM=$QT_IM" >> config.mak
 
 
 cd menu

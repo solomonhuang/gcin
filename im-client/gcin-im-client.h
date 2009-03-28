@@ -18,6 +18,11 @@ enum {
   FLAG_GCIN_client_handle_has_focus = 1
 };
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 GCIN_client_handle *gcin_im_client_open(Display *disp);
 void gcin_im_client_close(GCIN_client_handle *handle);
 void gcin_im_client_focus_in(GCIN_client_handle *handle);
@@ -38,4 +43,9 @@ int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
 int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr);
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif

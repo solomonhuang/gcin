@@ -463,7 +463,7 @@ static void cycle_next_in_method()
     int v = (current_CS->in_method + i) % gcin_switch_keysN;
     if (!(gcin_flags_im_enabled & (1<<v)))
       continue;
-    if (!inmd[v].cname[0])
+    if (!inmd[v].cname || !inmd[v].cname[0])
       continue;
 
     init_in_method(v);

@@ -31,5 +31,6 @@ pho-huge.tab:	 pho-huge.tab.src ../phoa2d
 install:
 	install -d $(GCIN_TABLE_DIR_i)
 	install -m 644 $(DATA) $(DATAKEEP) $(GCIN_TABLE_DIR_i)
+#	cd $(GCIN_TABLE_DIR_i); bzip2 -f *.gtab
 clean:
 	rm -f *~ tags core.* $(DATA) *.gtab

@@ -308,9 +308,20 @@ void init_gtab(int inmdno, int usenow)
   }
 
   inp->file_modify_time = st.st_mtime;
+#if 0
+  if (strstr(ttt, ".bz2")) {
+    char uu[256];
+    strcat(strcpy(uu, "bunzip2 -c "), ttt);
 
-  if ((fp=fopen(ttt, "r"))==NULL) {
-    p_err("init_tab:2 err open %s", ttt);
+    if ((fp=popen(uu, "r"))==NULL) {
+      p_err("init_tab:2 err popen %s", uu);
+    }
+  } else
+#endif
+  {
+    if ((fp=fopen(ttt, "r"))==NULL) {
+      p_err("init_tab:2 err open %s", ttt);
+    }
   }
 
   dbg("gtab file %s\n", ttt);
@@ -328,7 +339,8 @@ void init_gtab(int inmdno, int usenow)
     inp->max_keyN = 5;
   }
 
-  memcpy(inp->endkey, th.endkey, sizeof(th.endkey));
+  free(inp->endkey);
+  inp->endkey = strdup(th.endkey);
 
   fread(ttt, 1, th.KeyS, fp);
   dbg("KeyS %d\n", th.KeyS);
@@ -386,17 +398,22 @@ void init_gtab(int inmdno, int usenow)
 
   dbg("MaxPress:%d  M_DUP_SEL:%d\n", th.MaxPress, th.M_DUP_SEL);
 
+  free(inp->keymap);
+  inp->keymap = tzmalloc(char, 128);
+
   for(i=0;i<th.KeyS;i++) {
     inp->keymap[(int)ttt[i]]=i;
     if (!BITON(inp->flag, FLAG_KEEP_KEY_CASE))
       inp->keymap[toupper(ttt[i])]=i;
     inp->keycol[i]=key_col(ttt[i]);
   }
-
-
   inp->keymap[(int)'?']=61;
   inp->keymap[(int)'*']=62;
-  fread(inp->idx1, sizeof(gtab_idx1_t), th.KeyS+1,fp);
+
+
+  free(inp->idx1);
+  inp->idx1 = tmalloc(gtab_idx1_t, th.KeyS+1);
+  fread(inp->idx1, sizeof(gtab_idx1_t), th.KeyS+1, fp);
   /* printf("chars: %d\n",th.DefC); */
   dbg("inmdno: %d th.KeyS:%d\n", inmdno, th.KeyS);
 
@@ -431,8 +448,7 @@ void init_gtab(int inmdno, int usenow)
 
   fread(&inp->phrnum, sizeof(int), 1, fp);
   dbg("inp->phrnum: %d\n", inp->phrnum);
-  if (inp->phridx)
-    free(inp->phridx);
+  free(inp->phridx);
   inp->phridx = tmalloc(int, inp->phrnum);
   fread(inp->phridx, sizeof(int), inp->phrnum, fp);
 
@@ -445,8 +461,7 @@ void init_gtab(int inmdno, int usenow)
   if (inp->phrnum)
     nbuf = inp->phridx[inp->phrnum-1];
 
-  if (inp->phrbuf)
-    free(inp->phrbuf);
+  free(inp->phrbuf);
   inp->phrbuf = malloc(nbuf);
   fread(inp->phrbuf, 1, nbuf, fp);
 
@@ -1211,6 +1226,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     return 1;
   }
 
+  invalid_spc = FALSE;
   char *pendkey = strchr(cur_inmd->endkey, key);
 
   DispInArea();

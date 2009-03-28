@@ -17,7 +17,7 @@ void create_inmd_switch()
 
   int i;
   for(i=0; i < MAX_GTAB_NUM_KEY; i++) {
-    if (!inmd[i].cname[0])
+    if (!inmd[i].cname || !inmd[i].cname[0])
       continue;
 
     char tt[64];

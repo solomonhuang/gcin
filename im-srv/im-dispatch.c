@@ -111,7 +111,7 @@ void process_client_req(int fd)
     case GCIN_req_key_press:
     case GCIN_req_key_release:
       current_CS = cs;
-#if 1
+#if 0
       {
         char tt[128];
 

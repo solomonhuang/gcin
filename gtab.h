@@ -77,8 +77,8 @@ typedef struct {
   int DefChars;           /* defined chars */
   u_char keyname[MAX_GTAB_KEYS * CH_SZ];
   u_char *keyname_lookup; // used by boshiamy only
-  gtab_idx1_t idx1[64];
-  u_char keymap[128];
+  gtab_idx1_t *idx1;
+  u_char *keymap;
   char selkey[MAX_SELKEY];
   u_char *sel1st;
   int M_DUP_SEL;
@@ -89,7 +89,7 @@ typedef struct {
   time_t file_modify_time;
   gboolean key64;        // db is 64 bit-long key
   int max_keyN;
-  char endkey[64];       // only pinin/ar30 use it
+  char *endkey;       // only pinin/ar30 use it
   GTAB_space_pressed_E space_style;
 } INMD;
 

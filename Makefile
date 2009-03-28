@@ -39,6 +39,7 @@ all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C im-client
 	$(MAKE) -C gtk-im
+	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
 	$(CC) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
@@ -88,6 +89,7 @@ install:
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
+	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im install; fi
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
 	   install -d $(DOC_DIR); \
@@ -108,6 +110,7 @@ clean:
 	$(MAKE) -C im-srv clean
 	$(MAKE) -C im-client clean
 	$(MAKE) -C gtk-im clean
+	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
 	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
 

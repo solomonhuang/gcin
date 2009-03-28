@@ -536,5 +536,11 @@ int main(int argc, char **argv)
 
   fclose(fw);
 
+#if 0
+  char bzip2[128];
+  strcat(strcpy(bzip2, "bzip2 -f -k "), fname_tab);
+  system(bzip2);
+#endif
+
   return 0;
 }
