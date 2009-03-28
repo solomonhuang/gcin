@@ -100,6 +100,10 @@ msgstr "编辑默认输入法的用户外加字词"
 msgid "名稱"
 msgstr "名称"
 
+#: ../gcin-setup-list.c:258 
+msgid "icon"
+msgstr "图标"
+
 #: ../gcin-setup-list.c:268
 msgid "Ctrl-Alt-數字鍵"
 msgstr "Ctrl-Alt-数字键"
@@ -199,6 +203,14 @@ msgstr "同音字词选择按键在后"
 #: ../gcin-setup-pho.c:475
 msgid "Capslock英數用小寫"
 msgstr "Capslock英数用小写"
+
+#: ../gcin-setup-pho.c:533
+msgid "輸入時念出發音"
+msgstr "输入时念出发音"
+
+#: ../gcin-setup-pho.c:557
+msgid "speaker"
+msgstr "语音编号"
 
 #: ../gcin-setup-pho.c:468
 msgid "詞音編輯緩衝區大小"
@@ -335,6 +347,10 @@ msgstr "关于 gcin"
 #: ../gcin-setup.c:719
 msgid "結束 gcin"
 msgstr "结束 gcin"
+
+#: ../about.c:69
+msgid "bug tracking"
+msgstr "臭虫追踪"
 
 #: ../about.c:83
 msgid "關閉"

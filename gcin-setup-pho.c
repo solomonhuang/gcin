@@ -23,7 +23,6 @@ static struct {
 
 static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_phonetic_char_dynamic_sequence,
-                 *check_button_phonetic_speak,
                  *check_button_pho_simple_win,
                  *check_button_pho_hide_row2,
                  *check_button_pho_in_row1,
@@ -34,7 +33,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_gcin_capslock_lower,
                  *spinner_tsin_buffer_size;
 
-static GtkWidget *opt_kbm_opts, *opt_speaker_opts;
+static GtkWidget *opt_kbm_opts, *opt_eng_ch_opts, *opt_speaker_opts;
 
 
 static struct {
@@ -87,12 +86,9 @@ static gboolean cb_ok( GtkWidget *widget,
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_kbm_opts));
   save_gcin_conf_str(PHONETIC_KEYBOARD, kbm_sel[idx].kbm);
 
-  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_speaker_opts));
-  save_gcin_conf_str(PHONETIC_SPEAK_SEL, pho_speaker[idx]);
-
-
+  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_eng_ch_opts));
   save_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
-                     tsin_eng_ch_sw[new_select_idx_tsin_sw].key);
+                     tsin_eng_ch_sw[idx].key);
 
   save_gcin_conf_int(TSIN_SPACE_OPT,
                      tsin_space_options[new_select_idx_tsin_space_opt].key);
@@ -102,10 +98,6 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence)));
-
-  save_gcin_conf_int(PHONETIC_SPEAK,
-       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_speak)));
-
 
   save_gcin_conf_int(PHO_SIMPLE_WIN,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_pho_simple_win)));
@@ -320,29 +312,31 @@ static GtkWidget *create_kbm_opts()
 
 
 
-static GtkWidget *create_speaker_opts()
+static GtkWidget *create_eng_ch_opts()
 {
+
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
 
-  opt_speaker_opts = gtk_option_menu_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), opt_speaker_opts, FALSE, FALSE, 0);
-  GtkWidget *menu_speaker_opts = gtk_menu_new ();
+  opt_eng_ch_opts = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_eng_ch_opts, FALSE, FALSE, 0);
+  GtkWidget *menu_eng_ch_opts = gtk_menu_new ();
 
   int i;
-  int current_idx = get_current_speaker_idx();
+  int current_idx = get_currnet_eng_ch_sw_idx();
 
-  for(i=0; i<pho_speakerN; i++) {
-    GtkWidget *item = gtk_menu_item_new_with_label (pho_speaker[i]);
+  for(i=0; i < tsin_eng_ch_swN; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (tsin_eng_ch_sw[i].name);
 
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu_speaker_opts), item);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_eng_ch_opts), item);
   }
 
-  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_speaker_opts), menu_speaker_opts);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_speaker_opts), current_idx);
+  dbg("current_idx:%d\n", current_idx);
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_eng_ch_opts), menu_eng_ch_opts);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_eng_ch_opts), current_idx);
 
   return hbox;
 }
-
 
 
 void load_setttings();
@@ -378,28 +372,7 @@ void create_kbm_window()
   GtkWidget *frame_tsin_sw = gtk_frame_new(_("詞音輸入[中/英]切換"));
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_sw, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_sw), 1);
-
-  GtkWidget *box_tsin_sw = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame_tsin_sw), box_tsin_sw);
-  gtk_container_set_border_width (GTK_CONTAINER (box_tsin_sw), 1);
-
-  GSList *group_tsin_sw = NULL;
-  int current_idx = get_currnet_eng_ch_sw_idx();
-  new_select_idx_tsin_sw = current_idx;
-
-  int i;
-  for(i=0; i< tsin_eng_ch_swN; i++) {
-    GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_sw, tsin_eng_ch_sw[i].name);
-    gtk_box_pack_start (GTK_BOX (box_tsin_sw), button, TRUE, TRUE, 0);
-
-    group_tsin_sw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
-
-    g_signal_connect (G_OBJECT (button), "clicked",
-       G_CALLBACK (callback_button_clicked_tsin_sw), (gpointer) i);
-
-    if (i==current_idx)
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button), TRUE);
-  }
+  gtk_container_add (GTK_CONTAINER (frame_tsin_sw), create_eng_ch_opts());
 
 
   GtkWidget *frame_tsin_space_opt = gtk_frame_new(_("詞音輸入空白鍵選項"));
@@ -411,9 +384,10 @@ void create_kbm_window()
   gtk_container_set_border_width (GTK_CONTAINER (box_tsin_space_opt), 1);
 
   GSList *group_tsin_space_opt = NULL;
-  current_idx = get_currnet_tsin_space_option_idx();
+  int current_idx = get_currnet_tsin_space_option_idx();
   new_select_idx_tsin_space_opt = current_idx;
 
+  int i;
   for(i=0; i< tsin_space_optionsN; i++) {
     GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_space_opt, tsin_space_options[i].name);
     gtk_box_pack_start (GTK_BOX (box_tsin_space_opt), button, TRUE, TRUE, 0);
@@ -525,43 +499,6 @@ void create_kbm_window()
   gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), check_button_gcin_capslock_lower, FALSE, FALSE, 0);
   gtk_toggle_button_set_active(
      GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower), gcin_capslock_lower);
-
-
-
-  GtkWidget *hbox_phonetic_speak = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_phonetic_speak , TRUE, TRUE, 1);
-  GtkWidget *label_phonetic_speak = gtk_label_new(_("輸入時念出發音"));
-  gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), label_phonetic_speak , TRUE, TRUE, 0);
-  check_button_phonetic_speak = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), check_button_phonetic_speak, FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(
-     GTK_TOGGLE_BUTTON(check_button_phonetic_speak), phonetic_speak);
-
-#include <dirent.h>
-  DIR *dir;
-  if (dir=opendir(GCIN_OGG_DIR"/ㄧ")) {
-    struct dirent *dire;
-
-    while (dire=readdir(dir)) {
-      char *name = dire->d_name;
-
-      if (name[0]=='.')
-        continue;
-      pho_speaker[pho_speakerN++]=strdup(name);
-    }
-    closedir(dir);
-
-    dbg("pho_speakerN:%d\n", pho_speakerN);
-#if 1
-    if (pho_speakerN) {
-      GtkWidget *frame_speaker = gtk_frame_new(_("speaker"));
-      gtk_box_pack_start (GTK_BOX (vbox_top), frame_speaker, TRUE, TRUE, 0);
-      gtk_container_set_border_width (GTK_CONTAINER (frame_speaker), 1);
-      gtk_container_add (GTK_CONTAINER (frame_speaker), create_speaker_opts());
-    }
-#endif
-  }
-
 
   GtkWidget *frame_tsin_buffer_size = gtk_frame_new(_("詞音編輯緩衝區大小"));
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_buffer_size, FALSE, FALSE, 0);

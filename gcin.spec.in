@@ -17,7 +17,7 @@ Packager:       Edward Liu <cp76@csie.nctu.edu.tw>
 BuildRoot:	%{_builddir}/%{name}-%{version}-root
 
 BuildRequires: libgtk+2.0_0-devel >= 2.2.4
-Requires: gtk+2.0 >= 2.2.4
+Requires: gtk+2.0 >= 2.2.4 vorbis-tools
 
 Docdir:         %{prefix}/share/doc
 

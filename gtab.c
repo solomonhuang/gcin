@@ -632,6 +632,8 @@ static void putstr_inp(u_char *p)
   if (!wild_mode && gtab_hide_row2 || !gtab_disp_key_codes)
     set_key_codes_label(NULL);
 
+  char_play(p);
+
   if (utf8_str_N(p) > 1  || p[0] < 128) {
     if (gtab_disp_key_codes && !gtab_hide_row2 || wild_mode)
       lookup_gtabn(p);

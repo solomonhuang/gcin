@@ -100,6 +100,10 @@ msgstr "Add definitions for default input method"
 msgid "名稱"
 msgstr "Name"
 
+#: ../gcin-setup-list.c:258
+msgid "icon"
+msgstr "Icon"
+
 #: ../gcin-setup-list.c:268
 msgid "Ctrl-Alt-數字鍵"
 msgstr "Ctrl-Alt-Toggle Key"
@@ -199,6 +203,14 @@ msgstr "Show selection key behind choices"
 #: ../gcin-setup-pho.c:475
 msgid "Capslock英數用小寫"
 msgstr "Alphabet-numeric mode uses lower case letters"
+
+#: ../gcin-setup-pho.c:533
+msgid "輸入時念出發音"
+msgstr "Enable text-to-speech"
+
+#: ../gcin-setup-pho.c:557
+msgid "speaker"
+msgstr "speaker"
 
 #: ../gcin-setup-pho.c:468
 msgid "詞音編輯緩衝區大小"
@@ -335,6 +347,10 @@ msgstr "About gcin"
 #: ../gcin-setup.c:719
 msgid "結束 gcin"
 msgstr "Disable gcin server"
+
+#: ../about.c:69
+msgid "bug tracking"
+msgstr "Bug tracking:"
 
 #: ../about.c:83
 msgid "關閉"

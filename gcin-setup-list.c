@@ -18,9 +18,12 @@ static GtkWidget *vbox;
 static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
-static GtkWidget *button;
+static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts;
 static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
        *check_button_gcin_shift_space_eng_full;
+
+char *pho_speaker[16];
+int pho_speakerN;
 
 typedef struct
 {
@@ -156,6 +159,14 @@ static void cb_ok (GtkWidget *button, gpointer data)
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
   save_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full)));
+
+  if (opt_speaker_opts) {
+    idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_speaker_opts));
+    save_gcin_conf_str(PHONETIC_SPEAK_SEL, pho_speaker[idx]);
+  }
+
+  save_gcin_conf_int(PHONETIC_SPEAK,
+     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_speak)));
 
   gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 
@@ -368,6 +379,29 @@ static GtkWidget *create_im_toggle_keys()
   return hbox;
 }
 
+static GtkWidget *create_speaker_opts()
+{
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+
+  opt_speaker_opts = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_speaker_opts, FALSE, FALSE, 0);
+  GtkWidget *menu_speaker_opts = gtk_menu_new ();
+
+  int i;
+  int current_idx = get_current_speaker_idx();
+
+  for(i=0; i<pho_speakerN; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (pho_speaker[i]);
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_speaker_opts), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_speaker_opts), menu_speaker_opts);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_speaker_opts), current_idx);
+
+  return hbox;
+}
+
 
 void create_gtablist_window (void)
 {
@@ -438,6 +472,39 @@ void create_gtablist_window (void)
   gtk_box_pack_start (GTK_BOX (hbox_gcin_shift_space_eng_full),check_button_gcin_shift_space_eng_full,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full),
      gcin_shift_space_eng_full);
+
+  GtkWidget *hbox_phonetic_speak = gtk_hbox_new(FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_phonetic_speak , FALSE, FALSE, 0);
+  GtkWidget *label_phonetic_speak = gtk_label_new(_("輸入時念出發音"));
+  gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), label_phonetic_speak , FALSE, FALSE, 0);
+  check_button_phonetic_speak = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), check_button_phonetic_speak, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_phonetic_speak), phonetic_speak);
+
+#include <dirent.h>
+  DIR *dir;
+  if (dir=opendir(GCIN_OGG_DIR"/ㄧ")) {
+    struct dirent *dire;
+
+    pho_speakerN = 0;
+    while (dire=readdir(dir)) {
+      char *name = dire->d_name;
+
+      if (name[0]=='.')
+        continue;
+      pho_speaker[pho_speakerN++]=strdup(name);
+    }
+    closedir(dir);
+
+    dbg("pho_speakerN:%d\n", pho_speakerN);
+
+    if (pho_speakerN) {
+      GtkWidget *labelspeaker = gtk_label_new("發音選擇");
+      gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), labelspeaker, FALSE, FALSE, 0);
+      gtk_container_add (GTK_CONTAINER (hbox_phonetic_speak), create_speaker_opts());
+    }
+  }
 
 
   /* some buttons */
