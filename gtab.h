@@ -62,6 +62,7 @@ struct TableHead {
 
 #define MAX_TAB_KEY_NUM (32/KeyBits)
 #define MAX_TAB_KEY_NUM64 (64/KeyBits)
+#define MAX_TAB_KEY_NUM64_6 (10)
 
 
 typedef u_int gtab_idx1_t;
@@ -96,6 +97,7 @@ typedef struct {
   GTAB_space_pressed_E space_style;
   char *icon;
   u_char kmask, keybits, last_k_bitn;
+  char WILD_QUES, WILD_STAR;
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
@@ -105,6 +107,9 @@ extern INMD *cur_inmd;
 void load_gtab_list();
 
 #define LAST_K_bitN (cur_inmd->last_k_bitn)
+
+#define KEY_MASK ((1<<cur_inmd->keybits)-1);
+
 
 #define GTAB_LIST "gtab.list"
 

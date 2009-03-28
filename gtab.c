@@ -25,7 +25,7 @@ INMD *cur_inmd;
 static gboolean last_full, more_pg, wild_mode, spc_pressed, invalid_spc;
 static char seltab[MAX_SELKEY][MAX_CIN_PHR];
 static short defselN, exa_match;
-static KeySym inch[10];
+static KeySym inch[MAX_TAB_KEY_NUM64_6];
 static int ci;
 static int last_idx, pg_idx;
 static int wild_page;
@@ -59,7 +59,7 @@ gboolean gtab_has_input()
 {
   int i;
 
-  for(i=0; i < MAX_TAB_KEY_NUM64; i++)
+  for(i=0; i < MAX_TAB_KEY_NUM64_6; i++)
     if (inch[i])
       return TRUE;
 
@@ -164,7 +164,7 @@ void lookup_gtabn(char *ch, char *out)
     int j;
 
     int tlen=0, klen=0;
-    char t[CH_SZ * MAX_TAB_KEY_NUM64 + 1];
+    char t[CH_SZ * 10 + 1];
 
     for(j=Max_tab_key_num1(tinmd) - 1; j>=0; j--) {
 
@@ -327,6 +327,9 @@ static void DispInArea()
 
   for(i=0;i<ci;i++) {
     disp_gtab(i, &cur_inmd->keyname[inch[i] * CH_SZ]);
+//    dbg("inch:%d ", inch[i]);
+    utf8_putchar(&cur_inmd->keyname[inch[i] * CH_SZ]);
+//    puts("");
   }
 
   for(; i < cur_inmd->MaxPress; i++) {
@@ -347,7 +350,6 @@ time_t file_mtime(char *fname)
   return st.st_mtime;
 }
 
-static char WILD_QUES, WILD_STAR;
 
 void init_gtab(int inmdno)
 {
@@ -466,10 +468,10 @@ void init_gtab(int inmdno)
     free(inp->keyname);
   inp->keyname = tmalloc(char, (th.KeyS + 3) * CH_SZ);
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
-  WILD_QUES=th.KeyS+1;
-  WILD_STAR=th.KeyS+2;
-  utf8cpy(&inp->keyname[WILD_QUES*CH_SZ], "？");  /* for wild card */
-  utf8cpy(&inp->keyname[WILD_STAR*CH_SZ], "＊");
+  inp->WILD_QUES=th.KeyS+1;
+  inp->WILD_STAR=th.KeyS+2;
+  utf8cpy(&inp->keyname[inp->WILD_QUES*CH_SZ], "？");  /* for wild card */
+  utf8cpy(&inp->keyname[inp->WILD_STAR*CH_SZ], "＊");
 
   char *keyname = &inp->keyname[1 * CH_SZ];
 
@@ -508,6 +510,7 @@ void init_gtab(int inmdno)
 
 
   if (all_full_ascii) {
+    dbg("all_full_ascii\n");
     int mkeys = 1<< th.keybits;
     free(inp->keyname_lookup);
     inp->keyname_lookup = malloc(sizeof(char) * mkeys);
@@ -524,27 +527,28 @@ void init_gtab(int inmdno)
   free(inp->cname);
   inp->cname = strdup(th.cname);
 
-  dbg("MaxPress:%d  M_DUP_SEL:%d\n", th.MaxPress, th.M_DUP_SEL);
+//  dbg("MaxPress:%d  M_DUP_SEL:%d\n", th.MaxPress, th.M_DUP_SEL);
 
   free(inp->keymap);
   inp->keymap = tzmalloc(char, 128);
 
   if (!(th.flag & FLAG_GTAB_SYM_KBM)) {
-    inp->keymap[(int)'?']=WILD_QUES;
+    inp->keymap[(int)'?']=inp->WILD_QUES;
     if (!strchr(th.selkey, '*'))
-      inp->keymap[(int)'*']=WILD_STAR;
+      inp->keymap[(int)'*']=inp->WILD_STAR;
   }
 
   free(inp->keycol);
   inp->keycol=tzmalloc(char, th.KeyS+1);
   for(i=0;i<th.KeyS;i++) {
+    dbg("%c", ttt[i]);
     inp->keymap[(int)ttt[i]]=i;
 //    dbg("%d %d %c\n", i, inp->keymap[(int)ttt[i]], ttt[i]);
     if (!BITON(inp->flag, FLAG_KEEP_KEY_CASE))
       inp->keymap[toupper(ttt[i])]=i;
     inp->keycol[i]=key_col(ttt[i]);
   }
-
+  dbg("\n");
 
   free(inp->idx1);
   inp->idx1 = tmalloc(gtab_idx1_t, th.KeyS+1);
@@ -648,9 +652,9 @@ void init_gtab(int inmdno)
     printf("%d] %c %d\n", i, i, inp->keymap[i]);
 #endif
 #if 0
-  for(i=0; i < 100; i++) {
+  for(i=0; i < Min(100,th.DefC) ; i++) {
     u_char *ch = tblch(i);
-    dbg("%d] %c%c%c\n", i, ch[0], ch[1], ch[2]);
+    dbg("%d] %x %c%c%c\n", i, *((int *)inp->tbl[i].key), ch[0], ch[1], ch[2]);
   }
 #endif
 }
@@ -1070,11 +1074,11 @@ void wildcard()
   for(i=0; i < KEY_N; i++) {
     if (!inch[i])
       break;
-    if (inch[i] == WILD_STAR) {
+    if (inch[i] == cur_inmd->WILD_STAR) {
       regstr[regstrN++]='.';
       regstr[regstrN++]='*';
     } else
-    if (inch[i] == WILD_QUES) {
+    if (inch[i] == cur_inmd->WILD_QUES) {
       regstr[regstrN++]='.';
     } else {
       char c = inch[i] + '0';         // start from '0'
@@ -1163,7 +1167,7 @@ static gboolean has_wild_card()
   int i;
 
   for(i=0; i < cur_inmd->MaxPress; i++)
-    if (inch[i]>60) {
+    if (inch[i]>= cur_inmd->WILD_QUES) {
       return TRUE;
     }
 
@@ -1359,6 +1363,8 @@ next_page:
 
       has_wild = has_wild_card();
 
+//      dbg("wild_mode:%d more_pg:%d ci:%d  has_wild:%d\n", wild_mode, more_pg, ci, has_wild);
+
       if (wild_mode) {
         // request from tetralet
         if (!wild_page && total_matchN < cur_inmd->M_DUP_SEL) {
@@ -1423,8 +1429,8 @@ direct_select:
         return 0;
     case '*':
       inkey=cur_inmd->keymap[key];
-      if ((inkey && (inkey!=WILD_STAR && inkey!=WILD_QUES)) || ptr_selkey(key)) {
-        dbg("%d %d\n", inkey, WILD_STAR);
+      if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {
+        dbg("%d %d\n", inkey, cur_inmd->WILD_STAR);
         goto next;
       }
       if (ci< cur_inmd->MaxPress) {
@@ -1514,10 +1520,6 @@ next:
         putstr_inp(seltab[sel1st_i]);  /* select 1st */
       }
 
-#if 0
-      if (wild_mode)
-        goto XXXX;
-#endif
       if (key > 0x7f) {
         return 0;
       }
@@ -1576,8 +1578,8 @@ next:
 
 
       if (inkey) {
-        for(i=0; i < MAX_TAB_KEY_NUM64; i++)
-          if (inch[i]>=WILD_QUES) {
+        for(i=0; i < MAX_TAB_KEY_NUM64_6; i++)
+          if (inch[i]>=cur_inmd->WILD_QUES) {
             DispInArea();
             if (ci==cur_inmd->MaxPress) {
               wild_mode=1;
@@ -1616,16 +1618,18 @@ next:
   static u_int64_t val; // needs static
   val=0;
 
+
   for(i=0; i < Max_tab_key_num; i++)
     val|= (u_int64_t)inch[i] << (KeyBits * (Max_tab_key_num - 1 - i));
 
-//  dbg("--------- %d val %llx\n", Max_tab_key_num, val);
 #if 1
   if (last_idx)
     S1=last_idx;
   else
 #endif
     S1=cur_inmd->idx1[inch[0]];
+
+//  dbg("--------- ch:%d %d val %llx  S1:%d\n", inch[0], Max_tab_key_num, val, S1);
 
   int oE1=cur_inmd->idx1[inch[0]+1];
   u_int64_t vmaskci;
@@ -1641,13 +1645,17 @@ next:
   pg_idx=last_idx=S1;
 
 #if 0
-  dbg("ci:%d  %d\n", ci, ((CONVT2(cur_inmd, S1) & vmaskci)!=val));
+  dbg("MaxPress:%d vmaskci:%x ci:%d  !=%d\n", cur_inmd->MaxPress, vmaskci, ci,
+  ((CONVT2(cur_inmd, S1) & vmaskci)!=val));
 #endif
 
   if ((CONVT2(cur_inmd, S1) & vmaskci)!=val || (wild_mode && defselN) ||
                   ((ci==cur_inmd->MaxPress||spc_pressed) && defselN &&
       (pselkey && ( pendkey || spc_pressed)) ) ) {
 YYYY:
+
+    dbg("kkkkk\n");
+
     if ((pselkey || wild_mode) && defselN) {
       int vv = pselkey - cur_inmd->selkey;
 
@@ -1680,6 +1688,8 @@ YYYY:
       if (gtab_dup_select_bell)
         bell();
 
+      dbg("hhhhh\n");
+
       if (ci>0)
         inch[--ci]=0;
     }
@@ -1706,6 +1716,7 @@ refill:
       more_pg = 1;
   }
 
+
   if (ci < cur_inmd->MaxPress && !spc_pressed && !pendkey && !more_pg) {
     j = S1;
     exa_match=0;
@@ -1725,6 +1736,7 @@ refill:
       defselN--;
 
     int shiftb=(KEY_N - 1 -ci) * KeyBits;
+    dbg("shiftb %d\n", shiftb);
 
 //    if (gtab_disp_partial_match)
     while((CONVT2(cur_inmd, j) & vmaskci)==val && j<oE1) {

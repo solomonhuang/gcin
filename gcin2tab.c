@@ -484,9 +484,11 @@ int main(int argc, char **argv)
   bzero(def1,sizeof(def1));
   bzero(idx1,sizeof(idx1));
 
+
+  u_int64_t keymask = KEY_MASK;
   for(i=0; i<chno; i++) {
     u_int64_t key = CONVT2(cur_inmd, i);
-    int kk = (key>>LAST_K_bitN) & 0x3f;
+    int kk = (key>>LAST_K_bitN) & keymask;
 
     if (!def1[kk]) {
       idx1[kk]=(gtab_idx1_t)i;

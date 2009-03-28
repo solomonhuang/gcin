@@ -1,7 +1,6 @@
 #include "gcin.h"
 #include "gtab.h"
-// #include <X11/extensions/XTest.h>
-#include "win-sym.h";
+#include "win-sym.h"
 
 static int current_gtab_simple_win;
 static int current_gcin_inner_frame;
@@ -11,7 +10,7 @@ static int current_gtab_vertical_select;
 GtkWidget *gwin_gtab;
 static GtkWidget *top_bin;
 static GtkWidget *label_full, *label_gtab_sele;
-static GtkWidget *labels_gtab[10];
+static GtkWidget *labels_gtab[MAX_TAB_KEY_NUM64_6];
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
 static GtkWidget *image_pin;
@@ -51,6 +50,7 @@ void disp_gtab(int index, char *gtabchar)
       utf8[2]=0;
     }
 
+//    printf("index:%d jjjj '%s'\n", index, utf8);
     gtk_label_set_text(GTK_LABEL(labels_gtab[index]), utf8);
     gtk_widget_show(labels_gtab[index]);
     adj_gtab_win_pos();
@@ -62,7 +62,7 @@ void set_gtab_input_color(GdkColor *color)
 {
   int i;
 
-  for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
+  for(i=0; i < MAX_TAB_KEY_NUM64_6; i++) {
     GtkWidget *label = labels_gtab[i];
 
     if (!label)
@@ -143,7 +143,7 @@ void change_gtab_font_size()
   set_label_font_size(label_gtab_sele, gcin_font_size);
 
   int i;
-  for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
+  for(i=0; i < MAX_TAB_KEY_NUM64_6; i++) {
     set_label_font_size(labels_gtab[i], gcin_font_size_gtab_in);
   }
 
@@ -368,7 +368,7 @@ void create_win_gtab_gui_simple()
 #endif
 
   int i;
-  for(i=0; i < MAX_TAB_KEY_NUM64; i++) {
+  for(i=0; i < MAX_TAB_KEY_NUM64_6; i++) {
     GtkWidget *label = gtk_label_new(NULL);
     labels_gtab[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_gtab), label, FALSE, FALSE, 0);
@@ -536,7 +536,7 @@ void win_gtab_disp_half_full()
   gtk_label_set_text(GTK_LABEL(labels_gtab[0]), get_full_str());
   int i;
 
-  for(i=1; i < MAX_TAB_KEY_NUM64; i++) {
+  for(i=1; i < MAX_TAB_KEY_NUM64_6; i++) {
     if (!labels_gtab[i])
       continue;
     gtk_widget_hide(labels_gtab[i]);

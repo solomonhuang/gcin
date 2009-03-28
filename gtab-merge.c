@@ -344,6 +344,8 @@ int main(int argc, char **argv)
   bzero(def1,sizeof(def1));
   bzero(idx1,sizeof(idx1));
 
+  u_int64_t key_mask = KEY_MASK;
+
   for(i=0; i<chno; i++) {
     u_int64_t key = CONVT2(cur_inmd, i);
 #if 0
