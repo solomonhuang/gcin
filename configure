@@ -112,21 +112,30 @@ LIB='lib64'
 fi
 
 QT_IM='N'
-for i in qt3 qt4
-do
-  QT_IM_DIR=/usr/lib/$i/plugins/$LIB/inputmethods
-  echo "testing if you have QT_IM_MODULE dir:$QT_IM_DIR support"
-  if [ -d  $QT_IM_DIR ]; then
-    QT_IM='Y'
-    QT=$i
-    break
-  fi
-done
+QT_IM_DIR=/usr/lib/qt3/plugins/lib/inputmethods
+echo "testing if you have qt3 support"
+if [ -d  $QT_IM_DIR ]; then
+  QT_IM='Y'
+fi
 
 if [ $QT_IM = "Y" ]; then
     echo "-> Yes, you have QT_IM_MODULE $QT_IM_DIR support"
 else
-    echo "-> No, you don't have"
+    echo "-> No, you don't have. It's ok if you don't want QT support."
+fi
+
+
+QT4_IM='N'
+QT4_IM_DIR=/usr/lib/qt4/plugins/lib/inputmethods
+echo "testing if you have qt4 support"
+if [ -d  $QT_IM_DIR ]; then
+  QT4_IM='Y'
+fi
+
+if [ $QT4_IM = "Y" ]; then
+    echo "-> Yes, you have qt4 support"
+else
+    echo "-> No, you don't have. It's ok if you don't want QT support."
 fi
 
 
@@ -153,6 +162,12 @@ fi
 if [ $QT_IM = 'N' ]; then
   mv gcin.spec gcin.spec.tmp
   grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
+fi
+
+
+if [ $QT4_IM = 'N' ]; then
+  mv gcin.spec gcin.spec.tmp
+  grep -v qt4/plugins/inputmethods gcin.spec.tmp > gcin.spec
 fi
 
 
@@ -192,7 +207,7 @@ echo "GCIN_ICON_DIR_i=\$(datadir)/icons/gcin" >> config.mak
 echo "GCIN_BIN_DIR=\$(bindir_r)" >> config.mak
 echo "FREEBSD=$FREEBSD" >> config.mak
 echo "QT_IM=$QT_IM" >> config.mak
-echo "QT=$QT" >> config.mak
+echo "QT4_IM=$QT4_IM" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
 echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
 echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak

@@ -1,4 +1,5 @@
 include ../config.mak
+QT=qt3
 QTIM=$(QT)/plugins/inputmethods
 IMMODULES=$(libdir)/$(QTIM)
 ifeq ($(LIB), lib64)

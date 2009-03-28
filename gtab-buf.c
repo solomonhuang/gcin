@@ -123,12 +123,18 @@ void disp_gbuf()
   free(bf);
 }
 
+void clear_gbuf_sel()
+{
+  gtab_buf_select = 0;
+  ClrSelArea();
+}
+
 int gbuf_cursor_left()
 {
   if (!gbuf_cursor)
     return gbufN;
   if (gtab_buf_select)
-    return 1;
+    clear_gbuf_sel();
   gbuf_cursor--;
   disp_gbuf();
   return 1;
@@ -140,7 +146,7 @@ int gbuf_cursor_right()
   if (gbuf_cursor==gbufN)
     return gbufN;
   if (gtab_buf_select)
-    return 1;
+    clear_gbuf_sel();
   gbuf_cursor++;
   disp_gbuf();
   return 1;
@@ -503,6 +509,14 @@ void insert_gbuf_cursor1(char *s)
    clear_after_put();
 }
 
+int insert_gbuf_cursor1_not_empty(char *s)
+{
+   if (!gbufN || !gtab_auto_select_by_phrase)
+     return 0;
+   insert_gbuf_cursor1(s);
+   return TRUE;
+}
+
 void insert_gbuf_cursor_char(char ch)
 {
   char t[2];
@@ -536,18 +550,12 @@ int gtab_buf_backspace()
   return 1;
 }
 
-int show_buf_select()
+extern int more_pg;
+
+void gtab_disp_sel()
 {
-  if (!gbufN)
-    return 0;
-  gtab_buf_select = 1;
-
-  pg_idx = 0;
-
   int idx = gbuf_cursor==gbufN ? gbuf_cursor-1:gbuf_cursor;
   GEDIT *pbuf=&gbuf[idx];
-
-  total_matchN = pbuf->selN;
 
   int i;
   for(i=0; i < cur_inmd->M_DUP_SEL; i++) {
@@ -558,7 +566,35 @@ int show_buf_select()
     strcpy(seltab[i], pbuf->sel[v]);
   }
 
+  if (pbuf->selN > page_len())
+    more_pg = 1;
+
   disp_selection(FALSE);
+}
+
+
+int show_buf_select()
+{
+  if (!gbufN)
+    return 0;
+
+  int idx = gbuf_cursor==gbufN ? gbuf_cursor-1:gbuf_cursor;
+  GEDIT *pbuf=&gbuf[idx];
+  gtab_buf_select = 1;
+  total_matchN = pbuf->selN;
+  pg_idx = 0;
+
+  gtab_disp_sel();
 
   return 1;
+}
+
+
+void gbuf_next_pg()
+{
+  pg_idx += page_len();
+  if (pg_idx >= total_matchN)
+    pg_idx = 0;
+
+  gtab_disp_sel();
 }

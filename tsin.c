@@ -64,11 +64,7 @@ gboolean pho_has_input();
 
 gboolean tsin_has_input()
 {
-#if 0
-  return c_len || pho_has_input() || !eng_ph ;
-#else
   return c_len || pho_has_input();
-#endif
 }
 
 
@@ -879,6 +875,9 @@ void tsin_set_eng_ch(int nmod)
   show_stat();
   drawcursor();
 
+  if (!eng_ph)
+    clrin_pho_tsin();
+
   show_button_pho(eng_ph);
 #if TRAY_ENABLED
   load_tray_icon();
@@ -1350,13 +1349,21 @@ int feedkey_pp(KeySym xkey, int kbstate)
    if (!eng_ph && !c_len && gcin_pop_up_win && xkey!=XK_Caps_Lock) {
      hide_win0();
 
-     if (caps_eng_tog && xkey>=' ' && xkey<0x7f) {
+     gboolean is_ascii = xkey>=' ' && xkey<0x7f;
+
+     if (caps_eng_tog && is_ascii) {
        case_inverse(&xkey, shift_m);
        send_ascii(xkey);
        return 1;
      }
-     else
-       return 0;
+     else {
+       if (tsin_half_full && is_ascii) {
+         send_text(half_char_to_full_char(xkey));
+         return 1;
+       }
+       else
+         return 0;
+     }
    }
 
    int o_sel_pho = sel_pho;
@@ -1683,6 +1690,8 @@ other_keys:
    if (xkey > 0x7e && !key_pad)
      return 0;
 
+   if (key_pad && !c_len)
+     return 0;
 
    if (!eng_ph || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {
        if (eng_ph && !shift_m && strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num) {

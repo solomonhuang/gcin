@@ -17,7 +17,7 @@ static int *ts_gtab_hash;
 #define HASHN 256
 
 static int a_phcount;
-static char tsfname[64]="";
+char tsfname[64]="";
 
 #if USE_TSIN
 void load_tsin_db()

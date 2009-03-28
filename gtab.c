@@ -22,7 +22,8 @@ static int S1, E1;
 extern char *TableDir;
 
 INMD *cur_inmd;
-static gboolean last_full, more_pg, wild_mode, spc_pressed, invalid_spc;
+static gboolean last_full, wild_mode, spc_pressed, invalid_spc;
+gboolean more_pg;
 char seltab[MAX_SELKEY][MAX_CIN_PHR];
 static short defselN, exa_match;
 static KeySym inch[MAX_TAB_KEY_NUM64_6];
@@ -281,7 +282,7 @@ char *bch_cat(char *s, char *ch)
 void minimize_win_gtab();
 void disp_gtab_sel(char *s);
 
-static void ClrSelArea()
+void ClrSelArea()
 {
   disp_gtab_sel("");
   minimize_win_gtab();
@@ -848,7 +849,7 @@ gboolean cmp_inmd_idx(regex_t *reg, int idx)
   return regexec(reg, ts, 0, 0, 0);
 }
 
-static int page_len()
+int page_len()
 {
   return (_gtab_space_auto_first & GTAB_space_auto_first_any) ?
   cur_inmd->M_DUP_SEL+1:cur_inmd->M_DUP_SEL;
@@ -860,7 +861,9 @@ static void page_no_str(char tstr[])
     int pgN = (total_matchN + cur_inmd->M_DUP_SEL - 1) / cur_inmd->M_DUP_SEL;
     if (pgN < 2)
       return;
-    sprintf(tstr, "%d/%d", wild_page /cur_inmd->M_DUP_SEL + 1, pgN);
+
+    int pg = gtab_buf_select ? pg_idx : wild_page;
+    sprintf(tstr, "%d/%d", pg /cur_inmd->M_DUP_SEL + 1, pgN);
   } else {
     int pgN = (E1 - S1 + page_len() - 1) /page_len();
 
@@ -905,6 +908,7 @@ char *htmlspecialchars(char *s, char out[])
   return out;
 }
 
+
 void disp_selection(gboolean phrase_selected)
 {
   char pgstr[32];
@@ -917,7 +921,6 @@ void disp_selection(gboolean phrase_selected)
     else
       clear_page_label();
   }
-
 
   char tt[(MAX_CIN_PHR + 4) * MAX_SELKEY + 80];
   tt[0]=0;
@@ -1354,18 +1357,18 @@ next_page:
         return 1;
       } else
       if (more_pg && !(_gtab_space_auto_first & GTAB_space_auto_first_any)) {
-        goto next_page;
+        if (gtab_buf_select) {
+          gbuf_next_pg();
+          return 1;
+        }
+        else
+          goto next_page;
       } else
       if (ci==0) {
         if (current_CS->b_half_full_char)
           return full_char_proc(key);
 
-        if (gbufN) {
-          insert_gbuf_cursor1(" ");
-          return 1;
-        }
-        else
-          return 0;
+        return insert_gbuf_cursor1_not_empty(" ");
       } else
       if (!has_wild) {
 //        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);

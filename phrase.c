@@ -6,6 +6,8 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include "gcin.h"
+#include "gtab.h"
+
 
 struct keystruc {
   char *kname;
@@ -150,6 +152,8 @@ gboolean feed_phrase(KeySym ksym, int state)
   }
 
 
+  extern int gbufN;
+
   for(i=0; i < trN; i++) {
     if (tr[i].ksym!= ksym)
       continue;
@@ -161,10 +165,11 @@ gboolean feed_phrase(KeySym ksym, int state)
       if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)
         add_to_tsin_buf_str(str);
       else
+      if (!cur_inmd->DefChars || !insert_gbuf_cursor1_not_empty(str))
         send_text(str);
-    }
 
-    return str!=NULL;
+      return TRUE;
+    }
   }
 
   return FALSE;

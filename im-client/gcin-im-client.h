@@ -2,7 +2,7 @@
 #define GCIN_IM_CLIENT_H
 struct GCIN_PASSWD;
 
-typedef struct {
+typedef struct GCIN_client_handle_S {
   int fd;               // <=0 ; connection is not established
   Window client_win;	/* client window */
   u_int	input_style;	/* input style */

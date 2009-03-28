@@ -44,10 +44,33 @@ static CH_ENT *find(char *ch)
   return NULL;
 }
 
+#include <sys/stat.h>
+
 static void build_chs()
 {
   if (!ts_gtabN)
     build_ts_gtab(0);
+
+  char fname[256];
+  get_gcin_user_or_sys_fname("tsin-ch-idx", fname);
+  struct stat st_gtab, st_tsin32;
+  FILE *fp;
+  extern char tsfname[];
+
+#if 1
+  if (!stat(fname, &st_gtab) && !stat(tsfname, &st_tsin32) &&
+      st_tsin32.st_mtime < st_gtab.st_mtime) {
+
+    if (fp=fopen(fname, "r")) {
+      printf("............... from %s\n", fname);
+      fread(&chsN, sizeof(chsN), 1, fp);
+      chs = tmalloc(CH_ENT, chsN);
+      fread(chs, sizeof(CH_ENT), chsN, fp);
+      fclose(fp);
+      return;
+    }
+  }
+#endif
 
   int i;
   char str[MAX_CIN_PHR];
@@ -96,6 +119,12 @@ static void build_chs()
       cidx++;
       p+=sz;
     }
+  }
+
+  if (fp=fopen(fname, "w")) {
+    fwrite(&chsN, sizeof(chsN), 1, fp);
+    fwrite(chs, sizeof(CH_ENT), chsN, fp);
+    fclose(fp);
   }
 }
 

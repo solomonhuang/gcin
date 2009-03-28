@@ -1,0 +1,206 @@
+gcin-imcontext-qt.o: gcin-imcontext-qt.cpp gcin-imcontext-qt.h \
+  /usr/lib/qt4/include/QtGui/QApplication \
+  /usr/lib/qt4/include/QtGui/qapplication.h \
+  /usr/lib/qt4/include/QtCore/qcoreapplication.h \
+  /usr/lib/qt4/include/QtCore/qobject.h \
+  /usr/lib/qt4/include/QtCore/qobjectdefs.h \
+  /usr/lib/qt4/include/QtCore/qnamespace.h \
+  /usr/lib/qt4/include/QtCore/qglobal.h \
+  /usr/lib/qt4/include/QtCore/qconfig.h \
+  /usr/lib/qt4/include/QtCore/qfeatures.h \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/qchar.h \
+  /usr/lib/qt4/include/QtCore/qbytearray.h \
+  /usr/lib/qt4/include/QtCore/qatomic.h \
+  /usr/lib/qt4/include/QtCore/qatomic_arch.h \
+  /usr/lib/qt4/include/QtCore/qatomic_i386.h \
+  /usr/lib/qt4/include/QtCore/qlist.h \
+  /usr/lib/qt4/include/QtCore/qiterator.h \
+  /usr/lib/qt4/include/QtCore/qalgorithms.h \
+  /usr/lib/qt4/include/QtCore/qcoreevent.h \
+  /usr/lib/qt4/include/QtCore/qeventloop.h \
+  /usr/lib/qt4/include/QtGui/qwindowdefs.h \
+  /usr/lib/qt4/include/QtCore/qpoint.h \
+  /usr/lib/qt4/include/QtCore/qsize.h \
+  /usr/lib/qt4/include/QtGui/qcursor.h /usr/lib/qt4/include/QtCore/QEvent \
+  /usr/lib/qt4/include/QtCore/qcoreevent.h \
+  /usr/lib/qt4/include/QtGui/QFont /usr/lib/qt4/include/QtGui/qfont.h \
+  /usr/lib/qt4/include/QtGui/QInputContext \
+  /usr/lib/qt4/include/QtGui/qinputcontext.h \
+  /usr/lib/qt4/include/QtGui/qevent.h \
+  /usr/lib/qt4/include/QtGui/qregion.h \
+  /usr/lib/qt4/include/QtCore/qrect.h \
+  /usr/lib/qt4/include/QtGui/qkeysequence.h \
+  /usr/lib/qt4/include/QtGui/qmime.h \
+  /usr/lib/qt4/include/QtCore/qmimedata.h \
+  /usr/lib/qt4/include/QtCore/qvariant.h \
+  /usr/lib/qt4/include/QtCore/qmetatype.h \
+  /usr/lib/qt4/include/QtCore/qdatastream.h \
+  /usr/lib/qt4/include/QtCore/qiodevice.h \
+  /usr/lib/qt4/include/QtCore/qmap.h /usr/lib/qt4/include/QtGui/qdrag.h \
+  /usr/lib/qt4/include/QtGui/qaction.h \
+  /usr/lib/qt4/include/QtGui/qwidget.h \
+  /usr/lib/qt4/include/QtGui/qpaintdevice.h \
+  /usr/lib/qt4/include/QtGui/qpalette.h \
+  /usr/lib/qt4/include/QtGui/qcolor.h /usr/lib/qt4/include/QtGui/qrgb.h \
+  /usr/lib/qt4/include/QtCore/qstringlist.h \
+  /usr/lib/qt4/include/QtCore/qregexp.h \
+  /usr/lib/qt4/include/QtCore/qstringmatcher.h \
+  /usr/lib/qt4/include/QtGui/qbrush.h /usr/lib/qt4/include/QtCore/qpair.h \
+  /usr/lib/qt4/include/QtCore/qvector.h \
+  /usr/lib/qt4/include/QtGui/qmatrix.h \
+  /usr/lib/qt4/include/QtGui/qpolygon.h \
+  /usr/lib/qt4/include/QtCore/qline.h \
+  /usr/lib/qt4/include/QtGui/qtransform.h \
+  /usr/lib/qt4/include/QtGui/qpainterpath.h \
+  /usr/lib/qt4/include/QtGui/qimage.h \
+  /usr/lib/qt4/include/QtGui/qpixmap.h /usr/lib/qt4/include/QtGui/qfont.h \
+  /usr/lib/qt4/include/QtGui/qfontmetrics.h \
+  /usr/lib/qt4/include/QtGui/qfontinfo.h \
+  /usr/lib/qt4/include/QtGui/qsizepolicy.h \
+  /usr/lib/qt4/include/QtGui/qicon.h \
+  /usr/lib/qt4/include/QtGui/qactiongroup.h \
+  /usr/lib/qt4/include/QtGui/QInputMethodEvent \
+  /usr/lib/qt4/include/QtGui/qevent.h /usr/lib/qt4/include/QtCore/QObject \
+  /usr/lib/qt4/include/QtCore/qobject.h \
+  /usr/lib/qt4/include/QtCore/QPoint /usr/lib/qt4/include/QtCore/qpoint.h \
+  /usr/lib/qt4/include/QtGui/QWidget /usr/lib/qt4/include/QtGui/qwidget.h \
+  /usr/lib/qt4/include/QtGui/QX11Info \
+  /usr/lib/qt4/include/QtGui/qx11info_x11.h ../im-client/gcin-im-client.h
+gcin-qt.o: gcin-qt.cpp gcin-qt.h /usr/lib/qt4/include/QtCore/QObject \
+  /usr/lib/qt4/include/QtCore/qobject.h \
+  /usr/lib/qt4/include/QtCore/qobjectdefs.h \
+  /usr/lib/qt4/include/QtCore/qnamespace.h \
+  /usr/lib/qt4/include/QtCore/qglobal.h \
+  /usr/lib/qt4/include/QtCore/qconfig.h \
+  /usr/lib/qt4/include/QtCore/qfeatures.h \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/qchar.h \
+  /usr/lib/qt4/include/QtCore/qbytearray.h \
+  /usr/lib/qt4/include/QtCore/qatomic.h \
+  /usr/lib/qt4/include/QtCore/qatomic_arch.h \
+  /usr/lib/qt4/include/QtCore/qatomic_i386.h \
+  /usr/lib/qt4/include/QtCore/qlist.h \
+  /usr/lib/qt4/include/QtCore/qiterator.h \
+  /usr/lib/qt4/include/QtCore/qalgorithms.h \
+  /usr/lib/qt4/include/QtCore/QSocketNotifier \
+  /usr/lib/qt4/include/QtCore/qsocketnotifier.h \
+  /usr/lib/qt4/include/QtCore/qobject.h gcin-common-qt.h \
+  /usr/lib/qt4/include/QtCore/QString \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/QStringList \
+  /usr/lib/qt4/include/QtCore/qstringlist.h \
+  /usr/lib/qt4/include/QtCore/qdatastream.h \
+  /usr/lib/qt4/include/QtCore/qiodevice.h \
+  /usr/lib/qt4/include/QtCore/qregexp.h \
+  /usr/lib/qt4/include/QtCore/qstringmatcher.h
+im-gcin-qt.o: im-gcin-qt.cpp /usr/lib/qt4/include/QtCore/Qt \
+  /usr/lib/qt4/include/QtCore/qnamespace.h \
+  /usr/lib/qt4/include/QtCore/qglobal.h \
+  /usr/lib/qt4/include/QtCore/qconfig.h \
+  /usr/lib/qt4/include/QtCore/qfeatures.h \
+  /usr/lib/qt4/include/QtGui/QInputContextPlugin \
+  /usr/lib/qt4/include/QtGui/qinputcontextplugin.h \
+  /usr/lib/qt4/include/QtCore/qplugin.h \
+  /usr/lib/qt4/include/QtCore/qobject.h \
+  /usr/lib/qt4/include/QtCore/qobjectdefs.h \
+  /usr/lib/qt4/include/QtCore/qnamespace.h \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/qchar.h \
+  /usr/lib/qt4/include/QtCore/qbytearray.h \
+  /usr/lib/qt4/include/QtCore/qatomic.h \
+  /usr/lib/qt4/include/QtCore/qatomic_arch.h \
+  /usr/lib/qt4/include/QtCore/qatomic_i386.h \
+  /usr/lib/qt4/include/QtCore/qlist.h \
+  /usr/lib/qt4/include/QtCore/qiterator.h \
+  /usr/lib/qt4/include/QtCore/qalgorithms.h \
+  /usr/lib/qt4/include/QtCore/qpointer.h \
+  /usr/lib/qt4/include/QtCore/qfactoryinterface.h \
+  /usr/lib/qt4/include/QtCore/qstringlist.h \
+  /usr/lib/qt4/include/QtCore/qdatastream.h \
+  /usr/lib/qt4/include/QtCore/qiodevice.h \
+  /usr/lib/qt4/include/QtCore/qregexp.h \
+  /usr/lib/qt4/include/QtCore/qstringmatcher.h gcin-qt.h \
+  /usr/lib/qt4/include/QtCore/QObject \
+  /usr/lib/qt4/include/QtCore/qobject.h \
+  /usr/lib/qt4/include/QtCore/QSocketNotifier \
+  /usr/lib/qt4/include/QtCore/qsocketnotifier.h gcin-common-qt.h \
+  /usr/lib/qt4/include/QtCore/QString \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/QStringList \
+  /usr/lib/qt4/include/QtCore/qstringlist.h gcin-imcontext-qt.h \
+  /usr/lib/qt4/include/QtGui/QApplication \
+  /usr/lib/qt4/include/QtGui/qapplication.h \
+  /usr/lib/qt4/include/QtCore/qcoreapplication.h \
+  /usr/lib/qt4/include/QtCore/qcoreevent.h \
+  /usr/lib/qt4/include/QtCore/qeventloop.h \
+  /usr/lib/qt4/include/QtGui/qwindowdefs.h \
+  /usr/lib/qt4/include/QtCore/qpoint.h \
+  /usr/lib/qt4/include/QtCore/qsize.h \
+  /usr/lib/qt4/include/QtGui/qcursor.h /usr/lib/qt4/include/QtCore/QEvent \
+  /usr/lib/qt4/include/QtCore/qcoreevent.h \
+  /usr/lib/qt4/include/QtGui/QFont /usr/lib/qt4/include/QtGui/qfont.h \
+  /usr/lib/qt4/include/QtGui/QInputContext \
+  /usr/lib/qt4/include/QtGui/qinputcontext.h \
+  /usr/lib/qt4/include/QtGui/qevent.h \
+  /usr/lib/qt4/include/QtGui/qregion.h \
+  /usr/lib/qt4/include/QtCore/qrect.h \
+  /usr/lib/qt4/include/QtGui/qkeysequence.h \
+  /usr/lib/qt4/include/QtGui/qmime.h \
+  /usr/lib/qt4/include/QtCore/qmimedata.h \
+  /usr/lib/qt4/include/QtCore/qvariant.h \
+  /usr/lib/qt4/include/QtCore/qmetatype.h \
+  /usr/lib/qt4/include/QtCore/qmap.h /usr/lib/qt4/include/QtGui/qdrag.h \
+  /usr/lib/qt4/include/QtGui/qaction.h \
+  /usr/lib/qt4/include/QtGui/qwidget.h \
+  /usr/lib/qt4/include/QtGui/qpaintdevice.h \
+  /usr/lib/qt4/include/QtGui/qpalette.h \
+  /usr/lib/qt4/include/QtGui/qcolor.h /usr/lib/qt4/include/QtGui/qrgb.h \
+  /usr/lib/qt4/include/QtGui/qbrush.h /usr/lib/qt4/include/QtCore/qpair.h \
+  /usr/lib/qt4/include/QtCore/qvector.h \
+  /usr/lib/qt4/include/QtGui/qmatrix.h \
+  /usr/lib/qt4/include/QtGui/qpolygon.h \
+  /usr/lib/qt4/include/QtCore/qline.h \
+  /usr/lib/qt4/include/QtGui/qtransform.h \
+  /usr/lib/qt4/include/QtGui/qpainterpath.h \
+  /usr/lib/qt4/include/QtGui/qimage.h \
+  /usr/lib/qt4/include/QtGui/qpixmap.h /usr/lib/qt4/include/QtGui/qfont.h \
+  /usr/lib/qt4/include/QtGui/qfontmetrics.h \
+  /usr/lib/qt4/include/QtGui/qfontinfo.h \
+  /usr/lib/qt4/include/QtGui/qsizepolicy.h \
+  /usr/lib/qt4/include/QtGui/qicon.h \
+  /usr/lib/qt4/include/QtGui/qactiongroup.h \
+  /usr/lib/qt4/include/QtGui/QInputMethodEvent \
+  /usr/lib/qt4/include/QtGui/qevent.h /usr/lib/qt4/include/QtCore/QPoint \
+  /usr/lib/qt4/include/QtCore/qpoint.h /usr/lib/qt4/include/QtGui/QWidget \
+  /usr/lib/qt4/include/QtGui/qwidget.h \
+  /usr/lib/qt4/include/QtGui/QX11Info \
+  /usr/lib/qt4/include/QtGui/qx11info_x11.h ../im-client/gcin-im-client.h
+moc_gcin-qt.o: moc_gcin-qt.cpp gcin-qt.h \
+  /usr/lib/qt4/include/QtCore/QObject \
+  /usr/lib/qt4/include/QtCore/qobject.h \
+  /usr/lib/qt4/include/QtCore/qobjectdefs.h \
+  /usr/lib/qt4/include/QtCore/qnamespace.h \
+  /usr/lib/qt4/include/QtCore/qglobal.h \
+  /usr/lib/qt4/include/QtCore/qconfig.h \
+  /usr/lib/qt4/include/QtCore/qfeatures.h \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/qchar.h \
+  /usr/lib/qt4/include/QtCore/qbytearray.h \
+  /usr/lib/qt4/include/QtCore/qatomic.h \
+  /usr/lib/qt4/include/QtCore/qatomic_arch.h \
+  /usr/lib/qt4/include/QtCore/qatomic_i386.h \
+  /usr/lib/qt4/include/QtCore/qlist.h \
+  /usr/lib/qt4/include/QtCore/qiterator.h \
+  /usr/lib/qt4/include/QtCore/qalgorithms.h \
+  /usr/lib/qt4/include/QtCore/QSocketNotifier \
+  /usr/lib/qt4/include/QtCore/qsocketnotifier.h \
+  /usr/lib/qt4/include/QtCore/qobject.h gcin-common-qt.h \
+  /usr/lib/qt4/include/QtCore/QString \
+  /usr/lib/qt4/include/QtCore/qstring.h \
+  /usr/lib/qt4/include/QtCore/QStringList \
+  /usr/lib/qt4/include/QtCore/qstringlist.h \
+  /usr/lib/qt4/include/QtCore/qdatastream.h \
+  /usr/lib/qt4/include/QtCore/qiodevice.h \
+  /usr/lib/qt4/include/QtCore/qregexp.h \
+  /usr/lib/qt4/include/QtCore/qstringmatcher.h

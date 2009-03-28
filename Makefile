@@ -93,6 +93,7 @@ ifeq ($(USE_I18N),Y)
 	$(MAKE) -C po
 endif
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
+	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
 	LD_RUN_PATH=.:$(gcinlibdir) \
@@ -206,6 +207,7 @@ install:
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im install; fi
+	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im install; fi
 	if [ $(prefix) = /usr/local ]; then \
 	   install -m 644 gcin.png /usr/share/icons; \
 	   install -d $(DOC_DIR); \
@@ -232,6 +234,7 @@ clean:
 	$(MAKE) -C im-client clean
 	$(MAKE) -C gtk-im clean
 	$(MAKE) -C qt-im clean
+	$(MAKE) -C qt4-im clean
 	$(MAKE) -C man clean
 	$(MAKE) -C menu clean
 	$(MAKE) -C po clean
