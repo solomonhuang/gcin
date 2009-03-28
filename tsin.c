@@ -1658,7 +1658,7 @@ other_keys:
    }
 
    KeySym key_pad = keypad_proc(xkey);
-   if (!eng_ph || shift_m || key_pad) {
+   if (!eng_ph || shift_m || key_pad || !phkbm.phokbm[xkey][0].num) {
        if (key_pad)
          xkey = key_pad;
 asc_char:
@@ -1801,8 +1801,9 @@ llll2:
        return 1;
      }
 
-     if (key==0 || !ityp3_pho)
+     if (key==0 || !ityp3_pho) {
        return 1;
+     }
 
      ii=idx_pho[vv].start;
      start_idx=ii;

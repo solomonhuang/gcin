@@ -199,6 +199,8 @@ int main(int argc, char **argv)
   KeyNum = th.KeyS;
   dbg("keys %d\n",KeyNum);
 
+  if (!th.keybits)
+    th.keybits = 6;
   inp->keybits = th.keybits;
   dbg("keybits:%d\n", th.keybits);
 

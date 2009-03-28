@@ -657,6 +657,9 @@ gboolean init_in_method(int in_no)
 
       hide_in_win(current_CS);
     }
+
+    if (cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM))
+      hide_win_kbm();
   }
 
   reset_current_in_win_xy();

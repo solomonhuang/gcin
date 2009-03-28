@@ -207,8 +207,12 @@ void process_client_req(int fd)
 
       if (!getpeername(fd, (struct sockaddr *)&addr, &len)) {
         u_char addr_ch[4];
+#if 0
         memcpy(addr_ch, &addr.sin_addr.s_addr,sizeof(addr.sin_addr.s_addr));
         dbg("%d %d %d %d\n", addr_ch[0], addr_ch[1], addr_ch[2], addr_ch[3]);
+#else
+        dbg("%s\n", inet_ntoa(addr));
+#endif
       } else {
         perror("getpeername\n");
       }

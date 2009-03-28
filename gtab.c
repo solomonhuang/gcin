@@ -328,7 +328,7 @@ static void DispInArea()
   for(i=0;i<ci;i++) {
     disp_gtab(i, &cur_inmd->keyname[inch[i] * CH_SZ]);
 //    dbg("inch:%d ", inch[i]);
-    utf8_putchar(&cur_inmd->keyname[inch[i] * CH_SZ]);
+//    utf8_putchar(&cur_inmd->keyname[inch[i] * CH_SZ]);
 //    puts("");
   }
 
@@ -1431,7 +1431,7 @@ direct_select:
     case '*':
       inkey=cur_inmd->keymap[key];
       if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {
-        dbg("%d %d\n", inkey, cur_inmd->WILD_STAR);
+//        dbg("%d %d\n", inkey, cur_inmd->WILD_STAR);
         goto next;
       }
       if (ci< cur_inmd->MaxPress) {

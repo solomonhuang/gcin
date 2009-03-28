@@ -193,7 +193,8 @@ void init_gcin_im_serv(Window win)
 
   u_char *myip = (char *)&srv_ip_port.ip;
   srv_ip_port.port = serv_addr_tcp.sin_port;
-  dbg("server port bind to %d.%d.%d.%d:%d\n", myip[0], myip[1], myip[2], myip[3], port);
+
+  dbg("server port bind to %s:%d\n", inet_ntoa(serv_addr_tcp.sin_addr), port);
 
   time_t t;
 
