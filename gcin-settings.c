@@ -8,6 +8,7 @@ int default_input_method;
 int left_right_button_tips;
 int gcin_im_toggle_keys;
 int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
+int gcin_win_sym_click_close;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -90,6 +91,7 @@ void load_setttings()
 #if TRAY_ENABLED
   gcin_status_tray = get_gcin_conf_int(GCIN_STATUS_TRAY, 1);
 #endif
+  gcin_win_sym_click_close = get_gcin_conf_int(GCIN_WIN_SYM_CLICK_CLOSE, 1);
 
   gtab_dup_select_bell = get_gcin_conf_int(GTAB_DUP_SELECT_BELL, 0);
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);

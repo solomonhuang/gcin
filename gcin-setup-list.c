@@ -20,9 +20,10 @@ static GtkWidget *sw;
 static GtkWidget *treeview;
 static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts;
 static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
-       *check_button_gcin_shift_space_eng_full;
-       *check_button_gcin_init_im_enabled;
-       *check_button_gcin_eng_phrase_enabled;
+       *check_button_gcin_shift_space_eng_full,
+       *check_button_gcin_init_im_enabled,
+       *check_button_gcin_eng_phrase_enabled,
+       *check_button_gcin_win_sym_click_close;
 
 char *pho_speaker[16];
 int pho_speakerN;
@@ -167,6 +168,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   save_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_eng_phrase_enabled)));
+
+  save_gcin_conf_int(GCIN_WIN_SYM_CLICK_CLOSE,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close)));
 
   if (opt_speaker_opts) {
     idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_speaker_opts));
@@ -509,6 +513,17 @@ void create_gtablist_window (void)
   gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), check_button_phonetic_speak, FALSE, FALSE, 0);
   gtk_toggle_button_set_active(
      GTK_TOGGLE_BUTTON(check_button_phonetic_speak), phonetic_speak);
+
+
+  GtkWidget *hbox_gcin_win_sym_click_close = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_win_sym_click_close, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_win_sym_click_close = gtk_label_new(_("符號視窗點選後自動關閉"));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_win_sym_click_close,  FALSE, FALSE, 0);
+  check_button_gcin_win_sym_click_close = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close),check_button_gcin_win_sym_click_close,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close),
+     gcin_win_sym_click_close);
+
 
 #include <dirent.h>
   DIR *dir;

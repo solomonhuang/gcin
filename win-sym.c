@@ -186,6 +186,9 @@ static void cb_button_sym(GtkButton *button, char *str)
        reset_gtab_all();
        break;
   }
+
+  if (gcin_win_sym_click_close)
+    hide_win_sym();
 }
 
 void update_active_in_win_geom();

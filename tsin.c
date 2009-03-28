@@ -1557,6 +1557,8 @@ other_keys:
        if ((kbstate & ControlMask)) {
          if (xkey==XK_u) {
            clear_tsin_buffer();
+           if (gcin_pop_up_win)
+             hide_win0();
            return 1;
          } else
          if (xkey>=XK_1 && xkey<=XK_3) {

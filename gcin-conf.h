@@ -30,6 +30,7 @@
 #define GCIN_WIN_COLOR_USE "gcin-win-color-use"
 #define GCIN_CAPSLOCK_LOWER "gcin-capslock-lower"
 #define GCIN_ENG_PHRASE_ENABLED "gcin-eng-phrase-enabled"
+#define GCIN_WIN_SYM_CLICK_CLOSE "gcin-win-sym-click-close"
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
 #define GTAB_SPACE_AUTO_FIRST "gtab-space-auto-first"
@@ -79,7 +80,7 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
            gcin_capslock_lower, pho_hide_row2, pho_in_row1,
-           gcin_eng_phrase_enabled, gtab_que_wild_card;
+           gcin_eng_phrase_enabled, gtab_que_wild_card, gcin_win_sym_click_close;
 
 extern int default_input_method;
 extern int left_right_button_tips;
