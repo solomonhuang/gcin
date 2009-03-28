@@ -1,4 +1,33 @@
 ** UTF-8 encoding **
+0.9.8:
+- 請注意，現在 gcin 已經把 UTF-8 4-byte 的支援改成內定，詞音的資料庫(~/.gcin/tsin) 會自動轉換，但是如果你有自行產生的 .gtab 輸入法(e.g. 嘸蝦米)，必須再重新執行 gcin2tab。
+- 感謝卡拉蒙 ray2501.bbs bbs.ee.nchu.edu.tw 的行列輸入法二級簡碼支援。
+- Alt-Shift 片語如果 CapsLock 打開則無法使用的問題。
+- 修正一個 coredump。
+- gcin-seutp 注音的設定的視窗大小縮小一些，原來的大小對 1024x768 的解析度來說太大了。
+- 許氏鍵盤無法輸入  NYF哪  NYD拿  MYS嗎 的問題。
+- .gtab 32767 個片語的限制現在沒有了。
+- .gtab 由詞庫選字的正確率更高了。
+- CH_SZ 設成 4 則無法做詞庫編輯的問題。
+- 日文輸入拆字顯示的問題。
+- gtab %endkey 增加到 64，這樣就可以定義單鍵的西歐輸入法而不用按空白。
+- 感謝 chinsan 提供的詞庫。
+- gtab 新增 %keep_key_case 的選項，用在需要分別大小寫的輸入法像日文。
+	%space_style 4
+	%keep_key_case                           <---------------------------
+	%keyname begin
+- .cin 新增 %space_style 的選項，後面的數字代表的意義。
+	1:	嘸蝦米、大易
+	2:	倉頡等
+	4:	行列輸入法
+   有了這個，且在 gcin-setup 中設定成「由 .gtab 指定」，就可以自動設定空白鍵的選項，而且用 ctrl-alt- 切換輸入法時也會自動切換。
+
+%selkey 1234567890
+%space_style 2
+%keyname begin
+
+
+
 0.9.7:
 - 嘸蝦米用 wildcard (*?) 符合的字超過10個沒有辦法顯示的問題。
 - 新增 ctrl-alt-G 重複送出的字串。

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-  echo "please specify gcin table dir"
+if [ -z "$1" -o -z "$2" ]; then
+  echo "please specify gcin_table_dir gcin_bin_dir"
 fi
 
 cd
@@ -24,3 +24,13 @@ do
      cp $i ~/.gcin
   fi
 done
+
+# to support UTF-8 4-byte character
+cd ~/.gcin
+bindir=$2
+UTF8_4=utf8-4byte
+if [ ! -f $UTF8_4 ]; then
+    $bindir/tsd2a tsin > tmpfile
+    $bindir/tsa2d tmpfile
+    touch $UTF8_4
+fi

@@ -5,13 +5,13 @@ void prph(phokey_t kk)
 {
   u_int k[4];
 
-  k[3]=(kk&7) * CH_SZ;
+  k[3]=(kk&7);
   kk>>=3;
-  k[2]=(kk&15) * CH_SZ;
+  k[2]=(kk&15) * PHO_CHAR_LEN;
   kk>>=4;
-  k[1]=(kk&3) * CH_SZ;
+  k[1]=(kk&3) * PHO_CHAR_LEN;
   kk>>=2;
-  k[0]=(kk&31) * CH_SZ;
+  k[0]=(kk&31) * PHO_CHAR_LEN;
 
   int i;
 
@@ -21,11 +21,9 @@ void prph(phokey_t kk)
     if (!k[i])
       continue;
 
-    for(j=0; j < CH_SZ; j++) {
-      putchar(pho_chars[i][k[i]+j]);
-    }
+    utf8_putchar(&pho_chars[i][k[i]]);
   }
 
   if (k[3])
-    printf("%d", k[3]/CH_SZ);
+    printf("%d", k[3]);
 }

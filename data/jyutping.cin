@@ -24,6 +24,7 @@
 %cname 帶調粵拼
 %selkey 1234567890
 %endkey 123456
+%space_style 2
 %keyname begin
 a a
 b b

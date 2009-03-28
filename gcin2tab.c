@@ -43,11 +43,15 @@ void del_nl_spc(char *s)
 }
 
 
-void get_line(u_char *tt)
+void get_line(char *tt)
 {
   while (!feof(fr)) {
-    fgets(tt, 512, fr);
+    fgets((char *)tt, 512, fr);
     lineno++;
+
+    int len=strlen(tt);
+    if (tt[len-1]=='\n')
+      tt[len-1] = 0;
 
     if (tt[0]=='#' || strlen(tt) < 3)
       continue;
@@ -56,7 +60,7 @@ void get_line(u_char *tt)
   }
 }
 
-void cmd_arg(u_char *s, u_char **cmd, u_char **arg)
+void cmd_arg(char *s, char **cmd, char **arg)
 {
   char *t;
 
@@ -66,6 +70,7 @@ void cmd_arg(u_char *s, u_char **cmd, u_char **arg)
     *cmd=*arg=s;
     return;
   }
+
 
   s=skip_spc(s);
   t=to_spc(s);
@@ -118,8 +123,8 @@ int qcmp2(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  if (a->key > b->key) return 1;
-  if (a->key < b->key) return -1;
+  u_int d;
+  if ((d = a->key - b->key)) return d;
 
   return memcmp(a->ch ,b->ch, CH_SZ);
 }
@@ -138,8 +143,9 @@ int qcmp(const void *aa, const void *bb)
 {
   ITEM2 *a = (ITEM2 *)aa, *b = (ITEM2 *) bb;
 
-  if (a->key > b->key) return 1;
-  if (a->key < b->key) return -1;
+  u_int d;
+  if ((d = a->key - b->key)) return d;
+
   return a->oseq - b->oseq;
 }
 
@@ -150,6 +156,7 @@ int qcmp_64(const void *aa, const void *bb)
 
   if (a->key > b->key) return 1;
   if (a->key < b->key) return -1;
+
   return a->oseq - b->oseq;
 }
 
@@ -167,7 +174,6 @@ int main(int argc, char **argv)
   char tt[512];
   u_char *cmd, *arg;
   struct TableHead th;
-  struct TableHead2 th2;
   int KeyNum;
   char kname[128][CH_SZ];
   char keymap[64];
@@ -208,7 +214,6 @@ int main(int argc, char **argv)
           p_err("Cannot open %s\n", fname_cin);
 
   bzero(&th,sizeof(th));
-  bzero(&th2,sizeof(th));
   bzero(kno,sizeof(kno));
   bzero(keymap,sizeof(keymap));
 
@@ -218,7 +223,7 @@ int main(int argc, char **argv)
   bzero(itout64,sizeof(itout64));
 
   cmd_arg(tt, &cmd, &arg);
-  if (sequ(cmd, "%gen_inp\n")) {
+  if (sequ(cmd, "%gen_inp")) {
     dbg("skip gen_inp\n");
     cmd_arg(tt, &cmd, &arg);
   }
@@ -226,7 +231,7 @@ int main(int argc, char **argv)
   if (!sequ(cmd,"%ename") || !(*arg) )
     p_err("%d:  %%ename english_name  expected", lineno);
   arg[15]=0;
-  strcpy(th.ename,arg);
+//  strcpy(th.ename,arg);
 
   cmd_arg(tt, &cmd, &arg);
   if (!(sequ(cmd,"%prompt") || sequ(cmd,"%cname")) || !(*arg) )
@@ -249,7 +254,17 @@ int main(int argc, char **argv)
   }
 
   if (sequ(cmd,"%endkey")) {
-    strcpy(th2.endkey, arg);
+    strcpy(th.endkey, arg);
+    cmd_arg(tt,&cmd, &arg);
+  }
+
+  if (sequ(cmd,"%space_style")) {
+    th.space_style = atoi(arg);
+    cmd_arg(tt,&cmd, &arg);
+  }
+
+  if (sequ(cmd,"%keep_key_case")) {
+    th.flag |= FLAG_KEEP_KEY_CASE;
     cmd_arg(tt,&cmd, &arg);
   }
 
@@ -262,7 +277,11 @@ int main(int argc, char **argv)
 
     cmd_arg(tt,&cmd, &arg);
     if (sequ(cmd,"%keyname")) break;
-    k=mtolower(cmd[0]);
+    if (BITON(th.flag, FLAG_KEEP_KEY_CASE))
+      k=cmd[0];
+    else
+      k=mtolower(cmd[0]);
+
     if (kno[(int)k])
       p_err("%d:  key %c is already used",lineno, k);
 
@@ -276,6 +295,7 @@ int main(int argc, char **argv)
   th.KeyS=KeyNum;    /* include space */
 
   cmd_arg(tt,&cmd, &arg);
+
   if (sequ(cmd,"%quick") && sequ(arg,"begin")) {
     dbg(".. quick keys defined\n");
     for(quick_def=0;;) {
@@ -289,10 +309,26 @@ int main(int argc, char **argv)
       int N = 0;
       char *p = arg;
 
-      while (*p) {
-        bchcpy(th.qkeys.quick1[(int)k][N++], p);
-        p+=utf8_sz(p);
-      }
+      if (strlen(cmd)==1) {
+        while (*p) {
+          int len=u8cpy(th.qkeys.quick1[(int)k][N++], p);
+          p+=len;
+        }
+      } else
+      if (strlen(cmd)==2) {
+        int k1=kno[mtolower(cmd[1])]-1;
+        while (*p) {
+          char tp[4];
+          int len=u8cpy(tp, p);
+#if 1
+          if (utf8_eq(tp,"□"))
+             tp[0]=0;
+#endif
+          u8cpy(th.qkeys.quick2[(int)k][(int)k1][N++], tp);
+          p+=len;
+        }
+      } else
+        p_err("%d:  %quick only 1&2 keys are allowed '%s'", lineno, cmd);
 
       quick_def++;
     }
@@ -384,26 +420,14 @@ int main(int argc, char **argv)
 
     } else {
       if (key64) {
-#if LARGE_GTAB
           itar64[chno].ch[0]=phr_cou>>16;
           itar64[chno].ch[1]=(phr_cou >> 8) & 0xff;
           itar64[chno].ch[2]=phr_cou&0xff;
-#else
-          itar64[chno].ch[0]=phr_cou>>8;
-          itar64[chno].ch[1]=phr_cou&0xff;
-          itar64[chno].ch[2]=0;
-#endif
       }
       else {
-#if LARGE_GTAB
           itar[chno].ch[0]=phr_cou>>16;
           itar[chno].ch[1]=(phr_cou >> 8) & 0xff;
           itar[chno].ch[2]=phr_cou&0xff;
-#else
-          itar[chno].ch[0]=phr_cou>>8;
-          itar[chno].ch[1]=phr_cou&0xff;
-          itar[chno].ch[2]=0;
-#endif
       }
 
       if (len > MAX_CIN_PHR)
@@ -485,21 +509,9 @@ int main(int argc, char **argv)
     p_err("Cannot create");
   }
 
-  if (key64) {
-    fwrite(gtab64_header, 1, strlen(gtab64_header)+1, fw);
-  } else
-  if (th2.endkey[0]) {
-    dbg("32 bit with endkeys\n");
-    fwrite(gtab32_ver2_header, 1, strlen(gtab32_ver2_header)+1, fw);
-  }
-
-
   printf("Defined Characters:%d\n", chno);
 
   fwrite(&th,1,sizeof(th),fw);
-  if (key64 || th2.endkey[0])
-    fwrite(&th2,1,sizeof(th2),fw);
-
   fwrite(keymap, 1, KeyNum, fw);
   fwrite(kname, CH_SZ, KeyNum, fw);
   fwrite(idx1, sizeof(gtab_idx1_t), KeyNum+1, fw);

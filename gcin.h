@@ -15,7 +15,7 @@
 /* change 3 to 4 if you want to use 4-byte UTF-8 characters, but you must
    regenerate *.gtab tsin
 */
-#define CH_SZ (3)
+#define CH_SZ (4)
 
 
 typedef enum {
@@ -23,6 +23,7 @@ typedef enum {
   GCIN_STATE_ENG_FULL = 1,
   GCIN_STATE_CHINESE = 2
 } GCIN_STATE_E;
+
 
 
 #include "IC.h"
@@ -54,14 +55,12 @@ void loadIC();
 IC *FindIC(CARD16 icid);
 extern ClientState *current_CS;
 
-#define MROW 2
-#define MCOL 39
 
-typedef enum {
+enum {
   InputStyleOverSpot = 1,
   InputStyleRoot = 2,
   InputStyleOnSpot = 4
-} InputStyle_E;
+};
 
 enum {
   Control_Space=0,

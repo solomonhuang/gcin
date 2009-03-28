@@ -164,7 +164,7 @@ gboolean inph_typ_pho(int newkey)
       continue;
 
     if (num) {
-      if (typ==2 && typ_pho[0])
+      if (typ==2 && typ_pho[0] && !typ_pho[2])
         typ_pho[0] = 0;
       typ_pho[(int)typ] = num;
 #if TKBM

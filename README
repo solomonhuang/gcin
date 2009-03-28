@@ -17,7 +17,8 @@ Mandrake
 
 其他的 distribution 可能會失敗, 因為 file 位置 or 內容不一樣.  請自行修改 X
 中有關的 XIM startup script, 把原來執行 xcin 的部份改成執行 gcin
-
+---------------------
+0.9.8 的 .gtab format 有變動，如果你不是使用 gcin 內附的 .gtab file，一定要用 gcin2tab 重新產生新的 .gtab file，否則會 coredump。
 ---------------------
 Fedora rpms
 
@@ -76,6 +77,7 @@ logout & login
   [        「
   ㄣˋ   」
   ]           」
+  ㄌ‧  了
   ㄌ2   –    (連接號)
   ㄇ3   《    (書'名'號)
   ㄇ4    》
@@ -490,9 +492,23 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
 
 如果沒有，以 root 執行底下的 script 看看
 /usr/share/gcin/script/modify-XIM
-5. 檢查是否有設定 GTK_IM_MODULE=gcin 這個 environ variable，設定成 GTK_IM_MODULE=xim 也是可以用，
+5. 檢查是否有設定 GTK_IM_MODULE=gcin 這個 environ variable。設定成 GTK_IM_MODULE=xim 也是可以用，
 只是 over-the-spot 會有問題，gcin 視窗不會跟著程式的游標移動，除非有 install gtk2 xim over-the-spot 的 patch，還是用 GTK_IM_MODULE=gcin 最好。
 -------------------------------------------------------------------
 覺得 gcin 的釘子不好看，想要換掉。有此需求的的人自己 替換 /usr/share/icons/gcin
+-------------------------------------------------------------------
+.cin 新增 %space_style 的選項，後面的數字代表的意義。
+	1:	嘸蝦米、大易
+	2:	倉頡等
+	4:	行列輸入法
+有了這個，且在 gcin-setup 中設定成「由 .gtab 指定」，就可以自動設定空白鍵的選項，而且用 ctrl-alt- 切換輸入法時也會自動切換。
 
-
+%selkey 1234567890
+%space_style 2
+%keyname begin
+--------------------------------------------------------------------
+- gtab 新增 %keep_key_case 的選項，用在需要分別大小寫的輸入法像日文。
+	%space_style 4
+	%keep_key_case          <---------------------------
+	%keyname begin
+--------------------------------------------------------------------

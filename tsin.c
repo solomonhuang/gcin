@@ -679,8 +679,13 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 
 #define VOID_PHRASE_N -1
 
-    if (match_len == 2 && usecount < VOID_PHRASE_N)
+#if 0
+    if (/* match_len == 2 && */ usecount < VOID_PHRASE_N)
       continue;
+#else
+    if (match_len == plen && usecount < VOID_PHRASE_N)
+      continue;
+#endif
 
 #if 0
     dbg("nnn ");
@@ -712,7 +717,7 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 
     pre_sel[pre_selN].len = match_len;
     pre_sel[pre_selN].phidx = sti - 1;
-    memcpy(pre_sel[pre_selN].str, mtch, match_len*CH_SZ);
+    utf8cpyN(pre_sel[pre_selN].str, mtch, match_len);
     memcpy(pre_sel[pre_selN].phokey, mtk, match_len*sizeof(phokey_t));
     pre_selN++;
 

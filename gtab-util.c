@@ -23,6 +23,3 @@ u_int64_t CONVT2(INMD *inmd, int i)
 
   return kk;
 }
-
-char gtab64_header[]="## gtab 64-6bit ##";
-char gtab32_ver2_header[]="## gtab 32-6bit ##";

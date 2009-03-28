@@ -320,6 +320,7 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
       bottom = mid;
       int i;
 
+      int totlen=0;
       for(i=mid; i>=0; i--) {
         tlen = load_ts_gtab(i, tstr);
 
@@ -329,12 +330,9 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
         if (matchN >= match_chars_max)
           break;
 
-        memcpy(&match_chars[matchN * CH_SZ], &tstr[len], CH_SZ);
-//        dbg("zzz %c%c%c\n", match_chars[0], match_chars[1], match_chars[2]);
+        int slen= u8cpy(&match_chars[totlen], &tstr[len]);
+        totlen+=slen;
         matchN++;
-        match_chars[matchN * CH_SZ] = 0;
-
-//        dbg("iiiiii '%s' %d %d %s\n", tstr, tlen, len, match_chars);
       }
 
       for(i=mid+1; i< ts_gtabN; i++) {
@@ -346,9 +344,12 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
         if (matchN >= match_chars_max)
           break;
 
-        memcpy(&match_chars[matchN * CH_SZ], &tstr[len], CH_SZ);
+        int slen = u8cpy(&match_chars[totlen], &tstr[len]);
+        totlen+=slen;
         matchN++;
       }
+
+      match_chars[totlen] = 0;
 
       return matchN;
     }

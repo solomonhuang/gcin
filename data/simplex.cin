@@ -2,6 +2,7 @@
 %ename simplex
 %cname 簡易
 %selkey 123456789
+%space_style 2
 %keyname begin
 a 日
 b 月

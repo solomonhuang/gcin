@@ -202,8 +202,9 @@ struct {
   char *str;
   int num;
 } spc_opts[] = {
+  {"由 .gtab 指定", GTAB_space_auto_first_none},
   {"按空白立即送出第一字(嘸蝦米、大易)", GTAB_space_auto_first_any},
-  {"按滿按空白送出第一字(內定)", GTAB_space_auto_first_full},
+  {"按滿按空白送出第一字(倉頡)", GTAB_space_auto_first_full},
   {"按滿按空白不送出第一字(行列)", GTAB_space_auto_first_nofull},
   { NULL, 0},
 };
@@ -460,7 +461,7 @@ void create_gtab_conf_window()
 
     GtkWidget *hbox_gtab_auto_select_by_phrase = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_auto_select_by_phrase, FALSE, FALSE, 0);
-    GtkWidget *label_gtab_auto_select = gtk_label_new("自動由詞庫自動選擇字");
+    GtkWidget *label_gtab_auto_select = gtk_label_new("由詞庫自動選擇字");
     gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), label_gtab_auto_select,  FALSE, FALSE, 0);
     check_button_gtab_auto_select_by_phrase = gtk_check_button_new ();
     gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase),check_button_gtab_auto_select_by_phrase,  FALSE, FALSE, 0);

@@ -330,9 +330,11 @@ void create_win_gtab_gui_simple()
   gtk_container_set_border_width (GTK_CONTAINER (event_box_gtab), 0);
   gtk_box_pack_start (GTK_BOX (hbox), event_box_gtab, FALSE, FALSE, 0);
 
+#if 1
   GtkWidget *frame_gtab = gtk_frame_new(NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame_gtab), 0);
   gtk_container_add (GTK_CONTAINER (event_box_gtab), frame_gtab);
+#endif
 
   g_signal_connect(G_OBJECT(event_box_gtab),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
@@ -343,7 +345,11 @@ void create_win_gtab_gui_simple()
   }
 
   GtkWidget *hbox_gtab = gtk_hbox_new (FALSE, 0);
+#if 1
   gtk_container_add (GTK_CONTAINER (frame_gtab), hbox_gtab);
+#else
+  gtk_container_add (GTK_CONTAINER (event_box_gtab), hbox_gtab);
+#endif
 
   int i;
   for(i=0; i < MAX_TAB_KEY_NUM64; i++) {

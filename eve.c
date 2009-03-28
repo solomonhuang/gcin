@@ -239,6 +239,8 @@ void move_IC_in_win(ClientState *rec);
 void update_in_win_pos()
 {
 //  dbg("update_in_win_pos %d\n", current_CS->input_style);
+  check_CS();
+
   if (current_CS->input_style == InputStyleRoot) {
     Window r_root, r_child;
     int winx, winy, rootx, rooty;

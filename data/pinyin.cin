@@ -3,6 +3,7 @@
 %cname  拼音
 %selkey 1234567890
 %endkey 1234.
+%space_style 2
 %keyname begin
 a Ａ
 b Ｂ

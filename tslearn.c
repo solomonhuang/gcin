@@ -119,7 +119,7 @@ static void cb_button_parse(GtkButton *button, gpointer user_data)
 
     for(len=MAX_PHRASE_LEN; len>=2 ; len--) {
       u_char txt[MAX_PHRASE_LEN*CH_SZ + 1];
-      int txtN=0;
+      int txtN=0, u8chN=0;
 
       gboolean b_ignore = FALSE;
       int k;
@@ -137,9 +137,10 @@ static void cb_button_parse(GtkButton *button, gpointer user_data)
         memcpy(&txt[txtN], utf8, wn);
 
         txtN+= wn;
+        u8chN++;
       }
 
-      if (b_ignore || txtN < CH_SZ*2)
+      if (b_ignore || txtN < 2)
         continue;
 
       txt[txtN] = 0;
@@ -269,17 +270,18 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
 
   bigphoN = 0;
   int i;
-  for(i=0; i < current_strN; i+=CH_SZ) {
+  char *p = current_str;
+  while (*p) {
     big5char_pho *pbigpho = &bigpho[bigphoN++];
+    int len;
 
-    pbigpho->phokeysN = utf8_pho_keys(&current_str[i], pbigpho->phokeys);
+    pbigpho->phokeysN = utf8_pho_keys(p, pbigpho->phokeys);
+    p+=utf8_sz(p);
 
     if (!pbigpho->phokeysN) {
       dbg(" no mapping to pho\n");
       return;
     }
-
-    dbg(" phokeyN: %d", bigpho[i].phokeysN);
   }
 
   dbg("\n");

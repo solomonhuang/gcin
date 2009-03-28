@@ -5,6 +5,8 @@
 %ename changjei5
 %cname 倉五
 %selkey 1234567890
+%space_style 2
+#%keep_key_case
 %keyname begin
 a 日
 b 月

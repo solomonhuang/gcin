@@ -13,7 +13,7 @@ DUAL_XIM_ENTRY xim_arr[2];
 DUAL_XIM_ENTRY *pxim_arr;
 
 
-u_char *fullchar[]=
+char *fullchar[]=
 {"　","！","”","＃","＄","％","＆","’","（","）","＊","＋",
 "，","－","．","／","０","１","２","３","４","５","６","７","８","９","：","；","＜","＝","＞","？",
 "＠","Ａ","Ｂ","Ｃ","Ｄ","Ｅ","Ｆ","Ｇ","Ｈ","Ｉ","Ｊ","Ｋ","Ｌ","Ｍ","Ｎ","Ｏ","Ｐ","Ｑ","Ｒ","Ｓ",
@@ -414,7 +414,7 @@ static void exec_script(char *name)
 static void exec_setup_scripts()
 {
   exec_script("gcin-utf8-setup");
-  exec_script("gcin-user-setup "GCIN_TABLE_DIR);
+  exec_script("gcin-user-setup "GCIN_TABLE_DIR" "GCIN_BIN_DIR);
 }
 
 
