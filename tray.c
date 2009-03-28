@@ -32,6 +32,11 @@ static void draw_icon()
   int dw = da->allocation.width, dh = da->allocation.height;
   int w, h;
 
+  GdkColor color_fg;
+
+  gdk_color_parse("black", &color_fg);
+  gdk_gc_set_rgb_fg_color(gc, &color_fg);
+
   if (pix)
     gdk_draw_pixbuf(da->window, NULL, pix, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
   else {
@@ -39,14 +44,6 @@ static void draw_icon()
     pango_layout_get_pixel_size(pango, &w, &h);
     gdk_draw_layout(da->window, gc, 0, 0, pango);
   }
-
-  if (gb_output) {
-    static char sim[] = "简";
-    pango_layout_set_text(pango, sim, strlen(sim));
-    pango_layout_get_pixel_size(pango, &w, &h);
-    gdk_draw_layout(da->window, gc, 0, dh - h, pango);
-  }
-
 
   if (current_CS) {
     if (current_CS->b_half_full_char) {
@@ -64,6 +61,16 @@ static void draw_icon()
       pango_layout_get_pixel_size(pango, &w, &h);
       gdk_draw_layout(da->window, gc, 0, 0, pango);
     }
+  }
+
+  gdk_color_parse("red", &color_fg);
+  gdk_gc_set_rgb_fg_color(gc, &color_fg);
+
+  if (gb_output) {
+    static char sim[] = "简";
+    pango_layout_set_text(pango, sim, strlen(sim));
+    pango_layout_get_pixel_size(pango, &w, &h);
+    gdk_draw_layout(da->window, gc, 0, dh - h, pango);
   }
 }
 

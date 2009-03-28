@@ -80,7 +80,10 @@ add_items (void)
     key[0]=0;
     file[0]=0;
 
-    fscanf(fp, "%s %s %s", name, key, file);
+    char line[128];
+
+    fgets(line, sizeof(line), fp);
+    sscanf(line, "%s %s %s", name, key, file);
 
     if (strlen(name) < 1)
       break;

@@ -410,7 +410,7 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
   int mid, cmp;
   phokey_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
   u_char len, mlen, stch[MAX_PHRASE_LEN * CH_SZ];
-  char usecount;
+  usecount_t usecount;
   int sti, edi;
   int i= *pho >> TSIN_HASH_SHIFT;
 
