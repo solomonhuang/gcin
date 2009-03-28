@@ -17,10 +17,11 @@ static struct {
  {NULL, NULL}
 };
 
-static GtkWidget *check_button_phrase_pre_select,
-                 *check_button_phrase_pre_select,
+static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_phonetic_char_dynamic_sequence,
                  *check_button_pho_simple_win,
+                 *check_button_pho_hide_row2,
+                 *check_button_pho_in_row1,
                  *check_button_phonetic_huge_tab,
                  *check_button_tsin_tone_char_input,
                  *spinner_tsin_buffer_size;
@@ -71,7 +72,7 @@ static gboolean cb_ok( GtkWidget *widget,
                      tsin_space_options[new_select_idx_tsin_space_opt].key);
 
   save_gcin_conf_int(TSIN_PHRASE_PRE_SELECT,
-       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phrase_pre_select)));
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_phrase_pre_select)));
 
   save_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence)));
@@ -79,11 +80,18 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(PHO_SIMPLE_WIN,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_pho_simple_win)));
 
+  save_gcin_conf_int(PHO_HIDE_ROW2,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_pho_hide_row2)));
+
+  save_gcin_conf_int(PHO_IN_ROW1,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_pho_in_row1)));
+
   save_gcin_conf_int(PHONETIC_HUGE_TAB,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_huge_tab)));
 
   save_gcin_conf_int(TSIN_TONE_CHAR_INPUT,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input)));
+
 
   tsin_buffer_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_buffer_size));
   save_gcin_conf_int(TSIN_BUFFER_SIZE, tsin_buffer_size);
@@ -353,45 +361,75 @@ void create_kbm_window()
   }
 
 
-  GtkWidget *frame_tsin_phrase_pre_select = gtk_frame_new("詞音輸入預選詞視窗");
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_phrase_pre_select , TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_phrase_pre_select), 1);
-  check_button_phrase_pre_select = gtk_check_button_new ();
-  gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_pre_select),
-      check_button_phrase_pre_select);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_phrase_pre_select),
-     tsin_phrase_pre_select);
+  GtkWidget *hbox_tsin_phrase_pre_select = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_phrase_pre_select , TRUE, TRUE, 1);
+  GtkWidget *label_tsin_phrase_pre_select = gtk_label_new("詞音輸入預選詞視窗");
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_phrase_pre_select), label_tsin_phrase_pre_select , TRUE, TRUE, 0);
+  check_button_tsin_phrase_pre_select = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_phrase_pre_select), check_button_tsin_phrase_pre_select, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_tsin_phrase_pre_select), tsin_phrase_pre_select);
 
 
-  GtkWidget *frame_phonetic_char_dynamic_sequence = gtk_frame_new("注音依使用頻率調整順序");
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_phonetic_char_dynamic_sequence , TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_phonetic_char_dynamic_sequence), 1);
+  GtkWidget *hbox_phonetic_char_dynamic_sequence = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_phonetic_char_dynamic_sequence , TRUE, TRUE, 1);
+  GtkWidget *label_phonetic_char_dynamic_sequence = gtk_label_new("依使用頻率調整字的順序");
+  gtk_box_pack_start (GTK_BOX (hbox_phonetic_char_dynamic_sequence), label_phonetic_char_dynamic_sequence , TRUE, TRUE, 0);
   check_button_phonetic_char_dynamic_sequence = gtk_check_button_new ();
-  gtk_container_add (GTK_CONTAINER (frame_phonetic_char_dynamic_sequence),
-      check_button_phonetic_char_dynamic_sequence);
+  gtk_box_pack_start (GTK_BOX (hbox_phonetic_char_dynamic_sequence), check_button_phonetic_char_dynamic_sequence, FALSE, FALSE, 0);
   gtk_toggle_button_set_active(
-     GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence),
-     phonetic_char_dynamic_sequence);
+     GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence), phonetic_char_dynamic_sequence);
 
-  GtkWidget *frame_pho_simple_win = gtk_frame_new("詞音/注音精簡視窗");
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_pho_simple_win , TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_pho_simple_win), 3);
+
+  GtkWidget *hbox_pho_simple_win = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_pho_simple_win , TRUE, TRUE, 1);
+  GtkWidget *label_pho_simple_win = gtk_label_new("詞音/注音精簡視窗");
+  gtk_box_pack_start (GTK_BOX (hbox_pho_simple_win), label_pho_simple_win , TRUE, TRUE, 0);
   check_button_pho_simple_win = gtk_check_button_new ();
-  gtk_container_add (GTK_CONTAINER (frame_pho_simple_win),
-      check_button_pho_simple_win);
+  gtk_box_pack_start (GTK_BOX (hbox_pho_simple_win), check_button_pho_simple_win, FALSE, FALSE, 0);
   gtk_toggle_button_set_active(
-     GTK_TOGGLE_BUTTON(check_button_pho_simple_win),
-     pho_simple_win);
+     GTK_TOGGLE_BUTTON(check_button_pho_simple_win), pho_simple_win);
 
-  GtkWidget *frame_phonetic_huge_tab = gtk_frame_new("使用巨大 UTF-8 字集");
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_phonetic_huge_tab , TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_phonetic_huge_tab), 1);
-  check_button_phonetic_huge_tab = gtk_check_button_new ();
-  gtk_container_add (GTK_CONTAINER (frame_phonetic_huge_tab),
-      check_button_phonetic_huge_tab);
+
+  GtkWidget *hbox_pho_hide_row2 = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_pho_hide_row2 , TRUE, TRUE, 1);
+  GtkWidget *label_pho_hide_row2 = gtk_label_new("注音隱藏第二列(按鍵顯示)");
+  gtk_box_pack_start (GTK_BOX (hbox_pho_hide_row2), label_pho_hide_row2 , TRUE, TRUE, 0);
+  check_button_pho_hide_row2 = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_pho_hide_row2), check_button_pho_hide_row2, FALSE, FALSE, 0);
   gtk_toggle_button_set_active(
-     GTK_TOGGLE_BUTTON(check_button_phonetic_huge_tab),
-     phonetic_huge_tab);
+     GTK_TOGGLE_BUTTON(check_button_pho_hide_row2), pho_hide_row2);
+
+
+  GtkWidget *hbox_pho_in_row1 = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_pho_in_row1 , TRUE, TRUE, 1);
+  GtkWidget *label_pho_in_row1 = gtk_label_new("注音輸入顯示移至第一列");
+  gtk_box_pack_start (GTK_BOX (hbox_pho_in_row1), label_pho_in_row1 , TRUE, TRUE, 0);
+  check_button_pho_in_row1 = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_pho_in_row1), check_button_pho_in_row1, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_pho_in_row1), pho_in_row1);
+
+
+  GtkWidget *hbox_phonetic_huge_tab = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_phonetic_huge_tab , TRUE, TRUE, 1);
+  GtkWidget *label_phonetic_huge_tab = gtk_label_new("使用巨大 UTF-8 字集");
+  gtk_box_pack_start (GTK_BOX (hbox_phonetic_huge_tab), label_phonetic_huge_tab , TRUE, TRUE, 0);
+  check_button_phonetic_huge_tab = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_phonetic_huge_tab), check_button_phonetic_huge_tab, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_phonetic_huge_tab), phonetic_huge_tab);
+
+
+  GtkWidget *hbox_tsin_tone_char_input = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_tone_char_input , TRUE, TRUE, 1);
+  GtkWidget *label_tsin_tone_char_input = gtk_label_new("詞音輸入注音聲調符號");
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_tone_char_input), label_tsin_tone_char_input , TRUE, TRUE, 0);
+  check_button_tsin_tone_char_input = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_tone_char_input), check_button_tsin_tone_char_input, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input), tsin_tone_char_input);
+
 
   GtkWidget *frame_tsin_buffer_size = gtk_frame_new("詞音編輯緩衝區大小");
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_buffer_size, FALSE, FALSE, 0);
@@ -429,15 +467,6 @@ void create_kbm_window()
   gtk_container_add (GTK_CONTAINER (frame_tsin_cursor_color), button_tsin_cursor_color);
 
 
-  GtkWidget *frame_tsin_tone_char_input = gtk_frame_new("詞音輸入注音聲調符號");
-  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_tone_char_input , TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_tone_char_input), 1);
-  check_button_tsin_tone_char_input = gtk_check_button_new ();
-  gtk_container_add (GTK_CONTAINER (frame_tsin_tone_char_input),
-      check_button_tsin_tone_char_input);
-  gtk_toggle_button_set_active(
-     GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input),
-     tsin_tone_char_input);
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);

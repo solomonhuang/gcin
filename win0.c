@@ -5,14 +5,15 @@
 GtkWidget *gwin0;
 Window xwin0;
 extern Display *dpy;
-GtkWidget *frame;
+static GtkWidget *top_bin;
 static GtkWidget *image_pin;
+int current_pho_simple_win;
+int current_gcin_inner_frame;
 
-static GtkWidget *hbox_edit, *hbox_row2;
+static GtkWidget *hbox_edit;
 static PangoAttrList* attr_list, *attr_list_blank;
 
 void compact_win0();
-void compact_win0_x();
 void move_win0(int x, int y);
 void get_win0_geom();
 
@@ -27,16 +28,29 @@ static GtkWidget *labels_pho[4];
 static GtkWidget *button_eng_ph;
 static int max_yl;
 
+static void create_win0_gui();
 
-
-void disp_hide_tsin_status_row()
+static void recreate_win0()
 {
-  if (!pho_simple_win)
-    gtk_widget_show_all(hbox_row2);
-  else {
-    gtk_widget_hide_all(hbox_row2);
-    compact_win0();
-  }
+  bzero(chars, sizeof(chars));
+  bzero(labels_pho, sizeof(chars));
+
+  create_win0_gui();
+}
+
+
+void change_win0_style()
+{
+  if (!top_bin || (current_pho_simple_win == pho_simple_win &&
+      current_gcin_inner_frame == gcin_inner_frame))
+    return;
+
+  gtk_widget_destroy(top_bin);
+  top_bin = NULL;
+
+  current_pho_simple_win = pho_simple_win;
+  current_gcin_inner_frame = gcin_inner_frame;
+  recreate_win0();
 }
 
 void set_label_font_size(GtkWidget *label, int size)
@@ -47,17 +61,8 @@ void set_label_font_size(GtkWidget *label, int size)
   PangoContext *pango_context = gtk_widget_get_pango_context (label);
   PangoFontDescription* font=pango_context_get_font_description
        (pango_context);
+  pango_font_description_set_family(font, gcin_font_name);
   pango_font_description_set_size(font, PANGO_SCALE * size);
-  gtk_widget_modify_font(label, font);
-}
-
-
-void set_label_font_family(GtkWidget *label, char *family)
-{
-  PangoContext *pango_context = gtk_widget_get_pango_context (label);
-  PangoFontDescription* font=pango_context_get_font_description
-       (pango_context);
-  pango_font_description_set_family(font, family);
   gtk_widget_modify_font(label, font);
 }
 
@@ -139,7 +144,7 @@ void set_label_space(GtkWidget *label)
 }
 
 
-void disp_char(int index, u_char *ch)
+void disp_char(int index, char *ch)
 {
   char tt[CH_SZ+1];
 
@@ -160,7 +165,6 @@ void disp_char(int index, u_char *ch)
   gtk_widget_show(chars[index].vbox);
 
   get_win0_geom();
-
   if (win_x + win_xl >= dpy_xl)
     move_win0(dpy_xl - win_xl, win_y);
 }
@@ -255,13 +259,18 @@ void hide_pho(int index)
 void get_char_index_xy(int index, int *rx, int *ry)
 {
   int wx, wy;
-  GtkWidget *widget =chars[index].line;
   int ofs=0;
 
+#if 0
+  GtkWidget *widget =chars[index].line;
+
   if (!GTK_WIDGET_VISIBLE(widget)) {
-    widget = chars[index].vbox;
     ofs=2;
+    widget = chars[index].vbox;
   }
+#else
+  GtkWidget *widget = chars[index].vbox;
+#endif
 
   gtk_widget_show(widget);
 
@@ -287,16 +296,15 @@ void move_win_char_index(GtkWidget *win1, int index)
 
   get_char_index_xy(index, &x, &y);
 
-
   int win1_xl, win1_yl;
   get_win_size(win1, &win1_xl, &win1_yl);
 
   if (x + win1_xl > dpy_xl)
-
     x = dpy_xl - win1_xl;
   if (y + win1_yl > dpy_yl)
     y = win_y - win1_yl;
 
+//  dbg("move_win_char_index:%d %d\n", index, x);
   gtk_window_move(GTK_WINDOW(win1), x, y);
 }
 
@@ -306,6 +314,15 @@ static int best_win_x, best_win_y;
 
 static void raw_move(int x, int y)
 {
+  int xl, yl;
+
+  get_win_size(gwin0, &xl, &yl);
+
+  if (x + xl > dpy_xl)
+    x = dpy_xl - xl;
+  if (y + yl > dpy_yl)
+    y = dpy_yl - yl;
+
   gtk_window_move(GTK_WINDOW(gwin0), x, y);
 }
 
@@ -328,6 +345,7 @@ void compact_win0()
   raw_move(best_win_x, best_win_y);
 }
 
+gboolean tsin_has_input();
 
 void move_win0(int x, int y)
 {
@@ -346,7 +364,13 @@ void move_win0(int x, int y)
   if (y < 0)
     y = 0;
 
+
   gtk_window_move(GTK_WINDOW(gwin0), x, y);
+  win_x = x;
+  win_y = y;
+
+  if (gcin_pop_up_win && !tsin_has_input())
+    return;
 
   show_win_sym();
 }
@@ -356,6 +380,9 @@ GtkWidget *gwin1;
 void disp_tsin_eng_pho(int eng_pho)
 {
   static char *eng_pho_strs[]={"英", "注"};
+
+  if (!button_eng_ph)
+    return;
 
   gtk_button_set_label(GTK_BUTTON(button_eng_ph), eng_pho_strs[eng_pho]);
 }
@@ -403,6 +430,9 @@ char file_pin_float[] = GCIN_ICON_DIR"/pin-float16.png";
 
 static void set_currenet_IC_pin_image_pin()
 {
+  if (!image_pin)
+    return;
+
   if (current_CS->fixed_pos)
     gtk_image_set_from_file(GTK_IMAGE(image_pin),GCIN_ICON_DIR"/pin-fixed24.png");
   else
@@ -446,10 +476,6 @@ void create_win0()
   GdkWindow *gdkwin0 = gwin0->window;
   gdk_window_set_override_redirect(gdkwin0, TRUE);
   xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
-#if 0
-  g_signal_connect(G_OBJECT(gwin0),"button-press-event",
-                   G_CALLBACK(mouse_button_callback), NULL);
-#endif
 }
 
 
@@ -482,21 +508,28 @@ static void create_cursor_attr()
   pango_attr_list_insert (attr_list, white_fg);
 }
 
+void create_win1_gui();
 
-void create_win0_gui()
+static void create_win0_gui()
 {
-  if (frame)
+  if (top_bin)
     return;
 
-  bzero(chars, sizeof(chars));
-
-  frame = gtk_frame_new(NULL);
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
-  gtk_container_add (GTK_CONTAINER(gwin0), frame);
-
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  /* This packs the button into the gwin0 (a gtk container). */
-  gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+  gtk_container_set_border_width (GTK_CONTAINER (gwin0), 0);
+
+  if (gcin_inner_frame) {
+    GtkWidget *frame;
+    top_bin = frame = gtk_frame_new(NULL);
+    gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
+    gtk_container_add (GTK_CONTAINER(gwin0), frame);
+    gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+  } else {
+    top_bin = vbox_top;
+    gtk_container_add (GTK_CONTAINER (gwin0), vbox_top);
+  }
+
+  bzero(chars, sizeof(chars));
 
   GtkWidget *hbox_row1 = gtk_hbox_new (FALSE, 0);
   /* This packs the button into the gwin0 (a gtk container). */
@@ -534,35 +567,35 @@ void create_win0_gui()
     set_label_font_size(label, gcin_font_size_tsin_pho_in);
   }
 
-  hbox_row2 = gtk_hbox_new (FALSE, 0);
-//  gtk_container_set_border_width (GTK_CONTAINER (hbox_row2), 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_row2, FALSE, FALSE, 0);
-  GtkWidget *button_tsin = gtk_button_new_with_label("詞音");
-  g_signal_connect_swapped (GTK_OBJECT (button_tsin), "button_press_event",
-        G_CALLBACK (inmd_switch_popup_handler), NULL);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), button_tsin, FALSE, FALSE, 0);
+  if (!pho_simple_win) {
+    GtkWidget *hbox_row2 = gtk_hbox_new (FALSE, 0);
+  //  gtk_container_set_border_width (GTK_CONTAINER (hbox_row2), 0);
+    gtk_box_pack_start (GTK_BOX (vbox_top), hbox_row2, FALSE, FALSE, 0);
+    GtkWidget *button_tsin = gtk_button_new_with_label("詞音");
+    g_signal_connect_swapped (GTK_OBJECT (button_tsin), "button_press_event",
+          G_CALLBACK (inmd_switch_popup_handler), NULL);
+    gtk_box_pack_start (GTK_BOX (hbox_row2), button_tsin, FALSE, FALSE, 0);
 
 
-  button_eng_ph = gtk_button_new_with_label("注");
-  gtk_box_pack_start (GTK_BOX (hbox_row2), button_eng_ph, FALSE, FALSE, 0);
-  g_signal_connect (G_OBJECT (button_eng_ph), "clicked",
-      G_CALLBACK (cb_clicked_eng_ph), (gpointer) NULL);
+    button_eng_ph = gtk_button_new_with_label("注");
+    gtk_box_pack_start (GTK_BOX (hbox_row2), button_eng_ph, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (button_eng_ph), "clicked",
+        G_CALLBACK (cb_clicked_eng_ph), (gpointer) NULL);
 
-  image_pin = gtk_image_new_from_file(file_pin_float);
-  GtkWidget *event_box_pin = gtk_event_box_new();
-  gtk_container_add (GTK_CONTAINER (event_box_pin), image_pin);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), event_box_pin, FALSE, FALSE, 0);
-  g_signal_connect (G_OBJECT (event_box_pin), "button_press_event",
-      G_CALLBACK (cb_clicked_fixed_pos), (gpointer) NULL);
+    image_pin = gtk_image_new_from_file(file_pin_float);
+    GtkWidget *event_box_pin = gtk_event_box_new();
+    gtk_container_add (GTK_CONTAINER (event_box_pin), image_pin);
+    gtk_box_pack_start (GTK_BOX (hbox_row2), event_box_pin, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (event_box_pin), "button_press_event",
+        G_CALLBACK (cb_clicked_fixed_pos), (gpointer) NULL);
+  }
 
   clr_in_area_pho_tsin();
 
   gtk_widget_show_all (gwin0);
+  gdk_flush();
   gtk_widget_hide (gwin0);
 
-  disp_hide_tsin_status_row();
-
-  gdk_flush();
 
   create_win1();
   create_win1_gui();
@@ -588,31 +621,23 @@ gboolean tsin_has_input();
 
 void show_win0()
 {
-
+//  dbg("show_win0\n");
   create_win0();
   create_win0_gui();
   set_currenet_IC_pin_image_pin();
-#if 0
-  if (current_CS) {
-    if (current_CS->fixed_pos)
-      move_win0(0,0);
-  }
-#endif
-#if 0
-  else
-    dbg("show_win0 current_CS is null");
-#endif
 
   if (gcin_pop_up_win && !tsin_has_input())
     return;
 
   gtk_widget_show(gwin0);
+//  dbg("show_win0 b\n");
   show_win_sym();
 }
 
 void hide_selections_win();
 void hide_win0()
 {
+//  dbg("hide_win0\n");
   gtk_widget_hide(gwin0);
   hide_selections_win();
   hide_win_sym();
@@ -630,7 +655,7 @@ void change_tsin_font_size()
 {
   int i;
 
-  if (!frame)
+  if (!top_bin)
     return;
 
   for(i=0; i < 3;i ++) {
@@ -676,7 +701,6 @@ void change_tsin_color()
 {
   change_tsin_line_color();
   create_cursor_attr();
-  extern int c_idx;
 
   drawcursor();
 }

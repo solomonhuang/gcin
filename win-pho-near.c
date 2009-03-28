@@ -10,10 +10,13 @@ static struct {
   int type;
   char group[5];
 } groups[] = {
-  {0, {15, 19, -1}},   // £¤£¨, ¥H -1 °µµ²§À
-  {0, {16, 20, -1}},    // £¥ £©
-  {2, {2, 3, -1}},     // £¬£­
-  {2, {10, 12, -1}},   // £´ £¶
+  {0, {15, 19, -1}},   // ã„“ã„—, ä»¥ -1 åšçµå°¾
+  {0, {16, 20, -1}},    // ã„”ã„˜
+  {0, {8, 18, -1}},     // ã„Œã„–
+  {0, {4, 11,-1}},     // ã„ˆã„
+  {0, {17, 21,-1}},   // ã„•ã„™
+  {2, {2, 3, -1}},     // ã„›ã„œ
+  {2, {10, 12, -1}},   // ã„£ã„¥
 };
 
 static int groupsN=sizeof(groups)/ sizeof(groups[0]);
@@ -40,7 +43,7 @@ static char *find_group(int type, int num)
 }
 
 void key_typ_pho(phokey_t phokey, char rtyp_pho[]);
-void get_start_stop_idx(phokey_t key, int *start_i, int *stop_i);
+gboolean get_start_stop_idx(phokey_t key, int *start_i, int *stop_i);
 void close_win_pho_near();
 
 typedef struct {
@@ -77,7 +80,7 @@ void create_win_pho_near(phokey_t pho)
   GdkWindow *gdkwin = gwin_pho_near->window;
   gdk_window_set_override_redirect(gdkwin, TRUE);
 #else
-  gtk_window_set_title (GTK_WINDOW (gwin_pho_near), "gcin ªñ­µ¦r¬d¸ß");
+  gtk_window_set_title (GTK_WINDOW (gwin_pho_near), "gcin è¿‘éŸ³å­—æŸ¥è©¢");
 #endif
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_add(GTK_CONTAINER (gwin_pho_near), frame);
@@ -120,7 +123,9 @@ void create_win_pho_near(phokey_t pho)
       gtk_box_pack_start (GTK_BOX (hbox), label_pho, FALSE, FALSE, 0);
 
       int start_i, stop_i;
-      get_start_stop_idx(pk, &start_i, &stop_i);
+      if (!get_start_stop_idx(pk, &start_i, &stop_i))
+        continue;
+
 
       int i;
       for(i=start_i; i<stop_i; i++) {

@@ -33,6 +33,14 @@ typedef struct _GtkGCINInfo GtkGCINInfo;
 
 #if NEW_GTK_IM
 static GtkIMContextGCIN *context_xim_queued;
+static int timeout_handle;
+static void cancel_timeout()
+{
+  if (!context_xim_queued)
+    return;
+  g_source_remove(timeout_handle);
+  context_xim_queued = NULL;
+}
 #endif
 
 struct _GtkIMContextGCIN
@@ -110,6 +118,9 @@ static void gcin_display_closed (GdkDisplay *display,
 			 gboolean    is_error,
                          GtkIMContextGCIN *context_xim)
 {
+#if NEW_GTK_IM
+  cancel_timeout();
+#endif
   if (!context_xim->gcin_ch)
     return;
 
@@ -147,6 +158,10 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
   GtkIMContextClass *im_context_class = GTK_IM_CONTEXT_CLASS (class);
   GObjectClass *gobject_class = G_OBJECT_CLASS (class);
 
+#if NEW_GTK_IM
+  cancel_timeout();
+#endif
+
 //  parent_class = g_type_class_peek_parent (class);
   im_context_class->set_client_window = gtk_im_context_gcin_set_client_window;
   im_context_class->filter_keypress = gtk_im_context_gcin_filter_keypress;
@@ -177,8 +192,7 @@ gtk_im_context_gcin_finalize (GObject *obj)
     context_xim->gcin_ch = NULL;
   }
 #if NEW_GTK_IM
-  if (context_xim == context_xim_queued)
-    context_xim_queued = NULL;
+  cancel_timeout();
 #endif
 }
 
@@ -238,18 +252,19 @@ set_ic_client_window (GtkIMContextGCIN *context_xim,
 		      GdkWindow       *client_window)
 {
 //  printf("set_ic_client_window\n");
+#if NEW_GTK_IM
+  if (context_xim != context_xim_queued)
+    cancel_timeout();
+#endif
 
   context_xim->client_window = client_window;
 
   if (context_xim->client_window)
     {
       get_im (context_xim);
-//      context_xim->im_info->ics = g_slist_prepend (context_xim->im_info->ics, context_xim);
-#if 1
       if (context_xim->gcin_ch) {
         gcin_im_client_set_window(context_xim->gcin_ch, GDK_DRAWABLE_XID(client_window));
       }
-#endif
     }
 
 
@@ -294,7 +309,9 @@ gtk_im_context_xim_new (void)
 {
 //  printf("gtk_im_context_gcin_new\n");
   GtkIMContextGCIN *result;
-
+#if NEW_GTK_IM
+  cancel_timeout();
+#endif
   result = GTK_IM_CONTEXT_GCIN (g_object_new (GTK_TYPE_IM_CONTEXT_GCIN, NULL));
 
   return GTK_IM_CONTEXT (result);
@@ -349,37 +366,19 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   num_bytes = XLookupString (&xevent, buffer, buffer_size, &keysym, NULL);
 
   if (xevent.type == KeyPress) {
-
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
-#if 0
-    if (rstr) {
-      printf("yyyyyyyyy %x len:%d %d num_bytes:%d %x\n",
-        rstr, strlen(rstr), result, num_bytes, buffer[0]);
-      char *p = rstr;
-
-      while (*p) {
-        putchar(*p);
-        p++;
-      }
-#if 0
-      rstr = strdup("測 ");
-#else
-      rstr = strdup("ㄙㄙ");
-#endif
-    }
-#endif
 
 #if NEW_GTK_IM
     // this one is for mozilla
+    if (context_xim != context_xim_queued)
+        cancel_timeout();
     if (!context_xim_queued) {
         context_xim_queued = context_xim;
-        g_timeout_add(200, update_cursor_position, NULL);
+        timeout_handle = g_timeout_add(200, update_cursor_position, NULL);
     }
 #endif
-
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f) {
-//      dbg("buffer %c\n", buffer[0]);
       rstr = (char *)malloc(num_bytes + 1);
       memcpy(rstr, buffer, num_bytes);
       rstr[num_bytes] = 0;
@@ -410,7 +409,9 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
 
 //  printf("gtk_im_context_gcin_focus_in\n");
   if (context_xim->gcin_ch) {
+#if NEW_GTK_IM
     g_signal_emit_by_name(context_xim, "preedit_changed");
+#endif
     gcin_im_client_focus_in(context_xim->gcin_ch);
   }
 
@@ -422,6 +423,10 @@ gtk_im_context_gcin_focus_out (GtkIMContext *context)
 {
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 //  printf("gtk_im_context_gcin_focus_out\n");
+#if NEW_GTK_IM
+  if (context_xim == context_xim_queued)
+      cancel_timeout(timeout_handle);
+#endif
 
   if (context_xim->gcin_ch) {
     gcin_im_client_focus_out(context_xim->gcin_ch);
@@ -438,7 +443,9 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
 //  printf("gtk_im_context_gcin_set_cursor_location %d\n", area->x);
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 #if NEW_GTK_IM
-  context_xim_queued = NULL;
+  if (context_xim_queued) {
+      cancel_timeout(timeout_handle);
+  }
 #endif
   if (context_xim->gcin_ch) {
     gcin_im_client_set_cursor_location(context_xim->gcin_ch, area->x, area->y + area->height);
@@ -496,4 +503,7 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 void
 gtk_im_context_gcin_shutdown (void)
 {
+#if NEW_GTK_IM
+  cancel_timeout();
+#endif
 }

@@ -2,7 +2,7 @@
 
 PATH=$PATH:/opt/gnome/bin:/usr/local/bin
 
-for i in gedit kedit kate
+for i in leafpad gedit kedit kate
 do
   which $i >& /dev/null
   if [ $? = 0 ]; then

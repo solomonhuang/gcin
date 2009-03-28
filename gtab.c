@@ -53,6 +53,11 @@ int key_col(char cha)
   return (p - keyrow)%10;
 }
 
+gboolean same_query_show_pho_win()
+{
+  return same_pho_query_state != SAME_PHO_QUERY_none;
+}
+
 gboolean gtab_has_input()
 {
   int i;
@@ -60,6 +65,9 @@ gboolean gtab_has_input()
   for(i=0; i < MAX_TAB_KEY_NUM64; i++)
     if (inch[i])
       return TRUE;
+
+  if (same_query_show_pho_win())
+    return TRUE;
 
   return FALSE;
 }
@@ -194,6 +202,7 @@ static void ClrSelArea()
 
 
 void disp_gtab(int index, char *gtabchar);
+void clear_gtab_input_error_color();
 
 
 static void ClrIn()
@@ -208,8 +217,10 @@ static void ClrIn()
   clear_gtab_in_area();
   last_idx = 0;
 
-  if (gcin_pop_up_win)
+  if (gcin_pop_up_win && !same_query_show_pho_win())
     hide_win_gtab();
+
+  clear_gtab_input_error_color();
 }
 
 
@@ -368,8 +379,10 @@ void init_gtab(int inmdno, int usenow)
   dbg("KeyS %d\n", th.KeyS);
 
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
-  utf8cpy(&inp->keyname[61*CH_SZ], "？");  /* for wild card */
-  utf8cpy(&inp->keyname[62*CH_SZ], "＊");
+#define WILD_QUES 64
+#define WILD_STAR 65
+  utf8cpy(&inp->keyname[WILD_QUES*CH_SZ], "？");  /* for wild card */
+  utf8cpy(&inp->keyname[WILD_STAR*CH_SZ], "＊");
 
   // for boshiamy
   extern u_char *fullchar[];
@@ -429,8 +442,9 @@ void init_gtab(int inmdno, int usenow)
       inp->keymap[toupper(ttt[i])]=i;
     inp->keycol[i]=key_col(ttt[i]);
   }
-  inp->keymap[(int)'?']=61;
-  inp->keymap[(int)'*']=62;
+
+  inp->keymap[(int)'?']=WILD_QUES;
+  inp->keymap[(int)'*']=WILD_STAR;
 
 
   free(inp->idx1);
@@ -551,7 +565,7 @@ static void putstr_inp(u_char *p)
       return;
     }
 
-    if (gtab_disp_key_codes || wild_mode)
+    if (gtab_disp_key_codes && !gtab_hide_row2 || wild_mode)
       lookup_gtab(p, tt);
 
     sendkey_b5(p);
@@ -700,6 +714,12 @@ static gboolean load_seltab(int tblidx, int seltabidx)
   return FALSE;
 }
 
+void set_gtab_input_error_color();
+static void bell_err()
+{
+  bell();
+  set_gtab_input_error_color();
+}
 
 void wildcard()
 {
@@ -720,11 +740,11 @@ void wildcard()
   for(i=0; i < KEY_N; i++) {
     if (!inch[i])
       break;
-    if (inch[i] == 62) {
+    if (inch[i] == WILD_STAR) {
       regstr[regstrN++]='.';
       regstr[regstrN++]='*';
     } else
-    if (inch[i] == 61) {
+    if (inch[i] == WILD_QUES) {
       regstr[regstrN++]='.';
     } else {
       char c = inch[i] + '0';         // start from '0'
@@ -785,8 +805,9 @@ void wildcard()
   regfree(&reg);
   disp_gtab_sel(tt);
 
-  if (!found)
-    bell();
+  if (!found) {
+    bell_err();
+  }
 }
 
 static char *ptr_selkey(KeySym key)
@@ -922,6 +943,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   char *pselkey= NULL;
   gboolean phrase_selected = FALSE;
   char seltab_phrase[MAX_SELKEY];
+  gboolean is_keypad = FALSE;
 
   bzero(seltab_phrase, sizeof(seltab_phrase));
 
@@ -950,12 +972,25 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
      return 1;
   }
 #endif
-  if ((kbstate & ShiftMask) && key!='*' && key!='?') {
+
+
+  if (key < 127 && cur_inmd->keymap[key]) {
+     if (key < 'A' || key > 'z' || key > 'Z'  && key < 'a' )
+       goto shift_proc;
+     char lcase = tolower(key);
+     char ucase = toupper(key);
+     if (cur_inmd->keymap[lcase] != cur_inmd->keymap[ucase])
+       goto next;
+  }
+
+shift_proc:
+  if ((kbstate & ShiftMask) && key!='*' && (key!='?' || gtab_shift_phrase_key && !ci)) {
     if (gtab_shift_phrase_key)
-      return feed_phrase(key);
+      return feed_phrase(key, kbstate);
     else
       return shift_char_proc(key, kbstate);
   }
+
 
   gboolean has_wild = FALSE;
 
@@ -963,6 +998,9 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     case XK_BackSpace:
       clear_phrase_match_buf();
       last_idx=0;
+      spc_pressed=0;
+      sel1st_i=MAX_SELKEY-1;
+      clear_gtab_input_error_color();
 
       if (ci==0)
         return 0;
@@ -976,7 +1014,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       }
 
 
-      wild_mode=spc_pressed=0;
+      wild_mode=0;
       invalid_spc = FALSE;
       if (ci==1 && cur_inmd->use_quick) {
         int i;
@@ -1022,7 +1060,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     case ' ':
       if (invalid_spc) {
         ClrIn();
-        return TRUE;
       }
 
       has_wild = has_wild_card();
@@ -1053,7 +1090,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       if (!has_wild) {
 //        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);
         if (_gtab_space_auto_first == GTAB_space_auto_first_any && !more_pg && seltab[0][0] &&
-            sel1st_i==MAX_SELKEY-1 && exa_match<=cur_inmd->M_DUP_SEL) {
+            sel1st_i==MAX_SELKEY-1 && exa_match<=cur_inmd->M_DUP_SEL+1) {
           sel1st_i = 0;
         }
 
@@ -1083,6 +1120,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
         inkey=cur_inmd->keymap[key];
         inch[ci++]=inkey;
         DispInArea();
+
+        if (gcin_pop_up_win)
+          show_win_gtab();
+
 //        if (ci==cur_inmd->MaxPress)
         {
           wild_page=0;
@@ -1101,23 +1142,33 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     case XK_Caps_Lock:
       return 0;
     case '`':
-      same_pho_query_state = SAME_PHO_QUERY_gtab_input;
-      init_gtab_pho_query_win();
-      return 1;
+      if (!cur_inmd->keymap[key]) {
+        same_pho_query_state = SAME_PHO_QUERY_gtab_input;
+        if (gcin_pop_up_win)
+          show_win_gtab();
+        init_gtab_pho_query_win();
+        return 1;
+      }
     default:
+next:
+      if (invalid_spc) {
+        ClrIn();
+      }
       if (key>=XK_KP_0 && key<=XK_KP_9) {
+#if 0
         if (!spc_pressed)
+          return 0;
+#endif
+        if (!strncmp(cur_inmd->filename, "dayi", 4)) {
+          key = key - XK_KP_0 + '0';
+          is_keypad = TRUE;
+        }
+        else
           return 0;
       }
 
       char *pendkey = strchr(cur_inmd->endkey, key);
-#if 0
-      // for array30
-      if (!ci && (_gtab_space_auto_first & GTAB_space_auto_first_nofull)) {
-        if (cur_inmd->endkey[0] && pendkey)
-          return 0;
-      }
-#endif
+
       pselkey=ptr_selkey(key);
 
 
@@ -1135,7 +1186,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 //      dbg("spc_pressed %d %d %d\n", spc_pressed, last_full, cur_inmd->MaxPress);
 
 #if 1 // for dayi, testcase :  6 space keypad6
-      if (( (spc_pressed||last_full) ||(wild_mode && (!inkey ||pendkey))) && pselkey) {
+      if (( (spc_pressed||last_full||is_keypad) ||(wild_mode && (!inkey ||pendkey))) && pselkey) {
         int vv = pselkey - cur_inmd->selkey;
 
         if ((_gtab_space_auto_first & GTAB_space_auto_first_any) && !wild_mode)
@@ -1316,7 +1367,7 @@ YYYY:
 
     if (gtab_invalid_key_in) {
       if (spc_pressed) {
-        bell();
+        bell_err();
         invalid_spc = TRUE;
 //        dbg("invalid_spc\n");
       }
@@ -1408,7 +1459,9 @@ next_pg:
 
     exa_match = defselN;
 
-    if (j<e1 && CONVT2(cur_inmd, j)==val && defselN==cur_inmd->M_DUP_SEL) {
+    if (j<e1 && CONVT2(cur_inmd, j)==val &&
+        ((_gtab_space_auto_first & GTAB_space_auto_first_any) && defselN==cur_inmd->M_DUP_SEL+1 ||
+         !(_gtab_space_auto_first & GTAB_space_auto_first_any) && defselN==cur_inmd->M_DUP_SEL)) {
       pg_idx=j;
       more_pg=1;
       m_pg_mode=1;
@@ -1427,7 +1480,7 @@ next_pg:
       }
     } else
     if (!defselN) {
-      bell();
+      bell_err();
       spc_pressed=0;
 
       if (gtab_invalid_key_in) {

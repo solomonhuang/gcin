@@ -259,9 +259,10 @@ void move_in_win(ClientState *cs, int x, int y)
 #if DEBUG || 0
   dbg("move_in_win %d %d\n",x, y);
 #endif
+#if 1
   if (current_in_win_x == x && current_in_win_y == y)
     return;
-
+#endif
   current_in_win_x = x ; current_in_win_y = y;
 
   switch (cs->in_method) {
@@ -608,7 +609,7 @@ gboolean full_char_proc(KeySym keysym)
 int feedkey_pho(KeySym xkey, int kbstate);
 int feedkey_pp(KeySym xkey, int state);
 int feedkey_gtab(KeySym key, int kbstate);
-int feed_phrase(KeySym ksym);
+int feed_phrase(KeySym ksym, int state);
 int feedkey_intcode(KeySym key);
 void tsin_set_eng_ch(int nmod);
 static KeySym last_keysym;
@@ -661,7 +662,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
 
   if ((kev_state & (Mod1Mask|ShiftMask)) == (Mod1Mask|ShiftMask)) {
-    return feed_phrase(keysym);
+    return feed_phrase(keysym, kev_state);
   }
 
 //  dbg("state %x\n", kev_state);

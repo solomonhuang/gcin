@@ -3,6 +3,7 @@
 
 
 #define GCIN_FONT_SIZE "gcin-font-size"
+#define GCIN_FONT_NAME "gcin-font-name"
 #define GCIN_FONT_SIZE_TSIN_PRESEL "gcin-font-size-tsin-presel"
 #define GCIN_FONT_SIZE_SYMBOL "gcin-font-size-symbol"
 #define GCIN_FONT_SIZE_TSIN_PHO_IN "gcin-font-size-tsin-pho-in"
@@ -11,6 +12,8 @@
 #define GCIN_ROOT_X      "gcin-root-x"
 #define GCIN_ROOT_Y      "gcin-root-y"
 #define GCIN_POP_UP_WIN "gcin-pop-up-win"
+#define GCIN_POP_UP_WIN_ABS_CORNER "gcin-pop-up-win-abs-corner"
+#define GCIN_INNER_FRAME "gcin-inner-frame"
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -32,6 +35,8 @@
 #define GTAB_DISP_IM_NAME "gtab-disp-im-name"
 #define GTAB_INVALID_KEY_IN "gtab-invalid-key-in"
 #define GTAB_SHIFT_PHRASE_KEY "gtab-shift-phrase-key"
+#define GTAB_HIDE_ROW2 "gtab-hide-row2"
+#define GTAB_IN_ROW1 "gtab-in-row1"
 
 #define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
@@ -42,6 +47,8 @@
 #define TSIN_PHRASE_LINE_COLOR "tsin-phrase-line-color"
 #define TSIN_CURSOR_COLOR "tsin-cursor-color"
 #define TSIN_TONE_CHAR_INPUT "tsin-tone-char-input"
+#define PHO_HIDE_ROW2 "pho-hide-row2"
+#define PHO_IN_ROW1 "pho-in-row1"
 
 
 #define PHONETIC_KEYBOARD "phonetic-keyboard"
@@ -51,10 +58,11 @@
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_chars_big5_only,
-           gcin_font_size_gtab_in,
+           gcin_font_size_gtab_in, gcin_inner_frame,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
-           gtab_invalid_key_in;
+           gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, pho_hide_row2,
+           pho_in_row1;
 
 extern int default_input_method;
 extern int left_right_button_tips;
@@ -68,7 +76,7 @@ extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;
 extern int tsin_ec_toggle_key;
 extern int pho_simple_win, tsin_buffer_size;
-extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
+extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win, gcin_pop_up_win_abs_corner;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;
@@ -77,7 +85,7 @@ extern int phonetic_char_dynamic_sequence;
 extern int phonetic_huge_tab;
 extern int tsin_space_opt, tsin_tone_char_input;
 
-extern char tsin_phrase_line_color[], tsin_cursor_color[];
+extern char tsin_phrase_line_color[], tsin_cursor_color[], gcin_font_name[];
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char rstr[], char *default_str);

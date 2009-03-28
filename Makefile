@@ -10,6 +10,9 @@ OBJS=gcin.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-
      gcin-switch.o win-status.o
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o
+OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
+                 gcin-settings.o gcin-conf.o table-update.o
+OBJS_sim2trad=sim2trad.o util.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
 OBJS_tsa2d=tsa2d.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
@@ -36,7 +39,7 @@ im-srv = im-srv/im-srv.a
 .c.E:
 	$(CC) $(CFLAGS) -E -o $@ $<
 
-PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup gcin2tab
+PROGS=gcin tsd2a tsa2d phoa2d phod2a tslearn gcin-setup gcin2tab juyin-learn sim2trad
 PROGS_CV=kbmcv
 
 all:	$(PROGS) $(DATA) $(PROGS_CV) gcin.spec
@@ -52,6 +55,13 @@ gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
 
 tslearn:        $(OBJS_TSLEARN)
 	$(CC) -o $@ $(OBJS_TSLEARN) $(LDFLAGS)
+
+juyin-learn:        $(OBJS_JUYIN_LEARN)
+	$(CC) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)
+	rm -f core.*
+sim2trad:        $(OBJS_sim2trad)
+	$(CC) -o $@ $(OBJS_sim2trad) $(LDFLAGS)
+	rm -f core.*
 
 gcin-setup:     $(OBJS_gcin_steup)
 	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
@@ -116,7 +126,8 @@ clean:
 	$(MAKE) -C gtk-im clean
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
-	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~ */core.*
+	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) \
+	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.*
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

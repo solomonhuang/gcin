@@ -94,7 +94,11 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   get_gcin_im_srv_sock_path(sock_path, sizeof(sock_path));
   addr = sock_path;
   strcpy(serv_addr.sun_path, sock_path);
+#ifdef SUN_LEN
+  servlen = SUN_LEN(&serv_addr);
+#else
   servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
+#endif
 
   if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
     perror("cannot open socket");
@@ -155,7 +159,7 @@ tcp:
     sockfd = 0;
   }
 
-  u_char *pp = (char *)&srv_ip_port.ip;
+  u_char *pp = (u_char *)&srv_ip_port.ip;
   if (dbg_msg)
     dbg("gcin client connected to server %d.%d.%d.%d:%d\n",
         pp[0], pp[1], pp[2], pp[3], ntohs(srv_ip_port.port));

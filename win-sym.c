@@ -180,7 +180,9 @@ void show_win_sym()
 
   if (!gwin_sym || !win_sym_enabled || current_CS->im_state == GCIN_STATE_DISABLED)
     return;
-
+#if 0
+  dbg("show_win_sym\n");
+#endif
   gtk_widget_show_all(gwin_sym);
   move_win_sym(gwin_sym);
 }

@@ -1,8 +1,12 @@
 # 這個檔案是按 alt-shift-??? 時會送出的字串。
+# 第一個字母如果是大寫，代表如果 CapsLock 打開時會用的片語。
 
 a ├
+#A a
 b 股份有限公司
+#B b
 c ┘
+#C c
 d ┤
 e ┐
 f 『
@@ -40,27 +44,39 @@ z └
 \ 反斜
 ' 引
 kp0 ─
+Kp0 ═
 kp. │
+Kp. ║
 kp1 └
+Kp1 ╚
 kp2 ┴
+Kp2 ╩
 kp3 ┘
+Kp3 ╝
 kp4 ├
+Kp4 ╠
 kp5 ┼
+Kp5 ╬
 kp6 ┤
+Kp6 ╣
 kp7 ┌
+Kp7 ╔
 kp8 ┬
+Kp8 ╦
 kp9 ┐
-k_ins ─
-k_del │
-k_end └
-k_down ┴
-k_pgdn ┘
-k_left ├
-k_5 ┼
-k_right ┤
-k_home ┌
-k_up ┬
-k_pgup ┐
+Kp9 ╗
+# 底下的定義會造成 shift- 鍵方式不正常，需要者自行把 # 拿掉。
+#k_ins ─
+#k_del │
+#k_end └
+#k_down ┴
+#k_pgdn ┘
+#k_left ├
+#k_5 ┼
+#k_right ┤
+#k_home ┌
+#k_up ┬
+#k_pgup ┐
 
 # f1-f12 皆可用
 f1 A test

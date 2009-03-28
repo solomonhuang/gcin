@@ -74,15 +74,10 @@ logout & login
   ㄉˊ  ‧  (點)
   ㄑ‧  ＄  (錢)
   ㄒ‧  ＊  (星)
-  ㄣ‧  『   (引號)
-  ㄣ    『   (因與恩同音，應避免使用)
-  [        『
-  ㄣˊ   』
+   [        『
   ]    	 』
-  ㄣˇ  「
-  [        「
-  ㄣˋ   」
-  ]           」
+  [        「    (直接按中括號 '[' ，這個最容易使用)
+   ]           」 (直接按中括號 '[' ，這個最容易使用)
   ㄌ‧  了
   ㄌ2   –    (連接號)
   ㄌ     …   (省'略'號)
@@ -97,13 +92,15 @@ logout & login
   ㄍ‧ ♂   (公)
   ㄇ‧ ♀   (母)
   ㄇ‧ 嗎  
+  ㄇ‧ 麼
 
 
 酷音輸入 的 shift + ",./;'" 也可以用
 現在滑鼠的指標移到符號視窗的按鈕，約一秒鐘會顯示對應的注音按鍵提示，方便學習。
 使用許氏鍵盤者某些符號會不能用，例如 '。' ，這是許氏鍵盤先天的問題。
 
-要輸入'「」『』' 還有一種方法就是，用 '[ ]' 兩個鍵，，輸入以後可以用空白鍵選擇。
+要輸入'「」『』《》' 還有一種方法就是，用 '[ ]' 兩個鍵，，輸入以後可以用空白鍵選擇。
+在詞音中可以輸入中括號 '[]'，由於詞庫中'[]'有定義各種括號、引號及書名號的組合，這邊就可以用預選詞的方式來選擇你要的括號。
 
 -------------------------------------------------
 你可以在注音表中自己加入或刪除想要的符號或字
@@ -355,14 +352,8 @@ Answer: 注音輸入的區域的字型必須比編輯區的小個幾點就沒有
 gcin coredump 如果要幫忙 debug
 
 cd gcin-0.x.x
-export  GCIN_DEBUG=1
 make clean
 ./configure
-
-修改 config.mak 把
-OPTFLAGS=-O
-取代成
-OPTFLAGS=-g
 
 make
 
@@ -373,7 +364,7 @@ make 完了之後，執行
 
 (gdb) r
 
-r 指令會開始執行 gcin， 掛了之後，
+r 指令會開始執行 gcin， 在跑出來的 gedit 輸入一些字，gcin 掛了之後，
 
 (gdb) bt
 
@@ -401,9 +392,11 @@ GTK_IM_MODULE/QT_IM_MODULE(qt 4.0 or Mandriva 2006) 使用 gcin 自己的 .so，
     /etc/sysconfig/i18n
 gcin 會先使用 unix socket，如果不行，則使用 TCP port 9999 - 20000。
 如果因為 firewall 的緣故無法使用， export GTK_IM_MODULE=xim 可以指定使用 XIM。
+另外，如果你遠端也有 install gcin，可以 export XMODIFIERS=@im=gcin.remote，這樣就會在 remote 端自動執行一個新的 gcin。
 目前支援很簡單的編碼以避免 plaintext 在傳送，未來可能會支援 SSL。
 雖然目前是用很簡單的 encoding，如果 gcin 搭配 ssh X11 forwarding 應該是非常安全的。
 而且 data 不像 SSL 會變大，更適合在 low bandwidth 使用。
+
 
 目前支援 GTK2 & QT，gcin 有提供非常容易使用的 API 介面供其他 terminal
 使用，歡迎來把這部份完成，詳細的介面，請看 /usr/local/include/gcin-im-client.h
@@ -418,8 +411,8 @@ b.  gcin client connected to server 172.x.x.x:9999
 
 目前 OpenOffice 1.1.x GTK2 的版本好像是使用 XIM，1.9.x & 2.x 則是改成用 GTK_IM_MODULE。
 
-http://www.csie.nctu.edu.tw/~cp76/linux/mrxvt-gcin.tbz 是一個使用 gcin IM client 的 mrxvt。
-http://www.csie.nctu.edu.tw/~cp76/linux/rxvt-gcin.tbz 是一個使用 gcin IM client 的 rxvt。
+http://www.csie.nctu.edu.tw/~cp76/linux/mrxvt-gcin-0.4.1.tar.bz2 是一個使用 gcin IM client 的 mrxvt。
+http://www.csie.nctu.edu.tw/~cp76/linux/rxvt-gcin.tbz 是一個使用 gcin IM client 的 rxvt (crxvt)。
 ------------------------------------------------------------------------------------------------------
 - 新增關掉 gcin remote client 支援的選項 ，如果你是 su 成另外一個 user，這個選項仍然必須打開，否則無法輸入中文。
 ------------------------------------------------------------------------------------------------------
@@ -443,7 +436,9 @@ rpmbuild -ba gcin.spec
 看到你的 .rpm
 ----------------------------------------------------------------------------------------------------------
  現在可以用注音輸入半/全形 數字 (0..9 及減(-)) 及 用 [] 鍵輸入'()[]{}'，現在也可以加入含有數字的詞，譬如 
-「7月, 5點, 3個」。另外，你也可以用這來儲存電話號碼，只要用注音輸入電話的前兩碼然後用 shift 選就可以了。
+「7月, 5點, 3個」。另外，你也可以用這來儲存電話號碼，只要用注音輸入姓名，然後用 shift 選就可以了
+例如可以加入「周潔輪：0935-123456」
+
 ----------------------------------------------------------------------------------------------------------
 如果你因為 install 其他的輸入法把 gcin 的設定弄亂，可以用 root 執行看看
 /usr/share/gcin/script/modify-XIM
@@ -480,6 +475,7 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
 /usr/share/gcin/script/modify-XIM
 5. 檢查是否有設定 GTK_IM_MODULE=gcin 這個 environ variable。設定成 GTK_IM_MODULE=xim 也是可以用，
 只是 over-the-spot 會有問題，gcin 視窗不會跟著程式的游標移動，除非有 install gtk2 xim over-the-spot 的 patch，還是用 GTK_IM_MODULE=gcin 最好。
+6. 如果是用 XIM，建議設定 export LC_CTYPE=zh_TW.Big5
 -------------------------------------------------------------------
 覺得 gcin 的釘子不好看，想要換掉。有此需求的的人自己 替換 /usr/share/icons/gcin
 -------------------------------------------------------------------
@@ -498,6 +494,10 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
 	%keep_key_case          <---------------------------
 	%keyname begin
 --------------------------------------------------------------------
+
+- 現在 user 可以在 ~/.gcin 裏加自己的 gtab.list *.gtab，gcin 會優先使用這裡的 files。
+
+--------------------------------------------------------------------
 如何確定目前是使用 gcin 自己的 gtk/qt im module。
 1. 可以先用 gedit or kedit 測試，在編輯區按 mouse 右鍵，menu 裏選輸入法，會顯示出目前正在使用的輸入法，如果是
  'gcin Input Method' 就是對的，其他的是錯的。
@@ -506,19 +506,33 @@ terminal (console) 會出現以下 message
    connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin
 --------------------------------------------------------------------
 gcin 與 scim memory 使用比較。
-分別以 gcin 的詞音與 scim chewing 用 kedit/gedit 輸入「測試」兩個字，
+分別以 gcin 的詞音與 scim chewing 用 kedit/gedit/leafpad 輸入「測試」兩個字，
 由於 scim 有數個 process，必須全部加起來。這個測試也比較 qt-im-module/gtk-im-module 的 memory 使用。
 
       vsz    rss    kedit-vsz  kedit-rss
 scim  80168  31312  47052      17368
 gcin  29132  8568   41840      16144
 
-        gedit-vsz  gedit-rss
-scim  67148      16444
-gcin  61008      14924
+      gedit-vsz  gedit-rss  leafpad-vsz  leafpad-rss       (測試 gtk-im-module)
+scim  67148      16444      34084        9756
+gcin  61008      14924      26880        7884
 
 
 kedit: 3.4.1
 scim:  scim 1.4.2 + scim-chewing 0.2.1
 gcin:  gcin 1.0.4
+---------------------------------------------------------------------
+mozilla firefox 中 coredump，想看是不是 gtk-im module 造成的。
+0. 試著去 compile firefox，把 error 回報 mozilla，改成直接 coredump。Mandriva 中的firefox是改成直接 coredump。
 
+1. 在 make gcin 修改 config.mak 
+    設定 OPTFLAGS=-g 去 compile，這樣才有 debug 的 information。然後用 root make install。
+
+2. 當 coredump 發生時
+    gdb /usr/lib/mozilla-firefox-1.0.7/mozilla-firefox-bin core.xxxx
+    這邊這個可執行檔是要真正的那一個，不是 shell script。 core.xxxx 是 coredump 的 file。
+    這樣就可以看到 coredump 在那邊發生。
+
+
+
+   

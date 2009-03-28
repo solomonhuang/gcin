@@ -8,6 +8,7 @@
 #include "tsin.h"
 #include "gcin-conf.h"
 
+static gint64 key_press_time;
 extern gboolean b_hsu_kbm;
 
 extern PHO_ITEM *ch_pho;
@@ -17,8 +18,6 @@ extern int ityp3_pho;
 extern u_char typ_pho[];
 extern char inph[];
 
-extern u_short idxnum_pho;
-extern PHO_IDX idx_pho[];
 extern u_short hash_pho[];
 extern PHOKBM phkbm;
 
@@ -75,7 +74,7 @@ gboolean pho_has_input();
 
 gboolean tsin_has_input()
 {
-  return c_len || pho_has_input();
+  return c_len || pho_has_input() || !eng_ph;
 }
 
 
@@ -123,8 +122,6 @@ void drawcursor()
   else {
     set_cursor_tsin(c_idx);
   }
-
-//  gdk_flush();
 }
 
 static void chpho_extract(CHPHO *chph, int len, phokey_t *pho, char *ch, char *och)
@@ -252,18 +249,6 @@ static void disp_in_area_pho_tsin()
 
 void clear_chars_all();
 
-#if 0
-static void restore_ai()
-{
-  if (sel_pho)
-    return;
-
-  clear_chars_all();
-  clrin_pho_tsin();
-  disp_in_area_pho_tsin();
-  prbuf();
-}
-#endif
 
 static void clear_disp_ph_sta();
 static void clear_match()
@@ -306,6 +291,7 @@ static void clear_tsin_buffer()
 
 void clr_in_area_pho_tsin();
 void close_win_pho_near();
+void compact_win0_x();
 
 static void tsin_reset_in_pho()
 {
@@ -410,11 +396,7 @@ void init_tab_pp(int usenow)
   if (phcount && gwin0) {
 disp_prom:
     show_stat();
-#if 0
-    restore_ai();
-#else
     clear_ch_buf_sel_area();
-#endif
     if (!gcin_pop_up_win)
       show_win0();
 
@@ -469,7 +451,6 @@ static void save_phrase()
 }
 
 #define PH_SHIFT_N (tsin_buffer_size - 1)
-void compact_win0_x();
 
 static void shift_ins()
 {
@@ -887,6 +868,8 @@ void tsin_set_eng_ch(int nmod)
   drawcursor();
 
   show_button_pho(eng_ph);
+
+  show_win0();
 }
 
 void tsin_toggle_eng_ch()
@@ -897,6 +880,7 @@ void tsin_toggle_eng_ch()
 void tsin_toggle_half_full()
 {
     tsin_half_full^=1;
+    key_press_time = 0;
     drawcursor();
 }
 
@@ -981,6 +965,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     if (c_idx < 0 || c_len + len >= MAX_PH_BF_EXT)
       return 0;
 
+
     char *pp = str;
     for(i=0; i < len; i++) {
       if (pho[i])
@@ -1026,6 +1011,10 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
     disp_ph_sta();
     hide_pre_sel();
     ph_sta=-1;
+
+    if (gcin_pop_up_win)
+      show_win0();
+
     return TRUE;
 }
 
@@ -1155,12 +1144,12 @@ static gboolean pre_sel_handler(KeySym xkey)
 }
 
 
+
 static gboolean pre_punctuation(KeySym xkey)
 {
+  char *p;
   static char shift_punc[]="<>?:\"{}!";
   static char *chars[]={"，","。","？","：","；","『","』","！"};
-
-  char *p;
 
   if ((p=strchr(shift_punc, xkey))) {
     int c = p - shift_punc;
@@ -1172,9 +1161,34 @@ static gboolean pre_punctuation(KeySym xkey)
   return 0;
 }
 
+
+static char hsu_punc[]=",./;";
+static gboolean pre_punctuation_hsu(KeySym xkey)
+{
+  static char *chars[]={"，","。","？","；"};
+  char *p;
+
+  if ((p=strchr(hsu_punc, xkey))) {
+    int c = p - hsu_punc;
+    phokey_t key=0;
+
+    return add_to_tsin_buf(chars[c], &key, 1);
+  }
+
+  return 0;
+}
+
+
 gboolean inph_typ_pho(char newkey);
 
-static gboolean b_shift_pressed;
+
+gint64 current_time()
+{
+  struct timeval tval;
+
+  gettimeofday(&tval, NULL);
+  return (gint64)tval.tv_sec * 1000000 + tval.tv_usec;
+}
 
 
 int feedkey_pp(KeySym xkey, int kbstate)
@@ -1188,11 +1202,12 @@ int feedkey_pp(KeySym xkey, int kbstate)
   int j,jj,kk, idx;
   char kno;
 
-   b_shift_pressed = FALSE;
+  key_press_time = 0;
 
    if (kbstate & (Mod1Mask|Mod1Mask)) {
        return 0;
    }
+
 
    close_win_pho_near();
 
@@ -1263,17 +1278,17 @@ int feedkey_pp(KeySym xkey, int kbstate)
           close_selection_win();
           tsin_toggle_eng_ch();
           return 1;
-        } else {
-          if (c_len) {
-            flush_tsin_buffer();
-            return 1;
-          }
-          return 0;
         }
+
+        if (c_len) {
+          flush_tsin_buffer();
+          return 1;
+        }
+        return 0;
      case XK_Shift_L:
      case XK_Shift_R:
-        b_shift_pressed = TRUE;
-        break;
+        key_press_time = current_time();
+        return 1;
      case XK_Delete:
         if (c_idx == c_len)
           return 0;
@@ -1413,10 +1428,18 @@ int feedkey_pp(KeySym xkey, int kbstate)
        disp_current_sel_page();
        return 1;
      case XK_space:
-       if (tsin_space_opt == TSIN_SPACE_OPT_FLUSH_BUFFER && c_len && eng_ph
-           && (ityp3_pho || (!typ_pho[0] && !typ_pho[1] && !typ_pho[2])) ) {
-         flush_tsin_buffer();
+       if (!c_len && !ityp3_pho && !typ_pho[0] && !typ_pho[1] && !typ_pho[2]
+           && tsin_half_full) {
+         send_text("　");
          return 1;
+       }
+
+       if (tsin_space_opt == TSIN_SPACE_OPT_FLUSH_BUFFER) {
+         if (c_len && eng_ph
+           && (ityp3_pho || (!typ_pho[0] && !typ_pho[1] && !typ_pho[2])) ) {
+           flush_tsin_buffer();
+           return 1;
+         }
        }
      case XK_Down:
        if (!eng_ph && xkey == XK_space)
@@ -1623,11 +1646,18 @@ asc_char:
 
         orig_disp_in_area_x = -1;
 
+        if (gcin_pop_up_win)
+          show_win0();
+
         drawcursor();
         return 1;
    } else { /* pho */
      if (xkey > 127)
        return 0;
+
+     // for hsu & et26
+     if (strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num)
+       return pre_punctuation_hsu(xkey);
 
      if (xkey >= 'A' && xkey <='Z')
        xkey+=0x20;
@@ -1719,8 +1749,16 @@ restart:
 
 //     dbg("scanphr c_idx:%d match_len:%d\n", c_idx, match_len);
 //     chpho[c_idx-1].psta = c_idx-1;
-     pre_selN=0;
+
+#define MAX_SINGLE_SEL 9
      disp_ph_sta();
+
+     if (pre_selN > MAX_SINGLE_SEL)
+       pre_selN=0;
+     else {
+       disp_pre_sel_page();
+     }
+
      return 1;
    } else {
      int mdist = c_idx - ph_sta;
@@ -1762,9 +1800,13 @@ restart:
      disp_ph_sta();
 
      if (mdist == 1) {
-//       dbg("single len match\n");
        chpho[c_idx-1].psta = c_idx-1;
-       pre_selN=0;
+
+       if (pre_selN > MAX_SINGLE_SEL)
+         pre_selN=0;
+       else
+         disp_pre_sel_page();
+
        return 1;
      }
 
@@ -1829,8 +1871,9 @@ int feedkey_pp_release(KeySym xkey, int kbstate)
   switch (xkey) {
      case XK_Shift_L:
      case XK_Shift_R:
-        if (b_shift_pressed && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) {
-          b_shift_pressed = FALSE;
+        if (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift &&
+            current_time() - key_press_time < 300000) {
+          key_press_time = 0;
           close_selection_win();
           tsin_toggle_eng_ch();
           return 1;

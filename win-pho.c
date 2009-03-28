@@ -1,13 +1,19 @@
 #include "gcin.h"
 
+static int current_pho_simple_win;
+static int current_gcin_inner_frame;
+static int current_pho_in_row1;
+
 static GtkWidget *gwin_pho;
-static GtkWidget *frame;
+static GtkWidget *top_bin, *hbox_row2;
 Window xwin_pho;
 static GtkWidget *label_pho_sele;
 static GtkWidget *labels_pho[4];
 static GtkWidget *label_full;
 static GtkWidget *label_key_codes;
-int current_pho_simple_win;
+
+void change_pho_font_size();
+
 
 void disp_pho(int index, char *phochar)
 {
@@ -129,15 +135,20 @@ void create_win_pho_gui_full()
 {
 //  dbg("create_win_pho .....\n");
 
-  if (frame)
+  if (top_bin)
     return;
 
-  frame = gtk_frame_new(NULL);
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
-  gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
-
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+
+  if (gcin_inner_frame) {
+    GtkWidget *frame = top_bin = gtk_frame_new(NULL);
+    gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
+    gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
+    gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+  } else {
+    gtk_container_add (GTK_CONTAINER(gwin_pho), vbox_top);
+    top_bin = vbox_top;
+  }
 
   GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), align, FALSE, FALSE, 0);
@@ -147,23 +158,23 @@ void create_win_pho_gui_full()
   set_label_font_size(label_pho_sele, gcin_font_size);
 
 
-  GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
+  hbox_row2 = gtk_hbox_new (FALSE, 0);
   /* This packs the button into the gwin_pho (a gtk container). */
-  gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
+  gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
 
   label_full = gtk_label_new("全");
-  gtk_container_add (GTK_CONTAINER (hbox), label_full);
+  gtk_container_add (GTK_CONTAINER (hbox_row2), label_full);
 
   GtkWidget *button_pho = gtk_button_new_with_label("注音");
   g_signal_connect_swapped (GTK_OBJECT (button_pho), "button_press_event",
         G_CALLBACK (inmd_switch_popup_handler), NULL);
-  gtk_box_pack_start (GTK_BOX (hbox), button_pho, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_row2), button_pho, FALSE, FALSE, 0);
 
   int i;
 
   button_pho = gtk_button_new();
   gtk_container_set_border_width (GTK_CONTAINER (button_pho), 0);
-  gtk_box_pack_start (GTK_BOX (hbox), button_pho, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_row2), button_pho, FALSE, FALSE, 0);
   GtkWidget *hbox_pho = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (button_pho), hbox_pho);
 
@@ -184,7 +195,7 @@ void create_win_pho_gui_full()
 
   label_key_codes  = gtk_label_new(NULL);
   gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);
-  gtk_box_pack_start (GTK_BOX (hbox), label_key_codes, FALSE, FALSE, 2);
+  gtk_box_pack_start (GTK_BOX (hbox_row2), label_key_codes, FALSE, FALSE, 2);
 
   gtk_widget_show_all (gwin_pho);
 
@@ -196,34 +207,52 @@ void create_win_pho_gui_simple()
 {
 //  dbg("create_win_pho .....\n");
 
-  if (frame)
+  if (top_bin)
     return;
 
-  frame = gtk_frame_new(NULL);
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
-  gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
-
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame), vbox_top);
-
-  GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), align, FALSE, FALSE, 0);
-
-  label_pho_sele = gtk_label_new(NULL);
-  gtk_container_add (GTK_CONTAINER (align), label_pho_sele);
-  set_label_font_size(label_pho_sele, gcin_font_size);
-
-
-  GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
-  /* This packs the button into the gwin_pho (a gtk container). */
-  gtk_container_add (GTK_CONTAINER (vbox_top), hbox);
-
-  label_full = gtk_label_new("全");
-  gtk_container_add (GTK_CONTAINER (hbox), label_full);
 
   GtkWidget *event_box_pho = gtk_event_box_new();
-  gtk_box_pack_start (GTK_BOX (hbox), event_box_pho, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (event_box_pho), 0);
+
+  if (gcin_inner_frame) {
+    GtkWidget *frame = top_bin = gtk_frame_new(NULL);
+    gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
+    gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
+    gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+  } else {
+    gtk_container_add (GTK_CONTAINER(gwin_pho), vbox_top);
+    top_bin = vbox_top;
+  }
+
+
+  GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
+  label_pho_sele = gtk_label_new(NULL);
+
+  if (!pho_in_row1) {
+    gtk_box_pack_start (GTK_BOX (vbox_top), align, FALSE, FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (align), label_pho_sele);
+  } else {
+    GtkWidget *hbox_row1 = gtk_hbox_new (FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (vbox_top), hbox_row1, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (hbox_row1), event_box_pho, FALSE, FALSE, 0);
+
+    gtk_box_pack_start (GTK_BOX (hbox_row1), align, FALSE, FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (align), label_pho_sele);
+  }
+
+
+  hbox_row2 = gtk_hbox_new (FALSE, 0);
+  /* This packs the button into the gwin_pho (a gtk container). */
+  gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
+
+  label_full = gtk_label_new("全");
+  gtk_container_add (GTK_CONTAINER (hbox_row2), label_full);
+
+
+  if (!pho_in_row1)
+    gtk_box_pack_start (GTK_BOX (hbox_row2), event_box_pho, FALSE, FALSE, 0);
+
   g_signal_connect(G_OBJECT(event_box_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
 
@@ -249,7 +278,9 @@ void create_win_pho_gui_simple()
 
   label_key_codes  = gtk_label_new(NULL);
   gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);
-  gtk_box_pack_start (GTK_BOX (hbox), label_key_codes, FALSE, FALSE, 2);
+  gtk_box_pack_start (GTK_BOX (hbox_row2), label_key_codes, FALSE, FALSE, 2);
+
+  change_pho_font_size();
 
   gtk_widget_show_all (gwin_pho);
 
@@ -258,25 +289,41 @@ void create_win_pho_gui_simple()
 
 void create_win_pho_gui()
 {
-  if (current_pho_simple_win != pho_simple_win && frame) {
-     gtk_widget_destroy(frame);
-     frame = NULL;
-  }
-
-  current_pho_simple_win = pho_simple_win;
-
   if (pho_simple_win)
     create_win_pho_gui_simple();
   else
     create_win_pho_gui_full();
+
+  if (pho_hide_row2) {
+    gtk_widget_hide(hbox_row2);
+    gtk_window_resize(GTK_WINDOW(gwin_pho), 10, 20);
+  }
+
+  current_pho_simple_win = pho_simple_win;
+  current_gcin_inner_frame = gcin_inner_frame;
+  current_pho_in_row1 = pho_in_row1;
 }
+
+
+void change_win_pho_style()
+{
+  if (!top_bin || (current_pho_simple_win == pho_simple_win &&
+      current_gcin_inner_frame == gcin_inner_frame &&
+      current_pho_in_row1 ==  pho_in_row1))
+    return;
+
+  gtk_widget_destroy(top_bin);
+  top_bin = NULL;
+
+  create_win_pho_gui();
+}
+
 
 gboolean pho_has_input();
 
 void show_win_pho()
 {
 //  dbg("show_win_pho\n");
-
   create_win_pho();
   create_win_pho_gui();
 
@@ -285,12 +332,19 @@ void show_win_pho()
 
   gtk_widget_show(gwin_pho);
   show_win_sym();
+
+  if (pho_hide_row2)
+    gtk_widget_hide(hbox_row2);
+  else
+    gtk_widget_show(hbox_row2);
 }
 
 
+void hide_win_sym();
+
 void hide_win_pho()
 {
-//  dbg("hide_win_pho\n");
+// dbg("hide_win_pho\n");
   if (!gwin_pho)
     return;
   gtk_widget_hide(gwin_pho);
@@ -337,7 +391,7 @@ void change_pho_font_size()
 {
   int i;
 
-  if (!frame)
+  if (!top_bin)
     return;
 
   for(i=0; i < 3;i ++) {

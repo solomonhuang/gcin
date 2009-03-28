@@ -33,7 +33,7 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle,
 /*  rstr returns UTF-8 encoded string, you should use 'free()' to free the
     memory.
 
-    reutrn boolean:
+    return boolean:
       FALSE : the key is rejected, should use client's own result(ASCII key).
       TRUE : the key is accepted, translated result is in rstr.
  */

@@ -3,7 +3,8 @@
 倉五 2 cj5.gtab
 #輕鬆 2 ez7.gtab
 注音 3 -
-帶調粵拼 4 jyutping.gtab
+#帶調粵拼 4 jyutping.gtab
+標點倉頡 4 cj-punc.gtab
 拼音 5 pinyin.gtab
 詞音 6 -
 大易 7 dayi3.gtab
@@ -15,3 +16,4 @@
 簡易 - simplex.gtab
 日本式 =  kana-nippon.gtab
 greek ` greek.gtab
+#latin-letters ` latin-letters.gtab

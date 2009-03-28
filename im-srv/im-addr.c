@@ -21,7 +21,7 @@ void get_gcin_im_srv_sock_path(char *outstr, int outstrN)
   struct stat st;
 
   if (stat(my_dir, &st) < 0)
-    mkdir(my_dir, 0755);
+    mkdir(my_dir, 0700);
   else {
     if (st.st_uid != my_uid) {
       fprintf(stderr, "please check the permision of dir %s\n", my_dir);

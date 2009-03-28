@@ -76,6 +76,7 @@ int main(int argc, char **argv)
 
 
   while (!feof(fp)) {
+    s[0]=0;
     fgets(s,sizeof(s),fp);
     int len=strlen(s);
 

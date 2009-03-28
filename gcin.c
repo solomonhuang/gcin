@@ -310,7 +310,9 @@ static void reload_data()
   dbg("reload_data\n");
   load_setttings();
   load_tsin_db();
-  disp_hide_tsin_status_row();
+  change_win0_style();
+  change_win_gtab_style();
+  change_win_pho_style();
   load_tab_pho_file();
   change_tsin_color();
 }
@@ -328,6 +330,9 @@ static void change_font_size()
   change_gtab_font_size();
   change_pho_font_size();
   change_win_sym_font_size();
+  change_win0_style();
+  change_win_gtab_style();
+  change_win_pho_style();
 }
 
 static int xerror_handler(Display *d, XErrorEvent *eve)

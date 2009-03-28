@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export LC_ALL=zh_TW.Big5
-export GTK_IM_MODULE=scim
+export GTK_IM_MODULE=xim
 export XMODIFIERS=@im=SCIM
 scim -d &
 #scim-input-pad &
@@ -9,5 +9,4 @@ scim -d &
 #mozilla-firefox
 #kedit
 #gedit
-#leafpad
-amsn
+leafpad

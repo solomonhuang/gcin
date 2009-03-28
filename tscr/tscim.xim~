@@ -9,5 +9,4 @@ scim -d &
 #mozilla-firefox
 #kedit
 #gedit
-#leafpad
-amsn
+leafpad

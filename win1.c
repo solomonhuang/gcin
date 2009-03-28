@@ -56,6 +56,7 @@ void create_win1_gui()
   gtk_box_pack_start (GTK_BOX (vbox_top), arrow_down, FALSE, FALSE, 0);
 
   gtk_widget_show_all(gwin1);
+  gdk_flush();
   gtk_widget_hide(gwin1);
 }
 
@@ -95,8 +96,14 @@ void move_win_char_index(GtkWidget *win1, int index);
 
 void disp_selections(int idx)
 {
+  if (idx < 0)
+    p_err("err");
+
   move_win_char_index(gwin1, idx);
   gtk_widget_show(gwin1);
+#if 1 // strange bug in gtk
+  move_win_char_index(gwin1, idx);
+#endif
 }
 
 

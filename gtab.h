@@ -75,7 +75,7 @@ typedef struct {
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:5  changjei:5 */
   int DefChars;           /* defined chars */
-  u_char keyname[MAX_GTAB_KEYS * CH_SZ];
+  u_char keyname[(MAX_GTAB_KEYS+2) * CH_SZ]; // including ?*
   u_char *keyname_lookup; // used by boshiamy only
   gtab_idx1_t *idx1;
   u_char *keymap;

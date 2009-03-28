@@ -25,9 +25,11 @@ u_short hash_pho[MAX_HASH_PHO+1];
 
 static char typ_pho_len[]={5, 2, 4, 3};
 
+gboolean same_query_show_pho_win();
+
 gboolean pho_has_input()
 {
-  return typ_pho[0] || typ_pho[1] || typ_pho[2] || typ_pho[3];
+  return typ_pho[0] || typ_pho[1] || typ_pho[2] || typ_pho[3] || same_query_show_pho_win();
 }
 
 phokey_t pho2key(char typ_pho[])
@@ -221,7 +223,7 @@ void clrin_pho()
   maxi=ityp3_pho=0;
   cpg=0;
 
-  if (gcin_pop_up_win)
+  if (gcin_pop_up_win && !same_query_show_pho_win())
     hide_win_pho();
 }
 
@@ -264,7 +266,7 @@ static void ClrSelArea()
 extern char *TableDir;
 extern char phofname[128];
 
-void get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
+gboolean get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
 {
   int typ_pho0 = key >> 9;
   int vv=hash_pho[typ_pho0];
@@ -275,8 +277,13 @@ void get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
       vv++;
   }
 
+  if (vv >= idxnum_pho || idx_pho[vv].key != key)
+    return FALSE;
+
   *start_i=idx_pho[vv].start;
   *stop_i=idx_pho[vv+1].start;
+
+  return TRUE;
 }
 
 // given the pho key & the big5 char, return the idx in ch_pho

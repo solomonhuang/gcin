@@ -420,6 +420,9 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
   int top=hashidx[i];
   int bot=edi=hashidx[i+1];
 
+  if (top>=phcount)
+    return FALSE;
+
   while (top <= bot) {
     mid=(top+bot)/ 2;
     sti++;

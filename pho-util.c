@@ -7,7 +7,8 @@
 char phofname[128]="";
 extern char *TableDir;
 u_short idxnum_pho;
-PHO_IDX idx_pho[1403];
+// PHO_IDX idx_pho[1403];
+PHO_IDX *idx_pho;
 int ch_pho_ofs;
 PHO_ITEM *ch_pho;
 int ch_phoN;
@@ -41,13 +42,16 @@ void pho_load()
   if ((fr=fopen(phofname,"r"))==NULL)
     p_err("err %s\n", phofname);
 
+  fread(&idxnum_pho,sizeof(u_short),1,fr);
+  fread(&idxnum_pho,sizeof(u_short),1,fr);
+
+  // bad design, should store ch_phoN
   struct stat st;
   fstat(fileno(fr), &st);
 
-  int count = st.st_size / sizeof(PHO_ITEM);
-
-  fread(&idxnum_pho,sizeof(u_short),1,fr);
-  fread(&idxnum_pho,sizeof(u_short),1,fr);
+  if (idx_pho)
+    free(idx_pho);
+  idx_pho = tmalloc(PHO_IDX, idxnum_pho + 1);
   fread(idx_pho, sizeof(PHO_IDX), idxnum_pho, fr);
 
   ch_pho_ofs = ftell(fr);
@@ -55,7 +59,9 @@ void pho_load()
   if (ch_pho)
     free(ch_pho);
 
-  if (!(ch_pho=(PHO_ITEM *)malloc(sizeof(PHO_ITEM) * count))) {
+  int count = (st.st_size - ch_pho_ofs) / sizeof(PHO_ITEM);
+
+  if (!(ch_pho=tmalloc(PHO_ITEM, count))) {
     p_err("malloc error");
   }
 
@@ -115,6 +121,7 @@ int utf8_pho_keys(char *utf8, phokey_t *phkeys)
 
     for(i=0; i < idxnum_pho; i++) {
       if (idx_pho[i].start<= ofs && ofs < idx_pho[i+1].start) {
+//        dbg("ofs:%d %d  %d %d\n", ofs, i, idx_pho[i].start, idx_pho[i+1].start);
         phcou[phkeysN].count = ch_pho[ofs].count;
         phcou[phkeysN++].key = idx_pho[i].key;
         break;
@@ -126,7 +133,10 @@ int utf8_pho_keys(char *utf8, phokey_t *phkeys)
 
 ret:
 
-//  dbg("%s %d\n", utf8, phkeysN);
+#if 0
+    utf8_putchar(utf8);
+    dbg("n %d\n", phkeysN);
+#endif
   qsort(phcou, phkeysN, sizeof(PH_COUNT), qcmp_pho_count);
 
   for(i=0; i < phkeysN; i++)
@@ -150,40 +160,43 @@ char *phokey_to_str(phokey_t kk)
   k1=(kk&31) * PHO_CHAR_LEN;
 
   if (k1) {
-    bchcpy(phchars, &pho_chars[0][k1]);
-    phcharsN+=PHO_CHAR_LEN;
+    phcharsN+=u8cpy(phchars, &pho_chars[0][k1]);
   }
 
   if (k2) {
-    bchcpy(&phchars[phcharsN], &pho_chars[1][k2]);
-    phcharsN+=PHO_CHAR_LEN;
+    phcharsN+=u8cpy(&phchars[phcharsN], &pho_chars[1][k2]);
   }
 
   if (k3)  {
-    bchcpy(&phchars[phcharsN], &pho_chars[2][k3]);
-    phcharsN+=PHO_CHAR_LEN;
+    phcharsN+=u8cpy(&phchars[phcharsN], &pho_chars[2][k3]);
   }
 
-  if (k4)
+  if (k4) {
+#if 0
     phchars[phcharsN++] = k4 + '0';
+#else
+    phcharsN+=u8cpy(&phchars[phcharsN], &pho_chars[3][k4 * PHO_CHAR_LEN]);
+#endif
+  }
 
   phchars[phcharsN] = 0;
 
   return phchars;
 }
 
-void str_to_all_phokey_chars(char *b5_str, char *out)
+
+void str_to_all_phokey_chars(char *u8_str, char *out)
 {
   out[0]=0;
 
-  while (*b5_str) {
+  while (*u8_str) {
     phokey_t phos[32];
 
-    int n=utf8_pho_keys(b5_str, phos);
-
-//    utf8_putchar(b5_str);
-//    dbg("n %d\n", n);
-
+    int n=utf8_pho_keys(u8_str, phos);
+#if 0
+    utf8_putchar(u8_str);
+    dbg("n %d\n", n);
+#endif
     int i;
     for(i=0; i < n; i++) {
       char *pstr = phokey_to_str(phos[i]);
@@ -192,9 +205,9 @@ void str_to_all_phokey_chars(char *b5_str, char *out)
         strcat(out, " ");
     }
 
-    b5_str+=utf8_sz(b5_str);
+    u8_str+=utf8_sz(u8_str);
 
-    if (*b5_str)
+    if (*u8_str)
       strcat(out, " | ");
   }
 }

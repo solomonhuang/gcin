@@ -11,6 +11,7 @@ struct keystruc {
   char *kname;
   KeySym ksym;
   char *str;
+  char *str_caps;
 } tran[]={
   {"`", '~'},
   {"0", ')'}, {"1", '!'}, {"2", '@'}, {"3", '#'}, {"4", '$'}, {"5", '%'},
@@ -40,6 +41,7 @@ struct keystruc {
   {"kp+",XK_KP_Add}, {"kpenter",XK_KP_Enter}
 };
 
+
 int tranN=sizeof(tran)/sizeof(tran[0]);
 extern char *TableDir;
 
@@ -67,6 +69,13 @@ void load_phrase()
       kname[i]=ttt[i];
 
     kname[i]=0;
+    gboolean is_upper = FALSE;
+
+    if (isupper(kname[0])) {
+       is_upper = TRUE;
+       kname[0] = tolower(kname[0]);
+    }
+
     while((ttt[i]==' ' || ttt[i]==9) && ttt[i])
       i++;
 
@@ -87,7 +96,11 @@ void load_phrase()
       continue;
     }
 
-    tran[i].str = strdup(str);
+    if (is_upper) {
+      tran[i].str_caps = strdup(str);
+    }
+    else
+      tran[i].str = strdup(str);
   }
 }
 
@@ -102,7 +115,7 @@ void free_phrase()
 
 void add_to_tsin_buf_str(char *str);
 
-gboolean feed_phrase(KeySym ksym)
+gboolean feed_phrase(KeySym ksym, int state)
 {
   int i;
 
@@ -116,14 +129,17 @@ gboolean feed_phrase(KeySym ksym)
     if (tran[i].ksym!= ksym)
       continue;
 
-    if (tran[i].str) {
+    char *str = ((state & LockMask) && tran[i].str_caps) ?
+                 tran[i].str_caps : tran[i].str;
+
+    if (str) {
       if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)
-        add_to_tsin_buf_str(tran[i].str);
+        add_to_tsin_buf_str(str);
       else
-        send_text(tran[i].str);
+        send_text(str);
     }
 
-    return TRUE;
+    return str!=NULL;
   }
 
   return FALSE;

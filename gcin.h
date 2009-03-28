@@ -134,3 +134,7 @@ void get_win_size(GtkWidget *win, int *width, int *height);
 
 extern int gcin_switch_keysN;
 extern char gcin_switch_keys[];
+
+#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 4
+#define GTK_24 1
+#endif

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+export LC_ALL=ja
+#export GTK_IM_MODULE=uim
+export GTK_IM_MODULE=xim
+export XMODIFIERS=@im=uim
+/usr/bin/uim-xim &
+#gedit --new-window &
+#mozilla-firefox
+#kedit
+#gedit
+leafpad

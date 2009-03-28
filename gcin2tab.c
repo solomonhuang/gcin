@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
+#if FREEBSD
+#include <sys/param.h>
+#include <sys/stat.h>
+#endif
 #include <string.h>
 #include "gcin.h"
 #include "gtab.h"

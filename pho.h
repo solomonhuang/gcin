@@ -34,7 +34,7 @@ extern int start_idx, stop_idx;
 
 extern char phofname[128];
 extern u_short idxnum_pho;
-extern PHO_IDX idx_pho[];
+extern PHO_IDX *idx_pho;
 extern int ch_pho_ofs;
 extern PHO_ITEM *ch_pho;
 extern int ch_phoN;
