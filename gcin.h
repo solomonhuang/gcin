@@ -10,6 +10,11 @@
 #include <string.h>
 #include "IMdkit.h"
 #include "Xi18n.h"
+#if GCIN_i18n_message
+#define _(STRING) gettext(STRING)
+#else
+#define _(STRING) (STRING)
+#endif
 
 typedef enum {
   GCIN_STATE_DISABLED = 0,
@@ -123,6 +128,7 @@ void get_sys_table_file_name(char *name, char *fname);
 char *half_char_to_full_char(KeySym xkey);
 void send_text(char *text);
 void sendkey_b5(char *bchar);
+void send_ascii(int key);
 void bell();
 void set_label_font_size(GtkWidget *label, int size);
 void send_gcin_message(Display *dpy, char *s);

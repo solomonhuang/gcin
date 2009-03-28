@@ -326,8 +326,13 @@ int main(int argc, char **argv)
     cmd_arg(tt,&cmd,&arg);
     if (!cmd[0] || !arg[0])
       continue;
-    if (cmd[0]=='%')
-      continue;
+
+    if (!strcmp(cmd, "%chardef")) {
+      if (!strcmp(arg, "end"))
+        break;
+      else
+        continue;
+    }
 
     len=strlen(cmd);
 
@@ -357,8 +362,13 @@ int main(int argc, char **argv)
     cmd_arg(tt, &cmd, &arg);
     if (!cmd[0] || !arg[0])
       continue;
-    if (cmd[0]=='%')
-      continue;
+
+    if (!strcmp(cmd, "%chardef")) {
+      if (!strcmp(arg, "end"))
+        break;
+      else
+        continue;
+    }
 
     len=strlen(cmd);
 
@@ -431,11 +441,7 @@ int main(int argc, char **argv)
   }
   fclose(fr);
 
-#if FREEBSD && 0
-#define _sort mergesort
-#else
 #define _sort qsort
-#endif
 
   dbg("MaxPress: %d\n", th.MaxPress);
 

@@ -321,11 +321,7 @@ int main(int argc, char **argv)
   }
   fclose(fr);
 
-#if FREEBSD && 0
-#define _sort mergesort
-#else
 #define _sort qsort
-#endif
 
   th.DefC=chno;
   cur_inmd->DefChars = chno;

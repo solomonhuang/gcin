@@ -2,10 +2,12 @@
 %ename latin-letters
 %prompt latin-letters
 %selkey 1234567890
-%endkey abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+%endkey !/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 %space_style 2
 %keep_key_case
 %keyname begin
+!	!
+/	/
 a	a
 b	b
 c	c
@@ -311,3 +313,8 @@ Z	Ż	379	017B	LATIN CAPITAL LETTER Z WITH DOT ABOVE
 z	ż	380	017C	LATIN SMALL LETTER Z WITH DOT ABOVE
 Z	Ž	381	017D	LATIN CAPITAL LETTER Z WITH CARON
 z	ž	382	017E	LATIN SMALL LETTER Z WITH CARON
+!	!
+!	¡
+/	/
+/	¿
+E	€

@@ -184,6 +184,12 @@ void sendkey_b5(char *bchar)
   send_text(tt);
 }
 
+
+void send_ascii(int key)
+{
+  sendkey_b5(&key);
+}
+
 #if USE_XIM
 void export_text_xim()
 {
@@ -195,16 +201,9 @@ void export_text_xim()
   XTextProperty tp;
   char outbuf[512];
 
-#if !SOL
-  if (pxim_arr->b_send_utf8_str) {
-    Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
-  } else
-#endif
-  {
     utf8_big5(output_buffer, outbuf);
     text = outbuf;
     XmbTextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
-  }
 
 #if DEBUG
   dbg("sendkey_b5: %s\n", text);
@@ -619,8 +618,6 @@ void check_CS()
 void load_tray_icon();
 gboolean init_in_method(int in_no)
 {
-  gboolean status = TRUE;
-
   if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
     return FALSE;
 
@@ -638,34 +635,36 @@ gboolean init_in_method(int in_no)
   reset_current_in_win_xy();
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
-  current_CS->in_method = in_no;
 
 
   switch (in_no) {
     case 3:
+      current_CS->in_method = in_no;
       init_tab_pho();
       break;
     case 6:
+      current_CS->in_method = in_no;
       init_tab_pp(True);
       break;
     case 10:
+      current_CS->in_method = in_no;
       init_inter_code(True);
       break;
     default:
+      init_gtab(in_no, True);
+      if (!inmd[in_no].DefChars)
+        return FALSE;
+      current_CS->in_method = in_no;
       show_win_gtab();
-//      init_gtab(in_no, True);
       break;
   }
 
-#if 0
-  set_win_status_inmd(inmd[in_no].cname);
-#endif
 #if TRAY_ENABLED
   load_tray_icon();
 #endif
 
   update_in_win_pos();
-  return status;
+  return TRUE;
 }
 
 
@@ -674,14 +673,16 @@ static void cycle_next_in_method()
 
   int i;
 
-  for(i=1; i <= MAX_GTAB_NUM_KEY; i++) {
-    int v = (current_CS->in_method + i) % MAX_GTAB_NUM_KEY;
+  for(i=0; i < MAX_GTAB_NUM_KEY; i++) {
+    int v = ((current_CS->in_method + i) % MAX_GTAB_NUM_KEY) + 1;
     if (!(gcin_flags_im_enabled & (1<<v)))
       continue;
     if (!inmd[v].cname || !inmd[v].cname[0])
       continue;
 
-    init_in_method(v);
+    if (!init_in_method(v))
+      continue;
+
     return;
   }
 }
@@ -812,8 +813,9 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
      return TRUE;
   }
 
-  if (current_CS->b_raise_window && !timeout_handle
-      && keysym>=' ' && keysym < 127) {
+  if (current_CS->b_raise_window && keysym>=' ' && keysym < 127) {
+    if (timeout_handle)
+      g_source_remove(timeout_handle);
     timeout_handle = g_timeout_add(200, timeout_raise_window, NULL);
   }
 

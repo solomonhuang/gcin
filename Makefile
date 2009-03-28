@@ -11,7 +11,7 @@ gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o
 GCIN_SO= gcin1.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
-     gcin-switch.o $(GCIN_SO) \
+     gcin-switch.o gcin-exec-script.o $(GCIN_SO) \
      $(gcin_tsin_o) $(gcin_pho_o) $(gcin_gtab_o)
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
@@ -30,7 +30,7 @@ OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
-	gcin-icon.o gcin-setup-gtab.o gtab-list.o
+	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
@@ -58,6 +58,10 @@ CFLAGS += -DTRAY_ENABLED=1
 OBJS += tray.o eggtrayicon.o
 endif
 
+ifeq ($(USE_I18N),Y)
+CFLAGS += -DGCIN_i18n_message=1
+endif
+
 im-srv = im-srv/im-srv.a
 
 .c.E:
@@ -74,6 +78,7 @@ all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C im-client
 	$(MAKE) -C gtk-im
+	$(MAKE) -C po
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
@@ -190,6 +195,9 @@ install:
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install
 	$(MAKE) -C man install
+ifeq ($(USE_I18N),Y)
+	$(MAKE) -C po install
+endif
 clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean
@@ -200,6 +208,7 @@ clean:
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
 	$(MAKE) -C menu clean
+	$(MAKE) -C po clean
 	rm -f *.o *.E *.db *.pico *.so config.mak tags $(PROGS) $(PROGS_CV) \
 	$(DATA) .depend gcin.spec trad2sim gcin.spec.tmp gcin.log
 	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' -o -name 'vgcore.*' ')' -exec rm {} \;

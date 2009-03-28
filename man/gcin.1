@@ -1,4 +1,4 @@
-.TH "GCIN" "1" "28 AUG 2006" "GCIN 1.2.3" "gcin input method platform"
+.TH "GCIN" "1" "6 FEB 2007" "GCIN 1.3.4" "gcin input method platform"
 .SH "NAME" 
 gcin, gcin-setup \- an input method server
 .SH "SYNOPSIS" 
@@ -23,7 +23,7 @@ A file helps gcin finding text editors when needed. You may add any UTF-8 compat
 .IP "LC_CTYPE"        
 For bash: export LC_CTYPE=zh_TW.UTF-8
 .br
-For csh: setenv LC_CTYPE zh_TW.Big5
+For csh: setenv LC_CTYPE zh_TW.UTF-8
 .IP "XMODIFIERS"
 For bash: export XMODIFIERS=@im=gcin
 .br
@@ -36,12 +36,12 @@ For csh: setenv GTK_IM_MODULE gcin
 For bash: export QT_IM_MODULE=gcin
 .br
 For csh: setenv QT_IM_MODULE gcin
+.br
+If your QT3 library does not support immodule, you should set it as "xim".
 .IP "GCIN_CONNECT_MSG_ON"
 Display messages for socket connections.
 .IP "GCIN_DBG_TMP"
 Display additional debug messages.
-.IP "GCIN_DUAL_XIM_OFF"
-Disable dual XIM server feature.
 .IP "GCIN_ERR_COREDUMP"
 Option for debugging.
 .IP "GCIN_IM_CLIENT_NO_AUTO_EXEC"
@@ -50,6 +50,8 @@ Disable gcin protocol's auto-evoked feature.
 Assign IM tables' directory other then /usr/share/gcin/table.
 .IP "GCIN_XIM"
 Assign gcin XIM server's XIM name.
+.IP "GCIN_OUTPUT_FILTER"
+Assign output filter to process data before the IM server send them to clients. 
 .SH "CONFFILES" 
 If you can read Traditional Chinese, use gcin-setup and skip this secion.
 .PP
@@ -69,9 +71,9 @@ Key codes arrangement style within Bopomofo and Tsin intelligent input method(Ts
 .PP
 OPTIONS    MEANINGS
 .br
-\fBzo         Standard style with 1234 selection method\fP
+zo         Standard style with 1234 selection method
 .br
-zo-asdf    Standard style with asdf selection method
+\fBzo-asdf    Standard style with asdf selection method\fP
 .br
 et         Eten style with 1234 selection method
 .br
@@ -166,6 +168,14 @@ OPTIONS    MEANINGS
 1          ON
 .br
 \fB0          OFF\fP
+.IP "\fB$HOME/.gcin/config/tsin-tail-select-key\fP \fIboolean\fP"
+Show Tsin selection keys follows choices.
+.PP
+OPTIONS    MEANINGS
+.br
+1          ON
+.br
+\fB0          OFF\fP
 .IP "\fB$HOME/.gcin/config/tsin-buffer-size\fP \fInumber\fP" 
 Buffer size of editing area of Tsin IM. Default is \fB40\fP.
 .IP "\fB$HOME/.gcin/config/tsin-phrase-line-color\fP \fIhex\fP" 
@@ -207,21 +217,13 @@ OPTIONS    MEANINGS
 .br
 serif      Serif
 .IP "\fB$HOME/.gcin/config/gcin-pop-up-win\fP \fIboolean\fP"
-Pop up window on the right lower corner of screen.
+Dynamic pop up window.
 .PP
 OPTIONS    MEANINGS
 .br
-1          ON
+\fB1          ON\fP
 .br
-\fB0          OFF\fP
-.IP "\fB$HOME/.gcin/config/gcin-pop-up-win-abs-corner\fP \fIboolean\fP"
-Keep pop up window on the right lower corner of screen absolutely.
-.PP
-OPTIONS    MEANINGS
-.br
-1          ON
-.br
-\fB0          OFF\fP
+0          OFF
 .IP "\fB$HOME/.gcin/config/gcin-input-style\fP \fIboolean\fP"
 Window style of gcin.
 .PP
@@ -242,6 +244,32 @@ OPTIONS    MEANINGS
 1          ON
 .br
 \fB0          OFF\fP
+.IP "\fB$HOME/.gcin/config/gcin-win-color-use\fP \fIboolean\fP"
+Use custom colors for gcin's window. If you want to use GTK's theme, do not enable this.
+.PP
+OPTIONS    MEANINGS
+.br
+1          ON
+.br
+\fB0          OFF\fP
+.IP "\fB$HOME/.gcin/config/gcin-win-color-fg\fP \fIhex\fP"
+Foreground color of gcin's window.
+.PP
+OPTIONS    MEANINGS
+.br
+#FF0000    Red
+.br
+#00FF00    Green
+.br
+#0000FF    Blue
+.br
+#FFFF00    Yellow
+.br
+#FF00FF    Magenta
+.br
+\fB#FFFFFF    White\fP
+.IP "\fB$HOME/.gcin/config/gcin-win-color-bg\fP \fIhex\fP"
+Background color of gcin's window. Default is \fB#005BFF\fP.
 .IP "\fB$HOME/.gcin/config/gcin-status-tray\fP \fIboolean\fP"
 Show gcin's status in system tray.
 .PP
@@ -366,12 +394,27 @@ OPTIONS    MEANINGS
 \fB1          ON\fP
 .br
 0          OFF
+.IP "\fB$HOME/.gcin/config/gtab-vertical-select\fP \fIboolean\fP"
+Vertical selection window for gtab IMs.
+).
+.PP
+OPTIONS    MEANINGS
+.br
+1          ON
+.br
+\fB0          OFF\fP
+.IP "\fB$HOME/.gcin/config/gtab-unique-auto-send\fP \fIboolean\fP"
+Auto send characters when there is only one choice. (For gtab IMs)
+.PP
+OPTIONS    MEANINGS
+.br
+1          ON
+.br
+\fB0          OFF\fP
 .IP "\fB$HOME/.gcin/config/default-input-method\fP \fInumber\fP" 
 Default IM when gcin is called.
 .PP
 OPTIONS    MEANINGS
-.br
-0          Internal character code IM
 .br
 1          Chanjei IM version 3
 .br
@@ -391,22 +434,27 @@ OPTIONS    MEANINGS
 .br
 9          Liu's IM(Boshiamy IM)
 .br
-10         Simple Chanjei IM
+10         Internal encoding IM
 .br
-11         Japanese Kana and Kanji IM
+11         Simple Chanjei IM
 .br
-12         Greek letters IM
+12         Japanese Kana and Kanji IM
+.br
+13         Greek letters IM
+.br
+14         Latin letters IM
+.br
+15         Jyutping IM
+.br
+16         NewCJ3 IM
 .IP "\fB$HOME/.gcin/config/gcin-flags-im-enabled\fP \fInumber\fP" 
 Available IMs to be cyclic selected by Control-Shift.
 .PP
 OPTIONS    MEANINGS
 .br
-\fB2147483647 All IMs are enable.\fP
+\fB2147483647 All IMs are enable.\fP ( This is 2^31 - 1 )
 .br
-2147475456 All IMs are disabled.
 .PP
-         1 Ctrl\-Alt\-0 Internal character code IM
-.br
          2 Ctrl\-Alt\-1 Chanjei IM version 3
 .br
          4 Ctrl\-Alt\-2 Chanjei IM version 5
@@ -425,15 +473,23 @@ OPTIONS    MEANINGS
 .br
        512 Ctrl\-Alt\-9 Liu's IM(Boshiamy IM)
 .br
-      1024 Ctrl\-Alt\-\- Simple Chanjei IM
+      1024 Ctrl\-Alt\-0 Internal encoding IM
 .br
-      2048 Ctrl\-Alt\-= Japanese Kana and Kanji IM
+      2048 Ctrl\-Alt\-\- Simple Chanjei IM
 .br
-      4096 Ctrl\-Alt\-` Greek letters IM
+      4096 Ctrl\-Alt\-= Japanese Kana and Kanji IM
+.br
+      8192 Ctrl\-Alt\-` Greek letters IM
+.br
+     16384 Ctrl\-Alt\-[ Latin letters IM
+.br
+     32768 Ctrl\-Alt\-\] Jyutping IM
+.br
+     65536 Ctrl\-Alt\-\\ NewCJ3 IM
 .PP
-2147475456 add number of IMs, then you get your own setup number. For example, you want only Bopomofo, Tsin, and Array IM. So you calculate 2147475456 + 8 + 64 + 256 = 2147475784.
+2147483647 minus numbers of IMs, then you get your own setup number. For example, you want to disable Greek and Latin letters, so you calculate 2147483647 - 8192 - 16384 = 2147459071.
 .PP
-echo 2147475784 > $HOME/.gcin/config/gcin-flags-im-enabled
+echo 2147459071 > $HOME/.gcin/config/gcin-flags-im-enabled
 .PP
 Then you get it.
 .IP "\fB$HOME/.gcin/config/gcin-im-toggle-keys\fP \fInumber\fP" 
@@ -473,7 +529,7 @@ OPTIONS    MEANINGS
 .br
 0          OFF
 .SH "SEE ALSO" 
-\fIgcin2tab\fP(1), \fIphoa2d\fP(1), \fIphod2a\fP(1), \fItsa2d32\fP(1), \fItsd2a32\fP(1), \fIsim2trad\fP(1), \fItrad2sim\fP(1), \fItslearn\fP(1), \fIjuyin-learn\fP(1), \fIgcin-gb-toggle\fP(1)
+\fIgcin-gb-toggle\fP(1), \fItslearn\fP(1), \fIjuyin-learn\fP(1), \fIsim2trad\fP(1), \fItrad2sim\fP(1), \fIgcin2tab\fP(1), \fIgcin-message\fP(1), \fIphoa2d\fP(1), \fIphod2a\fP(1), \fItsa2d32\fP(1), \fItsd2a32\fP(1)
 .SH "AUTHORS" 
 .IP "Edward Der-Hua Liu <cp76@csie.nctu.edu.tw>"
 Wrote gcin and associated tools.

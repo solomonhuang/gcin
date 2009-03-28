@@ -13,6 +13,8 @@
 #include "gcin-protocol.h"
 #include "gcin-im-client.h"
 
+static int flags_backup;
+
 static void save_old_sigaction_single(int signo, struct sigaction *act)
 {
   sigaction(signo, NULL, act);
@@ -43,10 +45,9 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 //  dbg("gcin_im_client_reopen\n");
 
   if (!dpy) {
-    dbg("null disp\n");
+    dbg("null disp %d\n", gcin_ch->fd);
     goto next;
   }
-
 
   Atom gcin_addr_atom = get_gcin_addr_atom(dpy);
   Window gcin_win = None;
@@ -196,8 +197,12 @@ next:
     }
   }
 
-  if (handle->fd && BITON(handle->flag, FLAG_GCIN_client_handle_has_focus))
-    gcin_im_client_focus_in(handle);
+  if (handle->fd)  {
+    if (BITON(handle->flag, FLAG_GCIN_client_handle_has_focus))
+      gcin_im_client_focus_in(handle);
+    int rstatus;
+    gcin_im_client_set_flags(handle, flags_backup, &rstatus);
+  }
 
   return handle;
 }
@@ -231,9 +236,11 @@ void gcin_im_client_close(GCIN_client_handle *handle)
 
 
 
-static void gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
+static int gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
 {
   validate_handle(handle);
+  if (!handle->fd)
+    return 0;
 
   bzero(req, sizeof(GCIN_req));
 
@@ -250,6 +257,8 @@ static void gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
   req->spot_location.y = handle->spot_location.y;
   to_gcin_endian_2(&req->spot_location.x);
   to_gcin_endian_2(&req->spot_location.y);
+
+  return 1;
 }
 
 static void error_proc(GCIN_client_handle *handle, char *msg)
@@ -347,7 +356,8 @@ void gcin_im_client_focus_in(GCIN_client_handle *handle)
   handle->flag |= FLAG_GCIN_client_handle_has_focus;
 
   GCIN_req req;
-  gen_req(handle, GCIN_req_focus_in, &req);
+  if (!gen_req(handle, GCIN_req_focus_in, &req))
+    return;
 
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_focus_in error");
@@ -363,7 +373,8 @@ void gcin_im_client_focus_out(GCIN_client_handle *handle)
   handle->flag &= ~FLAG_GCIN_client_handle_has_focus;
 
   GCIN_req req;
-  gen_req(handle, GCIN_req_focus_out, &req);
+  if (!gen_req(handle, GCIN_req_focus_out, &req))
+    return;
 
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_focus_out error");
@@ -378,13 +389,10 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
 {
   *rstr = NULL;
 
-  if (!handle->fd) {
-//    dbg("gcin_im_client_forward_key_event fd is 0\n");
-    return 0;
-  }
-
   GCIN_req req;
-  gen_req(handle, event_type, &req);
+  if (!gen_req(handle, event_type, &req))
+    return 0;
+
   req.keyeve.key = key;
   to_gcin_endian_4(&req.keyeve.key);
   req.keyeve.state = state;
@@ -402,7 +410,6 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
     error_proc(handle, "cannot read reply from gcin server");
     return FALSE;
   }
-
 
   to_gcin_endian_4(&reply.datalen);
   to_gcin_endian_4(&reply.flag);
@@ -443,27 +450,6 @@ int gcin_im_client_forward_key_press(GCIN_client_handle *handle,
 }
 
 
-#if 0
-// return TRUE if the key is accepted
-int gcin_im_client_forward_key_press2(GCIN_client_handle *handle,
-                                          KeySym key, u_int state,
-                                          char **rstr)
-{
-  // in case client didn't send focus in event
-  if (!BITON(handle->flag, FLAG_GCIN_client_handle_has_focus)) {
-    gcin_im_client_focus_in(handle);
-    handle->flag |= FLAG_GCIN_client_handle_has_focus;
-    gcin_im_client_set_cursor_location(handle, handle->spot_location.x,
-       handle->spot_location.y);
-  }
-
-//  dbg("gcin_im_client_forward_key_press\n");
-  return gcin_im_client_forward_key_event(
-             handle, GCIN_req_key_press, key, state, rstr);
-}
-#endif
-
-
 // return TRUE if the key is accepted
 int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
@@ -486,7 +472,8 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y
     return;
 
   GCIN_req req;
-  gen_req(handle, GCIN_req_set_cursor_location, &req);
+  if (!gen_req(handle, GCIN_req_set_cursor_location, &req))
+    return;
 
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_cursor_location error");
@@ -504,14 +491,22 @@ void gcin_im_client_set_window(GCIN_client_handle *handle, Window win)
 }
 
 
-void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags)
+void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_flag)
 {
   GCIN_req req;
 
-  gen_req(handle, GCIN_req_set_flags, &req);
+  if (!gen_req(handle, GCIN_req_set_flags, &req))
+    return;
+
   req.flag |= flags;
+
+  flags_backup = flags;
 
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_flags error");
+  }
+
+  if (handle_read(handle, ret_flag, sizeof(int)) <= 0) {
+    error_proc(handle, "cannot read reply str from gcin server");
   }
 }

@@ -78,7 +78,6 @@ typedef struct _IC {
 
 
 typedef struct {
-  gboolean b_send_utf8_str;
   char *server_locale;
   char xim_server_name[32];
   Window xim_xwin;

@@ -8,23 +8,16 @@ static GtkWidget *gwin_pho;
 static GtkWidget *top_bin, *hbox_row2;
 Window xwin_pho;
 static GtkWidget *label_pho_sele;
-static GtkWidget *labels_pho[4];
+static GtkWidget *label_pho;
 static GtkWidget *label_full;
 static GtkWidget *label_key_codes;
 
 void change_pho_font_size();
-
+void disp_pho_sub(GtkWidget *label, int index, char *pho);
 
 void disp_pho(int index, char *phochar)
 {
-  char tt[CH_SZ+1];
-
-  if (phochar[0]==' ')
-    strcpy(tt, "　");
-  else
-    utf8cpy(tt, phochar);
-
-  gtk_label_set_text(GTK_LABEL(labels_pho[index]), tt);
+  disp_pho_sub(label_pho, index, phochar);
 }
 
 
@@ -178,13 +171,8 @@ void create_win_pho_gui_full()
   gtk_box_pack_start (GTK_BOX (hbox_row2), button_pho, FALSE, FALSE, 0);
   GtkWidget *hbox_pho = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (button_pho), hbox_pho);
-
-  for(i=0; i < 4;i ++) {
-    GtkWidget *label = gtk_label_new(NULL);
-    labels_pho[i] = label;
-    gtk_box_pack_start (GTK_BOX (hbox_pho), label, FALSE, FALSE, 0);
-    set_label_font_size(label, gcin_font_size);
-  }
+  label_pho = gtk_label_new(NULL);
+  gtk_box_pack_start (GTK_BOX (hbox_pho), label_pho, FALSE, FALSE, 0);
 
   g_signal_connect(G_OBJECT(button_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
@@ -261,16 +249,9 @@ void create_win_pho_gui_simple()
   gtk_container_add (GTK_CONTAINER (event_box_pho), frame_pho);
   gtk_container_set_border_width (GTK_CONTAINER (frame_pho), 0);
 
-  GtkWidget *hbox_pho = gtk_hbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame_pho), hbox_pho);
+  label_pho = gtk_label_new(NULL);
+  gtk_container_add (GTK_CONTAINER (frame_pho), label_pho);
 
-  int i;
-  for(i=0; i < 4;i ++) {
-    GtkWidget *label = gtk_label_new(NULL);
-    labels_pho[i] = label;
-    gtk_box_pack_start (GTK_BOX (hbox_pho), label, FALSE, FALSE, 0);
-    set_label_font_size(label, gcin_font_size_tsin_pho_in);
-  }
 
   if (left_right_button_tips) {
     GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
@@ -370,7 +351,7 @@ char *get_full_str();
 
 void win_pho_disp_half_full()
 {
-  gtk_label_set_text(GTK_LABEL(labels_pho[0]), get_full_str());
+  gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
 
   if (current_CS->im_state == GCIN_STATE_CHINESE && current_CS->b_half_full_char) {
     gtk_widget_show(label_full);
@@ -398,9 +379,7 @@ void change_pho_font_size()
   if (!top_bin)
     return;
 
-  for(i=0; i < 3;i ++) {
-    set_label_font_size(labels_pho[i], gcin_font_size_tsin_pho_in);
-  }
+  set_label_font_size(label_pho, gcin_font_size_tsin_pho_in);
 
   set_label_font_size(label_pho_sele, gcin_font_size);
 

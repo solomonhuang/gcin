@@ -51,6 +51,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
   for(plen=1; start + plen <= c_len && plen <= MAX_PHRASE_LEN; plen++) {
     if (plen > 1 && (chpho[start+plen-1].flag & FLAG_CHPHO_PHRASE_USER_HEAD))
       break;
+
     phokey_t pp[MAX_PHRASE_LEN + 1];
     int sti, edi;
     TSIN_PARSE pbest[MAX_PH_BF_EXT+1];
@@ -70,11 +71,13 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
     dbg("st:%d hh plen:%d ", start, plen);utf8_putchar(chpho[start].ch); dbg("\n");
 #endif
 
+
     extract_pho(start, plen, pp);
 
     if (!tsin_seek(pp, plen, &sti, &edi)) {
       if (plen > 1)
         break;
+
       goto next;
     }
 
@@ -126,7 +129,11 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 #endif
     }
 
+
 next:
+    if (!(chpho[start].ch[0] & 0x80) && !match_phr_N)
+      no_match_ch_N = 0;
+
     remlen = c_len - (start + plen);
 
 
@@ -154,9 +161,8 @@ next:
     }
 
     double score = log(maxusecount + 10) /
-      pow(match_phr_N + 0.05, 6) / pow(no_match_ch_N + 0.01, 8);
+      pow(match_phr_N + 0.05, 6) / pow(no_match_ch_N + 0.01, 20);
 
-    utf8_putchar(chpho[start].ch);
 #if DBG
     dbg("%d zz muse:%d ma:%d noma:%d  score:%.4e %.4e\n", plen,
         maxusecount, match_phr_N, no_match_ch_N, score, bestscore);

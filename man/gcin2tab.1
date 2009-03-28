@@ -1,10 +1,10 @@
-.TH GCIN2TAB 1 "28 AUG 2006" "GCIN 1.2.3" "gcin's miscellaneous tools"
+.TH GCIN2TAB 1 "6 FEB 2007" "GCIN 1.3.4" "gcin's miscellaneous tools"
 .SH NAME
-gcin2tab, phoa2d, phod2a, tsa2d32, tsd2a32, tsd2a, sim2trad, trad2sim, tslearn, juyin-learn, gcin-gb-toggle \- gcin associated tools
+gcin2tab, phoa2d, phod2a, tsa2d32, tsd2a32, tsd2a, sim2trad, trad2sim, tslearn, juyin-learn, gcin-gb-toggle, gcin-message, gtab-merge \- gcin associated tools
 .SH SYNOPSIS
 .B gcin2tab
 .RB [\| \-v \||\| \-\-version \|]
-.IR file
+file
 .br
 .B phoa2d
 .br
@@ -27,6 +27,16 @@ gcin2tab, phoa2d, phod2a, tsa2d32, tsd2a32, tsd2a, sim2trad, trad2sim, tslearn, 
 .B juyin-learn
 .br
 .B gcin-gb-toggle
+.br
+.B gcin-message
+.RB [\| \-icon
+.RB file \|]
+.RB [\| \-text
+.RB string \|]
+.RB [\| \-duration
+.RB milliseconds \|]
+.br
+.B gtab-merge
 .SH DESCRIPTION
 .B gcin2tab
 converts plain text input method(IM) table to gcin's .gtab format.
@@ -44,6 +54,10 @@ converts plain text input method(IM) table to gcin's .gtab format.
 \fBjuyin-learn\fP searches Chinese characters' phonations.
 .PP
 \fBgcin-gb-toggle\fP toggles gcin's output between Traditional Chinese and Simplified Chinese.
+.PP
+\fBgcin-message\fP displays notification image and text. It is useful for filters to have interaction with users.
+.PP
+\fBgtab-merge\fP is used internally only. It is not recommended to call from shells.
 .SH OPTIONS
 .PP
 .IP "\-h, \-v, \-\-version"

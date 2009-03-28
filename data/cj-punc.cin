@@ -5,7 +5,7 @@
 #
 %gen_inp
 %ename changjei
-%cname 倉頡
+%cname 標點倉頡
 %selkey 1234567890
 %endkey ,./'
 %space_style 4

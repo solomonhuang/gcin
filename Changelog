@@ -1,4 +1,23 @@
 ** UTF-8 encoding **
+1.3.4:
+- 由於如果使用彈出式(popup) 輸入視窗，其實只有在顯示按鍵的時候需要移動視窗，這樣可以減少gcin在 firefox 一類 mozilla 家族程式的奇怪問題。現在也把popup 改成內定的選擇。用來用去，還是比較習慣不用 popup 的方式，不用一直看 tray 是中/英，比較不會按錯。
+- gtab 如果選用不讓錯誤鍵進入(非傳統)，按下 space 時是無效的拆字，現在可以直接輸入下一個字，不用按 Escape 清除。
+- 「唯一選擇時自動送出」這個選項在某些時候會造成 coredump 的問題。
+- \ 現在可以定義輸入法了。
+- gtab 輸入法選擇不允許錯誤鍵進入，按空白鍵出現紅色警告字不存在後，可以按空白鍵清除，也可以繼續按下一個未輸入的鍵，紅色也會清除。
+-  詞音在按 CapsLock 輸入英文後有時候會造成前面已經對的詞後來又變錯的。
+- FREEBSD 用 GTK_IM_MODULE=gcin 無法輸入英文的問題。
+- gcin-setup 新增結束 gcin 的功能，只有從 gcin tray menu 內叫出 gcin-setup 才可以看到這個選項。
+- gcin 如果重新執行，在之前執行的firefox 內輸入文字，gcin 的視窗就不會自動拉到最上面的問題。需更新 im-client。
+- man page update from caleb.
+- 由 winlin 提供的 icon files。
+- gtab 如果定義的字串裏面含有 '<'，則會出現底下的訊息且無法顯示。Gtk-WARNING **: Failed to set text from markup due to error
+- 純注音(ctrl-alt-3)現在也支援拼音了，所以現在可以用拼音注音查詢查詢其他的輸入法。
+- build fix from Funda Wang.
+- 由 caleb 提供的 gcin-setup i18n po patch，由於會對某些人造成困擾而且大部份的人不需要，configure 需要 --use_i18n=Y啟用。
+- gtab 不允定義 & 的問題。
+- 新增 詞音/gtab CapsLock英數狀態大小寫的選項。
+
 1.3.3:
 - 詞音新增同音字詞選擇鍵在後的選項，這樣做的好處是當你由左到右看到某個字詞符合後，就不用再回頭看是那一個鍵。
 - 詞音Tab 斷詞改成可以在任意地方按，代表詞從這邊開頭，如果在結尾按則代表把最後一個字當開頭。例如輸入「他示意蜘蛛」，我們想要的是「他是一隻豬」，這時直接在結尾按 Tab 一次就可以了，代表把豬當成一個單字的詞。當使用者自己按空白鍵選詞時，會把這個手動斷詞清除。不過很可惜的，在某些程式不能用，例如 gedit，因為 gedit沒有把  Tab key 傳給 gcin 處理。為了解決這個問題，也可以改按 Escape。
@@ -14,8 +33,8 @@
 - 新增注音鍵盤「神通」。
 - 由某位提供的 ./configure --use_tray=N，不想要 tray 時可以用此選項。
 - alsa2 與 im-client 起衝突的問題，造成 flash player coredump。必須 update libgcin-im-client.so。
-- 為了解決 flashplayer 當掉的問題，XIM 的 IMdkit 換成 scim 的，現在不用 unset XMODIFIERS 似乎也不會當了。如果你必須經常重新啟動 gcin 最好還是在 firefox 的 start-script 裏面用 unset XMODIFIERS，因為新的 IMdkit 在 gcin 重新啟動有時候還是會造成正在執行的 firefox coredump。而且這樣可以節省 memory。
-- gtab 唯一選擇時自動送出的新選項。例如我們在倉頡裏面定義定義「benq 明基」，當按到 ben 時，由於此時沒有其他的是符合 'ben*'，這時候就會自動送出。
+- 為了解決 flashplayer9 當掉的問題，XIM 的 IMdkit 換成 scim 的，現在不用 unset XMODIFIERS 似乎也不會當了。如果你必須經常重新啟動 gcin 最好還是在 firefox 的 start-script 裏面用 unset XMODIFIERS，因為新的 IMdkit 在 gcin 重新啟動有時候還是會造成正在執行的 firefox coredump。而且這樣可以節省 memory。
+- gtab 唯一選擇時自動送出的新選項。例如我們在倉頡裏面定義「benq 明基」，當按到 ben 時，由於此時沒有其他的是符合 'ben*'，這時候就會自動送出。
 - []\ 現在也可以用來切換輸入法了。已經把拉丁字母及帶調粵拼放上去。
 
 1.3.2:

@@ -18,6 +18,10 @@ enum {
   FLAG_GCIN_client_handle_raise_window = 0x1000  // for mozilla, dirty fix
 };
 
+enum {
+  FLAG_GCIN_srv_ret_status_use_pop_up = 1    // If this is used, we don't need the dirty fix
+};
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +52,7 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr);
 
-void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags);
+void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_flags);
 #ifdef __cplusplus
 }
 #endif

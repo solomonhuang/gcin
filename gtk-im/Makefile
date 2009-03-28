@@ -11,14 +11,18 @@ EXTRA_INC=-I/sw/include
 endif
 
 .SUFFIXES:	.c .o .E
-CFLAGS = $(OPTFLAGS) $(EXTRA_INC) $(GTKINC) -I../im-client -I.. -I../IMdkit/include -DCLIENT_LIB=1
+CFLAGS = $(OPTFLAGS) $(EXTRA_INC) $(GTKINC) -I../im-client -I.. \
+-I../IMdkit/include -DCLIENT_LIB=1 -DMAC_OS=$(MAC_OS) -DFREEBSD=$(FREEBSD)
 
 ifeq ($(NEW_GTK_IM),Y)
 CFLAGS += -DNEW_GTK_IM=1
 endif
 
 .c.o:
-	$(CC) -c -fpic $(CFLAGS) -o $@ $<
+	$(CC) -c -fPIC $(CFLAGS) -o $@ $<
+
+.c.E:
+	$(CC) -E $(CFLAGS) -o $@ $<
 
 im-gcin.so:     $(OBJS) ../im-client/libgcin-im-client.so
 	export LD_RUN_PATH=$(gcinlibdir) ;\
@@ -26,7 +30,7 @@ im-gcin.so:     $(OBJS) ../im-client/libgcin-im-client.so
 	rm -f core.*
 
 clean:
-	rm -f *.o *.so *~ core.* .depend
+	rm -f *.o *.so *~ core.* .depend *.E
 
 install:
 	if [ $(prefix) = /usr/local ]; then \

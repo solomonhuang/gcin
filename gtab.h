@@ -6,7 +6,8 @@ typedef enum {
   GTAB_space_auto_first_none=0,   // use the value set by .cin
   GTAB_space_auto_first_any=1,    // boshiamy, dayi
   GTAB_space_auto_first_full=2,   // simplex
-  GTAB_space_auto_first_nofull=4  // windows ar30 cj
+  GTAB_space_auto_first_nofull=4,  // windows ar30 cj
+  GTAB_space_auto_first_dayi=8    // dayi: input:2   select:1
 } GTAB_space_pressed_E;
 
 typedef struct {
@@ -44,6 +45,7 @@ struct TableHead {
   union {
     struct {
       char endkey[64];
+      char keybits;
     };
 
     char dummy[128];  // for future use
@@ -92,6 +94,7 @@ typedef struct {
   char *endkey;       // only pinin/ar30 use it
   GTAB_space_pressed_E space_style;
   char *icon;
+  u_char kmask, keybits;
 } INMD;
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];

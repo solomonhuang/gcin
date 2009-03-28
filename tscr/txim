@@ -5,6 +5,7 @@ echo "GCIN_TABLE_DIR=$GCIN_TABLE_DIR"
 export GCIN_IM_CLIENT_NO_AUTO_EXEC=
 pkill gcin.test
 export LC_CTYPE=zh_TW.Big5
+export LC_CTYPE=zh_TW.UTF-8
 export XMODIFIERS=@im=gcin_test
 export GTK_IM_MODULE=xim
 locale

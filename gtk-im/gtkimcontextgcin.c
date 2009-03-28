@@ -42,7 +42,7 @@ struct _GtkIMContextGCIN
   GtkWidget *client_widget;
   GCIN_client_handle *gcin_ch;
   int timeout_handle;
-  gboolean is_mozilla;
+  gboolean is_mozilla, dirty_fix_off;
 };
 
 
@@ -143,9 +143,13 @@ get_im (GtkIMContextGCIN *context_xim)
     g_signal_connect (display, "closed",
                       G_CALLBACK (gcin_display_closed), context_xim);
 
-    if (context_xim->is_mozilla)
+    if (context_xim->is_mozilla) {
+      int rflag;
       gcin_im_client_set_flags(context_xim->gcin_ch,
-        FLAG_GCIN_client_handle_raise_window);
+        FLAG_GCIN_client_handle_raise_window, &rflag);
+
+      context_xim->dirty_fix_off = (rflag & FLAG_GCIN_srv_ret_status_use_pop_up) > 0;
+    }
   }
 }
 
@@ -177,7 +181,7 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
   int pid = getpid();
 // probably only works for linux
   static char *moz[]={"mozilla", "firefox", "thunderbird", "nvu", "sunbird",
-		"seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape"};
+	"seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape", "swiftfox"};
   char tstr0[64];
   char exec[256];
   sprintf(tstr0, "/proc/%d/exe", pid);
@@ -318,7 +322,7 @@ gtk_im_context_gcin_set_client_window (GtkIMContext          *context,
 
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 #if NEW_GTK_IM
-  if (context_xim->is_mozilla)
+  if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
     add_cursor_timeout(context_xim);
 #endif
   set_ic_client_window (context_xim, client_window);
@@ -373,17 +377,21 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   char *rstr = NULL;
   num_bytes = XLookupString (&xevent, buffer, buffer_size, &keysym, NULL);
 
-#if 1
   // If it is latin key, XLookupString only works for UTF-8 env
-  int uni = gdk_keyval_to_unicode(event->keyval);
-  if (uni) {
-    unsigned int rn;
-    GError *err = NULL;
-    char *utf8 = g_convert((char *)&uni, 4, "UTF-8", "UTF-32", &rn, &num_bytes, &err);
 
-    if (utf8) {
-      strcpy(buffer, utf8);
-      g_free(utf8);
+#if (!FREEBSD || MAC_OS)
+  char *lc_ctype = getenv("LC_CTYPE");
+  if (!lc_ctype || !strstr(lc_ctype, "UTF-8")) {
+    int uni = gdk_keyval_to_unicode(event->keyval);
+    if (uni) {
+      unsigned int rn;
+      GError *err = NULL;
+      char *utf8 = g_convert((char *)&uni, 4, "UTF-8", "UTF-32", &rn, &num_bytes, &err);
+
+      if (utf8) {
+        strcpy(buffer, utf8);
+        g_free(utf8);
+      }
     }
   }
 #endif
@@ -394,11 +402,14 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 
 #if NEW_GTK_IM
     // this one is for mozilla, I know it is very dirty
-    if (context_xim->is_mozilla && (rstr || !result) &&
-        (keysym==XK_Left || keysym==XK_Right || keysym==XK_Down || keysym==XK_Up
-         || keysym==XK_Home || keysym==XK_End || keysym==XK_BackSpace
-         || keysym==XK_Return) ) {
-      add_cursor_timeout(context_xim);
+
+    if (context_xim->dirty_fix_off) {
+      if (result && !rstr)
+        g_signal_emit_by_name(context, "preedit_changed");
+    } else {
+      if (context_xim->is_mozilla && (rstr || !result)) {
+        add_cursor_timeout(context_xim);
+      }
     }
 #endif
 
@@ -437,7 +448,7 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
 //  printf("gtk_im_context_gcin_focus_in\n");
   if (context_xim->gcin_ch) {
 #if NEW_GTK_IM
-    if (context_xim->is_mozilla)
+    if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
       add_cursor_timeout(context_xim);
 #endif
     gcin_im_client_focus_in(context_xim->gcin_ch);

@@ -27,6 +27,7 @@
 #define GCIN_WIN_COLOR_FG "gcin-win-color-fg"
 #define GCIN_WIN_COLOR_BG "gcin-win-color-bg"
 #define GCIN_WIN_COLOR_USE "gcin-win-color-use"
+#define GCIN_CAPSLOCK_LOWER "gcin-capslock-lower"
 
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
@@ -73,6 +74,7 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
+           gcin_capslock_lower,
            pho_hide_row2,
            pho_in_row1;
 

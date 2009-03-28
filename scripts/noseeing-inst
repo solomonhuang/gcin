@@ -2,7 +2,7 @@
 
 SAYYA=edt1023.sayya.org
 CLE=cle.linux.org.tw
-nosee=noseeing-6.tar.gz
+nosee=noseeing-8.tar.gz
 cd
 [ -d tmp ] || mkdir tmp
 cd tmp

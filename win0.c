@@ -219,7 +219,9 @@ void clr_tsin_cursor(int index)
 
 
 
-void disp_tsin_pho(int index, char *pho)
+
+
+void disp_pho_sub(GtkWidget *label, int index, char *pho)
 {
   if (index>=text_pho_N)
     return;
@@ -242,9 +244,14 @@ void disp_tsin_pho(int index, char *pho)
     tn += n;
   }
 
-  gtk_label_set_text(label_pho, s);
+  gtk_label_set_text(label, s);
 }
 
+
+void disp_tsin_pho(int index, char *pho)
+{
+  disp_pho_sub(label_pho, index, pho);
+}
 
 void clr_in_area_pho_tsin()
 {
@@ -407,6 +414,10 @@ void exec_gcin_setup()
 #if DEBUG
   dbg("exec gcin\n");
 #endif
+
+  char pidstr[32];
+  sprintf(pidstr, "GCIN_PID=%d",getpid());
+  putenv(pidstr);
   system(GCIN_BIN_DIR"/gcin-setup &");
 }
 
@@ -665,8 +676,10 @@ void show_win0()
 //  dbg("show_win0 b\n");
   show_win_sym();
 #if 1
-  if (current_CS->b_raise_window)
+  if (current_CS->b_raise_window) {
     gtk_window_present(gwin0);
+    raise_tsin_selection_win();
+  }
 #endif
 }
 

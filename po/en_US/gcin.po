@@ -1,0 +1,333 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-03-04 22:11+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gcin-setup-gtab.c:131
+msgid "空白鍵選項"
+msgstr "Behavior of Space key"
+
+#: ../gcin-setup-gtab.c:171 ../gcin-setup.c:632
+msgid "倉頡/行列/嘸蝦米/大易設定"
+msgstr "Settings for gtab input methods"
+
+#: ../gcin-setup-gtab.c:178
+msgid "倉頡/行列/嘸蝦米/大易"
+msgstr "gtab input methods"
+
+#: ../gcin-setup-gtab.c:188
+msgid "重複字選擇鈴聲"
+msgstr "Bell ring for multiple choices"
+
+#: ../gcin-setup-gtab.c:200
+msgid "由詞庫自動選擇字"
+msgstr "Auto-select by Tsin's database"
+
+#: ../gcin-setup-gtab.c:211
+msgid "預覽/預選 字"
+msgstr "Preview choices"
+
+#: ../gcin-setup-gtab.c:222
+msgid "按滿自動送字"
+msgstr "Auto-send when keycodes are filled"
+
+#: ../gcin-setup-gtab.c:233
+msgid "預選列中顯示部份符合的字"
+msgstr "Preview keycode-partial-matched choices"
+
+#: ../gcin-setup-gtab.c:244
+msgid "較小視窗"
+msgstr "Smaller input window"
+
+#: ../gcin-setup-gtab.c:255
+msgid "顯示拆字"
+msgstr "Show keycodes"
+
+#: ../gcin-setup-gtab.c:266
+msgid "顯示輸入法名稱"
+msgstr "Show input method names"
+
+#: ../gcin-setup-gtab.c:277
+msgid "允許錯誤鍵進入(傳統)"
+msgstr "Tolerate wrong keycodes"
+
+#: ../gcin-setup-gtab.c:288
+msgid "Shift 用來輸入片語(Alt-Shift)"
+msgstr "Single Shift key to input Alt-Shift-phrases"
+
+#: ../gcin-setup-gtab.c:299
+msgid "隱藏第二列(輸入鍵…)"
+msgstr "Hide second row of input window"
+
+#: ../gcin-setup-gtab.c:310
+msgid "輸入鍵顯示移至第一列"
+msgstr "Move keycodes to first row of input window"
+
+#: ../gcin-setup-gtab.c:321
+msgid "CapsLock 打開輸入英數"
+msgstr "Toggle alphabet-numeric mode with CapsLock key"
+
+#: ../gcin-setup-gtab.c:331
+msgid "垂直選擇"
+msgstr "Vertical selection window"
+
+#: ../gcin-setup-gtab.c:341
+msgid "唯一選擇時自動送出"
+msgstr "Auto-send when only one choice matched"
+
+#: ../gcin-setup-gtab.c:349
+msgid "編輯內定輸入法的使用者外加字詞"
+msgstr "Add definitions for default input method"
+
+#: ../gcin-setup-list.c:250
+msgid "名稱"
+msgstr "Name"
+
+#: ../gcin-setup-list.c:268
+msgid "Ctrl-Alt-數字鍵"
+msgstr "Ctrl-Alt-Toggle Key"
+
+#: ../gcin-setup-list.c:277
+msgid "檔案名"
+msgstr "Filename"
+
+#: ../gcin-setup-list.c:289
+msgid "Ctrl-Shift 循環"
+msgstr "Ctrl-Shift selections"
+
+#: ../gcin-setup-list.c:302
+msgid "第一次內定"
+msgstr "Default"
+
+#: ../gcin-setup-list.c:347
+msgid "輸入視窗(開啟/關閉)切換"
+msgstr "Toggle input window"
+
+#: ../gcin-setup-list.c:381
+msgid "輸入法選擇"
+msgstr "Select input methods"
+
+#: ../gcin-setup-list.c:394
+msgid "gcin 輸入法選擇"
+msgstr "Select input methods for gcin"
+
+#: ../gcin-setup-list.c:425
+msgid "遠端 client 程式支援 (port 9999-)"
+msgstr "Remote client support (port 9999-)"
+
+#: ../gcin-setup-list.c:435
+msgid "shift-space 進入全形英文模式"
+msgstr "Toggle half-/double-width with Shift-Space"
+
+#: ../gcin-setup-pho.c:205 ../gcin-setup-pho.c:477
+msgid "詞音標示詞的底線顏色"
+msgstr "Underline color of selected phrases"
+
+#: ../gcin-setup-pho.c:244 ../gcin-setup-pho.c:490
+msgid "詞音游標的顏色"
+msgstr "Tsin's cursor color"
+
+#: ../gcin-setup-pho.c:314 ../gcin-setup.c:622
+msgid "gcin 注音/詞音設定"
+msgstr "Settings for Bopomofo and Tsin"
+
+#: ../gcin-setup-pho.c:320
+msgid "鍵盤排列方式"
+msgstr "Keymap selections"
+
+#: ../gcin-setup-pho.c:327
+msgid "詞音輸入[中/英]切換"
+msgstr "Toggle alphabet-numeric mode in Tsin"
+
+#: ../gcin-setup-pho.c:354
+msgid "詞音輸入空白鍵選項"
+msgstr "Behavior of Space key in Tsin"
+
+#: ../gcin-setup-pho.c:382
+msgid "詞音輸入預選詞視窗"
+msgstr "Enable preselection window in Tsin"
+
+#: ../gcin-setup-pho.c:392
+msgid "依使用頻率調整字的順序"
+msgstr "Resorting choices by user's usage frequency"
+
+#: ../gcin-setup-pho.c:402
+msgid "詞音/注音精簡視窗"
+msgstr "Smaller input window for Tsin and Bopomofo"
+
+#: ../gcin-setup-pho.c:412
+msgid "注音隱藏第二列(按鍵顯示)"
+msgstr "Hide second row of Bopomofo's window"
+
+#: ../gcin-setup-pho.c:422
+msgid "注音輸入顯示移至第一列"
+msgstr "Move keycodes to first row of Bopomofo's window"
+
+#: ../gcin-setup-pho.c:432
+msgid "使用巨大 UTF-8 字集"
+msgstr "Enable more UTF-8 characters"
+
+#: ../gcin-setup-pho.c:442
+msgid "詞音輸入注音聲調符號"
+msgstr "Enable tone symbols in Tsin"
+
+#: ../gcin-setup-pho.c:452
+msgid "詞音/Escape Tab 斷詞"
+msgstr "Break sentence with Escape/Tab key"
+
+#: ../gcin-setup-pho.c:461
+msgid "同音字詞選擇按鍵在後"
+msgstr "Show selection key behind choices"
+
+#: ../gcin-setup-pho.c:468
+msgid "詞音編輯緩衝區大小"
+msgstr "Tsin's buffer size"
+
+#: ../gcin-setup.c:98
+msgid "請輸入要匯出的檔案名稱"
+msgstr "Please input filename for exporting data"
+
+#: ../gcin-setup.c:138
+msgid "請輸入要匯入的檔案名稱"
+msgstr "Please input filename for importing data"
+
+#: ../gcin-setup.c:366
+msgid "輸入視窗外觀設定"
+msgstr "Settings for input windows"
+
+#: ../gcin-setup.c:374
+msgid "字型大小"
+msgstr "Font size"
+
+#: ../gcin-setup.c:384
+msgid "符號選擇視窗字型大小"
+msgstr "Font size of symbols window"
+
+#: ../gcin-setup.c:394
+msgid "詞音預選詞視窗字型大小"
+msgstr "Font size of Tsin's preselection window"
+
+#: ../gcin-setup.c:404
+msgid "詞音注音輸入區字型大小"
+msgstr "Font size of keycodes for Bopomofo and Tsin"
+
+#: ../gcin-setup.c:414
+msgid "詞音近似音顯示字型大小"
+msgstr "Font size of similar phonetic choices"
+
+#: ../gcin-setup.c:424
+msgid "gtab(倉頡…)輸入區字型大小"
+msgstr "Font size of keycodes for gtab"
+
+#: ../gcin-setup.c:440
+msgid "彈出式輸入視窗"
+msgstr "Dynamic pop-up input window"
+
+#: ../gcin-setup.c:447
+msgid "固定 gcin 視窗位置"
+msgstr "Fixed input window"
+
+#: ../gcin-setup.c:455 ../gcin-setup.c:505
+msgid "使用"
+msgstr "Enable"
+
+#: ../gcin-setup.c:479
+msgid "顯示內框"
+msgstr "Show frame of input window"
+
+#: ../gcin-setup.c:489
+msgid "面板狀態(tray)"
+msgstr "System tray support"
+
+#: ../gcin-setup.c:497
+msgid "顏色選擇"
+msgstr "Color selection"
+
+#: ../gcin-setup.c:513
+msgid "測試目前狀態"
+msgstr "Preview"
+
+#: ../gcin-setup.c:517
+msgid "前景顏色"
+msgstr "Foreground color"
+
+#: ../gcin-setup.c:527
+msgid "背景顏色"
+msgstr "Background color"
+
+#: ../gcin-setup.c:627
+msgid "外觀設定"
+msgstr "Appearance Settings"
+
+#: ../gcin-setup.c:638
+msgid "內定輸入法 & 開啟/關閉"
+msgstr "Default input method and toggle key"
+
+#: ../gcin-setup.c:645
+msgid "alt-shift 片語編輯"
+msgstr "Edit Alt-Shift phrases"
+
+#: ../gcin-setup.c:650
+msgid "符號表編輯"
+msgstr "Edit symbols"
+
+#: ../gcin-setup.c:655
+msgid "簡體字輸出切換"
+msgstr "Toggle Traditional Chinese to Simplified Chinese conversion"
+
+#: ../gcin-setup.c:660
+msgid "剪貼區 簡體字->正體字"
+msgstr "Convert clipboard's Simplified Chinese to Traditional Chinese"
+
+#: ../gcin-setup.c:665
+msgid "剪貼區 注音查詢"
+msgstr "Lookup phonations of words in clipboard"
+
+#: ../gcin-setup.c:671
+msgid "詞庫選項"
+msgstr "Options for Tsin's database"
+
+#: ../gcin-setup.c:680
+msgid "詞庫匯出"
+msgstr "Export phrase database"
+
+#: ../gcin-setup.c:685
+msgid "詞庫匯入"
+msgstr "Import phrase database"
+
+#: ../gcin-setup.c:690
+msgid "詞庫編輯"
+msgstr "Edit phrase database"
+
+#: ../gcin-setup.c:695
+msgid "讓詞音從文章學習詞"
+msgstr "Learn phrases in articles"
+
+#: ../gcin-setup.c:700
+msgid "匯入系統的詞庫"
+msgstr "Import global database"
+
+#: ../gcin-setup.c:705 ../about.c:39
+msgid "關於 gcin"
+msgstr "About gcin"
+
+#: ../gcin-setup.c:719
+msgid "結束 gcin"
+msgstr "Disable gcin server"
+
+#: ../about.c:83
+msgid "關閉"
+msgstr "Close"

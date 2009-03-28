@@ -1,0 +1,333 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-03-04 22:11+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gcin-setup-gtab.c:131
+msgid "空白鍵選項"
+msgstr "空格键选项"
+
+#: ../gcin-setup-gtab.c:171 ../gcin-setup.c:632
+msgid "倉頡/行列/嘸蝦米/大易設定"
+msgstr "仓颉/行列/呒虾米/大易设置"
+
+#: ../gcin-setup-gtab.c:178
+msgid "倉頡/行列/嘸蝦米/大易"
+msgstr "仓颉/行列/呒虾米/大易"
+
+#: ../gcin-setup-gtab.c:188
+msgid "重複字選擇鈴聲"
+msgstr "重复字选择铃声"
+
+#: ../gcin-setup-gtab.c:200
+msgid "由詞庫自動選擇字"
+msgstr "由词库自动选择字"
+
+#: ../gcin-setup-gtab.c:211
+msgid "預覽/預選 字"
+msgstr "预览/预选 字"
+
+#: ../gcin-setup-gtab.c:222
+msgid "按滿自動送字"
+msgstr "按满自动送字"
+
+#: ../gcin-setup-gtab.c:233
+msgid "預選列中顯示部份符合的字"
+msgstr "预选列中显示部份符合的字"
+
+#: ../gcin-setup-gtab.c:244
+msgid "較小視窗"
+msgstr "较小视窗"
+
+#: ../gcin-setup-gtab.c:255
+msgid "顯示拆字"
+msgstr "显示拆字"
+
+#: ../gcin-setup-gtab.c:266
+msgid "顯示輸入法名稱"
+msgstr "显示输入法名称"
+
+#: ../gcin-setup-gtab.c:277
+msgid "允許錯誤鍵進入(傳統)"
+msgstr "允许错误键进入(传统)"
+
+#: ../gcin-setup-gtab.c:288
+msgid "Shift 用來輸入片語(Alt-Shift)"
+msgstr "Shift 用来输入片语(Alt-Shift)"
+
+#: ../gcin-setup-gtab.c:299
+msgid "隱藏第二列(輸入鍵…)"
+msgstr "隐藏第二列(输入键…)"
+
+#: ../gcin-setup-gtab.c:310
+msgid "輸入鍵顯示移至第一列"
+msgstr "输入键显示移至第一列"
+
+#: ../gcin-setup-gtab.c:321
+msgid "CapsLock 打開輸入英數"
+msgstr "CapsLock 打开输入英数"
+
+#: ../gcin-setup-gtab.c:331
+msgid "垂直選擇"
+msgstr "垂直选择"
+
+#: ../gcin-setup-gtab.c:341
+msgid "唯一選擇時自動送出"
+msgstr "唯一选择时自动送出"
+
+#: ../gcin-setup-gtab.c:349
+msgid "編輯內定輸入法的使用者外加字詞"
+msgstr "编辑默认输入法的用户外加字词"
+
+#: ../gcin-setup-list.c:250
+msgid "名稱"
+msgstr "名称"
+
+#: ../gcin-setup-list.c:268
+msgid "Ctrl-Alt-數字鍵"
+msgstr "Ctrl-Alt-数字键"
+
+#: ../gcin-setup-list.c:277
+msgid "檔案名"
+msgstr "文件名"
+
+#: ../gcin-setup-list.c:289
+msgid "Ctrl-Shift 循環"
+msgstr "Ctrl-Shift 循环"
+
+#: ../gcin-setup-list.c:302
+msgid "第一次內定"
+msgstr "第一次默认"
+
+#: ../gcin-setup-list.c:347
+msgid "輸入視窗(開啟/關閉)切換"
+msgstr "输入视窗(开启/关闭)切换"
+
+#: ../gcin-setup-list.c:381
+msgid "輸入法選擇"
+msgstr "输入法选择"
+
+#: ../gcin-setup-list.c:394
+msgid "gcin 輸入法選擇"
+msgstr "gcin 输入法选择"
+
+#: ../gcin-setup-list.c:425
+msgid "遠端 client 程式支援 (port 9999-)"
+msgstr "远端 client 程序支持 (port 9999-)"
+
+#: ../gcin-setup-list.c:435
+msgid "shift-space 進入全形英文模式"
+msgstr "shift-space 进入全角英文模态"
+
+#: ../gcin-setup-pho.c:205 ../gcin-setup-pho.c:477
+msgid "詞音標示詞的底線顏色"
+msgstr "智能拼音标示词的底线颜色"
+
+#: ../gcin-setup-pho.c:244 ../gcin-setup-pho.c:490
+msgid "詞音游標的顏色"
+msgstr "智能拼音游标的颜色"
+
+#: ../gcin-setup-pho.c:314 ../gcin-setup.c:622
+msgid "gcin 注音/詞音設定"
+msgstr "gcin 注音/智能拼音设置"
+
+#: ../gcin-setup-pho.c:320
+msgid "鍵盤排列方式"
+msgstr "键盘排列方式"
+
+#: ../gcin-setup-pho.c:327
+msgid "詞音輸入[中/英]切換"
+msgstr "智能拼音输入[中/英]切换"
+
+#: ../gcin-setup-pho.c:354
+msgid "詞音輸入空白鍵選項"
+msgstr "智能拼音输入空格键选项"
+
+#: ../gcin-setup-pho.c:382
+msgid "詞音輸入預選詞視窗"
+msgstr "智能拼音输入预选词视窗"
+
+#: ../gcin-setup-pho.c:392
+msgid "依使用頻率調整字的順序"
+msgstr "依使用频率调整字的顺序"
+
+#: ../gcin-setup-pho.c:402
+msgid "詞音/注音精簡視窗"
+msgstr "智能拼音/注音精简视窗"
+
+#: ../gcin-setup-pho.c:412
+msgid "注音隱藏第二列(按鍵顯示)"
+msgstr "注音隐藏第二列(按键显示)"
+
+#: ../gcin-setup-pho.c:422
+msgid "注音輸入顯示移至第一列"
+msgstr "注音输入显示移至第一列"
+
+#: ../gcin-setup-pho.c:432
+msgid "使用巨大 UTF-8 字集"
+msgstr "使用巨大 UTF-8 字集"
+
+#: ../gcin-setup-pho.c:442
+msgid "詞音輸入注音聲調符號"
+msgstr "智能拼音输入注音声调符号"
+
+#: ../gcin-setup-pho.c:452
+msgid "詞音/Escape Tab 斷詞"
+msgstr "智能拼音/Escape Tab 断词"
+
+#: ../gcin-setup-pho.c:461
+msgid "同音字詞選擇按鍵在後"
+msgstr "同音字词选择按键在后"
+
+#: ../gcin-setup-pho.c:468
+msgid "詞音編輯緩衝區大小"
+msgstr "智能拼音编辑缓冲区大小"
+
+#: ../gcin-setup.c:98
+msgid "請輸入要匯出的檔案名稱"
+msgstr "请输入要汇出的文件名称"
+
+#: ../gcin-setup.c:138
+msgid "請輸入要匯入的檔案名稱"
+msgstr "请输入要汇入的文件名称"
+
+#: ../gcin-setup.c:366
+msgid "輸入視窗外觀設定"
+msgstr "输入视窗外观设置"
+
+#: ../gcin-setup.c:374
+msgid "字型大小"
+msgstr "字体大小"
+
+#: ../gcin-setup.c:384
+msgid "符號選擇視窗字型大小"
+msgstr "符号选择视窗字体大小"
+
+#: ../gcin-setup.c:394
+msgid "詞音預選詞視窗字型大小"
+msgstr "智能拼音预选词视窗字体大小"
+
+#: ../gcin-setup.c:404
+msgid "詞音注音輸入區字型大小"
+msgstr "智能拼音、注音输入区字体大小"
+
+#: ../gcin-setup.c:414
+msgid "詞音近似音顯示字型大小"
+msgstr "智能拼音近似音显示字体大小"
+
+#: ../gcin-setup.c:424
+msgid "gtab(倉頡…)輸入區字型大小"
+msgstr "gtab(仓颉…)输入区字体大小"
+
+#: ../gcin-setup.c:440
+msgid "彈出式輸入視窗"
+msgstr "弹出式输入视窗"
+
+#: ../gcin-setup.c:447
+msgid "固定 gcin 視窗位置"
+msgstr "固定 gcin 视窗位置"
+
+#: ../gcin-setup.c:455 ../gcin-setup.c:505
+msgid "使用"
+msgstr "使用"
+
+#: ../gcin-setup.c:479
+msgid "顯示內框"
+msgstr "显示内框"
+
+#: ../gcin-setup.c:489
+msgid "面板狀態(tray)"
+msgstr "面板状态(tray)"
+
+#: ../gcin-setup.c:497
+msgid "顏色選擇"
+msgstr "颜色选择"
+
+#: ../gcin-setup.c:513
+msgid "測試目前狀態"
+msgstr "测试目前状态"
+
+#: ../gcin-setup.c:517
+msgid "前景顏色"
+msgstr "前景颜色"
+
+#: ../gcin-setup.c:527
+msgid "背景顏色"
+msgstr "背景颜色"
+
+#: ../gcin-setup.c:627
+msgid "外觀設定"
+msgstr "外观设置"
+
+#: ../gcin-setup.c:638
+msgid "內定輸入法 & 開啟/關閉"
+msgstr "默认输入法 & 开启/关闭"
+
+#: ../gcin-setup.c:645
+msgid "alt-shift 片語編輯"
+msgstr "Alt-Shift 片语编辑"
+
+#: ../gcin-setup.c:650
+msgid "符號表編輯"
+msgstr "符号表编辑"
+
+#: ../gcin-setup.c:655
+msgid "簡體字輸出切換"
+msgstr "简体字输出切换"
+
+#: ../gcin-setup.c:660
+msgid "剪貼區 簡體字->正體字"
+msgstr "剪贴区 简体字->正体字"
+
+#: ../gcin-setup.c:665
+msgid "剪貼區 注音查詢"
+msgstr "剪贴区 拼音查询"
+
+#: ../gcin-setup.c:671
+msgid "詞庫選項"
+msgstr "词库选项"
+
+#: ../gcin-setup.c:680
+msgid "詞庫匯出"
+msgstr "词库汇出"
+
+#: ../gcin-setup.c:685
+msgid "詞庫匯入"
+msgstr "词库汇入"
+
+#: ../gcin-setup.c:690
+msgid "詞庫編輯"
+msgstr "词库编辑"
+
+#: ../gcin-setup.c:695
+msgid "讓詞音從文章學習詞"
+msgstr "让智能拼音从文章学习词"
+
+#: ../gcin-setup.c:700
+msgid "匯入系統的詞庫"
+msgstr "汇入系统的词库"
+
+#: ../gcin-setup.c:705 ../about.c:39
+msgid "關於 gcin"
+msgstr "关于 gcin"
+
+#: ../gcin-setup.c:719
+msgid "結束 gcin"
+msgstr "结束 gcin"
+
+#: ../about.c:83
+msgid "關閉"
+msgstr "关闭"

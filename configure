@@ -6,6 +6,7 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "  --prefix=dir_name : install prefix(e.g. /usr)"
     echo "  --new_gtk_im=Y/N :  enable/disable new gtk im module for firefox 1.5 over-the-spot"
     echo "  --use_tray=N : disable the support of system tray, exec size is 12k smaller"
+    echo "  --use_i18n=Y : enable i18n"
     exit
 fi
 
@@ -35,6 +36,7 @@ use_xim='Y'
 #new_gtk_im='N'
 new_gtk_im='Y'
 use_tray='Y'
+use_i18n='N'
 
 if [ "$GCIN_USE_XIM" ]; then
   use_xim=$GCIN_USE_XIM
@@ -49,6 +51,8 @@ for opt do
   --new_gtk_im=*) new_gtk_im=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_tray=*) use_tray=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_i18n=*) use_i18n=`echo $opt | cut -d '=' -f 2`
   ;;
   esac
 done
@@ -165,7 +169,7 @@ echo "bindir_r=$bindir" >> config.mak
 echo "datadir=\$(DESTDIR)$datadir" >> config.mak
 echo "datadir_r=$datadir" >> config.mak
 echo "libdir=\$(DESTDIR)$libdir" >> config.mak
-echo "gcinlibdir=\$(DESTDIR)\$(libdir)/gcin" >> config.mak
+echo "gcinlibdir=\$(libdir)/gcin" >> config.mak
 echo "includedir=\$(DESTDIR)$includedir" >> config.mak
 
 echo "LDFLAGS=$GTKLDFLAGS" >> config.mak
@@ -192,6 +196,7 @@ echo "LIB=$LIB" >> config.mak
 echo "MAC_OS=$MAC_OS" >> config.mak
 echo "SO_FLAGS=$SO_FLAGS" >> config.mak
 echo "USE_TRAY=$use_tray" >> config.mak
+echo "USE_I18N=$use_i18n" >> config.mak
 
 
 cd menu

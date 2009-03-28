@@ -248,8 +248,14 @@ static void disp_in_area_pho()
 {
   int i;
 
-  for(i=0;i<4;i++)
-    disp_pho(i, &pho_chars[i][typ_pho[i]*3]);
+  if (pin_juyin) {
+    for(i=0;i<6;i++) {
+      disp_pho(i, &inph[i]);
+    }
+  } else {
+    for(i=0;i<4;i++)
+      disp_pho(i, &pho_chars[i][typ_pho[i]*3]);
+  }
 }
 
 static int qcmp_count(const void *aa, const void *bb)

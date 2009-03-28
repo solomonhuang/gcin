@@ -1196,6 +1196,16 @@ static void call_tsin_parse()
   prbuf();
 }
 
+void case_inverse(int *xkey, int shift_m)
+{
+  if (shift_m) {
+    if (islower(*xkey))
+      *xkey-=0x20;
+  } else
+  if (isupper(*xkey))
+    *xkey+=0x20;
+}
+
 
 int feedkey_pp(KeySym xkey, int kbstate)
 {
@@ -1294,15 +1304,13 @@ int feedkey_pp(KeySym xkey, int kbstate)
           return 1;
         }
 
-        if (tsin_tab_phrase_end) {
+        if (tsin_tab_phrase_end && c_len > 1) {
 tab_phrase_end:
           if (c_idx==c_len)
             chpho[c_idx-1].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
           else
             chpho[c_idx].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
-#if 1
            call_tsin_parse();
-#endif
           return 1;
         } else {
           if (c_len) {
@@ -1647,13 +1655,9 @@ asc_char:
             if (!(kbstate&LockMask) && isupper(xkey))
               xkey+=0x20;
         } else {
-          if (!eng_ph && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
-            if (shift_m) {
-              if (islower(xkey))
-                xkey-=0x20;
-            } else
-            if (isupper(xkey))
-              xkey+=0x20;
+          if (!eng_ph && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock
+              && gcin_capslock_lower) {
+            case_inverse(&xkey, shift_m);
           }
         }
 

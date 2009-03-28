@@ -334,7 +334,7 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
      if (xprop->atom == gcin_atom) {
        Atom actual_type;
        int actual_format;
-       u_long nitems,bytes_after;
+       unsigned long nitems,bytes_after;
        char *message;
 
        if (XGetWindowProperty(dpy, xprop->window, gcin_atom, 0, 64,
@@ -415,21 +415,6 @@ void do_exit()
   gtk_main_quit();
 }
 
-
-static void exec_script(char *name)
-{
-  char scr[128];
-
-  sprintf(scr, GCIN_SCRIPT_DIR"/%s", name);
-  system(scr);
-}
-
-static void exec_setup_scripts()
-{
-  exec_script("gcin-user-setup "GCIN_TABLE_DIR" "GCIN_BIN_DIR);
-}
-
-
 char *get_gcin_xim_name();
 void load_phrase(), init_TableDir(),  load_gtab_list();
 void init_im_serv(), create_tray();
@@ -476,11 +461,6 @@ int main(int argc, char **argv)
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
 
-  if (strstr(lc_ctype, ".UTF-8")) {
-    xim_arr[0].b_send_utf8_str = TRUE;
-  } else {
-    xim_arr[0].b_send_utf8_str = FALSE;
-  }
 #endif
 
 #if USE_XIM

@@ -182,6 +182,12 @@ void process_client_req(int fd)
         cs->b_raise_window = TRUE;
 //        dbg("********* raise * window\n");
       }
+
+      int rflags = 0;
+      if (gcin_pop_up_win)
+        rflags = FLAG_GCIN_srv_ret_status_use_pop_up;
+
+      write_enc(fd, &rflags, sizeof(rflags));
       break;
     default:
       dbg_time("Invalid request %x from:", req.req_no);

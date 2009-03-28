@@ -247,7 +247,7 @@ add_columns (GtkTreeView *treeview)
   renderer = gtk_cell_renderer_text_new ();
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_NAME);
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "名稱", renderer,
+                                               -1, _("名稱"), renderer,
                                                "text", COLUMN_NAME,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
@@ -265,7 +265,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_KEY);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "Ctrl-Alt-數字鍵", renderer,
+                                               -1, _("Ctrl-Alt-數字鍵"), renderer,
                                                "text", COLUMN_KEY,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
@@ -274,7 +274,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_FILE);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "檔案名", renderer,
+                                               -1, _("檔案名"), renderer,
                                                "text", COLUMN_FILE,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
@@ -286,7 +286,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "Ctrl-Shift 循環",
+                                               -1, _("Ctrl-Shift 循環"),
                                                renderer,
                                                "active", COLUMN_USE,
                                                NULL);
@@ -299,7 +299,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, "第一次內定",
+                                               -1, _("第一次內定"),
                                                renderer,
                                                "active", COLUMN_DEFAULT_INMD,
                                                NULL);
@@ -344,7 +344,7 @@ static GtkWidget *create_im_toggle_keys()
 {
 
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
-  GtkWidget *label = gtk_label_new("輸入視窗(開啟/關閉)切換");
+  GtkWidget *label = gtk_label_new(_("輸入視窗(開啟/關閉)切換"));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
   opt_im_toggle_keys = gtk_option_menu_new ();
@@ -378,7 +378,7 @@ void create_gtablist_window (void)
 
   /* create gtab_list_window, etc */
   gtablist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (gtablist_window), "輸入法選擇");
+  gtk_window_set_title (GTK_WINDOW (gtablist_window), _("輸入法選擇"));
   gtk_container_set_border_width (GTK_CONTAINER (gtablist_window), 5);
 
   g_signal_connect (G_OBJECT (gtablist_window), "destroy",
@@ -391,7 +391,7 @@ void create_gtablist_window (void)
   gtk_container_add (GTK_CONTAINER (gtablist_window), vbox);
 
   gtk_box_pack_start (GTK_BOX (vbox),
-                      gtk_label_new ("gcin 輸入法選擇"),
+                      gtk_label_new (_("gcin 輸入法選擇")),
                       FALSE, FALSE, 0);
 
   sw = gtk_scrolled_window_new (NULL, NULL);
@@ -422,7 +422,7 @@ void create_gtablist_window (void)
 
   GtkWidget *hbox_gcin_remote_client = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_remote_client, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_remote_client = gtk_label_new("遠端 client 程式支援 (port 9999-)");
+  GtkWidget *label_gcin_remote_client = gtk_label_new(_("遠端 client 程式支援 (port 9999-)"));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client), label_gcin_remote_client,  FALSE, FALSE, 0);
   check_button_gcin_remote_client = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client),check_button_gcin_remote_client,  FALSE, FALSE, 0);
@@ -432,7 +432,7 @@ void create_gtablist_window (void)
 
   GtkWidget *hbox_gcin_shift_space_eng_full = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_shift_space_eng_full, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_shift_space_eng_full = gtk_label_new("shift-space 進入全形英文模式");
+  GtkWidget *label_gcin_shift_space_eng_full = gtk_label_new(_("shift-space 進入全形英文模式"));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_shift_space_eng_full), label_gcin_shift_space_eng_full,  FALSE, FALSE, 0);
   check_button_gcin_shift_space_eng_full = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_gcin_shift_space_eng_full),check_button_gcin_shift_space_eng_full,  FALSE, FALSE, 0);

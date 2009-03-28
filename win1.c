@@ -112,6 +112,12 @@ void disp_selections(int idx)
 #endif
 }
 
+void raise_tsin_selection_win()
+{
+  if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
+    gtk_window_present(gwin1);
+}
+
 
 void hide_selections_win()
 {

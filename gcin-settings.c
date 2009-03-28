@@ -7,6 +7,7 @@ int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
 int gcin_im_toggle_keys;
+int gcin_capslock_lower;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -27,6 +28,7 @@ int gtab_unique_auto_send;
 
 
 int tsin_phrase_pre_select, tsin_tone_char_input;
+int tsin_capslock_upper;
 int phonetic_char_dynamic_sequence;
 int phonetic_huge_tab;
 int tsin_chinese_english_toggle_key;
@@ -63,7 +65,7 @@ void load_setttings()
   gcin_input_style = get_gcin_conf_int(GCIN_INPUT_STYLE, InputStyleOverSpot);
   gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 2000);
   gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 2000);
-  gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 0);
+  gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 1);
   gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 0);
 #if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 4
 #define ABS_VAL 0
@@ -76,6 +78,7 @@ void load_setttings()
   gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);
   gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 0);
   gcin_shift_space_eng_full = get_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL, 1);
+  gcin_capslock_lower = get_gcin_conf_int(GCIN_CAPSLOCK_LOWER, 1);
 
   default_input_method = get_gcin_conf_int(DEFAULT_INPUT_METHOD, 6);
   left_right_button_tips = get_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 1);

@@ -12,7 +12,7 @@ GdkWindow *tray_da_win;
 
 #define GCIN_TRAY_PNG "gcin-tray.png"
 static char gcin_icon[]=GCIN_ICON_DIR"/"GCIN_TRAY_PNG;
-static char pixbuf_ch_fname[128];
+static char *pixbuf_ch_fname;
 void exec_gcin_setup();
 
 void toggle_gb_output();
@@ -101,7 +101,7 @@ void get_icon_path(char *iconame, char fname[]);
 void load_tray_icon()
 {
   char *iconame = inmd[current_CS->in_method].icon;
-  char fname[128];
+  char fname[512];
 
   fname[0]=0;
 
@@ -116,10 +116,12 @@ void load_tray_icon()
       gdk_pixbuf_unref(pixbuf_ch);
 
     pixbuf_ch = NULL;
-    pixbuf_ch_fname[0] = 0;
+    if (pixbuf_ch_fname)
+      pixbuf_ch_fname[0] = 0;
   } else
-  if (strcmp(fname, pixbuf_ch_fname)) {
-    strcpy(pixbuf_ch_fname, fname);
+  if (!pixbuf_ch_fname || strcmp(fname, pixbuf_ch_fname)) {
+    free(pixbuf_ch_fname);
+    pixbuf_ch_fname = strdup(fname);
 
     if (pixbuf_ch)
       gdk_pixbuf_unref(pixbuf_ch);

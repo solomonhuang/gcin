@@ -36,7 +36,7 @@ void create_about_window()
     /* Create a new about_window */
     about_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-    gtk_window_set_title (GTK_WINDOW (about_window), "關於 gcin");
+    gtk_window_set_title (GTK_WINDOW (about_window), _("關於 gcin"));
 
     /* It's a good idea to do this for all windows. */
     g_signal_connect (G_OBJECT (about_window), "destroy",
@@ -80,7 +80,7 @@ void create_about_window()
     gtk_container_add (GTK_CONTAINER (about_window), vbox);
 
     /* Create a new button */
-    GtkWidget *button = gtk_button_new_with_label ("關閉");
+    GtkWidget *button = gtk_button_new_with_label (_("關閉"));
     gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 3);
     /* Connect the "clicked" signal of the button to our callback */
     g_signal_connect (G_OBJECT (button), "clicked",
