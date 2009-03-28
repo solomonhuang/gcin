@@ -593,3 +593,7 @@ msgstr "右下"
 #: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
 msgid "右上"
 msgstr "右上"
+
+#: ../tray.c:197
+msgid "解空白視窗"
+msgstr "解空白視窗"

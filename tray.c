@@ -168,20 +168,30 @@ static void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer *dat)
 
 void recreate_tsin_win();
 void recreate_win_gtab();
+extern Window xwin_pho, xwin0, xwin_gtab;
+extern Atom gcin_atom;
 
 void recreate_window()
 {
+  Window win;
+
+  if (!current_CS)
+    return;
   switch (current_CS->in_method) {
     case 3:
-      recreate_win_pho();
+      win = xwin_pho;
       break;
     case 6:
       recreate_tsin_win();
+      win = xwin0;
       break;
     default:
       recreate_win_gtab();
+      win = xwin_gtab;
       break;
   }
+
+  XSetSelectionOwner(dpy, gcin_atom, win, CurrentTime);
 }
 
 
