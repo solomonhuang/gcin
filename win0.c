@@ -66,29 +66,39 @@ void set_label_font_size(GtkWidget *label, int size)
   gtk_widget_modify_font(label, font);
 }
 
-
+/* there is a bug in gtk, if the widget is created and hasn't been processed by
+   gtk_main(), the coodinate of the widget is sometimes invalid.
+   We use pre-create to overcome this bug.
+*/
 static void create_char(int index)
 {
-  if (chars[index].vbox)
-    return;
+  int i;
 
-  GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (hbox_edit), vbox, FALSE, FALSE, 0);
-  chars[index].vbox = vbox;
+  for(i=index; i<=index+1 && i < MAX_PH_BF_EXT; i++) {
+    if (chars[i].vbox)
+      continue;
 
-  GtkWidget *label = gtk_label_new(NULL);
-  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+    GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (hbox_edit), vbox, FALSE, FALSE, 0);
+    chars[i].vbox = vbox;
 
-  set_label_font_size(label, gcin_font_size);
+    GtkWidget *label = gtk_label_new(NULL);
+    gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
 
-  chars[index].label = label;
-  GtkWidget *separator =  gtk_drawing_area_new();
-  GdkColor color_bg;
-  gdk_color_parse(tsin_phrase_line_color, &color_bg);
-  gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
-  gtk_widget_set_size_request(separator, 8, 2);
-  gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
-  chars[index].line = separator;
+    set_label_font_size(label, gcin_font_size);
+
+    chars[i].label = label;
+    GtkWidget *separator =  gtk_drawing_area_new();
+    GdkColor color_bg;
+    gdk_color_parse(tsin_phrase_line_color, &color_bg);
+    gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
+    gtk_widget_set_size_request(separator, 8, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
+    chars[i].line = separator;
+
+    gtk_widget_show(vbox);
+    gtk_widget_show(label);
+  }
 }
 
 static void change_tsin_line_color()
@@ -111,36 +121,8 @@ gboolean b_use_full_space = TRUE;
 // the width of ascii space in firefly song
 void set_label_space(GtkWidget *label)
 {
-#if 1
   gtk_label_set_text(GTK_LABEL(label), "　");
   return;
-#else
-  if (b_use_full_space) {
-    gtk_label_set_text(GTK_LABEL(label), "　");
-    return;
-  }
-
-  GtkRequisition sz;
-  // the value of gtk_window_get_size is old
-  gtk_label_set_text(GTK_LABEL(label), "測");
-
-  gtk_widget_size_request(GTK_WIDGET(label), &sz);
-  int width_chinese = sz.width;
-//  dbg("height chinese %d\n", sz.height);
-
-  gtk_label_set_text(GTK_LABEL(label), " ");
-  gtk_widget_size_request(GTK_WIDGET(label), &sz);
-//  dbg("height space %d\n", sz.height);
-  int N = width_chinese / sz.width;
-
-//  dbg("sz %d\n", sz.width);
-  char tt[32];
-
-  memset(tt, ' ', sizeof(tt));
-  tt[N] = 0;
-
-  gtk_label_set_text(GTK_LABEL(label), tt);
-#endif
 }
 
 
@@ -161,12 +143,12 @@ void disp_char(int index, char *ch)
     gtk_label_set_text(GTK_LABEL(label), tt);
   }
 
-  gtk_widget_show(label);
-  gtk_widget_show(chars[index].vbox);
-
   get_win0_geom();
   if (win_x + win_xl >= dpy_xl)
     move_win0(dpy_xl - win_xl, win_y);
+
+  gtk_widget_show(chars[index].vbox);
+  gtk_widget_show(label);
 }
 
 void hide_char(int index)
@@ -255,7 +237,6 @@ void hide_pho(int index)
   gtk_widget_hide(labels_pho[index]);
 }
 
-
 void get_char_index_xy(int index, int *rx, int *ry)
 {
   int wx, wy;
@@ -268,7 +249,11 @@ void get_char_index_xy(int index, int *rx, int *ry)
     ofs=2;
     widget = chars[index].vbox;
   }
-#else
+#endif
+#if 0
+  GtkWidget *widget = chars[index].label;
+#endif
+#if 1
   GtkWidget *widget = chars[index].vbox;
 #endif
 
@@ -280,7 +265,7 @@ void get_char_index_xy(int index, int *rx, int *ry)
   gtk_widget_translate_coordinates(widget, gwin0,
          0, sz.height, &wx, &wy);
 
-//  dbg("wy: %d %d   wx:%d\n", wy, sz.height, wx);
+//  dbg("%d wx:%d\n", index,  wx);
 
   int win_x, win_y;
 
@@ -402,9 +387,9 @@ void clear_tsin_line()
 void exec_gcin_setup()
 {
 #if DEBUG
-      dbg("exec gcin\n");
+  dbg("exec gcin\n");
 #endif
-      system(GCIN_BIN_DIR"/gcin-setup &");
+  system(GCIN_BIN_DIR"/gcin-setup &");
 }
 
 
@@ -479,8 +464,6 @@ void create_win0()
 }
 
 
-
-
 void create_win1();
 
 static void create_cursor_attr()
@@ -540,7 +523,6 @@ static void create_win0_gui()
   /* This packs the button into the gwin0 (a gtk container). */
   gtk_box_pack_start (GTK_BOX (hbox_row1), hbox_edit, FALSE, FALSE, 0);
 
-
   create_cursor_attr();
 
   button_pho = gtk_button_new();
@@ -551,7 +533,6 @@ static void create_win0_gui()
 
   g_signal_connect(G_OBJECT(button_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
-
 
   if (left_right_button_tips) {
     GtkTooltips *button_pho_tips = gtk_tooltips_new ();

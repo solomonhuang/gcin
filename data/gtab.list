@@ -1,19 +1,19 @@
 內碼 0 -
-倉頡 1 cj.gtab
-倉五 2 cj5.gtab
+倉頡 1 cj.gtab cj.png
+倉五 2 cj5.gtab cj5.png
 #輕鬆 2 ez7.gtab
-注音 3 -
+注音 3 - juyin.png
 #帶調粵拼 4 jyutping.gtab
-標點倉頡 4 cj-punc.gtab
-拼音 5 pinyin.gtab
+標點倉頡 4 cj-punc.gtab cj-punc.png
+拼音 5 pinyin.gtab pinyin.png
 詞音 6 - tsin.png
-大易 7 dayi3.gtab
-行列 8 ar30.gtab
-#嘸蝦米 9 liu5new.gtab
+大易 7 dayi3.gtab dayi3.png
+行列 8 ar30.gtab ar30.png
+#嘸蝦米 9 liu5new.gtab 
 #嘸蝦米 9 liu55.gtab
 #嘸蝦米 9 liu57a.gtab
-嘸蝦米 9 noseeing.gtab
-簡易 - simplex.gtab
-日本式 =  kana-nippon.gtab
+嘸蝦米 9 noseeing.gtab noseeing.png
+簡易 - simplex.gtab simplex.png
+日本式 =  kana-nippon.gtab kana-nippon.png
 greek ` greek.gtab greek.png
-#latin-letters ` latin-letters.gtab
+#latin-letters ` latin-letters.gtab latin-letters.png

@@ -97,8 +97,10 @@ void drawcursor()
 
   if (c_idx == c_len) {
     if (tsin_half_full || eng_ph) {
+#if 0
       disp_char(c_idx,"  ");
       set_cursor_tsin(c_idx);
+#endif
     } else {
       disp_char(c_idx, " ");
       set_cursor_tsin(c_idx);
@@ -211,11 +213,13 @@ static void prbuf()
     disp_char_chbuf(i);
   }
 
+#if 0
   if (c_len < MAX_PH_BF_EXT)
     hide_char(c_len);
 
   if (c_len+1 < MAX_PH_BF_EXT)
     hide_char(c_len+1);
+#endif
 
   drawcursor();
 }
@@ -552,7 +556,6 @@ static void get_sel_phrase()
       continue;
     }
 
-
     if (chpho_eq_pho(c_idx, stk, len)) {
       sellen[phrase_count]=len;
       selidx[phrase_count]=sti;
@@ -562,8 +565,6 @@ static void get_sel_phrase()
     sti++;
   }
 }
-
-
 
 static void get_sel_pho()
 {
@@ -629,7 +630,7 @@ static void disp_current_sel_page()
   if (current_page > 0)
     disp_arrow_up();
 
-  disp_selections(c_idx);
+  disp_selections(c_idx==c_len?c_idx-1:c_idx);
 }
 
 static int fetch_user_selection(int val, char **seltext)
@@ -733,11 +734,10 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
   while (sti < edi && pre_selN < 10) {
     phokey_t mtk[MAX_PHRASE_LEN];
     u_char mtch[MAX_PHRASE_LEN*CH_SZ+1];
-    u_char match_len;
+    char match_len;
     usecount_t usecount;
 
     load_tsin_entry(sti, &match_len, &usecount, mtk, mtch);
-
 
     sti++;
     if (plen > match_len || (pho_incr && plen==match_len)) {
@@ -818,7 +818,9 @@ static void disp_pre_sel_page()
 
     set_sele_text(i, pre_sel[i].str, tlen);
   }
-
+#if 0
+  dbg("ph_sta:%d\n", ph_sta);
+#endif
   disp_selections(ph_sta);
 }
 
@@ -1017,6 +1019,13 @@ static void set_phrase_link(int idx, int len)
 }
 #endif
 
+static void set_fixed(int idx, int len)
+{
+  int i;
+  for(i=idx; i < idx+len; i++)
+    chpho[i].flag |= FLAG_CHPHO_FIXED;
+}
+
 // should be used only if it is a real phrase
 gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
 {
@@ -1034,9 +1043,8 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     ch_pho_cpy(&chpho[idx], str, pho, len);
     set_chpho_ch2(&chpho[idx], str, len);
 
-    int i;
-    for(i=idx; i < idx+len; i++)
-      chpho[i].flag |= FLAG_CHPHO_FIXED;
+
+    set_fixed(idx, len);
 
     c_len=c_idx=idx + len;
 
@@ -1308,6 +1316,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
         }
 
         c_len--;
+        hide_char(c_len);
         init_chpho_i(c_len);
 
         prbuf();
@@ -1370,6 +1379,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
         }
 
         c_len--;
+        hide_char(c_len);
         init_chpho_i(c_len);
         prbuf();
         compact_win0_x();
@@ -1486,9 +1496,12 @@ other_keys:
            clear_tsin_buffer();
            return 1;
          } else
+         if (xkey>=XK_1 && xkey<=XK_3) {
+           return 1;
+         } else {
            return 0;
+         }
        }
-
 
        char *pp;
 
@@ -1513,6 +1526,8 @@ other_keys:
 #if 0
            set_phrase_link(c_idx, len);
 #endif
+           set_fixed(c_idx, len);
+
            raise_phr(c);
            if (c_idx + len == c_len) {
              ph_sta = -1;

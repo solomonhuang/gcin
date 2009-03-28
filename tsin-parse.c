@@ -1,9 +1,35 @@
 #include <string.h>
-
 #include "gcin.h"
 #include "pho.h"
 #include "tsin.h"
 #include "gcin-conf.h"
+
+typedef struct {
+  int start;
+  float score;
+  TSIN_PARSE best[MAX_PH_BF_EXT+1];
+} CACHE ;
+
+static CACHE *cache;
+static int cacheN;
+
+static CACHE *cache_lookup(int start)
+{
+  int i;
+
+  for(i=0; i < cacheN; i++)
+    if (cache[i].start == start)
+      return &cache[i];
+  return NULL;
+}
+
+static void add_cache(int start, float score, TSIN_PARSE *out)
+{
+  cache[cacheN].start = start;
+  cache[cacheN].score = score;
+  memcpy(cache[cacheN].best, out, sizeof(TSIN_PARSE) * (c_len - start));
+  cacheN++;
+}
 
 float tsin_parse_recur(int start, TSIN_PARSE *out)
 {
@@ -26,17 +52,17 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
     pbestscore = 0;
 
     extract_pho(start, plen, pp);
+
     if (!tsin_seek(pp, plen, &sti, &edi)) {
       if (plen > 1)
         break;
-
       goto next;
     }
 
     for (;sti < edi; sti++) {
       phokey_t mtk[MAX_PHRASE_LEN];
       char mtch[MAX_PHRASE_LEN*CH_SZ+1];
-      u_char match_len;
+      char match_len;
       usecount_t usecount;
 
       load_tsin_entry(sti, &match_len, &usecount, mtk, mtch);
@@ -89,12 +115,21 @@ float tsin_parse_recur(int start, TSIN_PARSE *out)
 #endif
     }
 
-
 next:
     remlen = c_len - (start + plen);
 
     if (remlen) {
-      int uc = tsin_parse_recur(start + plen, &pbest[1]);
+      int next = start + plen;
+      int uc;
+      CACHE *pca;
+
+      if (pca = cache_lookup(next)) {
+        uc = pca->score;
+        memcpy(&pbest[1], pca->best, (c_len - next) * sizeof(TSIN_PARSE));
+      } else {
+        uc = tsin_parse_recur(next, &pbest[1]);
+        add_cache(next, uc, &pbest[1]);
+      }
 
       pbestscore += uc;
     }
@@ -111,6 +146,9 @@ next:
 
 void tsin_parse(TSIN_PARSE out[])
 {
+  cache = tmalloc(CACHE, c_len);
+  cacheN = 0;
+
   tsin_parse_recur(0, out);
 
   int i, ofsi;
@@ -161,4 +199,6 @@ void tsin_parse(TSIN_PARSE out[])
 #if 0
   dbg("%d ph_sta: %d\n",i, ph_sta);
 #endif
+
+  free(cache); cache = NULL;
 }

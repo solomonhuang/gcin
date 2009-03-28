@@ -25,7 +25,7 @@ extern int c_idx, c_len, ph_sta, ph_sta_last;
 
 void extract_pho(int chpho_idx, int plen, phokey_t *pho);
 gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi);
-void load_tsin_entry(int idx, u_char *len, usecount_t *usecount, phokey_t *pho, u_char *ch);
+void load_tsin_entry(int idx, char *len, usecount_t *usecount, phokey_t *pho, u_char *ch);
 gboolean check_fixed_mismatch(int chpho_idx, char *mtch, int plen);
 
 typedef struct {

@@ -13,13 +13,19 @@ static char gcin_icon[]=GCIN_ICON_DIR"/gcin-tray.png";
 static char pixbuf_ch_fname[128];
 
 static void
-cb_pref (GtkAction * action)
+cb_pref ()
 {
   system(GCIN_BIN_DIR"/gcin-setup &");
 }
 
 void toggle_gb_output();
 extern gboolean gb_output;
+
+static void get_text_w_h(char *s, int *w, int *h)
+{
+  pango_layout_set_text(pango, s, strlen(s));
+  pango_layout_get_pixel_size(pango, w, h);
+}
 
 
 static void draw_icon()
@@ -40,8 +46,7 @@ static void draw_icon()
   if (pix)
     gdk_draw_pixbuf(da->window, NULL, pix, 0, 0, 0, 0, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
   else {
-    pango_layout_set_text(pango, inmd[current_CS->in_method].cname, strlen(inmd[current_CS->in_method].cname));
-    pango_layout_get_pixel_size(pango, &w, &h);
+    get_text_w_h(inmd[current_CS->in_method].cname, &w, &h);
     gdk_draw_layout(da->window, gc, 0, 0, pango);
   }
 
@@ -49,16 +54,14 @@ static void draw_icon()
     if (current_CS->b_half_full_char) {
       static char full[] = "全";
 
-      pango_layout_set_text(pango, full, strlen(full));
-      pango_layout_get_pixel_size(pango, &w, &h);
+      get_text_w_h(full,  &w, &h);
       gdk_draw_layout(da->window, gc, dw - w, dh - h, pango);
     }
 
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
       static char efull[] = "英全";
 
-      pango_layout_set_text(pango, efull, strlen(efull));
-      pango_layout_get_pixel_size(pango, &w, &h);
+      get_text_w_h(efull,  &w, &h);
       gdk_draw_layout(da->window, gc, 0, 0, pango);
     }
   }
@@ -68,8 +71,7 @@ static void draw_icon()
 
   if (gb_output) {
     static char sim[] = "简";
-    pango_layout_set_text(pango, sim, strlen(sim));
-    pango_layout_get_pixel_size(pango, &w, &h);
+    get_text_w_h(sim,  &w, &h);
     gdk_draw_layout(da->window, gc, 0, dh - h, pango);
   }
 }
@@ -236,9 +238,11 @@ void create_tray()
   gtk_widget_set_size_request(tray_icon, pwidth, pheight);
 
   pango = gtk_widget_create_pango_layout(da, " ");
-  PangoFontDescription* desc = pango_font_description_new();
-  pango_font_description_set_size(desc, 10);
+
+  PangoContext *context=gtk_widget_get_pango_context(da);
+  PangoFontDescription* desc=pango_context_get_font_description(context);
   pango_layout_set_font_description(pango, desc);
+  pango_font_description_set_size(desc, 10);
 
   gtk_widget_show_all (GTK_WIDGET (tray_icon));
 

@@ -364,7 +364,7 @@ int find_match(char *str, int len, char *match_chars, int match_chars_max)
 }
 
 
-void load_tsin_entry(int idx, u_char *len, usecount_t *usecount, phokey_t *pho,
+void load_tsin_entry(int idx, char *len, usecount_t *usecount, phokey_t *pho,
                     u_char *ch)
 {
   if (idx >= phcount) {
@@ -378,7 +378,8 @@ void load_tsin_entry(int idx, u_char *len, usecount_t *usecount, phokey_t *pho,
   fseek(fph, ph_ofs, SEEK_SET);
   fread(len, 1, 1, fph);
 
-  if (*len >= MAX_PHRASE_LEN) {
+  if (*len > MAX_PHRASE_LEN || *len <= 0) {
+    dbg("err: tsin db changed reload");
     load_tsin_db(); // probably db changed, reload;
     *len = 0;
     return;
@@ -404,28 +405,27 @@ int phokey_t_seq(phokey_t *a, phokey_t *b, int len)
   return 0;
 }
 
-
+// ***  r_sti<=  range  < r_edi
 gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
 {
   int mid, cmp;
   phokey_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
-  u_char len, mlen, stch[MAX_PHRASE_LEN * CH_SZ];
+  u_char mlen, stch[MAX_PHRASE_LEN * CH_SZ];
+  char len;
   usecount_t usecount;
-  int sti, edi;
-  int i= *pho >> TSIN_HASH_SHIFT;
+  int hashi= *pho >> TSIN_HASH_SHIFT;
 
-  if (i >= TSIN_HASH_N)
+  if (hashi >= TSIN_HASH_N)
     return FALSE;
 
-  int top=hashidx[i];
-  int bot=edi=hashidx[i+1];
+  int top=hashidx[hashi];
+  int bot=hashidx[hashi+1];
 
   if (top>=phcount)
     return FALSE;
 
   while (top <= bot) {
     mid=(top+bot)/ 2;
-    sti++;
     load_tsin_entry(mid, &len, &usecount, ss, stch);
 
     if (len > plen)
@@ -453,16 +453,25 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
   }
 
   // seek to the first match because binary search is used
-  for(;mid>=0;mid--) {
-    load_tsin_entry(mid, &len, &usecount, stk, stch);
+  int sti;
+  for(sti = mid; sti>=0; sti--) {
+    load_tsin_entry(sti, &len, &usecount, stk, stch);
 
     if (len >= plen && !phokey_t_seq(stk, pho, plen))
       continue;
     break;
   }
+  sti++;
 
-  mid++;
-  sti = mid;
+  // seek to the tail
+  int edi;
+  for(edi = mid; edi < phcount; edi++) {
+    load_tsin_entry(edi, &len, &usecount, stk, stch);
+
+    if (len >= plen && !phokey_t_seq(stk, pho, plen))
+      continue;
+    break;
+  }
 
   *r_sti = sti;
   *r_edi = edi;
