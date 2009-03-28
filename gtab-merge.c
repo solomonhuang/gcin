@@ -169,6 +169,7 @@ int main(int argc, char **argv)
   char *phrbuf = NULL;
   int prbf_cou=0;
 
+  INMD tinmd, *inp = &tinmd, *cur_inmd = &tinmd;
 
   if (argc != 4) {
     dbg("\tgtab-merge for gcin " GCIN_VERSION "\n");
@@ -178,12 +179,10 @@ int main(int argc, char **argv)
   if ((fr=fopen(argv[1], "r"))==NULL)
       p_err("cannot err open %s", argv[1]);
 
-  gboolean key64;
-  INMD inmd, *inp = &inmd, *cur_inmd = &inmd;
+  gboolean key64=64;
 
   inp->tbl64 = itout64;
   inp->tbl = itout;
-
 
   fread(&th,1, sizeof(th), fr);
 #if NEED_SWAP
@@ -199,8 +198,21 @@ int main(int argc, char **argv)
 #endif
   KeyNum = th.KeyS;
   dbg("keys %d\n",KeyNum);
-  cur_inmd->keybits = th.keybits;
-  cur_inmd->last_k_bitn = (((cur_inmd->key64 ? 64:32) / cur_inmd->keybits) - 1) * cur_inmd->keybits;
+
+  inp->keybits = th.keybits;
+  dbg("keybits:%d\n", th.keybits);
+
+  if (th.MaxPress*th.keybits > 32) {
+    inp->max_keyN = 64 / th.keybits;
+    key64 = inp->key64 = TRUE;
+    dbg("it's a 64-bit .gtab\n");
+  } else {
+    inp->max_keyN = 32 / th.keybits;
+    key64 = inp->key64 = FALSE;
+  }
+
+  inp->last_k_bitn = (((inp->key64 ? 64:32) / inp->keybits) - 1) * inp->keybits;
+  dbg("inp->key64:%d\n", inp->key64);
 
 
   fread(keymap, 1, th.KeyS, fr);
@@ -210,15 +222,6 @@ int main(int argc, char **argv)
   for(i=0; i < th.KeyS; i++) {
     kno[keymap[i]] = i;
   }
-
-  if (th.MaxPress*th.keybits > 32) {
-    inp->max_keyN = 64 / th.keybits;
-    inp->key64 = TRUE;
-    dbg("it's a 64-bit .gtab\n");
-  } else {
-    inp->max_keyN = 32 / th.keybits;
-  }
-
 
   for(i=0; i < th.DefC; i++) {
     ITEM it;

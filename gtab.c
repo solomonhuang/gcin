@@ -1383,11 +1383,12 @@ next_page:
         goto next_page;
       } else
       if (ci==0) {
+#if 0
         if (last_full) {
           last_full=0;
-          return 1;
+//          return 1;
         }
-
+#endif
         if (current_CS->b_half_full_char)
           return full_char_proc(key);
 
