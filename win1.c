@@ -186,6 +186,8 @@ void destroy_win1()
   if (!gwin1)
     return;
   gtk_widget_destroy(gwin1);
+  frame=NULL;
+  gwin1 = NULL;
 }
 
 void change_win1_font()
@@ -207,4 +209,12 @@ void change_win1_font()
   }
 
   change_win_bg(gwin1);
+}
+
+
+void recreate_tsin_select_win()
+{
+  destroy_win1();
+  create_win1();
+  create_win1_gui();
 }

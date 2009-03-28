@@ -1646,10 +1646,9 @@ static void create_main_win()
   GtkWidget *label_gcin_win_sym_click_close = gtk_label_new(_("符號視窗點選後自動關閉"));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_win_sym_click_close,  FALSE, FALSE, 0);
 
-/* aaaaa */
   GtkWidget *hbox_gcb_pos = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcb_pos, FALSE, FALSE, 0);
-  GtkWidget *label_gcb_pos = gtk_label_new(_("剪貼區管理視窗位置"));
+  GtkWidget *label_gcb_pos = gtk_label_new(_("剪貼區管理視窗位置&開關"));
   gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), label_gcb_pos,  FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), create_gcb_pos_opts(),  FALSE, FALSE, 0);
   GtkAdjustment *adj_gcb_position_x =

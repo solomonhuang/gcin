@@ -124,75 +124,6 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 }
 
-#if 0
-void create_win_pho_gui_full()
-{
-//  dbg("create_win_pho .....\n");
-
-  if (top_bin)
-    return;
-
-  GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-
-  if (gcin_inner_frame) {
-    GtkWidget *frame = top_bin = gtk_frame_new(NULL);
-    gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
-    gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
-    gtk_container_add (GTK_CONTAINER (frame), vbox_top);
-  } else {
-    gtk_container_add (GTK_CONTAINER(gwin_pho), vbox_top);
-    top_bin = vbox_top;
-  }
-
-  GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_top), align, FALSE, FALSE, 0);
-
-  label_pho_sele = gtk_label_new(NULL);
-  gtk_container_add (GTK_CONTAINER (align), label_pho_sele);
-  set_label_font_size(label_pho_sele, gcin_font_size);
-
-
-  hbox_row2 = gtk_hbox_new (FALSE, 0);
-  /* This packs the button into the gwin_pho (a gtk container). */
-  gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
-
-  label_full = gtk_label_new("全");
-  gtk_container_add (GTK_CONTAINER (hbox_row2), label_full);
-
-  GtkWidget *button_pho = gtk_button_new_with_label("注音");
-  g_signal_connect_swapped (GTK_OBJECT (button_pho), "button_press_event",
-        G_CALLBACK (inmd_switch_popup_handler), NULL);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), button_pho, FALSE, FALSE, 0);
-
-  int i;
-
-  button_pho = gtk_button_new();
-  gtk_container_set_border_width (GTK_CONTAINER (button_pho), 0);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), button_pho, FALSE, FALSE, 0);
-  GtkWidget *hbox_pho = gtk_hbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (button_pho), hbox_pho);
-  label_pho = gtk_label_new(NULL);
-  gtk_box_pack_start (GTK_BOX (hbox_pho), label_pho, FALSE, FALSE, 0);
-
-  g_signal_connect(G_OBJECT(button_pho),"button-press-event",
-                   G_CALLBACK(mouse_button_callback), NULL);
-
-  if (left_right_button_tips) {
-    GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), button_pho, _("左鍵符號，右鍵設定"),NULL);
-  }
-
-  label_key_codes  = gtk_label_new(NULL);
-  gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);
-  gtk_box_pack_start (GTK_BOX (hbox_row2), label_key_codes, FALSE, FALSE, 2);
-
-  gtk_widget_show_all (gwin_pho);
-
-  gtk_widget_hide(label_full);
-}
-#endif
-
-
 void create_win_pho_gui_simple()
 {
 //  dbg("create_win_pho .....\n");
@@ -272,14 +203,7 @@ void create_win_pho_gui_simple()
 
 void create_win_pho_gui()
 {
-#if 0
-  if (pho_simple_win)
-    create_win_pho_gui_simple();
-  else
-    create_win_pho_gui_full();
-#else
-    create_win_pho_gui_simple();
-#endif
+  create_win_pho_gui_simple();
 
   if (pho_hide_row2) {
     gtk_widget_hide(hbox_row2);
@@ -289,20 +213,6 @@ void create_win_pho_gui()
   current_pho_simple_win = pho_simple_win;
   current_gcin_inner_frame = gcin_inner_frame;
   current_pho_in_row1 = pho_in_row1;
-}
-
-
-void change_win_pho_style()
-{
-  if (!top_bin || (current_pho_simple_win == pho_simple_win &&
-      current_gcin_inner_frame == gcin_inner_frame &&
-      current_pho_in_row1 ==  pho_in_row1))
-    return;
-
-  gtk_widget_destroy(top_bin);
-  top_bin = NULL;
-
-  create_win_pho_gui();
 }
 
 
@@ -389,4 +299,14 @@ void change_pho_font_size()
   set_label_font_size(label_pho_sele, gcin_font_size);
 
   change_win_fg_bg(gwin_pho, label_pho_sele);
+}
+
+
+void recreate_win_pho()
+{
+  gtk_widget_destroy(gwin_pho);
+  top_bin = NULL;
+  gwin_pho = NULL;
+  create_win_pho();
+  create_win_pho_gui_simple();
 }

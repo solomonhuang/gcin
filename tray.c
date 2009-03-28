@@ -166,6 +166,25 @@ static void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer *dat)
   phonetic_speak= gtk_check_menu_item_get_active(checkmenuitem);
 }
 
+void recreate_tsin_win();
+void recreate_win_gtab();
+
+void recreate_window()
+{
+  switch (current_CS->in_method) {
+    case 3:
+      recreate_win_pho();
+      break;
+    case 6:
+      recreate_tsin_win();
+      break;
+    default:
+      recreate_win_gtab();
+      break;
+  }
+}
+
+
 void kbm_toggle();
 
 struct {
@@ -175,6 +194,7 @@ struct {
   int *check_dat;
 } mitems[] = {
   {N_("設定"), GTK_STOCK_PREFERENCES, exec_gcin_setup},
+  {N_("解空白視窗"), NULL, recreate_window},
   {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
   {N_("正->簡體"), NULL, cb_trad2sim},
   {N_("簡->正體"), NULL, cb_sim2trad},

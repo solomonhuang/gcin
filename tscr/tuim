@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#export LC_ALL=ja
+export LC_ALL=ja_JP.UTF-8
 #export GTK_IM_MODULE=uim
 export GTK_IM_MODULE=uim
 export XMODIFIERS=@im=uim

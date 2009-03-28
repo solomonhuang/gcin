@@ -575,8 +575,8 @@ msgid "小鍵盤"
 msgstr "Virtual keyboard"
 
 #: ../gcin-setup-list.c:570 ../gcin-setup-tab.c:1652
-msgid "剪貼區管理視窗位置"
-msgstr "gcb window position"
+msgid "剪貼區管理視窗位置&開關"
+msgstr "gcb window position & switch"
 
 #: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
 msgid "左下"

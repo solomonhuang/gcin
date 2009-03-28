@@ -406,5 +406,5 @@ void gcb_main()
 
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
 
-  gtk_timeout_add(5000, timeout_periodic_clipboard_fetch, NULL);
+  gtk_timeout_add(3000, timeout_periodic_clipboard_fetch, NULL);
 }

@@ -512,6 +512,8 @@ void destroy_win_gtab()
     return;
 
   gtk_widget_destroy(gwin_gtab);
+  gwin_gtab = NULL;
+  top_bin = NULL;
 }
 
 
@@ -570,4 +572,13 @@ void win_gtab_disp_half_full()
   }
 
   minimize_win_gtab();
+}
+
+
+void recreate_win_gtab()
+{
+//  puts("recreate_win_gtab");
+  destroy_win_gtab();
+  create_win_gtab();
+  create_win_gtab_gui();
 }

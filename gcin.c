@@ -287,7 +287,7 @@ static void reload_data()
 //  load_tsin_db();
   change_win0_style();
   change_win_gtab_style();
-  change_win_pho_style();
+//  change_win_pho_style();
   load_tab_pho_file();
   change_tsin_color();
   if (win_kbm_inited)
@@ -310,7 +310,7 @@ static void change_font_size()
   change_win_sym_font_size();
   change_win0_style();
   change_win_gtab_style();
-  change_win_pho_style();
+//  change_win_pho_style();
 }
 
 static int xerror_handler(Display *d, XErrorEvent *eve)
