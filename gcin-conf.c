@@ -2,8 +2,9 @@
 #include <dirent.h>
 #include <X11/Xatom.h>
 
-char *TableDir=GCIN_TABLE_DIR;
 
+#if !CLIENT_LIB
+char *TableDir=GCIN_TABLE_DIR;
 void init_TableDir()
 {
   char *dname;
@@ -104,6 +105,11 @@ void save_gcin_conf_int(char *name, int val)
   save_gcin_conf_str(name, tt);
 }
 
+void get_sys_table_file_name(char *name, char *fname)
+{
+  sprintf(fname, "%s/%s", TableDir, name);
+}
+#endif
 
 char *get_gcin_xim_name()
 {
@@ -142,10 +148,4 @@ Atom get_gcin_atom(Display *dpy)
   Atom atom = XInternAtom(dpy, tt, False);
 
   return atom;
-}
-
-
-void get_sys_table_file_name(char *name, char *fname)
-{
-  sprintf(fname, "%s/%s", TableDir, name);
 }

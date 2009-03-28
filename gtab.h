@@ -5,8 +5,8 @@
 typedef enum {
   GTAB_space_auto_first_none=0,   // use the value set by .cin
   GTAB_space_auto_first_any=1,    // boshiamy, dayi
-  GTAB_space_auto_first_full=2,   // cj
-  GTAB_space_auto_first_nofull=4  // windows ar30
+  GTAB_space_auto_first_full=2,   // simplex
+  GTAB_space_auto_first_nofull=4  // windows ar30 cj
 } GTAB_space_pressed_E;
 
 typedef struct {
@@ -54,7 +54,7 @@ struct TableHead {
 #define KeyBits (6)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
-#define MAX_GTAB_NUM_KEY (14)
+#define MAX_GTAB_NUM_KEY (16)
 #define MAX_SELKEY 16
 
 #define MAX_TAB_KEY_NUM 5

@@ -1,8 +1,8 @@
 /******************************************************************
-
+ 
          Copyright 1994, 1995 by Sun Microsystems, Inc.
          Copyright 1993, 1994 by Hewlett-Packard Company
-
+ 
 Permission to use, copy, modify, distribute, and sell this software
 and its documentation for any purpose is hereby granted without fee,
 provided that the above copyright notice appear in all copies and
@@ -13,7 +13,7 @@ distribution of the software without specific, written prior permission.
 Sun Microsystems, Inc. and Hewlett-Packard make no representations about
 the suitability of this software for any purpose.  It is provided "as is"
 without express or implied warranty.
-
+ 
 SUN MICROSYSTEMS INC. AND HEWLETT-PACKARD COMPANY DISCLAIMS ALL
 WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -22,20 +22,22 @@ SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
 RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
 CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
+ 
   Author: Hidetoshi Tajima(tajima@Eng.Sun.COM) Sun Microsystems, Inc.
 
     This version tidied and debugged by Steve Underwood May 1999
-
+ 
 ******************************************************************/
 
 #include <X11/Xlib.h>
 #include "IMdkit.h"
 #include "Xi18n.h"
 #include "FrameMgr.h"
+#include "XimFunc.h"
 
 Xi18nClient *_Xi18nFindClient (Xi18n, CARD16);
 
+int
 _Xi18nNeedSwap (Xi18n i18n_core, CARD16 connect_id)
 {
     CARD8 im_byteOrder = i18n_core->address.im_byteOrder;
@@ -47,20 +49,23 @@ _Xi18nNeedSwap (Xi18n i18n_core, CARD16 connect_id)
 Xi18nClient *_Xi18nNewClient(Xi18n i18n_core)
 {
     static CARD16 connect_id = 0;
+    int new_connect_id;
     Xi18nClient *client;
 
     if (i18n_core->address.free_clients)
     {
         client = i18n_core->address.free_clients;
         i18n_core->address.free_clients = client->next;
+	new_connect_id = client->connect_id;
     }
     else
     {
         client = (Xi18nClient *) malloc (sizeof (Xi18nClient));
+	new_connect_id = ++connect_id;
     }
     /*endif*/
     memset (client, 0, sizeof (Xi18nClient));
-    client->connect_id = ++connect_id;
+    client->connect_id = new_connect_id;
     client->pending = (XIMPending *) NULL;
     client->sync = False;
     client->byte_order = '?'; 	/* initial value */
@@ -158,8 +163,8 @@ void _Xi18nSendMessage (XIMS ims,
 
     i18n_core->methods.send (ims, connect_id, reply, reply_length);
 
-    free (reply);
-    free (reply_hdr);
+    XFree (reply);
+    XFree (reply_hdr);
     FrameMgrFree (fm);
 }
 
@@ -179,7 +184,7 @@ void _Xi18nSendTriggerKey (XIMS ims, CARD16 connect_id)
     if (on_key_num == 0  &&  off_key_num == 0)
         return;
     /*endif*/
-
+    
     fm = FrameMgrInit (register_triggerkeys_fr,
                        NULL,
                        _Xi18nNeedSwap (i18n_core, connect_id));
@@ -226,8 +231,7 @@ void _Xi18nSendTriggerKey (XIMS ims, CARD16 connect_id)
                        reply,
                        total_size);
     FrameMgrFree (fm);
-
-    free(reply);
+    XFree(reply);
 }
 
 void _Xi18nSetEventMask (XIMS ims,
@@ -237,7 +241,6 @@ void _Xi18nSetEventMask (XIMS ims,
                          CARD32 forward_mask,
                          CARD32 sync_mask)
 {
-
     Xi18n i18n_core = ims->protocol;
     FrameMgr fm;
     extern XimFrameRec set_event_mask_fr[];
@@ -269,6 +272,5 @@ void _Xi18nSetEventMask (XIMS ims,
                        total_size);
 
     FrameMgrFree (fm);
-
-    free(reply);
+    XFree(reply);
 }

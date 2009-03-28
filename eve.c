@@ -459,7 +459,9 @@ void disp_im_half_full()
   else
      set_win_status_half_full("");
 #endif
+#if TRAY_ENABLED
   update_tray_icon();
+#endif
 
   switch (current_CS->in_method) {
     case 3:
@@ -482,7 +484,7 @@ void toggle_im_enabled(u_int kev_state)
 //    dbg("toggle_im_enabled\n");
     check_CS();
 
-    if (current_CS->in_method < 0 || current_CS->in_method >= gcin_switch_keysN)
+    if (current_CS->in_method < 0 || current_CS->in_method > MAX_GTAB_NUM_KEY)
       p_err("err found");
 
     static u_int orig_caps_state;
@@ -513,7 +515,9 @@ void toggle_im_enabled(u_int kev_state)
 #endif
       current_CS->im_state = GCIN_STATE_DISABLED;
 
+#if TRAY_ENABLED
       update_tray_icon();
+#endif
     } else {
       current_CS->im_state = GCIN_STATE_CHINESE;
       orig_caps_state = kev_state & LockMask;
@@ -534,7 +538,9 @@ void toggle_im_enabled(u_int kev_state)
       if (gcin_pop_up_win)
         show_win_stautus();
 #endif
+#if TRAY_ENABLED
       update_tray_icon();
+#endif
     }
 }
 
@@ -654,7 +660,9 @@ gboolean init_in_method(int in_no)
 #if 0
   set_win_status_inmd(inmd[in_no].cname);
 #endif
+#if TRAY_ENABLED
   load_tray_icon();
+#endif
 
   update_in_win_pos();
   return status;
@@ -666,8 +674,8 @@ static void cycle_next_in_method()
 
   int i;
 
-  for(i=1; i <= gcin_switch_keysN; i++) {
-    int v = (current_CS->in_method + i) % gcin_switch_keysN;
+  for(i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+    int v = (current_CS->in_method + i) % MAX_GTAB_NUM_KEY;
     if (!(gcin_flags_im_enabled & (1<<v)))
       continue;
     if (!inmd[v].cname || !inmd[v].cname[0])
@@ -804,7 +812,8 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
      return TRUE;
   }
 
-  if (current_CS->b_raise_window && !timeout_handle) {
+  if (current_CS->b_raise_window && !timeout_handle
+      && keysym>=' ' && keysym < 127) {
     timeout_handle = g_timeout_add(200, timeout_raise_window, NULL);
   }
 
@@ -908,7 +917,9 @@ int gcin_FocusIn(ClientState *cs)
       hide_in_win(cs);
   }
 
+#if TRAY_ENABLED
   load_tray_icon();
+#endif
 #if 0
   dbg_time("gcin_FocusIn %x %x\n",cs, current_CS);
 #endif

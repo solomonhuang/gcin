@@ -132,11 +132,7 @@ void load_tray_icon()
 }
 
 
-void cb_trad_sim_toggle()
-{
-  toggle_gb_output();
-  update_tray_icon();
-}
+void cb_trad_sim_toggle();
 
 static void cb_sim2trad()
 {

@@ -34,6 +34,10 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <X11/Xmd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* IM Attributes Name */
 #define IMModifiers		"modifiers"
 #define IMServerWindow		"serverWindow"
@@ -97,11 +101,12 @@ typedef struct
     Status	(*closeIM) (XIMS);
     char*	(*setIMValues) (XIMS, XIMArg *);
     char*	(*getIMValues) (XIMS, XIMArg *);
-    Status	(*forwardEvent) (XIMS, ...);
-    Status	(*commitString) (XIMS, ...);
-    int		(*callCallback) (XIMS, ...);
-    int		(*preeditStart) (XIMS, ...);
-    int		(*preeditEnd) (XIMS, ...);
+    Status	(*forwardEvent) (XIMS, XPointer);
+    Status	(*commitString) (XIMS, XPointer);
+    int		(*callCallback) (XIMS, XPointer);
+    int		(*preeditStart) (XIMS, XPointer);
+    int		(*preeditEnd) (XIMS, XPointer);
+    int		(*syncXlib) (XIMS, XPointer);
 } IMMethodsRec, *IMMethods;
 
 typedef struct
@@ -114,6 +119,7 @@ typedef struct _XIMS
 {
     IMMethods	methods;
     IMCoreRec	core;
+    Bool	sync;
     void	*protocol;
 } XIMProtocolRec;
 
@@ -129,5 +135,10 @@ void IMCommitString (XIMS, XPointer);
 int IMCallCallback (XIMS, XPointer);
 int IMPreeditStart (XIMS, XPointer);
 int IMPreeditEnd (XIMS, XPointer);
+int IMSyncXlib (XIMS, XPointer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* IMdkit_h */

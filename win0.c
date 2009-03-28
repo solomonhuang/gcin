@@ -467,6 +467,17 @@ static void cb_clicked_eng_ph()
   tsin_toggle_eng_ch();
 }
 
+void set_no_focus(GtkWidget *win)
+{
+  gdk_window_set_override_redirect(win->window, TRUE);
+#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 6
+  gtk_window_set_accept_focus(win, FALSE);
+#endif
+#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 6
+  gtk_window_set_focus_on_map (win, FALSE);
+#endif
+}
+
 
 void create_win0()
 {
@@ -492,8 +503,9 @@ void create_win0()
 
   dbg("gdkwin0:%x\n", gdkwin0);
 #endif
-  gdk_window_set_override_redirect(gdkwin0, TRUE);
   xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
+
+  set_no_focus(gwin0);
 }
 
 

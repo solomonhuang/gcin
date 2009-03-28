@@ -267,7 +267,9 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GCIN_INPUT_STYLE, style);
 
   save_gcin_conf_int(GCIN_INNER_FRAME, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_inner_frame)));
+#if TRAY_ENABLED
   save_gcin_conf_int(GCIN_STATUS_TRAY, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray)));
+#endif
 
   gchar *cstr = gtk_color_selection_palette_to_string(&gcin_win_gcolor_fg, 1);
   dbg("color fg %s\n", cstr);
@@ -479,6 +481,7 @@ void create_appearance_conf_window()
        gcin_inner_frame);
   gtk_box_pack_start (GTK_BOX(hbox_gcin_inner_frame), check_button_gcin_inner_frame, FALSE, FALSE, 0);
 
+#if TRAY_ENABLED
   GtkWidget *hbox_gcin_status_tray = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX(vbox_top), hbox_gcin_status_tray, FALSE, FALSE, 0);
   GtkWidget *label_gcin_status_tray = gtk_label_new("面板狀態(tray)");
@@ -487,6 +490,7 @@ void create_appearance_conf_window()
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray),
        gcin_status_tray);
   gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_status_tray, FALSE, FALSE, 0);
+#endif
 
   GtkWidget *frame_win_color = gtk_frame_new("顏色選擇");
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_win_color, FALSE, FALSE, 0);

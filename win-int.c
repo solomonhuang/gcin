@@ -148,7 +148,7 @@ void create_win_intcode()
   gtk_widget_realize (gwin_int);
   GdkWindow *gdkwin = gwin_int->window;
 
-  gdk_window_set_override_redirect(gdkwin, TRUE);
+  set_no_focus(gwin_int);
 
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 0);

@@ -47,7 +47,7 @@ struct _GtkIMContextGCINClass
 };
 
 void gtk_im_context_gcin_register_type (GTypeModule *type_module);
-GtkIMContext *gtk_im_context_xim_new (void);
+GtkIMContext *gtk_im_context_gcin_new (void);
 
 void gtk_im_context_gcin_shutdown (void);
 

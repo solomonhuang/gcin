@@ -23,6 +23,7 @@ int gtab_hide_row2;
 int gtab_in_row1;
 int gtab_capslock_in_eng;
 int gtab_vertical_select;
+int gtab_unique_auto_send;
 
 
 int tsin_phrase_pre_select, tsin_tone_char_input;
@@ -98,6 +99,7 @@ void load_setttings()
   gtab_in_row1 = get_gcin_conf_int(GTAB_IN_ROW1, 0);
   gtab_capslock_in_eng = get_gcin_conf_int(GTAB_CAPSLOCK_IN_ENG, 1);
   gtab_vertical_select = get_gcin_conf_int(GTAB_VERTICAL_SELECT, 0);
+  gtab_unique_auto_send = get_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND, 0);
 
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,

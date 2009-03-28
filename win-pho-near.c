@@ -75,13 +75,10 @@ void create_win_pho_near(phokey_t pho)
     close_win_pho_near();
 
   gwin_pho_near = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-#if 1
   gtk_widget_realize (gwin_pho_near);
   GdkWindow *gdkwin = gwin_pho_near->window;
-  gdk_window_set_override_redirect(gdkwin, TRUE);
-#else
-  gtk_window_set_title (GTK_WINDOW (gwin_pho_near), "gcin 近音字查詢");
-#endif
+  set_no_focus(gwin_pho_near);
+
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_add(GTK_CONTAINER (gwin_pho_near), frame);
 

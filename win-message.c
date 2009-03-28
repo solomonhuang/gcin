@@ -6,6 +6,9 @@ static gboolean timeout_destroy_window(GtkWidget *win)
   return FALSE;
 }
 
+#if !TRAY_ENABLED
+GdkWindow *tray_da_win;
+#endif
 extern GdkWindow *tray_da_win;
 
 static void create_win_message(char *icon, char *text, int duration)
@@ -14,7 +17,7 @@ static void create_win_message(char *icon, char *text, int duration)
   gtk_container_set_border_width (GTK_CONTAINER (gwin_message), 0);
   gtk_widget_realize (gwin_message);
   GdkWindow *gdkwin = gwin_message->window;
-  gdk_window_set_override_redirect(gdkwin, TRUE);
+  set_no_focus(gwin_message);
 
   GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (gwin_message), hbox);

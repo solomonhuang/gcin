@@ -273,14 +273,18 @@ typedef struct {
 static void save_old_sigaction(SAVE_ACT *save_act)
 {
   save_old_sigaction_single(SIGPIPE, &save_act->apipe);
+#if 0
   save_old_sigaction_single(SIGIO, &save_act->aio);
+#endif
 }
 
 
 static void restore_old_sigaction(SAVE_ACT *save_act)
 {
   restore_old_sigaction_single(SIGPIPE, &save_act->apipe);
+#if 0
   restore_old_sigaction_single(SIGIO, &save_act->aio);
+#endif
 }
 
 static int handle_read(GCIN_client_handle *handle, void *ptr, int n)
@@ -291,10 +295,13 @@ static int handle_read(GCIN_client_handle *handle, void *ptr, int n)
     return 0;
 
   SAVE_ACT save_act;
-
+#if 1
   save_old_sigaction(&save_act);
+#endif
   int r = read(fd, ptr, n);
+#if 1
   restore_old_sigaction(&save_act);
+#endif
 
   if (r<=0)
     return r;
@@ -321,11 +328,13 @@ static int handle_write(GCIN_client_handle *handle, void *ptr, int n)
 
 
   SAVE_ACT save_act;
-
+#if 1
   save_old_sigaction(&save_act);
+#endif
   int r =  write(fd, tmp, n);
+#if 1
   restore_old_sigaction(&save_act);
-
+#endif
   free(tmp);
 
   return r;

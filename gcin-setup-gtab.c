@@ -16,6 +16,7 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_in_row1,
                  *check_button_gtab_capslock_in_eng;
                  *check_button_gtab_vertical_select;
+                 *check_button_gtab_unique_auto_send;
 
 struct {
   char *str;
@@ -76,6 +77,11 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 
   save_gcin_conf_int(GTAB_VERTICAL_SELECT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_vertical_select)));
+
+
+  save_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send)));
+
 
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
@@ -328,6 +334,16 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (hbox_gtab_vertical_select), check_button_gtab_vertical_select,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_vertical_select),
      gtab_vertical_select);
+
+
+  GtkWidget *hbox_gtab_unique_auto_send = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_unique_auto_send, FALSE, FALSE, 0);
+  GtkWidget *label_gtab_unique_auto_send = gtk_label_new("唯一選擇時自動送出");
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send), label_gtab_unique_auto_send,  FALSE, FALSE, 0);
+  check_button_gtab_unique_auto_send = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send), check_button_gtab_unique_auto_send,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send),
+     gtab_unique_auto_send);
 
 
   GtkWidget *button_edit_append = gtk_button_new_with_label("編輯內定輸入法的使用者外加字詞");

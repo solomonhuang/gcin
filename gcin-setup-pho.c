@@ -17,6 +17,7 @@ static struct {
  {"聲調拼音, 使用 asdf 選擇", "pinyin-asdf"},
 {"Dvorak", "dvorak"},
  {"IBM", "ibm"},
+ {"神通", "mitac"},
  {NULL, NULL}
 };
 
@@ -448,7 +449,7 @@ void create_kbm_window()
 
   GtkWidget *hbox_tsin_tab_phrase_end = gtk_hbox_new(FALSE, 1);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_tsin_tab_phrase_end , TRUE, TRUE, 1);
-  GtkWidget *label_tsin_tab_phrase_end = gtk_label_new("詞音 Tab 斷詞");
+  GtkWidget *label_tsin_tab_phrase_end = gtk_label_new("詞音/Escape Tab 斷詞");
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tab_phrase_end), label_tsin_tab_phrase_end , TRUE, TRUE, 0);
   check_button_tsin_tab_phrase_end = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tab_phrase_end), check_button_tsin_tab_phrase_end, FALSE, FALSE, 0);

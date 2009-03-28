@@ -21,6 +21,14 @@ static GtkWidget *label_page;
 Window xwin_gtab;
 void set_label_space(GtkWidget *label);
 void minimize_win_gtab();
+gboolean win_size_exceed(GtkWidget *win);
+void move_win_gtab(int x, int y);
+
+static void adj_gtab_win_pos()
+{
+  if (win_size_exceed(gwin_gtab))
+    move_win_gtab(current_in_win_x, current_in_win_y);
+}
 
 void disp_gtab(int index, char *gtabchar)
 {
@@ -43,6 +51,7 @@ void disp_gtab(int index, char *gtabchar)
 
     gtk_label_set_text(GTK_LABEL(labels_gtab[index]), utf8);
     gtk_widget_show(labels_gtab[index]);
+    adj_gtab_win_pos();
   }
 }
 
@@ -141,8 +150,6 @@ void change_gtab_font_size()
   change_win_fg_bg(gwin_gtab, label_gtab_sele);
 }
 
-void move_win_gtab(int x, int y);
-gboolean win_size_exceed(GtkWidget *win);
 
 void disp_gtab_sel(char *s)
 {
@@ -150,8 +157,7 @@ void disp_gtab_sel(char *s)
     return;
   gtk_label_set_markup(GTK_LABEL(label_gtab_sele), s);
   minimize_win_gtab();
-  if (win_size_exceed(gwin_gtab))
-    move_win_gtab(current_in_win_x, current_in_win_y);
+  adj_gtab_win_pos();
 }
 
 
@@ -216,9 +222,7 @@ void create_win_gtab()
   gtk_container_set_border_width (GTK_CONTAINER (gwin_gtab), 0);
   gtk_widget_realize (gwin_gtab);
   GdkWindow *gdkwin = gwin_gtab->window;
-  gdk_window_set_override_redirect(gdkwin, TRUE);
-
-
+  set_no_focus(gwin_gtab);
 
   xwin_gtab = GDK_WINDOW_XWINDOW(gdkwin);
 }

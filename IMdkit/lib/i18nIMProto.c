@@ -511,6 +511,23 @@ xim_externaldef XimFrameRec forward_event_fr[] =
     _FRAME(EOL),
 };
 
+xim_externaldef XimFrameRec wire_keyevent_fr[] = {
+    _FRAME(BIT8),		/* type */
+    _FRAME(BIT8),		/* detail */
+    _FRAME(BIT16),		/* serial number */
+    _FRAME(BIT32),		/* time */
+    _FRAME(BIT32),		/* root */
+    _FRAME(BIT32),		/* window */
+    _FRAME(BIT32),		/* subwindow */
+    _FRAME(BIT16),		/* rootX */
+    _FRAME(BIT16),		/* rootY */
+    _FRAME(BIT16),		/* X */
+    _FRAME(BIT16),		/* Y */
+    _FRAME(BIT16),		/* state */
+    _FRAME(BIT8),		/* sameScreen */
+    _FRAME(EOL),
+};
+
 xim_externaldef XimFrameRec sync_fr[] =
 {
     _FRAME(BIT16), 		/* input-method-ID */

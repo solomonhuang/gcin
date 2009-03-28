@@ -398,7 +398,7 @@ void create_win_sym()
 
   gtk_widget_realize (gwin_sym);
   GdkWindow *gdkwin_sym = gwin_sym->window;
-  gdk_window_set_override_redirect(gdkwin_sym, TRUE);
+  set_no_focus(gwin_sym);
 
   if (win_sym_enabled)
     gtk_widget_show_all(gwin_sym);

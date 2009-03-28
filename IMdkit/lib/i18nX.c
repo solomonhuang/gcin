@@ -35,6 +35,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "IMdkit.h"
 #include "Xi18n.h"
 #include "Xi18nX.h"
+#include "XimFunc.h"
 
 extern Xi18nClient *_Xi18nFindClient(Xi18n, CARD16);
 extern Xi18nClient *_Xi18nNewClient(Xi18n);
@@ -70,7 +71,7 @@ static unsigned char *ReadXIMMessage (XIMS ims,
 {
     Xi18n i18n_core = ims->protocol;
     Xi18nClient *client = i18n_core->address.clients;
-    XClient *x_client;
+    XClient *x_client = NULL;
     FrameMgr fm;
     extern XimFrameRec packet_header_fr[];
     unsigned char *p = NULL;
@@ -195,7 +196,7 @@ static void ReadXConnectMessage (XIMS ims, XClientMessageEvent *ev)
                             ClientMessage,
                             ClientMessage,
                             WaitXIMProtocol,
-                            ims);
+                            (XPointer)ims);
     event.xclient.type = ClientMessage;
     event.xclient.display = dpy;
     event.xclient.window = new_client;
@@ -232,7 +233,7 @@ static Bool Xi18nXBegin (XIMS ims)
                             ClientMessage,
                             ClientMessage,
                             WaitXConnectMessage,
-                            ims);
+                            (XPointer)ims);
     return True;
 }
 
@@ -244,7 +245,7 @@ static Bool Xi18nXEnd(XIMS ims)
     _XUnregisterFilter (dpy,
                         i18n_core->address.im_window,
                         WaitXConnectMessage,
-                        ims);
+                        (XPointer)ims);
     return True;
 }
 
@@ -417,7 +418,7 @@ static Bool Xi18nXDisconnect (XIMS ims, CARD16 connect_id)
     _XUnregisterFilter (dpy,
 		        x_client->accept_win,
                         WaitXIMProtocol,
-		        ims);
+		        (XPointer)ims);
     XFree (x_client);
     _Xi18nDeleteClient (i18n_core, connect_id);
     return True;

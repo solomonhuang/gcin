@@ -30,8 +30,10 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ******************************************************************/
 
 #include <X11/Xlib.h>
+#include <X11/Xresource.h>
 #include "IMdkit.h"
 #include "Xi18n.h"
+#include "XimFunc.h"
 
 typedef struct 
 {
@@ -49,7 +51,7 @@ typedef struct
 IMListOfAttr Default_IMattr[] =
 {
     {XNQueryInputStyle,   XimType_XIMStyles},
-    {XNQueryIMValuesList, XimType_XIMValuesList},
+/*    {XNQueryIMValuesList, XimType_XIMValuesList},	*/
     {(char *) NULL, (CARD16) 0}
 };
 

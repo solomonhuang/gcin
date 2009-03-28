@@ -4,7 +4,6 @@
 倉五 2 cj5.gtab cj5.png
 #亂倉打鳥 2 NewCJ3.gtab NewCJ3.png
 注音 3 - juyin.png
-#帶調粵拼 4 jyutping.gtab
 標點倉頡 4 cj-punc.gtab cj-punc.png
 拼音 5 pinyin.gtab pinyin.png
 詞音 6 - tsin.png
@@ -17,4 +16,5 @@
 簡易 - simplex.gtab simplex.png
 日本式 =  kana-nippon.gtab kana-nippon.png
 greek ` greek.gtab greek.png
-#latin-letters ` latin-letters.gtab latin-letters.png
+latin-letters [ latin-letters.gtab latin-letters.png
+帶調粵拼 ] jyutping.gtab

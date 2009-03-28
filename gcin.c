@@ -86,6 +86,7 @@ static XIMTriggerKey trigger_keys[] = {
 /* Supported Encodings */
 static XIMEncoding chEncodings[] = {
         "COMPOUND_TEXT",
+        0
 };
 static XIMEncodings encodings;
 
@@ -131,11 +132,6 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 //  dbg("gcin_ProtoHandler %x ims\n", ims);
   int index=0;
 
-  if (ims == xim_arr[0].xims)
-    index = 0;
-  else
-     p_err("bad ims %x\n", ims);
-
   pxim_arr = &xim_arr[index];
   switch_IC_index(index);
 
@@ -148,8 +144,10 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 #define MAX_CONNECT 20000
     {
       IMOpenStruct *pimopen=(IMOpenStruct *)call_data;
+
       if(pimopen->connect_id > MAX_CONNECT - 1)
         return True;
+
 #if DEBUG
     dbg("open lang %s  connectid:%d\n", pimopen->lang.name, pimopen->connect_id);
 #endif
@@ -247,30 +245,24 @@ void open_xim()
   triggerKeys.count_keys = sizeof(trigger_keys)/sizeof(trigger_keys[0]);
   triggerKeys.keylist = trigger_keys;
 
-  encodings.count_encodings = sizeof(chEncodings)/sizeof(XIMEncoding);
+  encodings.count_encodings = sizeof(chEncodings)/sizeof(XIMEncoding) - 1;
   encodings.supported_encodings = chEncodings;
 
-
-  int dualN = 1;
-  int i;
-
-  for(i=0; i < dualN; i++) {
-    if ((xim_arr[i].xims = IMOpenIM(dpy,
-            IMServerWindow,         xim_arr[i].xim_xwin,        //input window
-            IMModifiers,            "Xi18n",        //X11R6 protocol
-            IMServerName,           xim_arr[i].xim_server_name, //XIM server name
-            IMLocale,               xim_arr[i].server_locale,  //XIM server locale
-            IMServerTransport,      "X/",      //Comm. protocol
-            IMInputStyles,          &im_styles,   //faked styles
-            IMEncodingList,         &encodings,
-            IMProtocolHandler,      gcin_ProtoHandler,
-            IMFilterEventMask,      KeyPressMask,
-            IMOnKeysList, &triggerKeys,
-  //        IMOffKeysList, &triggerKeys,
-            NULL)) == NULL) {
-            p_err("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
-            xim_arr[i].xim_server_name);
-    }
+  if ((xim_arr[0].xims = IMOpenIM(dpy,
+          IMServerWindow,         xim_arr[0].xim_xwin,        //input window
+          IMModifiers,            "Xi18n",        //X11R6 protocol
+          IMServerName,           xim_arr[0].xim_server_name, //XIM server name
+          IMLocale,               xim_arr[0].server_locale,  //XIM server locale
+          IMServerTransport,      "X/",      //Comm. protocol
+          IMInputStyles,          &im_styles,   //faked styles
+          IMEncodingList,         &encodings,
+          IMProtocolHandler,      gcin_ProtoHandler,
+          IMFilterEventMask,      KeyPressMask,
+          IMOnKeysList, &triggerKeys,
+//        IMOffKeysList, &triggerKeys,
+          NULL)) == NULL) {
+          p_err("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
+          xim_arr[0].xim_server_name);
   }
 }
 
@@ -319,7 +311,13 @@ static int xerror_handler(Display *d, XErrorEvent *eve)
 
 
 Atom gcin_atom;
-void cb_trad_sim_toggle();
+void cb_trad_sim_toggle()
+{
+  toggle_gb_output();
+#if TRAY_ENABLED
+  update_tray_icon();
+#endif
+}
 void execute_message(char *message);
 
 static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
@@ -506,7 +504,7 @@ int main(int argc, char **argv)
 
   root=DefaultRootWindow(dpy);
   start_inmd_window();
-#if USE_XIM
+#if USE_XIM && 1
   open_xim();
 #endif
   init_atom_property();

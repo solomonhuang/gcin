@@ -1,16 +1,16 @@
 /******************************************************************
 Copyright 1993, 1994 by Digital Equipment Corporation, Maynard, Massachusetts,
-
+ 
                         All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and its
-documentation for any purpose and without fee is hereby granted,
+ 
+Permission to use, copy, modify, and distribute this software and its 
+documentation for any purpose and without fee is hereby granted, 
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in
+both that copyright notice and this permission notice appear in 
 supporting documentation, and that the names of Digital or MIT not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.
-
+software without specific, written prior permission.  
+ 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
 DIGITAL BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
@@ -18,7 +18,7 @@ ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
 WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
-
+ 
   Author: Hiroyuki Miyamoto  Digital Equipment Corporation
                              miyamoto@jrd.dec.com
 
@@ -245,20 +245,20 @@ void FrameMgrInitWithData (FrameMgr fm,
 
 void FrameMgrFree (FrameMgr fm)
 {
-    FrameInstFree (fm->fi);
+    FrameIter p, cur;
 
-    FrameIter p = fm->iters;
+    p = fm->iters;
+    cur = p;
 
-    // dhliu fixed MLK
-    while (p) {
-        FrameIter next = p->next;
-        XFree(p);
-
-        p = next;
+    while (p)
+    {
+        p = p->next;
+        Xfree (cur);
+        cur = p;
     }
-    fm->iters = NULL;
+    /*endwhile*/
 
-
+    FrameInstFree (fm->fi);
     Xfree (fm);
 }
 
@@ -278,7 +278,7 @@ FmStatus _FrameMgrPutToken (FrameMgr fm, void *data, int data_size)
     if (fm->total_size != NO_VALUE  &&  fm->idx >= fm->total_size)
         return FmNoMoreData;
     /*endif*/
-
+    
     type = FrameInstGetNextType(fm->fi, &info);
 
     if (type & COUNTER_MASK)
@@ -310,12 +310,12 @@ FmStatus _FrameMgrPutToken (FrameMgr fm, void *data, int data_size)
             *(CARD8 *) (fm->area + fm->idx) = input_length;
             fm->idx++;
             break;
-
+        
         case COUNTER_BIT16:
             *(CARD16 *) (fm->area + fm->idx) = Swap16 (fm, input_length);
             fm->idx += 2;
             break;
-
+            
         case COUNTER_BIT32:
             *(CARD32 *) (fm->area + fm->idx) = Swap32 (fm, input_length);
             fm->idx += 4;
@@ -327,6 +327,8 @@ FmStatus _FrameMgrPutToken (FrameMgr fm, void *data, int data_size)
             fm->idx += 8;
             break;
 #endif
+	default:
+	    break;
         }
         /*endswitch*/
         _FrameMgrPutToken(fm, data, data_size);
@@ -475,9 +477,11 @@ FmStatus _FrameMgrPutToken (FrameMgr fm, void *data, int data_size)
 
     case ITER:
         return FmInvalidCall;
-
+        
     case EOL:
         return FmEOD;
+    default:
+	break;
     }
     /*endswitch*/
     return (FmStatus) NULL;  /* Should never be reached */
@@ -492,12 +496,12 @@ FmStatus _FrameMgrGetToken (FrameMgr fm , void* data, int data_size)
     if (fm->total_size != NO_VALUE  &&  fm->idx >= fm->total_size)
         return FmNoMoreData;
     /*endif*/
-
+    
     type = FrameInstGetNextType(fm->fi, &info);
 
     if (type & COUNTER_MASK)
     {
-        int end;
+        int end=0;
         FrameIter client_data;
 
         type &= ~COUNTER_MASK;
@@ -506,30 +510,31 @@ FmStatus _FrameMgrGetToken (FrameMgr fm , void* data, int data_size)
         case BIT8:
             end = *(CARD8 *) (fm->area + fm->idx);
             break;
-
+        
         case BIT16:
             end = Swap16 (fm, *(CARD16 *) (fm->area + fm->idx));
             break;
-
+        
         case BIT32:
             end = Swap32 (fm, *(CARD32 *) (fm->area + fm->idx));
             break;
 
-#if defined(_NEED64BIT)
+#if defined(_NEED64BIT)        
         case BIT64:
             end = Swap64 (fm, *(CARD64 *) (fm->area + fm->idx));
             break;
 #endif
+	default:
+	    break;
         }
         /*endswitch*/
-
+        
         if ((client_data = _FrameMgrAppendIter (fm, info.counter.iter, end)))
         {
             IterSetStarter (info.counter.iter);
             IterSetStartWatch (info.counter.iter,
                                _IterStartWatch,
                                (void *) client_data);
-
         }
         /*endif*/
     }
@@ -630,7 +635,7 @@ FmStatus _FrameMgrGetToken (FrameMgr fm , void* data, int data_size)
         /*endif*/
         return FmSuccess;
 
-#if defined(_NEED64BIT)
+#if defined(_NEED64BIT)    
     case BIT64:
         if (data_size == sizeof (unsigned char))
         {
@@ -671,7 +676,7 @@ FmStatus _FrameMgrGetToken (FrameMgr fm , void* data, int data_size)
         if (info.num > 0)
         {
             *(char **) data = fm->area + fm->idx;
-
+            
             fm->idx += info.num;
             if ((fitr = _FrameIterCounterIncr (fm->iters, info.num)))
                 _FrameMgrRemoveIter (fm, fitr);
@@ -699,6 +704,8 @@ FmStatus _FrameMgrGetToken (FrameMgr fm , void* data, int data_size)
 
     case EOL:
         return FmEOD;
+    default:
+	break;
     }
     /*endswitch*/
     return (FmStatus) NULL;  /* Should never be reached */
@@ -761,38 +768,40 @@ FmStatus FrameMgrSkipToken (FrameMgr fm, int skip_count)
         case BIT8:
             fm->idx++;
             break;
-
+            
         case BIT16:
             fm->idx += 2;
             break;
-
+            
         case BIT32:
             fm->idx += 4;
             break;
-
+            
         case BIT64:
             fm->idx += 8;
             break;
-
+            
         case BARRAY:
             if (info.num == NO_VALUE)
                 return FmInvalidCall;
             /*endif*/
             fm->idx += info.num;
             break;
-
+            
         case PADDING:
             if (info.num == NO_VALUE)
                 return FmInvalidCall;
             /*endif*/
             fm->idx += info.num;
             return FrameMgrSkipToken (fm, skip_count);
-
+            
         case ITER:
             return FmInvalidCall;
-
+            
         case EOL:
             return FmEOD;
+	default:
+	    break;
         }
         /*endswitch*/
     }
@@ -923,8 +932,8 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
             register int offset, iter_idx;
 
             info->counter.is_byte_len =
-                (((int) fi->template[fi->cur_no].data & 0xFF)) == FmCounterByte;
-            offset = ((int) fi->template[fi->cur_no].data) >> 8;
+                (((long) fi->template[fi->cur_no].data & 0xFF)) == FmCounterByte;
+            offset = ((long) fi->template[fi->cur_no].data) >> 8;
             iter_idx = fi->cur_no + offset;
             if (fi->template[iter_idx].type == ITER)
             {
@@ -972,8 +981,8 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
             register int size;
             register int i;
 
-            unit = _UNIT ((int) fi->template[fi->cur_no].data);
-            number = _NUMBER ((int) fi->template[fi->cur_no].data);
+            unit = _UNIT ((long) fi->template[fi->cur_no].data);
+            number = _NUMBER ((long) fi->template[fi->cur_no].data);
 
             i = fi->cur_no;
             size = 0;
@@ -1042,6 +1051,8 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
             /*endif*/
         }
         break;
+    default:
+	break;
     }
     /*endswitch*/
     return ret_type;
@@ -1072,8 +1083,8 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
 	    register int iter_idx;
 
             info->counter.is_byte_len =
-                (((int) fi->template[fi->cur_no].data) & 0xFF) == FmCounterByte;
-            offset = ((int)fi->template[fi->cur_no].data) >> 8;
+                (((long) fi->template[fi->cur_no].data) & 0xFF) == FmCounterByte;
+            offset = ((long)fi->template[fi->cur_no].data) >> 8;
             iter_idx = fi->cur_no + offset;
             if (fi->template[iter_idx].type == ITER)
             {
@@ -1115,12 +1126,12 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
         if (info)
         {
             register int unit;
-            register number;
-            register size;
-            register i;
+            register int number;
+            register int size;
+            register int i;
 
-            unit = _UNIT ((int) fi->template[fi->cur_no].data);
-            number = _NUMBER ((int) fi->template[fi->cur_no].data);
+            unit = _UNIT ((long) fi->template[fi->cur_no].data);
+            number = _NUMBER ((long) fi->template[fi->cur_no].data);
 
             i = fi->cur_no;
             size = 0;
@@ -1175,6 +1186,8 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
             else
                 ret_type = sub_type;
             /*endif*/
+	default:
+	    break;
         }
         break;
     }
@@ -1211,7 +1224,7 @@ static FrameIter _FrameMgrAppendIter (FrameMgr fm, Iter it, int end)
     while (p  &&  p->next)
         p = p->next;
     /*endwhile*/
-
+    
     if (!p)
     {
         fm->iters =
@@ -1327,7 +1340,7 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
                 return FmSuccess;
             /*endif*/
             break;
-
+            
         case POINTER:
             if ((d = ChainMgrGetExtraData(&fi->cm, i)) == NULL)
             {
@@ -1339,6 +1352,8 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
                 return FmSuccess;
             /*endif*/
             break;
+	default:
+	    break;
         }
         /*endswitch*/
         i = _FrameInstIncrement(fi->template, i);
@@ -1378,7 +1393,7 @@ static int FrameInstGetSize (FrameInst fi)
                 return ret_size;
             /*endif*/
             break;
-
+            
         case POINTER:
             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
             {
@@ -1391,6 +1406,8 @@ static int FrameInstGetSize (FrameInst fi)
                 return ret_size;
             /*endif*/
             break;
+	default:
+	    break;
         }
         /*endswitch*/
         i = _FrameInstIncrement (fi->template, i);
@@ -1423,7 +1440,7 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
                 return FmSuccess;
             /*endif*/
             break;
-
+            
         case POINTER:
             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
             {
@@ -1435,6 +1452,9 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
                 return FmSuccess;
             /*endif*/
             break;
+
+	default:
+	    break;
         }
         /*endswitch*/
         i = _FrameInstIncrement (fi->template, i);
@@ -1523,13 +1543,13 @@ static Iter IterInit (XimFrame frame, int count)
     case BIT64:
         /* Do nothing */
         break;
-
+        
     case BARRAY:
     case ITER:
     case POINTER:
         ChainMgrInit (&it->cm);
         break;
-
+        
     default:
         Xfree (it);
         return NULL; /* This should never occur */
@@ -1545,7 +1565,7 @@ static void IterFree (Iter it)
     case BARRAY:
         ChainMgrFree (&it->cm);
         break;
-
+    
     case ITER:
         {
             ChainIterRec ci;
@@ -1560,13 +1580,13 @@ static void IterFree (Iter it)
             ChainMgrFree (&it->cm);
         }
         break;
-
+    
     case POINTER:
         {
             ChainIterRec ci;
             int count;
             ExtraDataRec dr;
-
+    
             ChainIterInit (&ci, &it->cm);
             while (ChainIterGetNext (&ci, &count, &dr))
                 FrameInstFree (dr.fi);
@@ -1575,6 +1595,9 @@ static void IterFree (Iter it)
             ChainMgrFree (&it->cm);
         }
         break;
+
+    default:
+	break;
     }
     /*endswitch*/
     Xfree (it);
@@ -1591,7 +1614,7 @@ static Bool IterIsLoopEnd (Iter it, Bool *myself)
         return True;
     }
     /*endif*/
-
+    
     if (it->template->type == POINTER)
     {
         ExtraData d = ChainMgrGetExtraData (&it->cm, it->cur_no);
@@ -1625,7 +1648,7 @@ static Bool IterIsLoopEnd (Iter it, Bool *myself)
         if (d)
         {
             Bool yourself;
-
+            
             if (IterIsLoopEnd (d->iter, &yourself))
                 ret = True;
             /*endif*/
@@ -1670,7 +1693,7 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
         if (info)
         {
             ExtraData d;
-
+    
             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
                 info->num = NO_VALUE;
             else
@@ -1726,6 +1749,9 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
             /*endif*/
 	    return ret_type;
         }
+
+    default:
+	return (XimFrameType) NULL;
     }
     /*endswitch*/
     return (XimFrameType) NULL;  /* This should never occur */
@@ -1738,7 +1764,7 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
     if (!it->allow_expansion  &&  it->cur_no >= it->max_count)
         return (EOL);
     /*endif*/
-
+    
     switch (type)
     {
     case BIT8:
@@ -1760,7 +1786,7 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
         }
         /*endif*/
         return BARRAY;
-
+    
     case ITER:
         {
             XimFrameType ret_type;
@@ -1780,7 +1806,7 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
             /*endif*/
             return ret_type;
         }
-
+        
     case POINTER:
         {
             XimFrameType ret_type;
@@ -1800,6 +1826,9 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
             /*endif*/
             return (ret_type);
         }
+
+    default:
+	break;
     }
     /*endswitch*/
     /* Reaching here is a bug! */
@@ -1814,7 +1843,7 @@ static FmStatus IterSetSize (Iter it, int num)
     if (!it->allow_expansion  &&  it->max_count == 0)
         return FmNoMoreData;
     /*endif*/
-
+    
     type = it->template->type;
     switch (type)
     {
@@ -1842,15 +1871,15 @@ static FmStatus IterSetSize (Iter it, int num)
             if (it->allow_expansion)
             {
                 ExtraDataRec dr;
-
+                
                 dr.num = num;
                 ChainMgrSetData (&it->cm, it->max_count, dr);
                 it->max_count++;
-
+    
                 return FmSuccess;
             }
             /*endif*/
-        }
+        }   
         return FmNoMoreData;
 
     case ITER:
@@ -1920,6 +1949,9 @@ static FmStatus IterSetSize (Iter it, int num)
             /*endif*/
         }
         return FmNoMoreData;
+
+    default:
+	break;
     }
     /*endswitch*/
     return FmNoMoreData;
@@ -1934,7 +1966,7 @@ static int IterGetSize (Iter it)
     if (it->cur_no >= it->max_count)
         return NO_VALID_FIELD;
     /*endif*/
-
+    
     switch (it->template->type)
     {
     case BARRAY:
@@ -1961,12 +1993,12 @@ static int IterGetSize (Iter it)
         }
         /*endfor*/
         return NO_VALID_FIELD;
-
+    
     case POINTER:
         for (i = it->cur_no;  i < it->max_count;  i++)
         {
             int ret_size;
-
+            
             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
             {
                 dr.fi = FrameInstInit (it->template[1].data);
@@ -1980,6 +2012,9 @@ static int IterGetSize (Iter it)
         }
         /*endfor*/
         return NO_VALID_FIELD;
+
+    default:
+	break;
     }
     /*endswitch*/
     return NO_VALID_FIELD;
@@ -2033,13 +2068,13 @@ static FmStatus IterSetIterCount (Iter it, int num)
         }
         /*endif*/
         break;
-
+    
     case POINTER:
         for (i = 0;  i < it->max_count;  i++)
         {
             ExtraData d;
             ExtraDataRec dr;
-
+            
             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
             {
                 dr.fi = FrameInstInit (it->template[1].data);
@@ -2054,7 +2089,7 @@ static FmStatus IterSetIterCount (Iter it, int num)
         if (it->allow_expansion)
         {
             ExtraDataRec dr;
-
+            
             dr.fi = FrameInstInit (it->template[1].data);
             ChainMgrSetData (&it->cm, it->max_count, dr);
             it->max_count++;
@@ -2065,6 +2100,9 @@ static FmStatus IterSetIterCount (Iter it, int num)
         }
         /*endif*/
         break;
+
+    default:
+	break;
     }
     /*endswitch*/
     return FmNoMoreData;
@@ -2108,7 +2146,7 @@ static int IterGetTotalSize (Iter it)
         {
             register int num;
             ExtraData d;
-
+            
             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
                 return  NO_VALUE;
             /*endif*/
@@ -2119,13 +2157,13 @@ static int IterGetTotalSize (Iter it)
         }
         /*endfor*/
         break;
-
+        
     case ITER:
         for (i = 0;  i < it->max_count;  i++)
         {
             register int num;
             ExtraData d;
-
+            
             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
                 return  NO_VALUE;
             /*endif*/
@@ -2136,14 +2174,14 @@ static int IterGetTotalSize (Iter it)
         }
         /*endfor*/
         break;
-
+        
     case POINTER:
         for (i = 0;  i < it->max_count;  i++)
         {
             register int num;
             ExtraData d;
             ExtraDataRec dr;
-
+            
             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
             {
                 dr.fi = FrameInstInit (it->template[1].data);
@@ -2157,6 +2195,9 @@ static int IterGetTotalSize (Iter it)
         }
         /*endfor*/
         break;
+
+    default:
+	break;
     }
     /*endswitch*/
     return  size;
@@ -2177,7 +2218,7 @@ static void IterReset (Iter it)
         /*endwhile*/
         ChainIterFree (&ci);
         break;
-
+  
     case POINTER:
         ChainIterInit (&ci, &it->cm);
         while (ChainIterGetNext (&ci, &count, &d))
@@ -2185,6 +2226,9 @@ static void IterReset (Iter it)
         /*endwhile*/
         ChainIterFree (&ci);
         break;
+
+    default:
+	break;
     }
     /*endswitch*/
     it->cur_no = 0;
@@ -2243,7 +2287,7 @@ static Bool ChainIterGetNext (ChainIter ci, int *frame_no, ExtraData d)
     if (ci->cur == NULL)
         return False;
     /*endif*/
-
+    
     *frame_no = ci->cur->frame_no;
     *d = ci->cur->d;
 
@@ -2268,12 +2312,14 @@ static int _FrameInstIncrement (XimFrame frame, int count)
     case BARRAY:
     case PADDING:
         return count + 1;
-
+        
     case POINTER:
         return count + 2;
-
+        
     case ITER:
         return _FrameInstIncrement (frame, count + 1);
+    default:
+	break;
     }
     /*endswitch*/
     return - 1;    /* Error */
@@ -2287,11 +2333,11 @@ static int _FrameInstDecrement (XimFrame frame, int count)
     if (count == 0)
         return - 1;    /* cannot decrement */
     /*endif*/
-
+    
     if (count == 1)
         return 0;     /* BOGUS - It should check the contents of data */
     /*endif*/
-
+    
     type = frame[count - 2].type;
     type &= ~COUNTER_MASK;
 
@@ -2318,6 +2364,8 @@ static int _FrameInstDecrement (XimFrame frame, int count)
         }
         /*endwhile*/
         return 0;
+    default:
+	break;
     }
     /*enswitch*/
     return - 1;    /* Error */
@@ -2364,8 +2412,8 @@ static int _FrameInstGetItemSize (FrameInst fi, int cur_no)
             register int size;
             register int i;
 
-            unit = _UNIT ((int) fi->template[cur_no].data);
-            number = _NUMBER ((int) fi->template[cur_no].data);
+            unit = _UNIT ((long) fi->template[cur_no].data);
+            number = _NUMBER ((long) fi->template[cur_no].data);
 
             i = cur_no;
             size = 0;
@@ -2409,6 +2457,9 @@ static int _FrameInstGetItemSize (FrameInst fi, int cur_no)
             /*endif*/
             return sub_size;
         }
+
+    default:
+	break;
     }
     /*endswitch*/
     return NO_VALUE;

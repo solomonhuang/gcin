@@ -107,7 +107,7 @@ void create_win_pho()
   gtk_widget_realize (gwin_pho);
   GdkWindow *gdkwin = gwin_pho->window;
   xwin_pho = GDK_WINDOW_XWINDOW(gdkwin);
-  gdk_window_set_override_redirect(gdkwin, TRUE);
+  set_no_focus(gwin_pho);
   change_win_bg(gwin_pho);
 }
 

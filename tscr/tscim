@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export LC_ALL=zh_TW.Big5
+export LC_CTYPE=zh_TW.UTF-8
+#export GTK_IM_MODULE=xim
 export GTK_IM_MODULE=scim
 export XMODIFIERS=@im=SCIM
 #scim -d &
@@ -11,4 +12,5 @@ export XMODIFIERS=@im=SCIM
 #gedit
 #leafpad
 #amsn
-abiword
+#abiword
+firefox

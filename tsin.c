@@ -213,19 +213,9 @@ static void prbuf()
 {
   int i;
 
-//  dbg("prbuf\n");
-
   for(i=0; i < c_len; i++) {
     disp_char_chbuf(i);
   }
-
-#if 0
-  if (c_len < MAX_PH_BF_EXT)
-    hide_char(c_len);
-
-  if (c_len+1 < MAX_PH_BF_EXT)
-    hide_char(c_len+1);
-#endif
 
   drawcursor();
 }
@@ -295,16 +285,20 @@ void clr_in_area_pho_tsin();
 void close_win_pho_near();
 void compact_win0_x();
 
-void tsin_reset_in_pho()
+void tsin_reset_in_pho0()
 {
-  clrin_pho_tsin();
-  prbuf();
+//  prbuf();
   clr_in_area_pho_tsin();
   close_selection_win();
   pre_selN = 0;
   drawcursor();
-
   close_win_pho_near();
+}
+
+void tsin_reset_in_pho()
+{
+  clrin_pho_tsin();
+  tsin_reset_in_pho0();
 }
 
 gboolean flush_tsin_buffer()
@@ -834,6 +828,8 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
   return maxlen;
 }
 
+void hide_selections_win();
+
 static void disp_pre_sel_page()
 {
 
@@ -843,8 +839,10 @@ static void disp_pre_sel_page()
     return;
   }
 
-  if (pre_selN==0 || (pre_selN==1 && pre_sel[0].len<=2))
+  if (pre_selN==0 || (pre_selN==1 && pre_sel[0].len<=2) || ph_sta < 0) {
+    hide_selections_win();
     return;
+  }
 
   clear_sele();
 
@@ -859,7 +857,6 @@ static void disp_pre_sel_page()
   disp_selections(ph_sta);
 }
 
-void hide_selections_win();
 static void close_selection_win()
 {
   hide_selections_win();
@@ -915,7 +912,7 @@ static void clear_disp_ph_sta()
 
 void draw_underline(int index);
 
-void disp_ph_sta()
+void disp_ph_sta_idx(int idx)
 {
 //  dbg("ph_sta:%d\n", ph_sta);
   clear_disp_ph_sta();
@@ -925,12 +922,15 @@ void disp_ph_sta()
 
   int i;
 
-  for(i=ph_sta; i < c_idx; i++) {
+  for(i=idx; i < c_idx; i++) {
     draw_underline(i);
   }
 }
 
-
+void disp_ph_sta()
+{
+  disp_ph_sta_idx(ph_sta);
+}
 
 void ch_pho_cpy(CHPHO *pchpho, char *utf8, phokey_t *phos, int len)
 {
@@ -1214,13 +1214,21 @@ int feedkey_pp(KeySym xkey, int kbstate)
      return 0;
    }
 
-
+   int o_sel_pho = sel_pho;
    close_win_pho_near();
 
    switch (xkey) {
      case XK_Escape:
-        tsin_reset_in_pho();
-        return 1;
+       tsin_reset_in_pho0();
+       if (!typ_pho[0] && !typ_pho[1] && !typ_pho[2] && !typ_pho[3]) {
+         if (!c_len)
+           return 0;
+
+         if (!o_sel_pho && tsin_tab_phrase_end)
+           goto tab_phrase_end;
+       }
+       tsin_reset_in_pho();
+       return 1;
      case XK_Return:
      case XK_KP_Enter:
         if (shift_m) {
@@ -1287,6 +1295,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
         }
 
         if (tsin_tab_phrase_end) {
+tab_phrase_end:
           if (c_idx==c_len)
             chpho[c_idx-1].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
           else
@@ -1712,9 +1721,10 @@ llll2:
 
      disp_in_area_pho_tsin();
 
-     if (pre_selN && scanphr(ph_sta, c_idx - ph_sta, TRUE)) {
-       disp_pre_sel_page();
-     }
+     if (pre_selN)
+       scanphr(ph_sta, c_idx - ph_sta, TRUE);
+
+     disp_pre_sel_page();
 
      key = pho2key(typ_pho);
 

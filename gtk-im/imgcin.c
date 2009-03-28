@@ -22,7 +22,7 @@
 #include "gtkimcontextgcin.h"
 #include <string.h>
 
-static const GtkIMContextInfo gcin_ja_info = {
+static const GtkIMContextInfo gcin_info = {
   "gcin",		           /* ID */
   N_("gcin Input Method"),            /* Human readable name */
   GETTEXT_PACKAGE,		   /* Translation domain */
@@ -32,14 +32,14 @@ static const GtkIMContextInfo gcin_ja_info = {
 };
 
 static const GtkIMContextInfo *info_list[] = {
-  &gcin_ja_info
+  &gcin_info
 };
 
 void
 im_module_init (GTypeModule *type_module)
 {
 //  printf("im_module_init\n");
-  gtk_im_context_xim_register_type (type_module);
+  gtk_im_context_gcin_register_type (type_module);
 }
 
 void
@@ -63,7 +63,7 @@ im_module_create (const gchar *context_id)
 {
 //  printf("im_module_create %s\n", context_id);
   if (strcmp (context_id, "gcin") == 0)
-    return gtk_im_context_xim_new ();
+    return gtk_im_context_gcin_new ();
   else
     return NULL;
 }

@@ -11,7 +11,7 @@ gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o
 GCIN_SO= gcin1.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
-     gcin-switch.o tray.o eggtrayicon.o $(GCIN_SO) \
+     gcin-switch.o $(GCIN_SO) \
      $(gcin_tsin_o) $(gcin_pho_o) $(gcin_gtab_o)
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
@@ -53,6 +53,11 @@ ifeq ($(MAC_OS),1)
 EXTRA_LDFLAGS=-bind_at_load
 endif
 
+ifeq ($(USE_TRAY),Y)
+CFLAGS += -DTRAY_ENABLED=1
+OBJS += tray.o eggtrayicon.o
+endif
+
 im-srv = im-srv/im-srv.a
 
 .c.E:
@@ -72,7 +77,7 @@ all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
-	export LD_RUN_PATH=.:$(gcinlibdir) ;\
+	LD_RUN_PATH=.:$(gcinlibdir) \
 	$(CC) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 	ln -sf $@ $@.test
@@ -197,7 +202,7 @@ clean:
 	$(MAKE) -C menu clean
 	rm -f *.o *.E *.db *.pico *.so config.mak tags $(PROGS) $(PROGS_CV) \
 	$(DATA) .depend gcin.spec trad2sim gcin.spec.tmp gcin.log
-	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' ')' -exec rm {} \;
+	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' -o -name 'vgcore.*' ')' -exec rm {} \;
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

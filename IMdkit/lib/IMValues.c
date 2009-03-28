@@ -29,6 +29,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  
 ******************************************************************/
 
+#include <stdlib.h>
 #include <X11/Xlib.h>
 #include "IMdkit.h"
 #include <stdarg.h>
@@ -43,7 +44,7 @@ static void _IMCountVaList (va_list var, int *total_count)
 
     for (attr = va_arg (var, char *);  attr;  attr = va_arg (var, char *))
     {
-	va_arg (var, XIMArg *);
+	(void)va_arg (var, XIMArg *);
 	++(*total_count);
     }
     /*endfor*/

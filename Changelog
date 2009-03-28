@@ -1,7 +1,22 @@
 ** UTF-8 encoding **
 1.3.3:
 - 詞音新增同音字詞選擇鍵在後的選項，這樣做的好處是當你由左到右看到某個字詞符合後，就不用再回頭看是那一個鍵。
-- 詞音Tab 斷詞改成可以在任意地方按，代表詞從這邊開頭，如果在結尾按則代表把最後一個字當開頭。例如輸入「他示意蜘蛛」，我們想要的是「他是一隻豬」，這時直接在結尾按 Tab 一次就可以了，代表把豬當成一個單字的詞。當使用者自己按空白鍵選詞時，會把這個手動斷詞清除。不過很可惜的，在某些程式不能用，例如 gedit，因為 gedit沒有把  Tab key 傳給 gcin 解釋。
+- 詞音Tab 斷詞改成可以在任意地方按，代表詞從這邊開頭，如果在結尾按則代表把最後一個字當開頭。例如輸入「他示意蜘蛛」，我們想要的是「他是一隻豬」，這時直接在結尾按 Tab 一次就可以了，代表把豬當成一個單字的詞。當使用者自己按空白鍵選詞時，會把這個手動斷詞清除。不過很可惜的，在某些程式不能用，例如 gedit，因為 gedit沒有把  Tab key 傳給 gcin 處理。為了解決這個問題，也可以改按 Escape。
+- 詞音編輯區如果沒有東西，這時按 escape 鍵 gcin 會傳回不處理，所以 AP 會自己處理 escape 鍵。
+- 在選字詞 menu 出現時按 escape 應該只把 menu 關閉，不要斷詞。
+- gcin2tab 現在遇到沒有定義 keyname 的鍵會中斷而不是忽略。
+- 詞音「試試新的」-> [是世新的]，由於單字詞「的」頻率出現次數過高，會造成錯誤，把較長斷詞的比重調高。
+- gtab 選擇頁數號碼不會清除的問題。
+- gtab 在只有顯示輸入鍵的情況，輸入視窗會超出螢幕的問題。
+- gtab 垂直選擇頁數顯示錯誤。
+- 簡易輸入法的問題。
+- 嘗試解決 gcin 在 beryl/firefox 上的問題。不確定是否有用，在 mandriva cooker 上似乎可以。
+- 新增注音鍵盤「神通」。
+- 由某位提供的 ./configure --use_tray=N，不想要 tray 時可以用此選項。
+- alsa2 與 im-client 起衝突的問題，造成 flash player coredump。必須 update libgcin-im-client.so。
+- 為了解決 flashplayer 當掉的問題，XIM 的 IMdkit 換成 scim 的，現在不用 unset XMODIFIERS 似乎也不會當了。如果你必須經常重新啟動 gcin 最好還是在 firefox 的 start-script 裏面用 unset XMODIFIERS，因為新的 IMdkit 在 gcin 重新啟動有時候還是會造成正在執行的 firefox coredump。而且這樣可以節省 memory。
+- gtab 唯一選擇時自動送出的新選項。例如我們在倉頡裏面定義定義「benq 明基」，當按到 ben 時，由於此時沒有其他的是符合 'ben*'，這時候就會自動送出。
+- []\ 現在也可以用來切換輸入法了。已經把拉丁字母及帶調粵拼放上去。
 
 1.3.2:
 - 新增編輯 gtab 輸入法外加字詞的功能，可以在 gcin-setup -> gtab 中執行。也可以自己手動編輯 ~/.gcin/xxx.gtab.append，其中 xxx 是你內定的 .gtab 輸入法，例如使用倉頡的人其 filename 就是 ~/.gcin/cj.gtab.append。gcin 會在按 ctrl-space 時檢查 file 是否有被修改，自動 reload。

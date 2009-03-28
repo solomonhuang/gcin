@@ -28,6 +28,9 @@
 #include "gtkimcontextgcin.h"
 // #include "gcin.h"  // for debug only
 #include "gcin-im-client.h"
+#include <X11/keysym.h>
+
+// #define NEW_GTK_IM 0
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
 
@@ -77,7 +80,7 @@ static void     gtk_im_context_gcin_get_preedit_string (GtkIMContext          *c
 GType gtk_type_im_context_gcin = 0;
 
 void
-gtk_im_context_xim_register_type (GTypeModule *type_module)
+gtk_im_context_gcin_register_type (GTypeModule *type_module)
 {
   static const GTypeInfo im_context_gcin_info =
   {
@@ -323,7 +326,7 @@ gtk_im_context_gcin_set_client_window (GtkIMContext          *context,
 
 ///
 GtkIMContext *
-gtk_im_context_xim_new (void)
+gtk_im_context_gcin_new (void)
 {
 //  printf("gtk_im_context_gcin_new\n");
   GtkIMContextGCIN *result;
@@ -391,7 +394,10 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 
 #if NEW_GTK_IM
     // this one is for mozilla, I know it is very dirty
-    if (context_xim->is_mozilla && (rstr || !result)) {
+    if (context_xim->is_mozilla && (rstr || !result) &&
+        (keysym==XK_Left || keysym==XK_Right || keysym==XK_Down || keysym==XK_Up
+         || keysym==XK_Home || keysym==XK_End || keysym==XK_BackSpace
+         || keysym==XK_Return) ) {
       add_cursor_timeout(context_xim);
     }
 #endif

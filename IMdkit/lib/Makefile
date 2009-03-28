@@ -5,7 +5,7 @@ CFLAGS =  -c $(OPTFLAGS) -fno-strength-reduce -DXIM_t -DTRANS_SERVER
 INC = -I../include -I/usr/X11R6/include
 
 
-SRC = IMConn.c IMValues.c IMMethod.c FrameMgr.c i18nIMProto.c i18nAttr.c i18nMethod.c i18nUtil.c i18nPtHdr.c i18nIc.c i18nClbk.c i18nX.c i18nTr.c i18ntrans.c
+SRC = IMConn.c IMValues.c IMMethod.c FrameMgr.c i18nIMProto.c i18nAttr.c i18nMethod.c i18nUtil.c i18nPtHdr.c i18nIc.c i18nClbk.c i18nX.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -14,6 +14,7 @@ all: libXimd.a
 libXimd.a: $(OBJ)
 	ar cr $@ $(OBJ)
 	ranlib $@
+	make -C ../..
 
 .c.o:
 	$(CC) $(CFLAGS) $(INC) $<

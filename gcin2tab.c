@@ -183,10 +183,8 @@ int main(int argc, char **argv)
     exit(0);
   }
 
-
   char *p;
-
-  if((p=strchr(fname, '.')))
+  if(p=strstr(fname, ".cin"))
     *p = 0;
 
   strcpy(fname_cin,fname);
@@ -364,18 +362,23 @@ int main(int argc, char **argv)
 
     len=strlen(cmd);
 
-    if (len > th.MaxPress)
+    if (len > th.MaxPress) {
       th.MaxPress=len;
+    }
 
     if (len > 10)
       p_err("%d:  only <= 10 keys is allowed '%s'", lineno, cmd);
 
     kk=0;
     for(i=0;i<len;i++) {
-      int key =  BITON(th.flag, FLAG_KEEP_KEY_CASE) ?
+      int key = BITON(th.flag, FLAG_KEEP_KEY_CASE) ?
         cmd[i] : mtolower(cmd[i]);
 
       k=kno[key];
+
+      if (!k)
+        p_err("%d: key undefined in keyname '%c'\n", lineno, cmd[i]);
+
       kk|=(u_int64_t)k << ( LAST_K_bitN - i*6);
     }
 
@@ -433,6 +436,8 @@ int main(int argc, char **argv)
 #else
 #define _sort qsort
 #endif
+
+  dbg("MaxPress: %d\n", th.MaxPress);
 
   th.DefC=chno;
   cur_inmd->DefChars = chno;

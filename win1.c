@@ -18,7 +18,7 @@ void create_win1()
   gtk_widget_realize (gwin1);
   GdkWindow *gdkwin1 = gwin1->window;
   xwin1 = GDK_WINDOW_XWINDOW(gdkwin1);
-  gdk_window_set_override_redirect(gdkwin1, TRUE);
+  set_no_focus(gwin1);
 }
 
 void change_win1_font();
