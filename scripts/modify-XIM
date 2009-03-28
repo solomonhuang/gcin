@@ -23,19 +23,6 @@ if  [ -d $xinitdir ]; then
     sed -e "s/XIM_PROGRAM=xcin/XIM_PROGRAM=gcin/" < xinput.orig.gcin > \
       xinput
     chmod 755 xinput
-  #SuSE 9.1 9.2 This is a testing, contributed by swyear@bbs.openfind.com.tw
-  elif [ -f ../xim ]; then
-    cd ..
-    if [ ! -f xim.orig.gcin ]; then
-      mv xim xim.orig.gcin
-    fi
-#    echo "export `locale | grep LC_CTYPE`" > xim
-    echo 'export XMODIFIERS="@im=gcin"' > xim
-    echo "export GTK_IM_MODULE=gcin" >> xim
-    echo "export QT_IM_SWITCHER=imsw-multi" >> xim
-    echo "export QT_IM_MODULE=$QT_IM" >> xim
-    echo "gcin &" >> xim
-    chmod 755 xim
   # others
   else
     echo "Please modify your XIM settings manually"

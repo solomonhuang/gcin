@@ -400,3 +400,39 @@ msgstr "Exit"
 #: ../win0.c:601
 msgid "左鍵符號，右鍵設定"
 msgstr "Left: Symbol selection tables\nRight: Preferences"
+
+#: ../gcin-setup-tab.c:1224
+msgid "雜項"
+msgstr "Misc."
+
+#: ../gcin-setup-tab.c:1232
+msgid "ctrl 片語編輯"
+msgstr "Edit Ctrl phrases"
+
+#: ../gcin-setup-tab.c:1252
+msgid "剪貼區 正體字->簡體字"
+msgstr "Convert clipboard's Traditional Chinese to Simplified Chinese"
+
+#: ../gcin-setup-tab.c:1304
+msgid "通用"
+msgstr "General"
+
+#: ../gcin-setup-tab.c:1383
+msgid "固定視窗位置"
+msgstr "Fixed input window"
+
+#: ../gcin-setup-tab.c:1511
+msgid "，發音選擇"
+msgstr ", speaker:"
+
+#: ../gcin-setup-tab.c:1520
+msgid "注音/詞音"
+msgstr "Bopomofo/Tsin"
+
+#: ../gcin-setup-tab.c:1682
+msgid "倉頡/行列"
+msgstr "gtab IMs"
+
+#: ../gcin-setup-tab.c:1830
+msgid "內定輸入法"
+msgstr "Default IMs"

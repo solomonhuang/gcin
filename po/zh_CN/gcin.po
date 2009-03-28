@@ -400,3 +400,39 @@ msgstr "离开 tslearn"
 #: ../win0.c:601
 msgid "左鍵符號，右鍵設定"
 msgstr "左键符号，右键设置"
+
+#: ../gcin-setup-tab.c:1224
+msgid "雜項"
+msgstr "杂项"
+
+#: ../gcin-setup-tab.c:1232
+msgid "ctrl 片語編輯"
+msgstr "Ctrl 片语编辑"
+
+#: ../gcin-setup-tab.c:1252
+msgid "剪貼區 正體字->簡體字"
+msgstr "简贴区 正体字->简体字"
+
+#: ../gcin-setup-tab.c:1304
+msgid "通用"
+msgstr "通用"
+
+#: ../gcin-setup-tab.c:1383
+msgid "固定視窗位置"
+msgstr "固定视窗位置"
+
+#: ../gcin-setup-tab.c:1511
+msgid "，發音選擇"
+msgstr "，发音选择"
+
+#: ../gcin-setup-tab.c:1520
+msgid "注音/詞音"
+msgstr "注音/智能拼音"
+
+#: ../gcin-setup-tab.c:1682
+msgid "倉頡/行列"
+msgstr "仓颉/行列"
+
+#: ../gcin-setup-tab.c:1830
+msgid "內定輸入法"
+msgstr "默认输入法"

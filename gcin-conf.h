@@ -46,6 +46,7 @@
 #define GTAB_CAPSLOCK_IN_ENG "gtab-capslock-in-eng"
 #define GTAB_VERTICAL_SELECT "gtab-vertical-select"
 #define GTAB_UNIQUE_AUTO_SEND "gtab-unique-auto-send"
+#define GTAB_QUE_WILD_CARD "gtab-que-wild-card"
 
 #define PHO_SIMPLE_WIN "pho-simple-window" // common to both pho and tsin
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
@@ -77,7 +78,7 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
            gcin_capslock_lower, pho_hide_row2, pho_in_row1,
-           gcin_eng_phrase_enabled;
+           gcin_eng_phrase_enabled, gtab_que_wild_card;
 
 extern int default_input_method;
 extern int left_right_button_tips;

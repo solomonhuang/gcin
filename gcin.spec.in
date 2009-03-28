@@ -49,6 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gcin/*
 %{_datadir}/man/man1/*
 %{_datadir}/icons/*
+%{_datadir}/doc/gcin-__gcin_version__/*
 %{_datadir}/applications/*
 %{_datadir}/control-center-2.0/capplets/*
 %{_libdir}/menu/*

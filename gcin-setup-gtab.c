@@ -17,6 +17,7 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_capslock_in_eng,
                  *check_button_gtab_vertical_select,
                  *check_button_gtab_unique_auto_send,
+                 *check_button_gtab_que_wild_card,
                  *check_button_gcin_capslock_lower;
 
 struct {
@@ -83,6 +84,8 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send)));
 
+  save_gcin_conf_int(GTAB_QUE_WILD_CARD,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_que_wild_card)));
 
   save_gcin_conf_int(GCIN_CAPSLOCK_LOWER,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower)));
@@ -356,6 +359,16 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send), check_button_gtab_unique_auto_send,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send),
      gtab_unique_auto_send);
+
+
+  GtkWidget *hbox_gtab_que_wild_card = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox_gtab), hbox_gtab_que_wild_card, FALSE, FALSE, 0);
+  GtkWidget *label_gtab_que_wild_card = gtk_label_new(_("使用？萬用字元"));
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_que_wild_card), label_gtab_que_wild_card,  FALSE, FALSE, 0);
+  check_button_gtab_que_wild_card = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_que_wild_card), check_button_gtab_que_wild_card,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_que_wild_card),
+     gtab_que_wild_card);
 
 
   GtkWidget *button_edit_append = gtk_button_new_with_label(_("編輯內定輸入法的使用者外加字詞"));

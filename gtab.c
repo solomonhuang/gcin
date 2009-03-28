@@ -107,7 +107,7 @@ static int qcmp_strlen(const void *aa, const void *bb)
 
 #define Max_tab_key_num1(inm) (inm->key64 ? MAX_TAB_KEY_NUM64 : MAX_TAB_KEY_NUM)
 #define Max_tab_key_num Max_tab_key_num1(cur_inmd)
-void set_key_codes_label(char *s);
+void set_key_codes_label(char *s, int better);
 void set_page_label(char *s);
 
 static void clear_page_label()
@@ -139,6 +139,8 @@ void lookup_gtabn(char *ch, char *out)
 
   out[0]=0;
 
+  int min_klen = 100;
+
   int i;
   for(i=0; i < tinmd->DefChars; i++) {
     char *chi = tblch2(tinmd, i);
@@ -161,7 +163,7 @@ void lookup_gtabn(char *ch, char *out)
 
     int j;
 
-    int tlen=0;
+    int tlen=0, klen=0;
     char t[CH_SZ * MAX_TAB_KEY_NUM64 + 1];
 
     for(j=Max_tab_key_num1(tinmd) - 1; j>=0; j--) {
@@ -184,7 +186,11 @@ void lookup_gtabn(char *ch, char *out)
 //      dbg("uuuuuuuuuuuu %d %x len:%d\n", k, tinmd->keyname[k], len);
       memcpy(&t[tlen], keyname, len);
       tlen+=len;
+      klen++;
     }
+
+    if (klen < min_klen)
+      min_klen = klen;
 
     t[tlen]=0;
 
@@ -210,7 +216,8 @@ void lookup_gtabn(char *ch, char *out)
   if (!out[0] || !need_disp)
     return;
 
-  set_key_codes_label(out);
+
+  set_key_codes_label(out, ci > min_klen);
   void set_key_codes_label_pho(char *s);
   set_key_codes_label_pho(out);
 }
@@ -647,7 +654,7 @@ static void putstr_inp(u_char *p)
   clear_page_label();
 
   if (!wild_mode && gtab_hide_row2 || !gtab_disp_key_codes)
-    set_key_codes_label(NULL);
+    set_key_codes_label(NULL, 0);
 
   char_play(p);
 
@@ -1328,6 +1335,8 @@ direct_select:
 
       break;
     case '?':
+      if (!gtab_que_wild_card)
+        return 0;
     case '*':
       if (ci< cur_inmd->MaxPress) {
         inkey=cur_inmd->keymap[key];

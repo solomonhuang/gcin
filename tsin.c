@@ -134,7 +134,7 @@ static void chpho_extract(CHPHO *chph, int len, phokey_t *pho, char *ch, char *o
 void inc_pho_count(phokey_t key, int ch_idx);
 int ch_key_to_ch_pho_idx(phokey_t phkey, char *big5);
 void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int prlen, int N);
-void lookup_gtabn(char *ch);
+void lookup_gtabn(char *ch, char *);
 
 static void putbuf(int len)
 {
@@ -204,7 +204,7 @@ static void putbuf(int len)
 
   tt[idx]=0;
   send_text(tt);
-  lookup_gtabn(tt);
+  lookup_gtabn(tt, NULL);
 }
 
 

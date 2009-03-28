@@ -17,6 +17,7 @@ static GtkWidget *image_pin;
 static GtkWidget *box_gtab_im_name;
 static GtkWidget *hbox_row2;
 static GtkWidget *label_page;
+static GdkColor better_color;
 
 Window xwin_gtab;
 void set_label_space(GtkWidget *label);
@@ -161,7 +162,7 @@ void disp_gtab_sel(char *s)
 }
 
 
-void set_key_codes_label(char *s)
+void set_key_codes_label(char *s, int better)
 {
   if (!label_key_codes)
     return;
@@ -173,6 +174,11 @@ void set_key_codes_label(char *s)
       gtk_widget_hide(hbox_row2);
     }
   }
+
+  if (better)
+    gtk_widget_modify_fg(label_key_codes, GTK_STATE_NORMAL, &better_color);
+  else
+    gtk_widget_modify_fg(label_key_codes, GTK_STATE_NORMAL, NULL);
 
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
 }
@@ -497,6 +503,7 @@ static void create_win_gtab_gui()
   current_gtab_in_row1 = gtab_in_row1;
   current_gtab_vertical_select = gtab_vertical_select;
   current_gcin_inner_frame = gcin_inner_frame;
+  gdk_color_parse("yellow", &better_color);
 }
 
 
