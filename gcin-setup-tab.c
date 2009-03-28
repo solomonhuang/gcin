@@ -46,7 +46,6 @@ GtkWidget *main_window;
 
 static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_phonetic_char_dynamic_sequence,
-                 *check_button_pho_simple_win,
                  *check_button_pho_hide_row2,
                  *check_button_pho_in_row1,
                  *check_button_phonetic_huge_tab,
@@ -1003,9 +1002,6 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence)));
 
-  save_gcin_conf_int(PHO_SIMPLE_WIN,
-       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_pho_simple_win)));
-
   save_gcin_conf_int(PHO_HIDE_ROW2,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_pho_hide_row2)));
 
@@ -1588,15 +1584,6 @@ static void create_main_win()
      GTK_TOGGLE_BUTTON(check_button_phonetic_char_dynamic_sequence), phonetic_char_dynamic_sequence);
   GtkWidget *label_phonetic_char_dynamic_sequence = gtk_label_new(_("依使用頻率調整字的順序"));
   gtk_box_pack_start (GTK_BOX (hbox_phonetic_char_dynamic_sequence), label_phonetic_char_dynamic_sequence , FALSE, FALSE, 0);
-
-  GtkWidget *hbox_pho_simple_win = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_pho_simple_win , FALSE, FALSE, 0);
-  check_button_pho_simple_win = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_pho_simple_win), check_button_pho_simple_win, FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(
-     GTK_TOGGLE_BUTTON(check_button_pho_simple_win), pho_simple_win);
-  GtkWidget *label_pho_simple_win = gtk_label_new(_("詞音/注音精簡視窗"));
-  gtk_box_pack_start (GTK_BOX (hbox_pho_simple_win), label_pho_simple_win , FALSE, FALSE, 0);
 
   GtkWidget *hbox_pho_hide_row2 = gtk_hbox_new(FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_pho_hide_row2 , FALSE, FALSE, 0);

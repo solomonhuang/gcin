@@ -30,9 +30,14 @@ static char typ_pho_len[]={5, 2, 4, 3};
 
 gboolean same_query_show_pho_win();
 
+gboolean typ_pho_empty()
+{
+  return !typ_pho[0] &&!typ_pho[1] &&!typ_pho[2] &&!typ_pho[3];
+}
+
 gboolean pho_has_input()
 {
-  return typ_pho[0] || typ_pho[1] || typ_pho[2] || typ_pho[3] || same_query_show_pho_win();
+  return !typ_pho_empty() || same_query_show_pho_win();
 }
 
 phokey_t pho2key(char typ_pho[])
@@ -484,7 +489,7 @@ int feedkey_pho(KeySym xkey, int kbstate)
 
   switch (xkey) {
     case XK_Escape:
-      if (!typ_pho[0] &&!typ_pho[1] &&!typ_pho[2] &&!typ_pho[3])
+      if (typ_pho_empty())
         return 0;
       ClrSelArea();
       clr_in_area_pho();
@@ -495,7 +500,7 @@ int feedkey_pho(KeySym xkey, int kbstate)
       ityp3_pho=0;
       for(j=3;j>=0;j--) if (typ_pho[j]) {
         typ_pho[j]=0;
-        if (!typ_pho[0]&&!typ_pho[1]&&!typ_pho[2]&&!typ_pho[3]) {
+        if (typ_pho_empty()) {
           ClrSelArea();
           clr_in_area_pho();
           return 1;

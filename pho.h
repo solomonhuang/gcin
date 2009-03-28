@@ -56,6 +56,7 @@ phokey_t pho2key(char typ_pho[]);
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t usecount);
 int lookup(u_char *s);
 
+
 #define MAX_PH_BF (90)
 
 #define MAX_PH_BF_EXT (MAX_PH_BF + MAX_PHRASE_LEN + 1)

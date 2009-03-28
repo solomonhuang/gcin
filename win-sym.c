@@ -242,6 +242,8 @@ void hide_win_sym()
   if (!gwin_sym)
     return;
 
+  win_sym_enabled=0;
+
   gtk_widget_hide(gwin_sym);
 }
 
@@ -340,11 +342,10 @@ void create_win_sym()
   win_sym_enabled^=1;
 
   if (gwin_sym) {
-    if (win_sym_enabled) {
-      show_win_sym(gwin_sym);
-    }
+    if (win_sym_enabled)
+      show_win_sym();
     else
-      hide_win_sym(gwin_sym);
+      hide_win_sym();
 
     return;
   }

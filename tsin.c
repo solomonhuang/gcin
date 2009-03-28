@@ -16,6 +16,7 @@ extern char *pho_chars[];
 
 extern int ityp3_pho;
 extern u_char typ_pho[];
+gboolean typ_pho_empty();
 extern char inph[];
 
 extern u_short hash_pho[];
@@ -1246,10 +1247,9 @@ int feedkey_pp(KeySym xkey, int kbstate)
    switch (xkey) {
      case XK_Escape:
        tsin_reset_in_pho0();
-       if (!typ_pho[0] && !typ_pho[1] && !typ_pho[2] && !typ_pho[3]) {
+       if (typ_pho_empty()) {
          if (!c_len)
            return 0;
-
          if (!o_sel_pho && tsin_tab_phrase_end)
            goto tab_phrase_end;
        }
@@ -1265,8 +1265,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
           draw_ul(c_idx, c_len);
           save_phrase();
           return 1;
-        } else
-          return flush_tsin_buffer();
+        } else {
+          if (c_len)
+            flush_tsin_buffer();
+          else
+          if (typ_pho_empty())
+            return 0;
+          return 1;
+        }
      case XK_Home:
         close_selection_win();
         if (!c_len)
