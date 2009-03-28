@@ -136,61 +136,11 @@ static int Is(char *attr, XICAttribute *attr_list) {
 extern Window root;
 extern Display *dpy;
 
-static int xerror_handler(Display *d, XErrorEvent *eve)
-{
-  return 0;
-}
-
-
-static void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
-{
-  Window ow;
-  void *olderr = XSetErrorHandler((XErrorHandler)xerror_handler);
-
-  XTranslateCoordinates(dpy,win,root,wx,wy,tx,ty,&ow);
-
-  XSetErrorHandler(olderr);
-}
-
-
 
 void move_in_win(ClientState *cs, int x, int y);
 void show_in_win(ClientState *cs);
 extern Window focus_win;
 
-void move_IC_in_win(ClientState *cs)
-{
-#if DEBUG
-   dbg("move_IC_in_win\n");
-#endif
-   Window inpwin = cs->client_win;
-
-   if (!inpwin)
-      return;
-
-   // non focus win filtering is done in the client lib
-   if (inpwin != focus_win && focus_win && !cs->b_gcin_protocol)
-      return;
-
-   int inpx = cs->spot_location.x;
-   int inpy = cs->spot_location.y;
-   XWindowAttributes att;
-
-   XGetWindowAttributes(dpy, inpwin, &att);
-
-   if (inpx >= att.width)
-     inpx = att.width - 1;
-   if (inpy >= att.height)
-     inpy = att.height - 1;
-
-   int tx, ty;
-   getRootXY(inpwin, inpx, inpy, &tx, &ty);
-#if DEBUG
-   dbg("move_IC_in_win %d %d   txy:%d %d\n", inpx, inpy, tx, ty);
-#endif
-
-   move_in_win(cs, tx, ty+1);
-}
 
 void load_IC(IC *rec)
 {

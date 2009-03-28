@@ -49,21 +49,10 @@
 //
 //
 
-#if !defined(Q_NO_IM)
 
-#include "qglobal.h"
 #include <qinputcontext.h>
-#include <qfont.h>
-#include <qcstring.h>
-
-class QKeyEvent;
-class QWidget;
-class QFont;
-class QString;
-
-#include "qarray.h"
-#include "qwindowdefs.h"
 #include <private/qt_x11_p.h>
+
 #include "gcin-im-client.h"
 
 class QGCINInputContext : public QInputContext
@@ -117,7 +106,5 @@ private:
     int lookupString(XKeyEvent *, QCString &, KeySym *, Status *) const;
 };
 
-
-#endif //Q_NO_IM
 
 #endif // QXIMINPUTCONTEXT_H

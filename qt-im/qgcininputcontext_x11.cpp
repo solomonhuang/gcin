@@ -1,17 +1,8 @@
 #include "qgcininputcontext.h"
-
-// #include "qplatformdefs.h"
-
-#include "qapplication.h"
 #include "qwidget.h"
-#include "qstring.h"
-#include "qptrlist.h"
-#include "qintdict.h"
-#include "qtextcodec.h"
 
 #include <stdlib.h>
 #include <X11/keysymdef.h>
-
 #include "gcin-im-client.h"
 
 
@@ -71,7 +62,7 @@ bool QGCINInputContext::x11FilterEvent( QWidget *keywidget, XEvent *event )
 
     XKeyEvent *keve = (XKeyEvent *) event;
 
-    int num_bytes = XLookupString (keve, buffer, buffer_size, &keysym, NULL);
+    XLookupString (keve, buffer, buffer_size, &keysym, NULL);
     int result;
     char *rstr = NULL;
     unsigned int state = keve->state;

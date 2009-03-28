@@ -43,7 +43,6 @@
 #include "qgcininputcontext.h"
 #include "qgcininputcontextplugin.h"
 #include <qinputcontextplugin.h>
-#include <qstringlist.h>
 
 
 QGCINInputContextPlugin::QGCINInputContextPlugin()

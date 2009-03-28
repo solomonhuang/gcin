@@ -40,10 +40,9 @@
 **
 **********************************************************************/
 
-#ifndef QT_NO_IM
 #include "qgcininputcontext.h"
 #include <qinputcontextplugin.h>
-#include <qstringlist.h>
+// #include <qstringlist.h>
 
 
 class QGCINInputContextPlugin : public QInputContextPlugin
@@ -59,5 +58,3 @@ public:
     QString displayName( const QString &key );
     QString description( const QString &key );
 };
-
-#endif

@@ -6,7 +6,7 @@ void big5_utf8_n(char *s, int len, char out[])
 
   GError *err = NULL;
   int rn, wn;
-  char *utf8 = g_locale_to_utf8 (s, len, &rn, &wn, &err);
+  char *utf8 = g_convert(s, len, "UTF-8", "Big5", &rn, &wn, &err);
 
   if (err) {
     dbg("big5_utf8  convert error\n");
@@ -36,7 +36,6 @@ void utf8_big5_n(char *s, int len, char out[])
 
   if (err) {
     dbg("utf8_big5 convert error\n");
-    out[0]=0;
 //    abort();
     return;
   }

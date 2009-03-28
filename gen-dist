@@ -26,4 +26,6 @@ fi
 
 cd
 
+export GCIN_USE_XIM=Y
+
 rpm -ba gcin.spec

@@ -222,17 +222,20 @@ static void DispInArea()
   }
 }
 
+char gtab_list[]="gtab.list";
 
 void load_gtab_list()
 {
   char ttt[128];
   FILE *fp;
 
-//  strcat(strcpy(ttt,TableDir),"/gtab.list");
-  get_sys_table_file_name("gtab.list", ttt);
+  get_gcin_user_fname(gtab_list, ttt);
 
-  if ((fp=fopen(ttt, "r"))==NULL)
-    p_err("cannot open %s", ttt);
+  if ((fp=fopen(ttt, "r"))==NULL) {
+    get_sys_table_file_name(gtab_list, ttt);
+    if ((fp=fopen(ttt, "r"))==NULL)
+      p_err("cannot open %s", ttt);
+  }
 
   dbg("load_gtab_list %s\n", ttt);
 
@@ -282,17 +285,21 @@ void init_gtab(int inmdno, int usenow)
     return;
   }
 
-  strcat(strcpy(ttt,TableDir),"/");
-  strcat(ttt, inmd[inmdno].filename);
-
   struct stat st;
+  get_gcin_user_fname(inmd[inmdno].filename, ttt);
   int rval = stat(ttt, &st);
 
   if (rval < 0) {
-    dbg("init_tab:1 err open %s\n", ttt);
-    return;
-  }
+    strcat(strcpy(ttt,TableDir),"/");
+    strcat(ttt, inmd[inmdno].filename);
 
+    int rval = stat(ttt, &st);
+
+    if (rval < 0) {
+      dbg("init_tab:1 err open %s\n", ttt);
+      return;
+    }
+  }
 
   if (st.st_mtime == inp->file_modify_time) {
 //    dbg("unchanged\n");

@@ -1,4 +1,17 @@
 ** UTF-8 encoding **
+1.0.4:
+- 現在詞音詞的選單的排列順序改成依詞的使用頻率排列，原來是用注音符號的順序。
+- 現在 user 可以在 ~/.gcin 裏加自己的 gtab.list *.gtab，gcin 會優先使用這裡的 files。
+- QT4 的 QT_IM_MODULE 支援，不過沒有實際測過。
+- 新增輸入正體中文然後用簡體字輸出，用 gcin-setup 切換，不過不會顯示狀態。
+- ./configure 時可以用 --use_xim=N，這樣就把 XIM 的支援拿掉，這樣 gcin 的可執行檔 size 就會小很多，135K -> 84K。 而且 mozilla/firefox 如果有開 flash plugin， pkill gcin 就不會導致 mozilla 的掛掉，這是因為 flash plugin 有 open XIM 的關係，XIM 有 bug。希望 XIM 能早日被淘汰。
+- 詞音在按 ctrl-alt 切換到其他輸入法時，會自動送出編輯區的內容。例如想輸入「用γ射線]，現在切到希臘字母輸入法前就就不用按 enter 了。在OpenOffice 用希臘字母輸入法輸入字母還蠻好用的，不用切換 font 搞半天。
+- gcin-setup 新增 clipboard 簡體字 -> 正體字 翻譯的功能。
+- zh_CN 的 XIM 支援。
+- gtab.list 的問題。
+- SUSE gcin-setup gnome desktop 的 path fix。
+
+
 1.0.3:
 - QT_IM_MODULE=gcin 的支援。如果你的系統有支援(qt4.0 or Mandriva 2006)，會自動修改 /etc/sysconfig/i18n 加上QT_IM_MODULE=gcin。
 - gtab.list 如果有拿掉一些，則會 coredump 無法 ctrl-shift 的問題。

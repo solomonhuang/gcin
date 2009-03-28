@@ -6,8 +6,10 @@
 #define STRBUFLEN 64
 
 extern Display *dpy;
+#if USE_XIM
 extern XIMS current_ims;
 static IMForwardEventStruct *current_forward_eve;
+#endif
 
 static char callback_str_buffer[32];
 Window focus_win;
@@ -48,12 +50,48 @@ void clear_output_buffer()
   output_bufferN = 0;
 }
 
+gboolean gb_output = FALSE;
 
 void send_text(char *text)
 {
   if (!text)
     return;
   int len = strlen(text);
+
+  char *utf8_gbtext = NULL;
+
+  if (gb_output) {
+  u_int rn = 0 , wn = 0;
+  GError *err = NULL;
+  char *big5 = g_convert(text, len, "big5", "UTF-8", &rn, &wn, &err);
+
+  if (err) {
+    dbg("utf8 -> gb  convert error %d %d\n", rn, wn);
+    return;
+  }
+
+  err = NULL;
+  char *gbtext = g_convert(big5, wn, "GB2312", "big5", &rn, &wn, &err);
+  g_free(big5);
+
+  if (err) {
+    dbg("big5 -> gb  convert error %d %d\n", rn, wn);
+    return;
+  }
+
+  err = NULL;
+  utf8_gbtext = g_convert(gbtext, wn, "UTF-8", "GB2312", &rn, &wn, &err);
+  g_free(gbtext);
+
+  if (err) {
+    dbg("gb -> utf8  convert error %d %d\n", rn, wn);
+    return;
+  }
+
+  text = utf8_gbtext;
+  len = wn;
+  }
+
   int requiredN = len + 1 + output_bufferN;
 
   output_buffer = realloc(output_buffer, requiredN);
@@ -61,6 +99,8 @@ void send_text(char *text)
 
   strcat(output_buffer, text);
   output_bufferN += len;
+
+  g_free(utf8_gbtext);
 }
 
 void send_output_buffer_bak()
@@ -79,7 +119,7 @@ void sendkey_b5(char *bchar)
   send_text(tt);
 }
 
-
+#if USE_XIM
 void export_text_xim()
 {
   char *text = output_buffer;
@@ -121,6 +161,7 @@ static void bounce_back_key()
     IMForwardEventStruct forward_ev = *(current_forward_eve);
     IMForwardEvent(current_ims, (XPointer)&forward_ev);
 }
+#endif
 
 void hide_win0();
 void hide_win_gtab();
@@ -233,8 +274,56 @@ void move_in_win(ClientState *cs, int x, int y)
   }
 }
 
-void move_IC_win0(ClientState *rec);
-void move_IC_in_win(ClientState *rec);
+static int xerror_handler(Display *d, XErrorEvent *eve)
+{
+  return 0;
+}
+
+static void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
+{
+  Window ow;
+  void *olderr = XSetErrorHandler((XErrorHandler)xerror_handler);
+
+  XTranslateCoordinates(dpy,win,root,wx,wy,tx,ty,&ow);
+
+  XSetErrorHandler(olderr);
+}
+
+
+void move_IC_in_win(ClientState *cs)
+{
+#if DEBUG
+   dbg("move_IC_in_win\n");
+#endif
+   Window inpwin = cs->client_win;
+
+   if (!inpwin)
+      return;
+
+   // non focus win filtering is done in the client lib
+   if (inpwin != focus_win && focus_win && !cs->b_gcin_protocol)
+      return;
+
+   int inpx = cs->spot_location.x;
+   int inpy = cs->spot_location.y;
+   XWindowAttributes att;
+
+   XGetWindowAttributes(dpy, inpwin, &att);
+
+   if (inpx >= att.width)
+     inpx = att.width - 1;
+   if (inpy >= att.height)
+     inpy = att.height - 1;
+
+   int tx, ty;
+   getRootXY(inpwin, inpx, inpy, &tx, &ty);
+#if DEBUG
+   dbg("move_IC_in_win %d %d   txy:%d %d\n", inpx, inpy, tx, ty);
+#endif
+
+   move_in_win(cs, tx, ty+1);
+}
+
 
 void update_in_win_pos()
 {
@@ -424,6 +513,9 @@ gboolean init_in_method(int in_no)
 
 
   if (current_CS->in_method != in_no) {
+    if (current_CS->in_method == 6)
+      flush_tsin_buffer();
+
     hide_in_win(current_CS);
   }
 
@@ -617,7 +709,7 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 }
 
 
-
+#if USE_XIM
 int xim_ForwardEventHandler(IMForwardEventStruct *call_data)
 {
     current_forward_eve = call_data;
@@ -644,6 +736,7 @@ int xim_ForwardEventHandler(IMForwardEventStruct *call_data)
 
     return False;
 }
+#endif
 
 IC *FindIC(CARD16 icid);
 void load_IC(IC *rec);
@@ -689,7 +782,7 @@ int gcin_FocusIn(ClientState *cs)
 }
 
 
-
+#if USE_XIM
 int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 {
     IC *ic = FindIC(call_data->icid);
@@ -706,6 +799,7 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 #endif
     return True;
 }
+#endif
 
 int gcin_FocusOut(ClientState *cs)
 {
@@ -721,6 +815,7 @@ int gcin_FocusOut(ClientState *cs)
     return True;
 }
 
+#if USE_XIM
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
 {
     IC *ic = FindIC(call_data->icid);
@@ -730,3 +825,4 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
 
     return True;
 }
+#endif

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export LC_ALL=zh_TW.Big5
+export QT_IM_MODULE=scim
+export XMODIFIERS=@im=SCIM
+kedit
+#kedit

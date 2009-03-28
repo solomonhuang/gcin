@@ -131,28 +131,14 @@ logout & login
 只要字有在注音表內就可以存成詞，請參考前面的說明，支援半型字。
 
 ----------------------
-為什麼有時候gcin的輸入視窗不會跟著程式的游標 ? 這是因為有些程式只支援 root
-input style,
-程式不會回報游標所在位置。 像用 GTK2/Gnome2 開發的程式都有這個問題. 目前 gcin
-的視窗是擺在滑鼠指標所在的位置. 這樣好像比目前 xcin 的方式容易使用。
-你可以按輸入視窗中的圖釘來固定或解除固定視窗。
-
-現在你可以 download
-   http://www.csie.nctu.edu.tw/~cp76/linux/gtk-xim/im-xim.so
-   cp im-xim.so  /usr/lib/gtk-2.0/2.2.0/immodules
-就可以在 Gnome 2.X 上使用 over-the-spot。
-依照不同的 gtk 版本，必須把上述的 2.2.0 換成 2.4.0 或 2.6.0
+為什麼有時候gcin的輸入視窗不會跟著程式的游標 ? 
+如果是 GTK(gnome) 的程式，可能你沒有設定 GTK_IM_MODULE=gcin， QT 的程式必須在在 qtconfig 設定 XIM over-the-spot。如果你的 QT 支援 QT_IM_MODULE，只要設定 QT_IM_MODULE=gcin就可以了。
 
 mozilla gtk2-ft 的版本中是不支援 over-the-spot，如果要用 over-the-spot，必須 download
 http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
-mozilla gtk2-ft 有什麼優點，用 GTK2 的優點就是與系統的主題(theme) 完全整合，比較漂亮，
-而且 GTK1 完全不用了之後，比較節省 memory。
-
-Firefox & Thunderbird over-the-spot 支援可以看下面的 link download .so
-http://moto.debian.org.tw/viewtopic.php?t=5311
 
 如果是用 Mandrake 10.2 cooker ，libwidget_gtk2.so 是分開 compiled 的，你可以在這邊找到 .so
-http://www.csie.nctu.edu.tw/~cp76/linux/mozilla/mdk-firefox-thunderbird-1.0.2
+http://www.csie.nctu.edu.tw/~cp76/linux/mozilla
 official firefox 現在是 把 libwidget_gtk2.so link 進去，所以沒有辦法取代。
 
 這個 patch 早就送交 mozilla bugzilla，但一直沒有進去，需要多一些人關切，請參考底下的link，
@@ -430,7 +416,7 @@ b.  gcin client connected to server 172.x.x.x:9999
 
 只需要一個 gcin 執行就可以，不需要為了同時支援 GTK_IM_MODULE/QT_IM_MODULE & XIM 而執行兩個 gcin process。
 
-目前 OpenOffice GTK2 的版本好像仍然是使用 XIM。
+目前 OpenOffice 1.1.x GTK2 的版本好像是使用 XIM，1.9.x & 2.x 則是改成用 GTK_IM_MODULE。
 
 http://www.csie.nctu.edu.tw/~cp76/linux/mrxvt-gcin.tbz 是一個使用 gcin IM client 的 mrxvt。
 http://www.csie.nctu.edu.tw/~cp76/linux/rxvt-gcin.tbz 是一個使用 gcin IM client 的 rxvt。
@@ -439,14 +425,16 @@ http://www.csie.nctu.edu.tw/~cp76/linux/rxvt-gcin.tbz 是一個使用 gcin IM cl
 ------------------------------------------------------------------------------------------------------
 如何 build 自己的 gcin rpm？
 
-首先 create build dir/file
+第一步 install libgtk+2.0_0-devel 這個 rpm。
+
+然後 create build dir/file
 
 你可執行 .tar.bz2 內的 gcin-0.x.x/setup-rpm，這個 shell script 會幫你把 environment 設定好。
 
 cp gcin-x.x.x.tar.bz2 ~/rpm/SOURCES
 
-在 gcin-x.x.x
-./configure 完後，會有一個 gcin.spec
+在 gcin-x.x.x 裏面
+執行./configure 完後，會有一個 gcin.spec
 (這是給 Mandrake 用的，其它的 distribution 可能要稍微修改一下。)
 
 rpmbuild -ba gcin.spec
@@ -516,4 +504,16 @@ ctrl-space 無法叫出 gcin 的視窗，檢查事項
 2. 在terminal 用 export GCIN_CONNECT_MSG_ON=， 再執行自己要的測試程式，
 terminal (console) 會出現以下 message 
    connected to unix socket addr /tmp/gcin-????/socket-:0.0-xcin
+--------------------------------------------------------------------
+gcin 與 scim memory 使用比較。
+分別以 gcin 的詞音與 scim chewing 用 kedit 輸入「測試」兩個字，
+由於 scim 有數個 process，必須全部加起來。這個測試也比較 qt-im-module 的 memory 使用。
+
+      vsz    rss    kedit-vsz  kedit-rss
+scim  80168  31312  47052      17368
+gcin  29132  8568   41840      16144
+
+kedit: 3.4.1
+scim:  scim 1.4.2 + scim-chewing 0.2.1
+gcin:  gcin 1.0.4
 

@@ -16,7 +16,8 @@ static GtkWidget *check_button_gtab_dup_select_bell,
 static GtkWidget *opt_spc_opts;
 
 static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
-
+static GtkClipboard *pclipboard;
+GtkWidget *main_window;
 
 static gboolean close_application( GtkWidget *widget,
                                    GdkEvent  *event,
@@ -50,7 +51,7 @@ static void cb_ret(GtkWidget *widget, gpointer user_data)
 static void create_result_win(int res)
 {
   char *restr = res ? "結果失敗":"結果成功";
-  GtkWidget *main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
   GtkWidget *button = gtk_button_new_with_label(restr);
   gtk_container_add (GTK_CONTAINER (main_window), button);
@@ -600,13 +601,76 @@ static void cb_gtab_conf()
 }
 
 
+
+static void cb_gb_output_toggle()
+{
+  send_gcin_message(GDK_DISPLAY(), GB_OUTPUT_TOGGLE);
+  exit(0);
+}
+
+
+static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
+{
+  if (!text) {
+    dbg("empty\n");
+    return;
+  }
+
+  int len = strlen(text);
+  GError *err = NULL;
+  u_int rn = 0, wn = 0;
+  char *gb = g_convert(text, len, "GB2312", "UTF-8", &rn, &wn, &err);
+
+  if (err) {
+    dbg("utf8 -> gb  convert error %d %d\n", rn, wn);
+    return;
+  }
+
+  char *big5 = g_convert(gb, strlen(gb), "big5", "GB2312", &rn, &wn, &err);
+  g_free(gb);
+
+  if (err) {
+    dbg("gb -> big5  convert error %d %d\n", rn, wn);
+    return;
+  }
+
+
+  char *big5utf8 = g_convert(big5, strlen(big5), "UTF-8", "big5", &rn, &wn, &err);
+  g_free(big5);
+
+  if (err) {
+    dbg("big5 -> big5utf8  convert error %d %d\n", rn, wn);
+    return;
+  }
+
+
+  char tt[512];
+
+  sprintf(tt,"%s/.gcin/gb-big5.txt", getenv("HOME"));
+
+  FILE *fp;
+
+  if ((fp=fopen(tt, "w"))==NULL)
+    p_err("cannot create %s", tt);
+
+  fwrite(big5utf8, 1, strlen(big5utf8), fp);
+  fclose(fp);
+
+  utf8_editor(tt);
+}
+
+static void cb_gb_translate_toggle()
+{
+  gtk_clipboard_request_text(pclipboard, selection_received, main_window);
+}
+
+
 void create_gtablist_window();
 static void cb_default_input_method()
 {
   create_gtablist_window();
 }
 
-GtkWidget *main_window;
 void create_about_window();
 
 static void create_main_win()
@@ -679,6 +743,16 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_symbol_table), "clicked",
                     G_CALLBACK (cb_symbol_table), NULL);
 
+  GtkWidget *button_gb_output_toggle = gtk_button_new_with_label("簡體字輸出切換");
+  gtk_box_pack_start (GTK_BOX (vbox), button_gb_output_toggle, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_gb_output_toggle), "clicked",
+                    G_CALLBACK (cb_gb_output_toggle), NULL);
+
+  GtkWidget *button_gb_translate_toggle = gtk_button_new_with_label("clipboard 簡體字 -> 正體字");
+  gtk_box_pack_start (GTK_BOX (vbox), button_gb_translate_toggle, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_gb_translate_toggle), "clicked",
+                    G_CALLBACK (cb_gb_translate_toggle), NULL);
+
 
   GtkWidget *button_about = gtk_button_new_with_label("關於 gcin");
   gtk_box_pack_start (GTK_BOX (vbox), button_about, TRUE, TRUE, 0);
@@ -714,6 +788,8 @@ int main(int argc, char **argv)
 
   // once you invoke gcin-setup, the left-right buton tips is disabled
   save_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 0);
+
+  pclipboard = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
 
   gtk_main();
 

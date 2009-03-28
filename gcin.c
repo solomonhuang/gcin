@@ -7,10 +7,14 @@ Window root;
 int win_xl, win_yl;
 int win_x, win_y;   // actual win x/y
 int dpy_xl, dpy_yl;
-gboolean dual_xim=TRUE;
 
+#if USE_XIM
+gboolean dual_xim=TRUE;
 DUAL_XIM_ENTRY xim_arr[2];
 DUAL_XIM_ENTRY *pxim_arr;
+#else
+DUAL_XIM_ENTRY xim_arr[1];
+#endif
 
 
 char *fullchar[]=
@@ -39,35 +43,38 @@ void start_inmd_window()
   switch (default_input_method) {
     case 3:
       create_win_pho();
-
+#if USE_XIM
       if (dual_xim)
         create_win0();
-
-      xim_arr[0].xim_xwin = xwin_pho;
       xim_arr[1].xim_xwin = xwin0;
+#endif
+      xim_arr[0].xim_xwin = xwin_pho;
       break;
     case 6:
       create_win0();
-
+#if USE_XIM
       if (dual_xim)
         create_win1();
-
-      xim_arr[0].xim_xwin = xwin0;
       xim_arr[1].xim_xwin = xwin1;
+#endif
+      xim_arr[0].xim_xwin = xwin0;
       break;
     default:
       create_win_gtab();
 
+#if USE_XIM
       if (dual_xim)
         create_win_pho();
+      xim_arr[1].xim_xwin = xwin_pho;
+#endif
 
       xim_arr[0].xim_xwin = xwin_gtab;
-      xim_arr[1].xim_xwin = xwin_pho;
       break;
   }
 }
 
 
+#if USE_XIM
 static XIMStyle Styles[] = {
 #if 0
         XIMPreeditCallbacks|XIMStatusCallbacks,		//OnTheSpot
@@ -135,6 +142,7 @@ void SetIC(IMChangeICStruct * call_data);
 void GetIC(IMChangeICStruct *call_data);
 int xim_gcin_FocusIn(IMChangeFocusStruct *call_data);
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
+
 
 #define DEBUG 0
 
@@ -289,6 +297,7 @@ void open_xim()
   }
 }
 
+#endif // if USE_XIM
 
 void load_tsin_db();
 void load_tsin_conf(), load_setttings(), load_tab_pho_file();
@@ -355,16 +364,20 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
        if (!strcmp(message, CHANGE_FONT_SIZE)) {
          change_font_size();
        } else
+       if (!strcmp(message, GB_OUTPUT_TOGGLE)) {
+         extern gboolean gb_output;
+         gb_output = !gb_output;
+       } else
          reload_data();
 
        XFree(message);
        return GDK_FILTER_REMOVE;
      }
    }
-
+#if USE_XIM
    if (XFilterEvent(xeve, None) == True)
      return GDK_FILTER_REMOVE;
-
+#endif
    return GDK_FILTER_CONTINUE;
 }
 
@@ -389,7 +402,9 @@ void do_exit()
 
   free_pho_mem();
   free_tsin();
+#if USE_XIM
   free_all_IC();
+#endif
   free_gtab();
   free_phrase();
 
@@ -425,8 +440,7 @@ void init_gcin_im_serv(Window win);
 
 int main(int argc, char **argv)
 {
-//  SSL_library_init();
-
+#if USE_XIM
   dual_xim = getenv("GCIN_DUAL_XIM_OFF") == NULL;
   char *lc_ctype = getenv("LC_CTYPE");
   char *lc_all = getenv("LC_ALL");
@@ -437,42 +451,50 @@ int main(int argc, char **argv)
     lc_all = "";
   dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s  LANG=%s\n", lc_ctype, lc_all, lang);
 
-  xim_arr[0].server_locale = "zh_TW";
+  char *enc;
+  char *lc_enc;
+  char *lc_utf8;
+  char *lc;
+
+  if (strstr(lc_ctype, "CN")) {
+    lc = "zh_CN";
+    enc = "GB2312";
+    lc_enc = "zh_CN.GB2312";
+    lc_utf8 = "zh_CN.UTF-8";
+  } else {
+    lc = "zh_TW";
+    enc = "Big5";
+    lc_enc = "zh_TW.Big5";
+    lc_utf8 = "zh_TW.UTF-8";
+  }
+
+
+  xim_arr[0].server_locale = lc;
   char *xim_server_name = get_gcin_xim_name();
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
   strcpy(xim_arr[1].xim_server_name, xim_server_name);
 
-  if ((lc_ctype && (strstr(lc_ctype, ".utf-8") || strstr(lc_ctype, ".UTF-8"))) ||
-      (lc_all && (strstr(lc_all, ".utf-8") || strstr(lc_all, ".UTF-8"))) ||
-       (lang && !strcasecmp(lang, "zh_TW.UTF-8"))) {
+  if ((lc_ctype && strstr(lc_ctype, ".UTF-8")) ||
+      (lc_all && strstr(lc_all, ".UTF-8")) ||
+      (lang && strstr(lang, "UTF-8"))) {
     xim_arr[0].b_send_utf8_str = TRUE;
     xim_arr[1].b_send_utf8_str = FALSE;
-    xim_arr[1].server_locale = "zh_TW.Big5";
-    strcat(xim_arr[1].xim_server_name, ".Big5");
+    xim_arr[1].server_locale = lc_enc;
+    strcat(xim_arr[1].xim_server_name, enc);
     dbg("gcin will use UTF-8 as the default encoding\n");
   } else {
     xim_arr[0].b_send_utf8_str = FALSE;
     xim_arr[1].b_send_utf8_str = TRUE;
-    xim_arr[1].server_locale = "zh_TW.UTF-8";
+    xim_arr[1].server_locale = lc_utf8;
     strcat(xim_arr[1].xim_server_name, ".UTF-8");
-    dbg("gcin will use Big5 as the default encoding\n");
+    dbg("gcin will use %s as the default encoding\n", enc);
   }
-
 
   if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {
     p_err(" version %s\n", GCIN_VERSION);
   }
 
-  // temporaray solution
-  static char tmplocale[]="zh_TW.Big5";
-  setlocale(LC_ALL, tmplocale);
-#if SOL
-  char tstr[128];
-  sprintf(tstr, "LC_ALL=%s", tmplocale);
-  putenv(tstr);
-#else
-  setenv("LC_ALL", tmplocale, TRUE);
 #endif
 
   exec_setup_scripts();
@@ -488,9 +510,9 @@ int main(int argc, char **argv)
 
   root=DefaultRootWindow(dpy);
   start_inmd_window();
-
+#if USE_XIM
   open_xim();
-
+#endif
   init_atom_property();
 
   gdk_window_add_filter(NULL, my_gdk_filter, NULL);

@@ -34,7 +34,7 @@ static struct {
 } tsin_eng_ch_sw[]={
   {"CapsLock", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock},
   {"Tab", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
-  {"Shift(限 GTK_IM_MODULE=gcin)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
+  {"Shift(限非 XIM)", TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
 };
 int tsin_eng_ch_swN = sizeof(tsin_eng_ch_sw) / sizeof(tsin_eng_ch_sw[0]);
 

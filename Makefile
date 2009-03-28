@@ -4,7 +4,7 @@ include config.mak
 
 .SUFFIXES:	.c .o .E
 
-OBJS=gcin.o IC.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
+OBJS=gcin.o eve.o win0.o pho.o tsin.o win1.o util.o pho-util.o gcin-conf.o tsin-util.o \
      win-sym.o intcode.o pho-sym.o win-int.o win-pho.o gcin-settings.o table-update.o win-gtab.o \
      gtab.o gtab-util.o phrase.o win-inmd-switch.o pho-dbg.o locale.o win-pho-near.o \
      gcin-switch.o
@@ -25,8 +25,12 @@ CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
         -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\"
-
+ifeq ($(USE_XIM),Y)
 IMdkitLIB = IMdkit/lib/libXimd.a
+CFLAGS += -DUSE_XIM=1
+OBJS+=IC.o
+endif
+
 im-srv = im-srv/im-srv.a
 
 .c.E:
@@ -112,7 +116,7 @@ clean:
 	$(MAKE) -C gtk-im clean
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
-	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~
+	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) $(DATA) .depend gcin.spec menu/*~ */core.*
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

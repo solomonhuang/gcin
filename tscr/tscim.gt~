@@ -1,9 +1,0 @@
-#!/bin/bash
-
-export LC_ALL=zh_TW.Big5
-export GTK_IM_MODULE=scim
-export XMODIFIERS=@im=SCIM
-scim -d &
-#scim-input-pad &
-gedit --new-window &
-#kedit

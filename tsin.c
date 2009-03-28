@@ -50,13 +50,16 @@ static int startf;
 static gboolean full_match;
 static gboolean tsin_half_full;
 
-static struct {
+typedef struct {
   phokey_t phokey[MAX_PHRASE_LEN];
   int phidx;
   char str[MAX_PHRASE_LEN*CH_SZ+1];
   int len;
-} pre_sel[10];
-int pre_selN;
+  char usecount;
+} PRE_SEL;
+
+static PRE_SEL pre_sel[10];
+static int pre_selN;
 
 gboolean save_phrase_to_db2(CHPHO *chph, int len);
 
@@ -448,7 +451,8 @@ static void put_b5_char(char *b5ch, phokey_t key)
 
 #define MAX_PHRASE_SEL_N (9)
 
-static u_char selstr[MAX_PHRASE_SEL_N][MAX_PHRASE_LEN * CH_SZ], sellen[MAX_PHRASE_SEL_N];
+static u_char selstr[MAX_PHRASE_SEL_N][MAX_PHRASE_LEN * CH_SZ];
+static u_char sellen[MAX_PHRASE_SEL_N];
 static int selidx[MAX_PHRASE_SEL_N];
 
 static u_short phrase_count;
@@ -612,6 +616,15 @@ static void extract_pho(int chpho_idx, int plen, phokey_t *pho)
 gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi);
 void mask_key_typ_pho(phokey_t *key);
 
+static int qcmp_pre_sel_usecount(const void *aa, const void *bb)
+{
+  PRE_SEL *a = (PRE_SEL *) aa;
+  PRE_SEL *b = (PRE_SEL *) bb;
+
+  return b->usecount - a->usecount;
+}
+
+
 static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 {
   if (plen >= MAX_PHRASE_LEN)
@@ -717,11 +730,13 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 
     pre_sel[pre_selN].len = match_len;
     pre_sel[pre_selN].phidx = sti - 1;
+    pre_sel[pre_selN].usecount = usecount;
     utf8cpyN(pre_sel[pre_selN].str, mtch, match_len);
     memcpy(pre_sel[pre_selN].phokey, mtk, match_len*sizeof(phokey_t));
     pre_selN++;
-
   }
+
+  qsort(pre_sel, pre_selN, sizeof(PRE_SEL), qcmp_pre_sel_usecount);
 
   return maxlen;
 }
