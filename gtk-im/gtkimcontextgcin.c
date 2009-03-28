@@ -31,37 +31,27 @@
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
 
-#if NEW_GTK_IM
-static GtkIMContextGCIN *context_xim_queued;
-static int timeout_handle;
-static void cancel_timeout()
-{
-  if (!context_xim_queued)
-    return;
-  g_source_remove(timeout_handle);
-  context_xim_queued = NULL;
-}
-#endif
-
 struct _GtkIMContextGCIN
 {
   GtkIMContext object;
 
   GdkWindow *client_window;
   GtkWidget *client_widget;
-
-#if 0
-  gint preedit_size;
-  gint preedit_length;
-  gunichar *preedit_chars;
-  XIMFeedback *feedbacks;
-  gint preedit_cursor;
-#endif
   GCIN_client_handle *gcin_ch;
-
-//  guint in_toplevel : 1;
-//  guint has_focus : 1;
+  int timeout_handle;
+  gboolean is_mozilla;
 };
+
+
+#if NEW_GTK_IM
+static void cancel_timeout(GtkIMContextGCIN *context)
+{
+  if (!context->timeout_handle)
+    return;
+  g_source_remove(context->timeout_handle);
+  context->timeout_handle = 0;
+}
+#endif
 
 static void     gtk_im_context_gcin_class_init         (GtkIMContextGCINClass  *class);
 static void     gtk_im_context_gcin_init               (GtkIMContextGCIN       *im_context_gcin);
@@ -119,7 +109,7 @@ static void gcin_display_closed (GdkDisplay *display,
                          GtkIMContextGCIN *context_xim)
 {
 #if NEW_GTK_IM
-  cancel_timeout();
+  cancel_timeout(context_xim);
 #endif
   if (!context_xim->gcin_ch)
     return;
@@ -142,6 +132,7 @@ get_im (GtkIMContextGCIN *context_xim)
   GdkScreen *screen = gdk_drawable_get_screen (client_window);
   GdkDisplay *display = gdk_screen_get_display (screen);
 
+
   if (!context_xim->gcin_ch) {
     if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
       perror("cannot open gcin_ch");
@@ -158,10 +149,6 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
   GtkIMContextClass *im_context_class = GTK_IM_CONTEXT_CLASS (class);
   GObjectClass *gobject_class = G_OBJECT_CLASS (class);
 
-#if NEW_GTK_IM
-  cancel_timeout();
-#endif
-
 //  parent_class = g_type_class_peek_parent (class);
   im_context_class->set_client_window = gtk_im_context_gcin_set_client_window;
   im_context_class->filter_keypress = gtk_im_context_gcin_filter_keypress;
@@ -177,8 +164,28 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
 static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
-//  im_context_gcin->has_focus = FALSE;
-//  im_context_gcin->in_toplevel = FALSE;
+  im_context_gcin->timeout_handle = 0;
+
+#if NEW_GTK_IM
+  int pid = getpid();
+// probably only works for linux
+  static char *moz[]={"mozilla", "firefox", "thunderbird", "nvu"};
+  char tstr0[64];
+  char exec[256];
+  sprintf(tstr0, "/proc/%d/exe", pid);
+  int n;
+  if ((n=readlink(tstr0, exec, sizeof(exec))) > 0) {
+    exec[n]=0;
+    int i;
+    for(i=0; i < sizeof(moz)/sizeof(moz[0]); i++) {
+      if (!strstr(exec, moz[i]))
+        continue;
+      im_context_gcin->is_mozilla = TRUE;
+      break;
+    }
+  }
+#endif
+// dirty hack for mozilla...
 }
 
 static void
@@ -192,7 +199,7 @@ gtk_im_context_gcin_finalize (GObject *obj)
     context_xim->gcin_ch = NULL;
   }
 #if NEW_GTK_IM
-  cancel_timeout();
+  cancel_timeout(context_xim);
 #endif
 }
 
@@ -221,20 +228,6 @@ widget_for_window (GdkWindow *window)
  */
 static void update_in_toplevel (GtkIMContextGCIN *context_xim)
 {
-#if 0
-  if (context_xim->client_widget)
-    {
-      GtkWidget *toplevel = gtk_widget_get_toplevel (context_xim->client_widget);
-
-      context_xim->in_toplevel = (toplevel && GTK_WIDGET_TOPLEVEL (toplevel));
-    }
-  else
-    context_xim->in_toplevel = FALSE;
-
-  /* Some paranoia, in case we don't get a focus out */
-  if (!context_xim->in_toplevel)
-    context_xim->has_focus = FALSE;
-#endif
 }
 
 
@@ -249,14 +242,9 @@ on_client_widget_hierarchy_changed (GtkWidget       *widget,
 
 static void
 set_ic_client_window (GtkIMContextGCIN *context_xim,
-		      GdkWindow       *client_window)
+                      GdkWindow       *client_window)
 {
 //  printf("set_ic_client_window\n");
-#if NEW_GTK_IM
-  if (context_xim != context_xim_queued)
-    cancel_timeout();
-#endif
-
   context_xim->client_window = client_window;
 
   if (context_xim->client_window)
@@ -290,6 +278,26 @@ set_ic_client_window (GtkIMContextGCIN *context_xim,
     }
 }
 
+#if NEW_GTK_IM
+static gboolean update_cursor_position(gpointer data)
+{
+  GtkIMContextGCIN *context = (GtkIMContextGCIN *)data;
+
+  g_signal_emit_by_name(context, "preedit_changed");
+  context->timeout_handle = 0;
+  return FALSE;
+}
+#endif
+
+
+#if NEW_GTK_IM
+void add_cursor_timeout(GtkIMContextGCIN *context_xim)
+{
+  if (context_xim->timeout_handle)
+    return;
+  context_xim->timeout_handle = g_timeout_add(200, update_cursor_position, (gpointer)context_xim);
+}
+#endif
 
 ///
 static void
@@ -299,7 +307,10 @@ gtk_im_context_gcin_set_client_window (GtkIMContext          *context,
 //  printf("gtk_im_context_gcin_set_client_window\n");
 
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-
+#if NEW_GTK_IM
+  if (context_xim->is_mozilla)
+    add_cursor_timeout(context_xim);
+#endif
   set_ic_client_window (context_xim, client_window);
 }
 
@@ -309,26 +320,14 @@ gtk_im_context_xim_new (void)
 {
 //  printf("gtk_im_context_gcin_new\n");
   GtkIMContextGCIN *result;
-#if NEW_GTK_IM
-  cancel_timeout();
-#endif
+
   result = GTK_IM_CONTEXT_GCIN (g_object_new (GTK_TYPE_IM_CONTEXT_GCIN, NULL));
 
   return GTK_IM_CONTEXT (result);
 }
 
-#if NEW_GTK_IM
-static gboolean update_cursor_position(gpointer data)
-{
-  if (!context_xim_queued)
-    return;
 
-  g_signal_emit_by_name(context_xim_queued, "preedit_changed");
-  context_xim_queued = NULL;
 
-  return FALSE;
-}
-#endif
 
 ///
 static gboolean
@@ -371,12 +370,8 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 
 #if NEW_GTK_IM
     // this one is for mozilla
-    if (context_xim != context_xim_queued)
-        cancel_timeout();
-    if (!context_xim_queued) {
-        context_xim_queued = context_xim;
-        timeout_handle = g_timeout_add(200, update_cursor_position, NULL);
-    }
+    if (context_xim->is_mozilla && (rstr || !result))
+      add_cursor_timeout(context_xim);
 #endif
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f) {
       rstr = (char *)malloc(num_bytes + 1);
@@ -410,7 +405,8 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
 //  printf("gtk_im_context_gcin_focus_in\n");
   if (context_xim->gcin_ch) {
 #if NEW_GTK_IM
-    g_signal_emit_by_name(context_xim, "preedit_changed");
+    if (context_xim->is_mozilla)
+      add_cursor_timeout(context_xim);
 #endif
     gcin_im_client_focus_in(context_xim->gcin_ch);
   }
@@ -424,8 +420,7 @@ gtk_im_context_gcin_focus_out (GtkIMContext *context)
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 //  printf("gtk_im_context_gcin_focus_out\n");
 #if NEW_GTK_IM
-  if (context_xim == context_xim_queued)
-      cancel_timeout(timeout_handle);
+  cancel_timeout(context_xim);
 #endif
 
   if (context_xim->gcin_ch) {
@@ -442,11 +437,7 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
 {
 //  printf("gtk_im_context_gcin_set_cursor_location %d\n", area->x);
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-#if NEW_GTK_IM
-  if (context_xim_queued) {
-      cancel_timeout(timeout_handle);
-  }
-#endif
+
   if (context_xim->gcin_ch) {
     gcin_im_client_set_cursor_location(context_xim->gcin_ch, area->x, area->y + area->height);
   }
@@ -503,7 +494,7 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 void
 gtk_im_context_gcin_shutdown (void)
 {
-#if NEW_GTK_IM
+#if NEW_GTK_IM && 0
   cancel_timeout();
 #endif
 }

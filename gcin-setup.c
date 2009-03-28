@@ -212,8 +212,8 @@ struct {
 } spc_opts[] = {
   {"由 .gtab 指定", GTAB_space_auto_first_none},
   {"按空白立即送出第一字(嘸蝦米、大易)", GTAB_space_auto_first_any},
-  {"按滿按空白送出第一字(倉頡)", GTAB_space_auto_first_full},
-  {"按滿按空白不送出第一字(行列)", GTAB_space_auto_first_nofull},
+  {"按滿按空白送出第一字", GTAB_space_auto_first_full},
+  {"按滿按空白不送出第一字(倉頡, 行列)", GTAB_space_auto_first_nofull},
   { NULL, 0},
 };
 

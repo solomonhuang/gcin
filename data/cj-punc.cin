@@ -8,7 +8,7 @@
 %cname 倉頡
 %selkey 1234567890
 %endkey ,./'
-%space_style 2
+%space_style 4
 #%keep_key_case
 %keyname begin
 a 日

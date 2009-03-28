@@ -118,7 +118,7 @@ char *get_gcin_xim_name()
     return sstr;
   }
 
-  return "xcin";
+  return "gcin";
 }
 
 Atom get_gcin_atom(Display *dpy)

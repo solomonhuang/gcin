@@ -49,7 +49,7 @@ cd /etc/sysconfig
 ## below is for Mandrake 10.1
 [ -f i18n.orig.gcin ] || mv i18n i18n.orig.gcin
 
-sed -e "s/im=SCIM/im=xcin/" < i18n.orig.gcin |
+sed -e "s/im=SCIM/im=gcin/" < i18n.orig.gcin |
 sed -e "s/scim -d/gcin/" | \
 sed -e "s/GTK_IM_MODULE=scim/GTK_IM_MODULE=gcin/" | \
 sed -e "s/QT_IM_MODULE=.*/QT_IM_MODULE=$QT_IM/" > i18n

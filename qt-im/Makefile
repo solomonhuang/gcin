@@ -27,7 +27,7 @@ libqgcin.so: $(OBJS)
 install:
 	if [ $(prefix) = /usr/local ]; then \
 		install -d $(IMMODULES_LOCAL); \
-		install -s -m 755 libqgcin.so $(IMMODULES_LOCAL); \
+		install -m 755 libqgcin.so $(IMMODULES_LOCAL); \
 	else \
 		install -d $(IMMODULES); \
                 install -m 755 libqgcin.so $(IMMODULES); \

@@ -4,7 +4,7 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "** valid options:"
     echo "  --use_xim=N : disable the support of XIM, exec size is 50k smaller"
     echo "  --prefix=dir_name : install prefix(e.g. /usr)"
-    echo "  --new_gtk_im=Y :  enable new gtk im module for firefox 1.5 over-the-spot"
+    echo "  --new_gtk_im=N :  disable new gtk im module for firefox 1.5 over-the-spot"
     exit
 fi
 
@@ -24,7 +24,7 @@ fi
 
 prefix="/usr/local"
 use_xim='Y'
-new_gtk_im='N'
+new_gtk_im='Y'
 
 if [ "$GCIN_USE_XIM" ]; then
   use_xim=$GCIN_USE_XIM
@@ -60,6 +60,7 @@ GTKLDFLAGS=`pkg-config --libs $GTK`
 
 if [ $? != 0 ]; then
   echo "$GTK or above required --libs"
+  echo "please install rpm/package libgtk+2.0_0-devel"
   rm -f config.mak
   exit -1;
 else
@@ -113,14 +114,6 @@ fi
 if [ $QT_IM = 'N' ]; then
   mv gcin.spec gcin.spec.tmp
   grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
-fi
-
-grep Cooker /etc/mandriva-release 2>&1 | grep 2006 >& /dev/null
-if [ $? = 0 ]; then
-  new_gtk_im='Y'
-  echo "!!!! new gtk-im(im-gcin.so) will be enabled because you are using Cooker 2006."
-  echo "!!!! You have to install the latest libwidget_gtk2.so"
-  echo "http://www.csie.nctu.edu.tw/~cp76/linux/mozilla/mdk-firefox-thunderbird-1.0.6/cooker-new-gtkim-libwidget_gtk2.so.gz"
 fi
 
 

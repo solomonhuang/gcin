@@ -1048,8 +1048,10 @@ shift_proc:
       if (ci) {
         reset_gtab_all();
         return 1;
-      } else
+      } else {
+        ClrIn();
         return 0;
+      }
     case '<':
       if (wild_mode) {
         if (wild_page >= cur_inmd->M_DUP_SEL) wild_page-=cur_inmd->M_DUP_SEL;
@@ -1093,6 +1095,9 @@ shift_proc:
             sel1st_i==MAX_SELKEY-1 && exa_match<=cur_inmd->M_DUP_SEL+1) {
           sel1st_i = 0;
         }
+
+        if (_gtab_space_auto_first == GTAB_space_auto_first_nofull && exa_match > 1)
+          bell();
 
         if (seltab[sel1st_i][0]) {
 //          dbg("last_full %d %d\n", last_full,spc_pressed);
@@ -1155,10 +1160,8 @@ next:
         ClrIn();
       }
       if (key>=XK_KP_0 && key<=XK_KP_9) {
-#if 0
-        if (!spc_pressed)
-          return 0;
-#endif
+        if (!ci)
+          return FALSE;
         if (!strncmp(cur_inmd->filename, "dayi", 4)) {
           key = key - XK_KP_0 + '0';
           is_keypad = TRUE;
@@ -1490,14 +1493,17 @@ next_pg:
       goto refill;
     } else
     if (!more_pg) {
-      if (gtab_dup_select_bell && (gtab_full_space_auto_first || spc_pressed || last_full))
-        bell();
+      if (gtab_dup_select_bell && (gtab_disp_partial_match || gtab_pre_select)) {
+        if (spc_pressed || gtab_full_space_auto_first || last_full && gtab_press_full_auto_send)
+          bell();
+      }
     }
   }
 
 Disp_opt:
-  if (gtab_disp_partial_match || gtab_pre_select || exa_match > 1)
-  disp_selection(phrase_selected);
+  if (gtab_disp_partial_match || gtab_pre_select || (exa_match > 1 && (spc_pressed || gtab_press_full_auto_send)) ) {
+       disp_selection(phrase_selected);
+  }
 
   return 1;
 }

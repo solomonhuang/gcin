@@ -42,7 +42,7 @@ enum {
 static CHPHO chpho[MAX_PH_BF_EXT];
 static int c_idx, c_len, ph_sta=-1, ph_sta_last=-1;
 static int sel_pho;
-static gboolean eng_ph=TRUE;
+static gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
 static int save_frm, save_to;
 static int current_page;
 static int startf;
@@ -435,9 +435,19 @@ static void save_phrase()
   if (len < 2 || len > MAX_PHRASE_LEN)
     return;
 
-  for(i=save_frm;i<=save_to;i++)
-    if (!chpho[i].pho)
+  for(i=save_frm;i<=save_to;i++) {
+    if (chpho[i].pho)
+      continue;
+    phokey_t tpho[32];
+    tpho[0]=0;
+
+    utf8_pho_keys(chpho[i].ch, tpho);
+
+    if (!tpho[0])
       return;
+
+    chpho[i].pho = tpho[0];
+  }
 
   if (!save_phrase_to_db2(&chpho[save_frm], len)) {
     bell();
@@ -967,6 +977,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
 
 
     char *pp = str;
+#if 0
     for(i=0; i < len; i++) {
       if (pho[i])
         continue;
@@ -979,7 +990,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
       pho[i] = tpho[0];
       pp += u8len;
     }
-
+#endif
 
     if (c_idx < c_len) {
       for(i=c_len-1; i >= c_idx; i--) {
@@ -1510,7 +1521,6 @@ other_keys:
          if (len > 1) {
            int cpsta = chpho[c_idx].psta;
            if (cpsta >= 0) {
-//             dbg("psta %d\n", cpsta);
              chpho[cpsta].flag |= FLAG_CHPHO_PHRASE_VOID;
              set_chpho_ch(&chpho[c_idx], sel_text, len);
            } else
@@ -1519,7 +1529,6 @@ other_keys:
            chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
            set_phrase_link(c_idx, len);
            raise_phr(c);
-#if 1
            if (c_idx + len == c_len) {
              ph_sta = -1;
 
@@ -1527,16 +1536,12 @@ other_keys:
                draw_underline(i);
              }
            }
-#endif
          } else
          if (len == 1) { // single chinese char
            i= c_idx==c_len?c_idx-1:c_idx;
            key=chpho[i].pho;
-#if 0
-           set_chpho_ch2(&chpho[i], sel_text, 1);
-#else
            set_chpho_ch(&chpho[i], sel_text, 1);
-#endif
+
            if (i && chpho[i].psta == i-1 && !(chpho[i-1].flag & FLAG_CHPHO_FIXED)) {
              set_chpho_ch(&chpho[i-1], chpho[i-1].ph1ch, 1);
              chpho[i-1].flag |= FLAG_CHPHO_PHRASE_VOID;

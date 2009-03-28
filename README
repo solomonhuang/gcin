@@ -153,7 +153,8 @@ script 中執行 gnome-settings-daemon.
 把 gcin 一類的 XIM server kill 掉再重新啟動，容易造成 X window 底下程式運作
 不正常(特別是 mozilla)，最好還是 logout 再 login。
 -----------------------------------------
-現在可以用 GCIN_XIM 這個環境變數來控制 gcin XIM 的名字 (內定值是 xcin)
+現在可以用 GCIN_XIM 這個環境變數來控制 gcin XIM 的名字 
+(內定值是由環境變數中的 XMODIFIERS=@im=XXXX 裏面的 XXXX自動設定)
 export GCIN_XIM=gcin_test
 
 一般程式就可以用 以下方式來控制要連接到那一個 XIM server
@@ -242,8 +243,7 @@ gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
 ----------------------------------------------
 如何使用 utf8 encoding  : 使用雙重 XIM
 
-- gcin 現在內定可以執行一個 process 卻可以同時支援雙 Big5 & UTF-8，以下是一個範例，
-      export GCIN_XIM=xcin
+- gcin 現在內定可以執行一個 process 卻可以同時支援雙 Big5 & UTF-8，以下是一個範例， 
       export LC_ALL=zh_TW.Big5
       export XMODIFIERS=@im=$GCIN_XIM
       gcin &
@@ -261,7 +261,6 @@ gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
 
   上面的例子是 Big5 為主，底下的範例是 UTF-8 為主，主要差別就在 export XMODIFIERS=@im= 部份。
 
-      export GCIN_XIM=xcin
       export LC_ALL=zh_TW.UTF-8
       export XMODIFIERS=@im=$GCIN_XIM
       gcin &
@@ -275,7 +274,6 @@ gcin 的 .cin format 與 .xcin 有些不同，並不支援 * 第三欄位，
 ------------------------------------------------
 如何使用 utf8 encoding  : 使用單一 XIM
 export GCIN_DUAL_XIM_OFF=
-export GCIN_XIM=gcin.UTF-8
 export XMODIFIERS=@im=$GCIN_XIM
 export LC_ALL=zh_TW.UTF-8
 gcin &

@@ -1,5 +1,20 @@
 ** UTF-8 encoding **
-1.1.7:
+1.1.8: 
+- 詞音英數的字在某些情況會與後來輸入的字結合變成詞的問題。
+- 倉頡(cj*.cin) 空白鍵的處理方式改成與行列一樣，在按滿 5 鍵後，按空白仍然不會送出第一字。目前 Windows 的倉頡也是這樣，如果想回復成以前的方式，可以用 gcin-setup 指定或是修改 cj*.cin。
+- 倉頡按 afmbc，如果預選及顯示部份符合的字關掉，只會在按空白鍵後才顯示。
+- 大易現在按 keypad 區可以輸入數字。
+- LANG=en_US 會導致 XIM 無法輸入中文的問題。
+- gtab 同音字查詢 gtab 輸入視窗現在可以用 Escape key 關閉。
+- gtk-im for firefox 的部份改寫。之前的 implementation 總覺得很 dirty，看會不會更穩。firefox 中 history window 擋住的問題也改善了。
+- 修改 gtk im 以避掉 gnumeric 上的問題，方法是看目前是不是 mozilla 系列的程式在執行。目前的方式似乎只能在 linux 上用。
+- firefox 1.5 用的 new gtk im 改成內定是開啟的。
+- 內定的 XIM_NAME 由 xcin 改為 gcin。理論上 user 應該是不用改任何東西，因為會自動從XMODIFIERS=@im=xxx 抓，除非你自己設成不一致的情形。
+- symbol table 新增愛心符號 ♥
+
+
+
+1.1.7: (2005/2/22)
 - client與 server 間如果是不同的 32/64  bit，會無法互通的問題，64-bit的使用者必須同時用新的 gcin server and libgcin-imclient.so。 
 - 倉頡等輸入法中，如果沒有開啟預覽字，則只有在重覆字出現時才會顯示字。
 - 只能用 LC_CTYPE 設定 locale 的 bug。

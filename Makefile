@@ -127,7 +127,7 @@ clean:
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C man clean
 	rm -f *.o *~ *.E *.db config.mak tags core.* $(PROGS) $(PROGS_CV) \
-	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.*
+	$(DATA) .depend gcin.spec menu/*~ */core.* tscr/core.* tscr/*~
 
 .depend:
 	$(CC) $(CFLAGS) -MM *.c > $@

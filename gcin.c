@@ -460,11 +460,17 @@ int main(int argc, char **argv)
   char *lc_utf8;
   char *lc;
 
-  if (lc_ctype && strstr(lc_ctype, "en") || lang && strstr(lang, "en")){
+  if (lc_ctype && strstr(lc_ctype, "en") /* || lang && strstr(lang, "en") */){
     lc = "en_US";
     enc = "UTF-8";
-    lc_enc = "en_US.UTF-8";
+#if 0
+    lc_enc = "zh_TW.UTF-8";
     lc_utf8 = "en_US.UTF-8";
+#else
+    // XIM in en_US doesn't work
+    lc_enc = "zh_TW.UTF-8";
+    lc_utf8 = "zh_TW.UTF-8";
+#endif
   } else
   if (lc_ctype && strstr(lc_ctype, "CN") || lang && strstr(lang, "CN")) {
     lc = "zh_CN";
