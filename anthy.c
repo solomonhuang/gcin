@@ -1118,7 +1118,8 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
       strcat(str, s);
     }
 
-    attr[0].ofs1 = ch_N;
+    strcat(str, keys);
+    attr[0].ofs1 = ch_N + keysN;
   }
 
 ret:

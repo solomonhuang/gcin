@@ -34,27 +34,32 @@ static void create_win_message(char *icon, char *text, int duration)
 
   gtk_widget_show_all(gwin_message);
 
-  int ox, oy, szx, szy;
-  gdk_window_get_origin  (tray_da_win, &ox, &oy);
-  gdk_drawable_get_size(tray_da_win, &szx, &szy);
-
   int width, height;
   get_win_size(gwin_message, &width, &height);
 
-  if (oy<height) {
-    oy = szy;
-  } else {
-    oy -= height;
-    if (oy + height > dpy_yl)
-      oy = dpy_yl - height;
-    if (oy < 0)
-      oy = 0;
-  }
+  int ox, oy, szx, szy;
+  if (tray_da_win) {
+    gdk_window_get_origin  (tray_da_win, &ox, &oy);
+    gdk_drawable_get_size(tray_da_win, &szx, &szy);
 
-  if (ox + width > dpy_xl)
+    if (oy<height) {
+      oy = szy;
+    } else {
+      oy -= height;
+      if (oy + height > dpy_yl)
+        oy = dpy_yl - height;
+      if (oy < 0)
+        oy = 0;
+    }
+
+    if (ox + width > dpy_xl)
+      ox = dpy_xl - width;
+    if (ox < 0)
+      ox = 0;
+  } else {
     ox = dpy_xl - width;
-  if (ox < 0)
-    ox = 0;
+    oy = dpy_yl - height;
+  }
 
   gtk_window_move(GTK_WINDOW(gwin_message), ox, oy);
 

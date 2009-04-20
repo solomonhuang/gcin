@@ -13,9 +13,11 @@ struct {
   { NULL, 0},
 };
 
+#if USE_GCB
 char *gcb_pos[] = {
   N_("關閉"), N_("左下"), N_("左上"), N_("右下"), N_("右上")
 };
+#endif
 
 static GtkWidget *gtablist_window = NULL;
 static GtkWidget *vbox;
@@ -23,12 +25,17 @@ static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
 static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts;
-static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client, *opt_gcb_pos,
+static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
+#if USE_GCB
+       *opt_gcb_pos,
+#endif
        *check_button_gcin_shift_space_eng_full,
        *check_button_gcin_init_im_enabled,
        *check_button_gcin_eng_phrase_enabled,
-       *check_button_gcin_win_sym_click_close,
-       *spinner_gcb_position_x, *spinner_gcb_position_y;
+       *check_button_gcin_win_sym_click_close;
+#if USE_GCB
+static GtkWidget *spinner_gcb_position_x, *spinner_gcb_position_y;
+#endif
 
 char *pho_speaker[16];
 int pho_speakerN;
@@ -183,12 +190,14 @@ static void cb_ok (GtkWidget *button, gpointer data)
   }
 
 
+#if USE_GCB
   idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcb_pos));
   save_gcin_conf_int(GCB_POSITION, idx);
   int pos_x = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_x));
   save_gcin_conf_int(GCB_POSITION_X, pos_x);
   int pos_y = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_y));
   save_gcin_conf_int(GCB_POSITION_Y, pos_y);
+#endif
 
 
   save_gcin_conf_int(PHONETIC_SPEAK,
@@ -432,6 +441,7 @@ static GtkWidget *create_speaker_opts()
 }
 
 
+#if USE_GCB
 static GtkWidget *create_gcb_pos_opts()
 {
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
@@ -453,6 +463,7 @@ static GtkWidget *create_gcb_pos_opts()
 
   return hbox;
 }
+#endif
 
 
 void create_gtablist_window (void)
@@ -565,6 +576,7 @@ void create_gtablist_window (void)
      gcin_win_sym_click_close);
 
 
+#if USE_GCB
   GtkWidget *hbox_gcb_pos = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcb_pos, FALSE, FALSE, 0);
   GtkWidget *label_gcb_pos = gtk_label_new(_("剪貼區管理視窗位置&開關"));
@@ -578,6 +590,7 @@ void create_gtablist_window (void)
    (GtkAdjustment *) gtk_adjustment_new (gcb_position_y, 0.0, 100.0, 1.0, 1.0, 0.0);
   spinner_gcb_position_y = gtk_spin_button_new (adj_gcb_position_y, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), spinner_gcb_position_y, FALSE, FALSE, 0);
+#endif
 
 #include <dirent.h>
   DIR *dir;

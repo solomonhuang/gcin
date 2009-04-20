@@ -33,9 +33,9 @@ struct {
   char *keystr;
   int keynum;
 } edit_disp[] = {
-  {"gcin視窗", GCIN_EDIT_DISPLAY_OVER_THE_SPOT},
-  {"應用程式編輯區", GCIN_EDIT_DISPLAY_ON_THE_SPOT},
-  {"同時顯示",  GCIN_EDIT_DISPLAY_BOTH},
+  {N_("gcin視窗"), GCIN_EDIT_DISPLAY_OVER_THE_SPOT},
+  {N_("應用程式編輯區"), GCIN_EDIT_DISPLAY_ON_THE_SPOT},
+  {N_("同時顯示"),  GCIN_EDIT_DISPLAY_BOTH},
   { NULL, 0},
 };
 
@@ -431,7 +431,7 @@ static GtkWidget *create_gcin_edit_display()
   int i, current_idx=0;
 
   for(i=0; edit_disp[i].keystr; i++) {
-    GtkWidget *item = gtk_menu_item_new_with_label (edit_disp[i].keystr);
+    GtkWidget *item = gtk_menu_item_new_with_label (_(edit_disp[i].keystr));
 
     if (edit_disp[i].keynum == gcin_edit_display)
       current_idx = i;

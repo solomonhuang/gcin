@@ -71,7 +71,7 @@ gboolean gtab_has_input()
   if (same_query_show_pho_win())
     return TRUE;
 
-  if (gbufN)
+  if (gbufN && gcin_edit_display!=GCIN_EDIT_DISPLAY_ON_THE_SPOT)
     return TRUE;
 
   return FALSE;
@@ -310,7 +310,7 @@ void ClrIn()
   clear_gtab_in_area();
   last_idx = 0;
 
-  if (gcin_pop_up_win && !same_query_show_pho_win() && !gbufN)
+  if (gcin_pop_up_win && !gtab_has_input())
     hide_win_gtab();
 
   clear_gtab_input_error_color();

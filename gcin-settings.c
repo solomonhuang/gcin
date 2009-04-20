@@ -53,7 +53,10 @@ int gcin_status_tray;
 #endif
 
 int pho_hide_row2, pho_in_row1;
-int gcb_position, gcb_position_x, gcb_position_y, gcin_bell_volume;
+#if USE_GCB
+int gcb_position, gcb_position_x, gcb_position_y;
+#endif
+int gcin_bell_volume;
 int gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch;
 
 
@@ -134,9 +137,11 @@ void load_setttings()
   gcin_win_color_use = get_gcin_conf_int(GCIN_WIN_COLOR_USE, 0);
 
 
+#if USE_GCB
   gcb_position = get_gcin_conf_int(GCB_POSITION, 4);
   gcb_position_x = get_gcin_conf_int(GCB_POSITION_X, 0);
   gcb_position_y = get_gcin_conf_int(GCB_POSITION_Y, 0);
+#endif
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
   gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);

@@ -589,3 +589,19 @@ msgstr "Upper right"
 #: ../tray.c:197
 msgid "重新執行gcin"
 msgstr "Restart gcin"
+
+#: ../gcin-setup.c:36
+msgid "gcin視窗"
+msgstr "on gcin window"
+
+#: ../gcin-setup.c:37
+msgid "應用程式編輯區"
+msgstr "on application window"
+
+#: ../gcin-setup.c:38
+msgid "同時顯示"
+msgstr "on both windows"
+
+#: ../gcin-setup.c:424
+msgid "編輯區顯示"
+msgstr "Editing area"

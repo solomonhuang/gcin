@@ -497,15 +497,8 @@ void hide_win_gtab()
 //  dbg("hide_win_gtab gwin_gtab\n", gwin_gtab);
   if (!gwin_gtab)
     return;
-#if 0
-  // get around the grey window bug in GTK/X11
-  gdk_flush();
-  XSync(dpy, False);
-  usleep(10000);
-#endif
   gtk_widget_hide(gwin_gtab);
   close_gtab_pho_win();
-
   hide_win_sym();
 }
 

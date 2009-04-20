@@ -56,7 +56,7 @@ static void clrin_pho_tsin()
 {
   clrin_pho();
 
-  if (!c_len && gcin_pop_up_win)
+  if (!tsin_has_input())
     hide_win0();
 }
 
@@ -64,7 +64,9 @@ gboolean pho_has_input();
 
 gboolean tsin_has_input()
 {
-  return c_len || pho_has_input();
+  gboolean v = (gcin_edit_display!=GCIN_EDIT_DISPLAY_ON_THE_SPOT && c_len) || pho_has_input();
+//  dbg("tsin_has_input %d\n", v);
+  return v;
 }
 
 
@@ -2062,7 +2064,7 @@ int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor)
   int tn=0;
   int attrN=0;
 
-  dbg("tsin_get_preedit\n");
+//  dbg("tsin_get_preedit\n");
   for(i=0; i<c_len; i++) {
     if (tn>=GCIN_PREEDIT_MAX_STR-CH_SZ-1)
       goto fin;

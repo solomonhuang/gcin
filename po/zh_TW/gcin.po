@@ -589,3 +589,19 @@ msgstr "右上"
 #: ../tray.c:197
 msgid "重新執行gcin"
 msgstr "重新執行gcin"
+
+#: ../gcin-setup.c:36
+msgid "gcin視窗"
+msgstr "gcin視窗"
+
+#: ../gcin-setup.c:37
+msgid "應用程式編輯區"
+msgstr "應用程式編輯區"
+
+#: ../gcin-setup.c:38
+msgid "同時顯示"
+msgstr "同時顯示"
+
+#: ../gcin-setup.c:424
+msgid "編輯區顯示"
+msgstr "編輯區顯示"
