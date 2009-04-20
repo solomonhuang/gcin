@@ -580,6 +580,7 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
   printf("gtk_im_context_gcin_get_preedit_string attN:%d '%s'\n", attN, *str);
 #endif
   int i;
+  if (attrs)
   for(i=0; i < attN; i++) {
     add_preedit_attr(*attrs, *str, &att[i]);
   }
