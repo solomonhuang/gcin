@@ -73,16 +73,21 @@ void GCINIMContext::update_preedit()
   QList<QAttribute> preedit_attributes;
 //  QString preedit_string;
   int preedit_cursor_position=0;
-  char *str;
+  char *str=NULL;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
   int attN = gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position);
-
-//  str = strdup("aaaa");
 
   preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
 
   const QWidget *focused_widget = qApp->focusWidget ();
+  if (!focused_widget) {
+free_mem:
+    free(str);
+    return;
+  }
   const QPalette &palette = focused_widget->palette ();
+  if (&palette==NULL)
+    goto free_mem;
   const QBrush &reversed_foreground = palette.base ();
   const QBrush &reversed_background = palette.text ();
 
@@ -113,7 +118,6 @@ void GCINIMContext::update_preedit()
           }
     }
   }
-
 
   QInputMethodEvent im_event (QString::fromUtf8(str), preedit_attributes);
   sendEvent (im_event);

@@ -1154,8 +1154,10 @@ empty:
       goto empty;
     case 6:
       return tsin_get_preedit(str, attr, cursor);
+#if USE_ANTHY
     case 12:
       return anthy_get_preedit(str, attr, cursor);
+#endif
     default:
       return gtab_get_preedit(str, attr, cursor);
 //      dbg("metho %d\n", current_CS->in_method);
@@ -1180,9 +1182,11 @@ void gcin_reset()
     case 6:
       tsin_reset();
       return;
+#if USE_ANTHY
     case 12:
       gcin_anthy_reset();
       return;
+#endif
     default:
       gtab_reset();
 //      dbg("metho %d\n", current_CS->in_method);
