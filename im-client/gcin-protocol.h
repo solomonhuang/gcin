@@ -7,7 +7,9 @@ typedef enum {
   GCIN_req_focus_in = 4,
   GCIN_req_focus_out = 8,
   GCIN_req_set_cursor_location = 0x10,
-  GCIN_req_set_flags = 0x20
+  GCIN_req_set_flags = 0x20,
+  GCIN_req_get_preedit = 0x40,
+  GCIN_req_reset = 0x80,
 } GCIN_req_t;
 
 

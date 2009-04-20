@@ -1,6 +1,6 @@
 #!/bin/bash -f
 
 export LD_LIBRARY_PATH="../im-client"
-export LD_PRELOAD=./im-gcin.so
+export LD_PRELOAD=./im-gcin-cur.so
 #valgrind leafpad
 leafpad

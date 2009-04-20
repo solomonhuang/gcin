@@ -23,6 +23,15 @@ void align_with_ui_window(GtkWidget *win)
 
 void align_with_ui_window(GtkWidget *win);
 
+#if 0
+void cb_link_button(GtkLinkButton *button, const gchar *link_,
+                           gpointer user_data)
+{
+  GError *err;
+  gtk_show_uri(NULL, link_, GDK_CURRENT_TIME, &err);
+}
+#endif
+
 void create_about_window()
 {
     if (about_window) {
@@ -71,6 +80,7 @@ void create_about_window()
 #else
     GtkWidget *button_url = gtk_link_button_new_with_label("http://hyperrate.com/dir.php?eid=67", "forum");
     gtk_box_pack_start(GTK_BOX(vbox), button_url, FALSE, FALSE, 0);
+    gtk_link_button_set_uri_hook(cb_link_button, NULL, NULL);
 #endif
 
     image = gtk_image_new_from_file (SYS_ICON_DIR"/gcin.png");

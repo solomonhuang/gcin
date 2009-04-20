@@ -12,6 +12,8 @@
 using namespace Qt;
 static QWidget *focused_widget;
 
+typedef QInputMethodEvent::Attribute QAttribute;
+
 GCINIMContext::GCINIMContext ()
 {
   Display *display = QX11Info::display();
@@ -44,6 +46,9 @@ void GCINIMContext::widgetDestroyed (QWidget *widget)
 
 void GCINIMContext::reset ()
 {
+  if (gcin_ch) {
+    gcin_im_client_reset(gcin_ch);
+  }
 }
 
 void GCINIMContext::update_cursor(QWidget *fwidget)
@@ -63,6 +68,58 @@ void GCINIMContext::update_cursor(QWidget *fwidget)
   }
 }
 
+void GCINIMContext::update_preedit()
+{
+  QList<QAttribute> preedit_attributes;
+//  QString preedit_string;
+  int preedit_cursor_position=0;
+  char *str;
+  GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
+  int attN = gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position);
+
+//  str = strdup("aaaa");
+
+  preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
+
+  const QWidget *focused_widget = qApp->focusWidget ();
+  const QPalette &palette = focused_widget->palette ();
+  const QBrush &reversed_foreground = palette.base ();
+  const QBrush &reversed_background = palette.text ();
+
+#if DBG || 0
+  printf("gtk_im_context_gcin_get_preedit_string attN:%d '%s'\n", attN, str);
+#endif
+  int i;
+  for(i=0; i < attN; i++) {
+    int ofs0 = att[i].ofs0;
+    int len = att[i].ofs1 - att[i].ofs0;
+
+    switch (att[i].flag) {
+      case GCIN_PREEDIT_ATTR_FLAG_REVERSE:
+          {
+              QTextCharFormat text_format;
+              text_format.setForeground (reversed_foreground);
+              text_format.setBackground (reversed_background);
+              QAttribute qt_attribute (QInputMethodEvent::TextFormat, ofs0, len, text_format);
+              preedit_attributes.push_back (qt_attribute);
+          }
+          break;
+      case GCIN_PREEDIT_ATTR_FLAG_UNDERLINE:
+          {
+              QTextCharFormat text_format;
+              text_format.setProperty (QTextFormat::FontUnderline, true);
+              QAttribute qt_attribute (QInputMethodEvent::TextFormat, ofs0, len, text_format);
+              preedit_attributes.push_back (qt_attribute);
+          }
+    }
+  }
+
+
+  QInputMethodEvent im_event (QString::fromUtf8(str), preedit_attributes);
+  sendEvent (im_event);
+  free(str);
+}
+
 void GCINIMContext::update()
 {
     QWidget *focused_widget = qApp->focusWidget ();
@@ -75,7 +132,6 @@ void GCINIMContext::update()
         update_cursor(focused_widget);
     }
 }
-
 
 QString GCINIMContext::language ()
 {
@@ -135,6 +191,7 @@ bool GCINIMContext::x11FilterEvent (QWidget *widget, XEvent *event)
        keysym, state, &rstr);
   }
 
+  update_preedit();
   update_cursor(widget);
 
   if (rstr)
@@ -150,5 +207,12 @@ bool GCINIMContext::filterEvent (const QEvent *event)
 
 bool GCINIMContext::isComposing() const
 {
-  return FALSE;
+  char *str;
+  GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
+  int preedit_cursor_position;
+  gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position);
+  bool is_compose = str[0]>0;
+  free(str);
+
+  return is_compose;
 }

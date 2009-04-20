@@ -8,7 +8,7 @@ int default_input_method;
 int left_right_button_tips;
 int gcin_im_toggle_keys;
 int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
-int gcin_win_sym_click_close;
+int gcin_win_sym_click_close, gcin_edit_display;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -140,4 +140,11 @@ void load_setttings()
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
   gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);
+#if 1
+  gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_BOTH);
+#elif 1
+  gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_ON_THE_SPOT);
+#else
+  gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_OVER_THE_SPOT);
+#endif
 }

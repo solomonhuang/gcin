@@ -1,13 +1,14 @@
+#### Turn off LD_RUN_PATH in ./Makefile to run this
+
+rm -f core.*
 make
 export XMODIFIERS=@im=gcin_test
-pkill gcin.test
-../gcin.test &
-
 export LC_ALL=zh_TW.Big5
 export LD_LIBRARY_PATH="../im-client"
-export LD_PRELOAD=./im-gcin-cur.so
-#gdb /usr/bin/firefox
-gdb /usr/bin/gedit
+export LD_PRELOAD="./im-gcin-cur.so"
+#valgrind gedit
+gedit
+#gimp
 
 unset LD_PRELOAD
 pkill gcin.test

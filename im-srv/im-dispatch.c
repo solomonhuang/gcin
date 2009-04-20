@@ -36,6 +36,11 @@ int write_enc(int fd, void *p, int n)
   }
 
   int r =  write(fd, tmp, n);
+#if DBG
+  if (r < 0)
+    perror("write_enc");
+#endif
+
   free(tmp);
 
   return r;
@@ -62,8 +67,7 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state);
 void process_client_req(int fd)
 {
   GCIN_req req;
-
-//  printf("process_client_req %d\n", fd);
+//  printf("svr--> process_client_req %d\n", fd);
 
   int rn = read(fd, &req, sizeof(req));
 
@@ -139,20 +143,23 @@ void process_client_req(int fd)
 
 //      dbg("serv key eve %x %x\n",req.keyeve.key, req.keyeve.state);
 
+#if DBG
+      char *typ="press";
+#endif
       if (req.req_no==GCIN_req_key_press)
         status = ProcessKeyPress(req.keyeve.key, req.keyeve.state);
       else {
         status = ProcessKeyRelease(req.keyeve.key, req.keyeve.state);
+#if DBG
+        typ="rele";
+#endif
       }
 
       if (status)
         reply.flag |= GCIN_reply_key_processed;
-#if 0
-      if (cs->im_state == GCIN_STATE_DISABLED)
-        reply.flag |= GCIN_reply_key_state_disabled;
+#if DBG
+      dbg("%s srv flag:%x status:%d len:%d\n",typ, reply.flag, status, output_bufferN);
 #endif
-//      dbg("srv flag %x\n", reply.flag);
-
       int datalen = reply.datalen =
         output_bufferN ? output_bufferN + 1 : 0; // include '\0'
       to_gcin_endian_4(&reply.flag);
@@ -200,6 +207,35 @@ void process_client_req(int fd)
         rflags = FLAG_GCIN_srv_ret_status_use_pop_up;
 
       write_enc(fd, &rflags, sizeof(rflags));
+      break;
+    case GCIN_req_get_preedit:
+      {
+#if DBG
+      dbg("svr GCIN_req_get_preedit %x\n", cs);
+#endif
+      char str[GCIN_PREEDIT_MAX_STR];
+      GCIN_PREEDIT_ATTR attr[GCIN_PREEDIT_ATTR_MAX_N];
+      int cursor;
+      int attrN = gcin_get_preedit(cs, str, attr, &cursor);
+      if (gcin_edit_display&(GCIN_EDIT_DISPLAY_BOTH|GCIN_EDIT_DISPLAY_OVER_THE_SPOT))
+        cursor=0;
+      if (gcin_edit_display&GCIN_EDIT_DISPLAY_OVER_THE_SPOT) {
+        attrN=0;
+        str[0]=0;
+      }
+      int len = strlen(str)+1; // including \0
+      write_enc(fd, &len, sizeof(len));
+      write_enc(fd, str, len);
+//      dbg("attrN:%d\n", attrN);
+      write_enc(fd, &attrN, sizeof(attrN));
+      if (attrN > 0)
+        write_enc(fd, attr, sizeof(GCIN_PREEDIT_ATTR)*attrN);
+      write_enc(fd, &cursor, sizeof(cursor));
+ //     dbg("uuuuuuuuuuuuuuuuu len:%d %d cursor:%d\n", len, attrN, cursor);
+      }
+      break;
+    case GCIN_req_reset:
+      gcin_reset();
       break;
     default:
       dbg_time("Invalid request %x from:", req.req_no);

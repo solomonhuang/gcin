@@ -13,7 +13,7 @@ static GtkWidget *check_button_root_style_use,
 static GtkWidget *opt_spc_opts;
 
 static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
-static GtkClipboard *pclipboard;
+static GtkClipboard *pclipboard, *opt_gcin_edit_display;
 GtkWidget *main_window;
 static GdkColor gcin_win_gcolor_fg, gcin_win_gcolor_bg, gcin_sel_key_gcolor;
 
@@ -28,6 +28,16 @@ COLORSEL colorsel[2] =
   { {&gcin_win_gcolor_fg, &gcin_win_color_fg, "前景顏色"},
     {&gcin_win_gcolor_bg, &gcin_win_color_bg, "背景顏色"}
   };
+
+struct {
+  char *keystr;
+  int keynum;
+} edit_disp[] = {
+  {"gcin視窗", GCIN_EDIT_DISPLAY_OVER_THE_SPOT},
+  {"應用程式編輯區", GCIN_EDIT_DISPLAY_ON_THE_SPOT},
+  {"同時顯示",  GCIN_EDIT_DISPLAY_BOTH},
+  { NULL, 0},
+};
 
 static gboolean close_application( GtkWidget *widget,
                                    GdkEvent  *event,
@@ -299,6 +309,10 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   cstr = gtk_color_selection_palette_to_string(&gcin_sel_key_gcolor, 1);
   dbg("selkey color %s\n", cstr);
   save_gcin_conf_str(GCIN_SEL_KEY_COLOR, cstr);
+
+  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcin_edit_display));
+  save_gcin_conf_int(GCIN_EDIT_DISPLAY, edit_disp[idx].keynum);
+
   g_free(cstr);
 
 
@@ -401,6 +415,34 @@ static gboolean cb_gcin_sel_key_color( GtkWidget *widget, gpointer data)
 
    gtk_widget_show((GtkWidget*)color_selector);
    return TRUE;
+}
+
+static GtkWidget *create_gcin_edit_display()
+{
+
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+  GtkWidget *label = gtk_label_new(_("編輯區顯示"));
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+
+  opt_gcin_edit_display = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_gcin_edit_display, FALSE, FALSE, 0);
+  GtkWidget *menu = gtk_menu_new ();
+
+  int i, current_idx=0;
+
+  for(i=0; edit_disp[i].keystr; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (edit_disp[i].keystr);
+
+    if (edit_disp[i].keynum == gcin_edit_display)
+      current_idx = i;
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcin_edit_display), menu);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcin_edit_display), current_idx);
+
+  return hbox;
 }
 
 
@@ -529,6 +571,8 @@ void create_appearance_conf_window()
   spinner_root_style_y = gtk_spin_button_new (adj_root_style_y, 0, 0);
   gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_y);
 
+
+  gtk_box_pack_start (GTK_BOX(vbox_top), create_gcin_edit_display(), FALSE, FALSE, 0);
 
   GtkWidget *hbox_gcin_inner_frame = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX(vbox_top), hbox_gcin_inner_frame, FALSE, FALSE, 0);

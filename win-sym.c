@@ -168,6 +168,9 @@ static void cb_button_sym(GtkButton *button, char *str)
 
   if (current_CS->in_method == 6 && current_CS->im_state != GCIN_STATE_DISABLED) {
     add_to_tsin_buf(str, pho, utf8_str_N(str));
+    if (gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT) {
+      send_fake_key_eve(XK_Control_L);
+    }
   }
   else
     send_text_call_back(str);

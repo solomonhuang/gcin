@@ -141,7 +141,6 @@ void set_sele_text(int i, char *text, int len)
 }
 
 
-void move_win_char_index(GtkWidget *win1, int index);
 
 void disp_selections(int x, int y)
 {
@@ -156,7 +155,6 @@ void disp_selections(int x, int y)
   if (y + win1_yl > dpy_yl)
     y = win_y - win1_yl;
 
-//  dbg("move_win_char_index:%d %d\n", index, x);
   gtk_window_move(GTK_WINDOW(gwin1), x, y);
 }
 

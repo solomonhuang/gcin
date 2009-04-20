@@ -245,7 +245,6 @@ static void disp_in_area_pho_tsin()
 
 void clear_chars_all();
 
-
 static void clear_match()
 {
   ph_sta=-1;
@@ -786,8 +785,6 @@ static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
       continue;
     }
 
-
-
     int i;
     for(i=0; i < plen; i++) {
       if (mtk[i]!=pp[i])
@@ -913,7 +910,9 @@ void tsin_toggle_half_full()
     tsin_half_full^=1;
     key_press_time = 0;
     drawcursor();
+#if TRAY_ENABLED
     load_tray_icon();
+#endif
 }
 
 
@@ -1128,12 +1127,12 @@ int tsin_sele_by_idx(int c)
 {
   int len = pre_sel[c].len;
 
+#if 0
+    dbg("eqlenN:%d %d\n", c, pre_selN);
+#endif
+
   if (c >= pre_selN)
     return 0;
-
-#if 0
-    dbg("eqlenN:%d %d\n", eqlenN, current_ph_idx);
-#endif
 
   full_match = FALSE;
   gboolean b_added = add_to_tsin_buf_phsta(pre_sel[c].str, pre_sel[c].phokey, len);
@@ -1672,7 +1671,6 @@ other_keys:
          else
            set_chpho_ch2(&chpho[sel_idx], sel_text, len);
 
-//         chpho[c_idx].flag &= ~FLAG_CHPHO_PHRASE_VOID;
          set_fixed(sel_idx, len);
 
          call_tsin_parse();
@@ -2054,4 +2052,47 @@ gboolean save_phrase_to_db2(CHPHO *chph, int len)
    chpho_extract(chph, len, pho, ch, NULL);
 
    return save_phrase_to_db(pho, ch, len, 1);
+}
+
+#include "im-client/gcin-im-client-attr.h"
+
+int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor)
+{
+  int i;
+  int tn=0;
+  int attrN=0;
+
+  dbg("tsin_get_preedit\n");
+  for(i=0; i<c_len; i++) {
+    if (tn>=GCIN_PREEDIT_MAX_STR-CH_SZ-1)
+      goto fin;
+    tn+=u8cpy(str+tn, chpho[i].ch);
+  }
+
+fin:
+  str[tn]=0;
+
+  if (c_len) {
+    attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;
+    attr[0].ofs0=0;
+    attr[0].ofs1=c_len;
+    attrN++;
+
+    if (c_idx < c_len) {
+      attr[1].ofs0=c_idx;
+      attr[1].ofs1=c_idx+1;
+      attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
+      attrN++;
+    }
+  }
+
+  *cursor = c_idx;
+ret:
+  return attrN;
+}
+
+void tsin_reset()
+{
+  tsin_reset_in_pho0();
+  clear_tsin_buffer();
 }

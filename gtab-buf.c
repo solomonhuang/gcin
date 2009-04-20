@@ -105,13 +105,14 @@ static void free_gbuf(int idx)
 }
 
 
-static void clear_buf_all()
+static void clear_gtab_buf_all()
 {
   int i;
   for(i=0;i<gbufN;i++)
     free_gbuf(i);
   gbuf_cursor = gbufN=0;
   gtab_buf_select = 0;
+  disp_gbuf();
 }
 
 void disp_gbuf()
@@ -209,8 +210,7 @@ int output_gbuf()
   }
 
 
-  clear_buf_all();
-  disp_gbuf();
+  clear_gtab_buf_all();
   ClrIn();
   return;
 }
@@ -599,4 +599,52 @@ void gbuf_next_pg()
     pg_idx = 0;
 
   gtab_disp_sel();
+}
+
+#include "im-client/gcin-im-client-attr.h"
+
+int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
+{
+  int i;
+  int tn=0;
+
+//  dbg("gtab_get_preedit\n");
+  str[0]=0;
+  *pcursor=0;
+
+  if (!(inmd[current_CS->in_method].flag & FLAG_AUTO_SELECT_BY_PHRASE))
+    return 0;
+
+  attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;
+  attr[0].ofs0=0;
+  int attrN=0;
+  int ch_N=0;
+
+  if (gbufN)
+    attrN=1;
+
+  for(i=0; i < gbufN; i++) {
+    char *s = gbuf[i].ch;
+    int N = utf8_str_N(s);
+    ch_N+=N;
+    if (i < gbuf_cursor)
+      *pcursor+=N;
+    if (i==gbuf_cursor) {
+      attr[1].ofs0=*pcursor;
+      attr[1].ofs1=*pcursor+N;
+      attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
+      attrN++;
+    }
+    strcat(str, s);
+  }
+
+  attr[0].ofs1 = ch_N;
+  return attrN;
+}
+
+void gtab_reset()
+{
+  clear_gtab_buf_all();
+  clear_gbuf_sel();
+  ClrIn();
 }

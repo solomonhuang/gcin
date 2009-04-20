@@ -229,7 +229,7 @@ void set_gtab_input_method_name(char *s)
 //  dbg("set_gtab_input_method_name '%s'\n", s);
   if (!label_input_method_name)
     return;
-  gtk_label_set(GTK_LABEL(label_input_method_name), s);
+  gtk_label_set_text(GTK_LABEL(label_input_method_name), s);
 }
 
 
@@ -296,6 +296,10 @@ char full_char_str[]="全";
 
 void disp_label_edit(char *str)
 {
+  if (gcin_edit_display == GCIN_EDIT_DISPLAY_ON_THE_SPOT) {
+    gtk_widget_hide(label_edit);
+    return;
+  }
   gtk_label_set_markup(GTK_LABEL(label_edit), str);
 }
 
@@ -415,6 +419,9 @@ void create_win_gtab_gui_simple()
 
   gtk_widget_show_all (gwin_gtab);
   gtk_widget_hide (gwin_gtab);
+
+  if (gcin_edit_display == GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+    gtk_widget_hide(label_edit);
 
   set_disp_im_name();
   gtk_widget_hide(label_full);

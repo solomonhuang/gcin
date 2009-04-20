@@ -12,7 +12,7 @@ GCIN_SO= gcin1.so gcin2.so gtk_bug_fix.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o \
-     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o gcb.o phrase.o
+     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o
@@ -74,6 +74,11 @@ endif
 
 ifeq ($(USE_ANTHY),Y)
 CFLAGS += -DUSE_ANTHY=1
+endif
+
+ifeq ($(USE_GCB),Y)
+CFLAGS += -DUSE_GCB=1
+OBJS += gcb.o
 endif
 
 im-srv = im-srv/im-srv.a

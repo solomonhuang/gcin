@@ -773,3 +773,8 @@ void start_gtab_pho_query(char *utf8)
     feedkey_pho(xkeys[i], 0);
   }
 }
+
+
+void pho_reset()
+{
+}

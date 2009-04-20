@@ -11,6 +11,7 @@ typedef struct GCIN_client_handle_S {
   u_int flag;
   Display *disp;
   struct GCIN_PASSWD *passwd;
+  u_int seq;
 } GCIN_client_handle;
 
 enum {
@@ -53,6 +54,12 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           char **rstr);
 
 void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_flags);
+
+void gcin_im_client_reset(GCIN_client_handle *handle);
+
+#include "gcin-im-client-attr.h"
+int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor);
+
 #ifdef __cplusplus
 }
 #endif

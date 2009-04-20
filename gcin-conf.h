@@ -19,6 +19,7 @@
 #define GCIN_BELL_VOLUME "gcin-bell-volume"
 #define GCIN_SOUND_PLAY_OVERLAP "gcin-sound-play-overlap"
 #define GCIN_ENABLE_CTRL_ALT_SWITCH "gcin-enable-ctrl-alt-switch"
+#define GCIN_EDIT_DISPLAY "gcin-edit-display"
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -115,7 +116,7 @@ extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name, *gcin_
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use;
 extern int gcin_init_im_enabled;
-extern int gcb_position, gcb_position_x, gcb_position_y;
+extern int gcb_position, gcb_position_x, gcb_position_y, gcin_edit_display;
 
 void get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char **rstr, char *default_str);

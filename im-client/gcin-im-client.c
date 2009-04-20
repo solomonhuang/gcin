@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 #ifndef _XSERVER64
 #define _XSERVER64
 #endif
@@ -273,6 +274,8 @@ static int gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
   if (!handle->fd)
     return 0;
 
+  handle->seq++;
+
   bzero(req, sizeof(GCIN_req));
 
   req->req_no = req_no;
@@ -332,6 +335,12 @@ static int handle_read(GCIN_client_handle *handle, void *ptr, int n)
   save_old_sigaction(&save_act);
 #endif
   int r = read(fd, ptr, n);
+
+#if DBG || 1
+  if (r < 0)
+    perror("handle_read");
+#endif
+
 #if 1
   restore_old_sigaction(&save_act);
 #endif
@@ -536,5 +545,84 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 
   if (handle_read(handle, ret_flag, sizeof(int)) <= 0) {
     error_proc(handle, "cannot read reply str from gcin server");
+  }
+}
+
+
+
+
+
+int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor)
+{
+#if DBG
+  dbg("gcin_im_client_get_preedit\n");
+#endif
+  GCIN_req req;
+  if (!gen_req(handle, GCIN_req_get_preedit, &req)) {
+err_ret:
+#if DBG
+    dbg("aaaaaaaaaaaaa %x\n", str);
+#endif
+    if (cursor)
+      *cursor=0;
+    *str=strdup("");
+    return 0;
+  }
+
+  if (handle_write(handle, &req, sizeof(req)) <=0) {
+    error_proc(handle,"gcin_im_client_get_preedit error");
+    return 0;
+  }
+
+  int str_len=-1; // str_len includes \0
+  if (handle_read(handle, &str_len, sizeof(str_len))<=0)
+    goto err_ret; // including \0
+
+  *str = malloc(str_len);
+
+  if (handle_read(handle, *str, str_len)<=0)
+    goto err_ret;
+#if DBG
+  dbg("gcin_im_client_get_preedit len:%d '%s' \n", str_len, *str);
+#endif
+  int attN = -1;
+  if (handle_read(handle, &attN, sizeof(attN))<=0) {
+    dbg("aaaa\n");
+    goto err_ret;
+  }
+
+  if (attN>0 && handle_read(handle, att, sizeof(GCIN_PREEDIT_ATTR)*attN)<=0) {
+    dbg("www\n");
+    goto err_ret;
+  }
+
+  int tcursor;
+  if (handle_read(handle, &tcursor, sizeof(tcursor))<=0) {
+    dbg("bbb\n");
+    goto err_ret;
+  }
+
+  if (cursor)
+    *cursor = tcursor;
+
+#if DBG
+  dbg("jjjjjjjjj %d cursor:%d\n", attN, *cursor);
+#endif
+  return attN;
+}
+
+
+
+void gcin_im_client_reset(GCIN_client_handle *handle)
+{
+  GCIN_req req;
+#if DBG
+  dbg("gcin_im_client_reset\n");
+#endif
+  if (!gen_req(handle, GCIN_req_reset, &req))
+    return;
+
+  if (handle_write(handle, &req, sizeof(req)) <=0) {
+    error_proc(handle,"gcin_im_client_reset error");
   }
 }

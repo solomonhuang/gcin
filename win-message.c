@@ -36,7 +36,7 @@ static void create_win_message(char *icon, char *text, int duration)
 
   int ox, oy, szx, szy;
   gdk_window_get_origin  (tray_da_win, &ox, &oy);
-  gdk_window_get_size(tray_da_win, &szx, &szy);
+  gdk_drawable_get_size(tray_da_win, &szx, &szy);
 
   int width, height;
   get_win_size(gwin_message, &width, &height);

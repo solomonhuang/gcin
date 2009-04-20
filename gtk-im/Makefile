@@ -24,8 +24,14 @@ endif
 .c.E:
 	$(CC) -E $(CFLAGS) -o $@ $<
 
+all:	im-gcin.so im-gcin-cur.so
+
 im-gcin.so:     $(OBJS) ../im-client/libgcin-im-client.so
 	export LD_RUN_PATH=$(gcinlibdir) ;\
+	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
+	rm -f core.*
+
+im-gcin-cur.so:     $(OBJS) ../im-client/libgcin-im-client.so
 	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
 	rm -f core.*
 

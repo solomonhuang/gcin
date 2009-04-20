@@ -284,12 +284,22 @@ gboolean timeout_periodic_clipboard_fetch()
   return TRUE;
 }
 
+static int old_gcb_position=-1, old_gcb_position_x=-1, old_gcb_position_y=-1;
+
 void gcb_main()
 {
 
   GtkWidget *hbox,*vbox;
   GtkWidget *proxy_invisible;
   int i;
+#if 1
+  if (gcb_position==old_gcb_position && gcb_position_x==old_gcb_position_x
+      && gcb_position_y==old_gcb_position_y)
+    return;
+#endif
+  old_gcb_position = gcb_position;
+  old_gcb_position_x = gcb_position_x;
+  old_gcb_position_y = gcb_position_y;
 
   if (mainwin)
     gtk_widget_destroy(mainwin);
@@ -303,7 +313,7 @@ void gcb_main()
   if (!gcb_position)
     return;
 
-  printf("gcb_position:%d\n", gcb_position);
+//  printf("gcb_position:%d\n", gcb_position);
 
   static char geo[][2]={{0,0},{'+','-'},{'+','+'},{'-','-'},{'-','+'}};
   sprintf(geomstr, "%c%d%c%d",
@@ -321,6 +331,11 @@ void gcb_main()
   }
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+#if 0
+  gtk_widget_realize (mainwin);
+  set_no_focus(mainwin);
+#endif
 
   hist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
@@ -386,7 +401,10 @@ void gcb_main()
 
   gtk_widget_show (hbox);
   gtk_widget_show (vbox);
+
   gtk_widget_show (mainwin);
+
+
 #if 0
   gdk_input_set_extension_events(mainwin->window, GDK_EXTENSION_EVENTS_ALL,
                                  GDK_EXTENSION_EVENTS_ALL);

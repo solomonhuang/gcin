@@ -360,7 +360,7 @@ static int xerror_handler(Display *d, XErrorEvent *eve)
   return 0;
 }
 
-static void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
+void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
 {
   Window ow;
   void *olderr = XSetErrorHandler((XErrorHandler)xerror_handler);
@@ -1134,6 +1134,61 @@ int gcin_FocusOut(ClientState *cs)
 
   return True;
 }
+
+#include "im-client/gcin-im-client-attr.h"
+
+int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor)
+{
+//  dbg("gcin_get_preedit %x\n", current_CS);
+  if (!current_CS) {
+empty:
+//    dbg("empty\n");
+    str[0]=0;
+    *cursor=0;
+    return 0;
+  }
+
+  switch(current_CS->in_method) {
+    case 3:
+    case 10:
+      goto empty;
+    case 6:
+      return tsin_get_preedit(str, attr, cursor);
+    case 12:
+      return anthy_get_preedit(str, attr, cursor);
+    default:
+      return gtab_get_preedit(str, attr, cursor);
+//      dbg("metho %d\n", current_CS->in_method);
+  }
+
+  return 0;
+}
+
+
+
+void gcin_reset()
+{
+  if (!current_CS)
+    return;
+//  dbg("gcin_reset\n");
+  switch(current_CS->in_method) {
+    case 3:
+      pho_reset();
+      return;
+    case 10:
+      return;
+    case 6:
+      tsin_reset();
+      return;
+    case 12:
+      gcin_anthy_reset();
+      return;
+    default:
+      gtab_reset();
+//      dbg("metho %d\n", current_CS->in_method);
+  }
+}
+
 
 #if USE_XIM
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)

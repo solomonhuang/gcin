@@ -2,5 +2,5 @@ export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
 export LD_LIBRARY_PATH="../im-client"
 
-export LD_PRELOAD=~/gcin/gtk-im/im-gcin.so
+export LD_PRELOAD=~/gcin/gtk-im/im-gcin-cur.so
 oo ~/t.sxi

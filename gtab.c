@@ -374,7 +374,6 @@ void init_gtab(int inmdno)
   else
     inp->flag &= ~FLAG_AUTO_SELECT_BY_PHRASE;
 
-
   if (!inmd[inmdno].filename || !strcmp(inmd[inmdno].filename,"-")) {
     dbg("filename is empty\n");
     return;

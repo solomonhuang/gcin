@@ -23,7 +23,7 @@ typedef struct {
 
 #define COLN 19
 static KEY keys[][COLN]={
-{{XK_Escape,"Esc"},{XK_F1,"F1"},{XK_F2,"F2"},{XK_F3,"F3"},{XK_F4,"F4"},{XK_F5,"F5"},{XK_F6,"F6"},{XK_F7,"F7"},{XK_F8,"F8"},{XK_F9,"F9"},{XK_F10,"F10"},{XK_F11,"11"},{XK_F12,"12"},{XK_Print,"Pr",8},{XK_Scroll_Lock,"Slk",8},{XK_Pause,"Pau",8}},
+{{XK_Escape,"Esc"},{XK_F1,"F1"},{XK_F2,"F2"},{XK_F3,"F3"},{XK_F4,"F4"},{XK_F5,"F5"},{XK_F6,"F6"},{XK_F7,"F7"},{XK_F8,"F8"},{XK_F9,"F9"},{XK_F10,"F10"},{XK_F11,"F11"},{XK_F12,"F12"},{XK_Print,"Pr",8},{XK_Scroll_Lock,"Slk",8},{XK_Pause,"Pau",8}},
 {{'`'," ` "},{'1'," 1 "},{'2'," 2 "},{'3'," 3 "},{'4'," 4 "},{'5'," 5 "},{'6'," 6 "},{'7'," 7 "},{'8'," 8 "},{'9'," 9 "},{'0'," 0 "},{'-'," - "},{'='," = "},{XK_BackSpace,"←",1},{XK_Insert,"Ins",8},{XK_Home,"Ho",8},{XK_Prior,"P↑",8}},
 {{XK_Tab, "Tab"}, {'q'," q "},{'w'," w "},{'e'," e "},{'r'," r "},{'t'," t "}, {'y'," y "},{'u'," u "},{'i'," i "},{'o'," o "}, {'p'," p "},{'['," [ "},{']'," ] "},{'\\'," \\ "},{XK_Delete,"Del",8},{XK_End,"En",8},{XK_Next,"P↓",8}},
 {{XK_Caps_Lock, "Caps"},{'a'," a "},{'s'," s "},{'d'," d "},{'f', " f "},{'g'," g "},{'h'," h "},{'j'," j "},{'k'," k "},{'l'," l "},{';'," ; "},{'\''," ' "},{XK_Return," Enter ",1},{XK_Num_Lock,"Num",8},{XK_KP_Add," + ",8}},
@@ -153,7 +153,7 @@ static void move_win_kbm()
   int ox, oy, szx, szy;
   if (tray_da_win) {
     gdk_window_get_origin(tray_da_win, &ox, &oy);
-    gdk_window_get_size(tray_da_win, &szx, &szy);
+    gdk_drawable_get_size(tray_da_win, &szx, &szy);
 
     if (oy<height) {
       oy = szy;
@@ -179,9 +179,6 @@ static void move_win_kbm()
 
 void show_win_kbm()
 {
-  if (!current_CS)
-    return;
-
   if (!gwin_kbm) {
     create_win_kbm();
     update_win_kbm();

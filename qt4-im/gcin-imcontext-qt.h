@@ -26,4 +26,5 @@ class GCINIMContext: public QInputContext {
         GCIN_client_handle_S *gcin_ch;
         bool isComposing() const;
         void update_cursor(QWidget *);
+        void update_preedit();
 };
