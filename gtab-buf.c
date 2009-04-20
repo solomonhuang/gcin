@@ -572,6 +572,7 @@ void gtab_disp_sel()
     more_pg = 1;
 
   disp_selection(FALSE);
+  show_win_gtab();
 }
 
 

@@ -71,6 +71,9 @@ gboolean gtab_has_input()
   if (same_query_show_pho_win())
     return TRUE;
 
+  if (gtab_buf_select)
+    return TRUE;
+
   if (gbufN && gcin_edit_display!=GCIN_EDIT_DISPLAY_ON_THE_SPOT)
     return TRUE;
 
@@ -1305,6 +1308,8 @@ shift_proc:
       if (gtab_buf_select) {
         gtab_buf_select = 0;
         ClrSelArea();
+        if (!gtab_has_input())
+          hide_win_gtab();
         return 1;
       }
 
@@ -1527,6 +1532,10 @@ next:
           }
           else
             putstr_inp(seltab[vv]);
+
+          if (!gtab_has_input())
+            hide_win_gtab();
+
           return 1;
         }
       }
