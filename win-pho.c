@@ -1,7 +1,6 @@
 #include "gcin.h"
 #include "win-sym.h"
 
-static int current_pho_simple_win;
 static int current_gcin_inner_frame;
 static int current_pho_in_row1;
 
@@ -210,7 +209,6 @@ void create_win_pho_gui()
     gtk_window_resize(GTK_WINDOW(gwin_pho), 10, 20);
   }
 
-  current_pho_simple_win = pho_simple_win;
   current_gcin_inner_frame = gcin_inner_frame;
   current_pho_in_row1 = pho_in_row1;
 }

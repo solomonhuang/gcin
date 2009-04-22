@@ -2,7 +2,6 @@
 #include "gtab.h"
 #include "win-sym.h"
 
-static int current_gtab_simple_win;
 static int current_gcin_inner_frame;
 static int current_gtab_in_row1;
 static int current_gtab_vertical_select;
@@ -434,7 +433,6 @@ void create_win_gtab_gui_simple()
 static void create_win_gtab_gui()
 {
   create_win_gtab_gui_simple();
-  current_gtab_simple_win = gtab_simple_win;
   current_gtab_in_row1 = gtab_in_row1;
   current_gtab_vertical_select = gtab_vertical_select;
   current_gcin_inner_frame = gcin_inner_frame;
@@ -444,7 +442,7 @@ static void create_win_gtab_gui()
 
 void change_win_gtab_style()
 {
-  if (!top_bin || current_gtab_simple_win == gtab_simple_win &&
+  if (!top_bin ||
       current_gcin_inner_frame == gcin_inner_frame &&
       current_gtab_in_row1 == gtab_in_row1 &&
       current_gtab_vertical_select == gtab_vertical_select &&

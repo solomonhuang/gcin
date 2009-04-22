@@ -1254,6 +1254,7 @@ static KeySym keypad_proc(KeySym xkey)
 
 static int cursor_left()
 {
+//  dbg("cursor left %d %d\n", c_idx, c_len);
   close_selection_win();
   if (c_idx) {
     clrcursor();
@@ -1266,6 +1267,7 @@ static int cursor_left()
 }
 static int cursor_right()
 {
+//  dbg("cursor right %d %d\n", c_idx, c_len);
   close_selection_win();
   if (c_idx < c_len) {
     clrcursor();
@@ -1274,7 +1276,6 @@ static int cursor_right()
     return 1;
   }
 
-  // Thanks to PCMan.bbs@bbs.sayya.org for the suggestion
   return c_len;
 }
 
@@ -1355,6 +1356,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
   int j,jj,kk, idx;
   char kno;
   int caps_eng_tog = tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock;
+
+//  dbg("%x %x\n", xkey, kbstate);
 
   if (caps_eng_tog)
     eng_ph = !(kbstate&LockMask);
@@ -2074,6 +2077,8 @@ int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor)
 fin:
   str[tn]=0;
 
+//  printf("'%s'\n", str);
+
   if (c_len) {
     attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;
     attr[0].ofs0=0;
@@ -2095,6 +2100,7 @@ ret:
 
 void tsin_reset()
 {
+//  dbg("tsin_reset\n");
   tsin_reset_in_pho0();
   clear_tsin_buffer();
 }

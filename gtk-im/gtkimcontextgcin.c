@@ -393,7 +393,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
 #if DBG || 0
-    printf("seq:%d jj %x %x %d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
+    printf("seq:%d jj %s result:%x %d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
 #endif
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f
         && !(xevent.state & (Mod1Mask|ControlMask))) {
@@ -415,7 +415,8 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
       }
     } else {
 //      printf("predit_changed\n");
-      g_signal_emit_by_name(context, "preedit_changed");
+      if (result)
+        g_signal_emit_by_name(context, "preedit_changed");
     }
 #endif
   }
@@ -511,6 +512,7 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
 
   if (context_gcin->gcin_ch) {
     gcin_im_client_reset(context_gcin->gcin_ch);
+    g_signal_emit_by_name(context, "preedit_changed");
   }
 }
 

@@ -48,6 +48,7 @@ void GCINIMContext::reset ()
 {
   if (gcin_ch) {
     gcin_im_client_reset(gcin_ch);
+    update_preedit();
   }
 }
 
@@ -195,7 +196,9 @@ bool GCINIMContext::x11FilterEvent (QWidget *widget, XEvent *event)
        keysym, state, &rstr);
   }
 
-  update_preedit();
+  if (result)
+    update_preedit();
+
   update_cursor(widget);
 
   if (rstr)

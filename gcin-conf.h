@@ -80,7 +80,7 @@
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_font_size_pho_near,
            gcin_font_size_gtab_in, gcin_inner_frame,
-           gcin_flags_im_enabled, gcin_remote_client, gtab_simple_win,
+           gcin_flags_im_enabled, gcin_remote_client,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
            gcin_capslock_lower, pho_hide_row2, pho_in_row1,
@@ -98,7 +98,7 @@ extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;
 extern int gtab_vertical_select, gtab_unique_auto_send;
-extern int pho_simple_win, tsin_buffer_size;
+extern int tsin_buffer_size;
 extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
 extern int gcin_status_tray;
 

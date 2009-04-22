@@ -7,7 +7,6 @@ Window xwin0;
 extern Display *dpy;
 static GtkWidget *top_bin;
 static GtkWidget *image_pin;
-int current_pho_simple_win;
 int current_gcin_inner_frame;
 
 static GtkWidget *hbox_edit;
@@ -44,14 +43,12 @@ static void recreate_win0()
 
 void change_win0_style()
 {
-  if (!top_bin || (current_pho_simple_win == pho_simple_win &&
-      current_gcin_inner_frame == gcin_inner_frame))
+  if (!top_bin || current_gcin_inner_frame == gcin_inner_frame)
     return;
 
   gtk_widget_destroy(top_bin);
   top_bin = NULL;
 
-  current_pho_simple_win = pho_simple_win;
   current_gcin_inner_frame = gcin_inner_frame;
   recreate_win0();
 }
