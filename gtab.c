@@ -1209,15 +1209,15 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     if (key < 0x20 || key>=0x7f)
       return 0;
 
-    if (gcin_capslock_lower) {
+    if (gcin_capslock_lower)
       case_inverse(&key, shift_m);
-      if (gbufN)
-        insert_gbuf_cursor_char(key);
-      else
-        send_ascii(key);
-      return 1;
-    } else
-      return 0;
+
+    if (gbufN)
+      insert_gbuf_cursor_char(key);
+    else
+      send_ascii(key);
+
+    return 1;
   }
 
 
@@ -1308,7 +1308,7 @@ shift_proc:
       if (gtab_buf_select) {
         gtab_buf_select = 0;
         ClrSelArea();
-        if (!gtab_has_input())
+        if (gcin_pop_up_win && !gtab_has_input())
           hide_win_gtab();
         return 1;
       }
@@ -1533,7 +1533,7 @@ next:
           else
             putstr_inp(seltab[vv]);
 
-          if (!gtab_has_input())
+          if (gcin_pop_up_win && !gtab_has_input())
             hide_win_gtab();
 
           return 1;

@@ -160,20 +160,21 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len);
 void send_text_call_back(char *text);
 void tsin_reset_in_pho(), reset_gtab_all(), clr_in_area_pho();
 
-extern int eng_ph;
+extern int eng_ph, c_len;
+extern short gbufN;
 static void cb_button_sym(GtkButton *button, char *str)
 {
   phokey_t pho[256];
   bzero(pho, sizeof(pho));
 
-  if (current_CS->in_method == 6 && current_CS->im_state != GCIN_STATE_DISABLED) {
-    add_to_tsin_buf(str, pho, utf8_str_N(str));
-    if (gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT) {
-      send_fake_key_eve(XK_Control_L);
-    }
+  if (current_CS->in_method == 6 && current_CS->im_state != GCIN_STATE_DISABLED && c_len) {
+    flush_tsin_buffer();
   }
   else
-    send_text_call_back(str);
+  if (cur_inmd && cur_inmd->DefChars && gbufN)
+    output_gbuf();
+
+  send_text_call_back(str);
 
   switch (current_CS->in_method) {
     case 3:

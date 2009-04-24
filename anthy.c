@@ -490,6 +490,7 @@ static void clear_all()
 {
   clear_seg_label();
   jpN=0;
+  keys[0]=0;
   keysN = 0;
   segN = 0;
   auto_hide();
@@ -560,7 +561,8 @@ static void disp_select()
   int x,y;
   get_widget_xy(win_anthy, seg[cursor].label, &x, &y);
 //  printf("%x cusor %d %d\n", win_anthy, cursor, x);
-  disp_selections(x, win_y+win_yl);
+  y = gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT?win_y:win_y+win_yl;
+  disp_selections(x, y);
 }
 
 static void load_seg()

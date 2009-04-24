@@ -407,6 +407,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     // this one is for mozilla, I know it is very dirty
     if (context_xim->is_mozilla) {
       if (context_xim->dirty_fix_off) {
+        if (result)
           g_signal_emit_by_name(context, "preedit_changed");
       } else {
         if (rstr || !result) {

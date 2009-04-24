@@ -56,7 +56,7 @@ static void clrin_pho_tsin()
 {
   clrin_pho();
 
-  if (!tsin_has_input())
+  if (!tsin_has_input() && gcin_pop_up_win)
     hide_win0();
 }
 

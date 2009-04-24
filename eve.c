@@ -24,12 +24,23 @@ void send_fake_key_eve(KeySym key)
   XTestFakeKeyEvent(dpy, kc, False, CurrentTime);
 }
 
+void fake_shift()
+{
+  send_fake_key_eve(XK_Shift_L);
+}
+
+int force_preedit=0;
+void force_preedit_shift()
+{
+  send_fake_key_eve(XK_Shift_L);
+  force_preedit=1;
+}
 
 void send_text_call_back(char *text)
 {
   callback_str_buffer = realloc(callback_str_buffer, strlen(text)+1);
   strcpy(callback_str_buffer, text);
-  send_fake_key_eve(XK_Shift_L);
+  fake_shift();
 }
 
 
@@ -810,6 +821,11 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     send_text(callback_str_buffer);
     callback_str_buffer[0]=0;
     return TRUE;
+  }
+
+  if (force_preedit) {
+    force_preedit=0;
+    return 1;
   }
 
   if (keysym == XK_space) {

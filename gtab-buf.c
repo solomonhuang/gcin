@@ -505,6 +505,7 @@ void set_gbuf_c_sel(int v)
 
 void insert_gbuf_cursor1(char *s)
 {
+//  printf("insert_gbuf_cursor1 %s\n", s);
    char **sel = tmalloc(char *, 1);
    sel[0] = strdup(s);
    insert_gbuf_cursor(sel, 1);
@@ -513,6 +514,7 @@ void insert_gbuf_cursor1(char *s)
 
 int insert_gbuf_cursor1_not_empty(char *s)
 {
+//  printf("insert_gbuf_cursor1_not_empty %s\n", s);
    if (!gbufN || !gtab_auto_select_by_phrase)
      return 0;
    insert_gbuf_cursor1(s);
