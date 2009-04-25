@@ -164,14 +164,16 @@ gboolean feed_phrase(KeySym ksym, int state)
     if (str) {
       extern int c_len;
 
-      if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE && c_len) {
+      if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
+        add_to_tsin_buf_str(str);
         flush_tsin_buffer();
       }
       else
-      if (cur_inmd && cur_inmd->DefChars)
+      if (cur_inmd && cur_inmd->DefChars) {
+        insert_gbuf_cursor1(str);
         output_gbuf();
-
-      send_text(str);
+      } else
+        send_text(str);
 
       return TRUE;
     }

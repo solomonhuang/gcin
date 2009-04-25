@@ -167,14 +167,18 @@ static void cb_button_sym(GtkButton *button, char *str)
   phokey_t pho[256];
   bzero(pho, sizeof(pho));
 
-  if (current_CS->in_method == 6 && current_CS->im_state != GCIN_STATE_DISABLED && c_len) {
+  if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
+    add_to_tsin_buf_str(str);
     flush_tsin_buffer();
+    output_buffer_call_back();
   }
   else
-  if (cur_inmd && cur_inmd->DefChars && gbufN)
+  if (cur_inmd && cur_inmd->DefChars) {
+    insert_gbuf_cursor1(str);
     output_gbuf();
-
-  send_text_call_back(str);
+    output_buffer_call_back();
+  } else
+    send_text_call_back(str);
 
   switch (current_CS->in_method) {
     case 3:

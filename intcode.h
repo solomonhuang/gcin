@@ -3,4 +3,4 @@ enum {
   INTCODE_UTF32=1
 };
 
-#define MAX_INTCODE 5
+#define MAX_INTCODE 6

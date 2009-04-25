@@ -16,6 +16,10 @@ extern gboolean win_kbm_inited;
 static char *callback_str_buffer;
 Window focus_win;
 static int timeout_handle;
+char *output_buffer;
+int output_bufferN;
+static char *output_buffer_raw, *output_buffer_raw_bak;
+static int output_buffer_rawN;
 
 void send_fake_key_eve(KeySym key)
 {
@@ -27,6 +31,13 @@ void send_fake_key_eve(KeySym key)
 void fake_shift()
 {
   send_fake_key_eve(XK_Shift_L);
+}
+
+void swap_ptr(char **a, char **b)
+{
+  char *t = *a;
+  *a = *b;
+  *b = t;
 }
 
 int force_preedit=0;
@@ -43,16 +54,22 @@ void send_text_call_back(char *text)
   fake_shift();
 }
 
+void output_buffer_call_back()
+{
+  swap_ptr(&callback_str_buffer, &output_buffer);
+
+  if (output_buffer)
+    output_buffer[0] = 0;
+  output_bufferN = 0;
+
+  fake_shift();
+}
 
 ClientState *current_CS;
 static ClientState temp_CS;
 
 gboolean init_in_method(int in_no);
 
-char *output_buffer;
-int output_bufferN;
-static char *output_buffer_raw, *output_buffer_raw_bak;
-static int output_buffer_rawN;
 
 void clear_output_buffer()
 {
@@ -60,9 +77,7 @@ void clear_output_buffer()
     output_buffer[0] = 0;
   output_bufferN = 0;
 
-  char *t = output_buffer_raw;
-  output_buffer_raw = output_buffer_raw_bak;
-  output_buffer_raw_bak = t;
+  swap_ptr(&output_buffer_raw, &output_buffer_raw_bak);
 
   if (output_buffer_raw)
     output_buffer_raw[0] = 0;

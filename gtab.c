@@ -1207,7 +1207,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (gtab_capslock_in_eng && (kbstate&LockMask)) {
     if (key < 0x20 || key>=0x7f)
-      return 0;
+      goto shift_proc;
 
     if (gcin_capslock_lower)
       case_inverse(&key, shift_m);

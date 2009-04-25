@@ -461,11 +461,12 @@ static GEDIT *cursor_gbuf()
   return gbuf_cursor == gbufN ? &gbuf[gbuf_cursor-1] : &gbuf[gbuf_cursor];
 }
 
-
+char auto_end_punch[]=", . ? : ; ! [ ] 「 」 ， 。 ？ ； ： 、";
 void insert_gbuf_cursor(char **sel, int selN)
 {
   if (!sel || !selN)
     return;
+
 
   GEDIT *pbuf = &gbuf[gbuf_cursor];
 
@@ -487,6 +488,10 @@ void insert_gbuf_cursor(char **sel, int selN)
   disp_gbuf();
 
   char_play(pbuf->ch);
+
+  if (gbufN==gbuf_cursor && selN==1 && strstr(auto_end_punch, sel[0])) {
+    output_gbuf();
+  }
 }
 
 
@@ -505,6 +510,8 @@ void set_gbuf_c_sel(int v)
 
 void insert_gbuf_cursor1(char *s)
 {
+   if (!gtab_auto_select_by_phrase)
+     return 0;
 //  printf("insert_gbuf_cursor1 %s\n", s);
    char **sel = tmalloc(char *, 1);
    sel[0] = strdup(s);

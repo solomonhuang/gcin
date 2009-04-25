@@ -76,7 +76,7 @@ int feedkey_intcode(KeySym key)
       return 1;
   }
 
-  if ((cin<4 || (current_intcode!=INTCODE_BIG5 && cin < MAX_INTCODE)) && key!=' ')
+  if ((cin<MAX_INTCODE-1 || (current_intcode!=INTCODE_BIG5 && cin < MAX_INTCODE)) && key!=' ')
     inch[cin++]=key;
 
 dispIn:
