@@ -7,5 +7,5 @@ pkill gcin.test
 #/usr/lib/firefox
 export LD_PRELOAD=./im-gcin-cur.so
 export LD_LIBRARY_PATH=/usr/lib/firefox-3.0.8:../im-client
-/usr/lib/firefox-3.0.8/firefox
+firefox
 pkill gcin.test

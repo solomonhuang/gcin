@@ -284,7 +284,7 @@ gboolean timeout_periodic_clipboard_fetch()
   return TRUE;
 }
 
-static int old_gcb_position=-1, old_gcb_position_x=-1, old_gcb_position_y=-1;
+static int old_gcb_position=-1, old_gcb_position_x=-1, old_gcb_position_y=-1, old_gcb_enabled=-1;
 
 void gcb_main()
 {
@@ -293,7 +293,7 @@ void gcb_main()
   GtkWidget *proxy_invisible;
   int i;
 #if 1
-  if (gcb_position==old_gcb_position && gcb_position_x==old_gcb_position_x
+  if (gcb_enabled==old_gcb_enabled && gcb_position==old_gcb_position && gcb_position_x==old_gcb_position_x
       && gcb_position_y==old_gcb_position_y)
     return;
 #endif
@@ -310,7 +310,7 @@ void gcb_main()
   if (hist_window)
     gtk_widget_destroy(hist_window);
 
-  if (!gcb_position)
+  if (!gcb_enabled)
     return;
 
 //  printf("gcb_position:%d\n", gcb_position);

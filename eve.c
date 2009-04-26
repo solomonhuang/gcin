@@ -798,7 +798,14 @@ gboolean full_char_proc(KeySym keysym)
 
   utf8cpy(tt, s);
 
-  send_text(tt);
+  if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)
+    add_to_tsin_buf_str(tt);
+  else
+  if (gtab_in_use())
+    insert_gbuf_cursor1(tt);
+  else
+    send_text(tt);
+
   return 1;
 }
 
@@ -929,7 +936,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   if (current_CS->im_state == GCIN_STATE_DISABLED) {
     return FALSE;
   }
-
 
   if (!current_CS->b_gcin_protocol) {
   if (((keysym == XK_Control_L || keysym == XK_Control_R)

@@ -184,6 +184,14 @@ void restart_gcin()
 }
 
 
+static void cb_tog_gcb(GtkCheckMenuItem *checkmenuitem, gpointer *dat)
+{
+  gcb_enabled = gtk_check_menu_item_get_active(checkmenuitem);
+//  dbg("gcb_enabled %d\n", gcb_enabled);
+  gcb_main();
+}
+
+
 void kbm_toggle();
 
 struct {
@@ -195,6 +203,7 @@ struct {
   {N_("設定"), GTK_STOCK_PREFERENCES, exec_gcin_setup},
   {N_("重新執行gcin"), NULL, restart_gcin},
   {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
+  {N_("gcb(剪貼區暫存)"), NULL, cb_tog_gcb, &gcb_enabled},
   {N_("正->簡體"), NULL, cb_trad2sim},
   {N_("簡->正體"), NULL, cb_sim2trad},
   {N_("小鍵盤"), NULL, kbm_toggle},

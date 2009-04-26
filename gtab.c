@@ -55,6 +55,11 @@ int key_col(char cha)
   return (p - keyrow)%10;
 }
 
+gboolean gtab_in_use()
+{
+  return cur_inmd && cur_inmd->DefChars;
+}
+
 gboolean same_query_show_pho_win()
 {
   return same_pho_query_state != SAME_PHO_QUERY_none;
@@ -1196,7 +1201,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (!cur_inmd)
     return 0;
 
-  if (kbstate & (Mod1Mask|ControlMask)) {
+  if (kbstate & (Mod1Mask|Mod4Mask|Mod5Mask|ControlMask)) {
     return 0;
   }
 

@@ -27,6 +27,11 @@ short gbuf_cursor;
 extern int pg_idx, total_matchN;
 extern char seltab[MAX_SELKEY][MAX_CIN_PHR];
 
+gboolean gtab_cursor_end()
+{
+  return gbuf_cursor==gbufN;
+}
+
 void dump_gbuf()
 {
   int i;

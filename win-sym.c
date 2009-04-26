@@ -169,14 +169,20 @@ static void cb_button_sym(GtkButton *button, char *str)
 
   if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
     add_to_tsin_buf_str(str);
-    flush_tsin_buffer();
-    output_buffer_call_back();
+    if (tsin_cursor_end()) {
+      flush_tsin_buffer();
+      output_buffer_call_back();
+    } else
+      force_preedit_shift();
   }
   else
   if (cur_inmd && cur_inmd->DefChars) {
     insert_gbuf_cursor1(str);
-    output_gbuf();
-    output_buffer_call_back();
+    if (gtab_cursor_end()) {
+      output_gbuf();
+      output_buffer_call_back();
+    } else
+      force_preedit_shift();
   } else
     send_text_call_back(str);
 

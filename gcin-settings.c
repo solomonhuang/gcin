@@ -52,7 +52,7 @@ int gcin_status_tray;
 
 int pho_hide_row2, pho_in_row1;
 #if USE_GCB
-int gcb_position, gcb_position_x, gcb_position_y;
+int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y;
 #endif
 int gcin_bell_volume;
 int gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch;
@@ -136,6 +136,7 @@ void load_setttings()
 
 
 #if USE_GCB
+  gcb_enabled = get_gcin_conf_int(GCB_ENABLED, 0);
   gcb_position = get_gcin_conf_int(GCB_POSITION, 4);
   gcb_position_x = get_gcin_conf_int(GCB_POSITION_X, 0);
   gcb_position_y = get_gcin_conf_int(GCB_POSITION_Y, 0);

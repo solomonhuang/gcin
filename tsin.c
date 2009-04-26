@@ -52,6 +52,11 @@ static int pre_selN;
 
 void clrin_pho(), hide_win0();
 
+gboolean tsin_cursor_end()
+{
+  return c_idx==c_len;
+}
+
 static void clrin_pho_tsin()
 {
   clrin_pho();
@@ -1183,12 +1188,10 @@ static gboolean pre_punctuation(KeySym xkey)
     int c = p - shift_punc;
     phokey_t key=0;
 
-    if (c_len)
-      return add_to_tsin_buf(chars[c], &key, 1);
-    else {
-      send_text(chars[c]);
-      return 1;
-    }
+    add_to_tsin_buf(chars[c], &key, 1);
+    if (tsin_cursor_end())
+      flush_tsin_buffer();
+    return 1;
   }
 
   return 0;
@@ -1364,7 +1367,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
 
   key_press_time = 0;
 
-   if (kbstate & (Mod1Mask|Mod1Mask)) {
+   if (kbstate & (Mod1Mask|Mod4Mask|Mod5Mask)) {
+//     dbg("ret\n");
      return 0;
    }
 
@@ -1628,18 +1632,22 @@ change_char:
 other_keys:
        if ((kbstate & ControlMask)) {
          if (xkey==XK_u) {
-           clear_tsin_buffer();
-           if (gcin_pop_up_win)
-             hide_win0();
-           return 1;
+           if (c_len) {
+             clear_tsin_buffer();
+             if (gcin_pop_up_win)
+               hide_win0();
+             return 1;
+           } else
+             return 0;
          } else if (tsin_buffer_editing_mode && xkey == XK_e) { //ctrl+e only works when user enabled tsin_buffer_editing_mode
            //toggler
            tsin_buffer_editing ^= 1;
            return 1;
          } else if (xkey>=XK_1 && xkey<=XK_3) {
            return 1;
-         } else
+         } else {
            return 0;
+         }
        }
 
        char xkey_lcase = xkey;
