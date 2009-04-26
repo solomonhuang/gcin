@@ -176,7 +176,7 @@ static void cb_button_sym(GtkButton *button, char *str)
       force_preedit_shift();
   }
   else
-  if (cur_inmd && cur_inmd->DefChars) {
+  if (gtab_phrase_on()) {
     insert_gbuf_cursor1(str);
     if (gtab_cursor_end()) {
       output_gbuf();

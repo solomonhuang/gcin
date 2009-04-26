@@ -168,7 +168,7 @@ send_it:
           flush_tsin_buffer();
       }
       else
-      if (gtab_in_use() && gtab_auto_select_by_phrase) {
+      if (gtab_phrase_on()) {
         insert_gbuf_cursor1(str);
         if (gtab_cursor_end())
           output_gbuf();

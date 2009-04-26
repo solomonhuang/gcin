@@ -55,9 +55,9 @@ int key_col(char cha)
   return (p - keyrow)%10;
 }
 
-gboolean gtab_in_use()
+gboolean gtab_phrase_on()
 {
-  return cur_inmd && cur_inmd->DefChars;
+  return cur_inmd && cur_inmd->DefChars && gtab_auto_select_by_phrase;
 }
 
 gboolean same_query_show_pho_win()

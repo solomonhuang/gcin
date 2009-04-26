@@ -801,7 +801,7 @@ gboolean full_char_proc(KeySym keysym)
   if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE)
     add_to_tsin_buf_str(tt);
   else
-  if (gtab_in_use())
+  if (gtab_phrase_on())
     insert_gbuf_cursor1(tt);
   else
     send_text(tt);
