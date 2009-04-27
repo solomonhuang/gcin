@@ -568,7 +568,7 @@ msgstr "Virtual keyboard"
 
 #: ../gcin-setup-list.c:570 ../gcin-setup-tab.c:1652
 msgid "剪貼區管理視窗位置&開關"
-msgstr "gcb window position & switch"
+msgstr "gcb clipboard manager"
 
 #: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
 msgid "左下"
@@ -605,3 +605,7 @@ msgstr "on both windows"
 #: ../gcin-setup.c:424
 msgid "編輯區顯示"
 msgstr "Editing area"
+
+#: ../tray.c:206
+msgid "gcb(剪貼區暫存)"
+msgstr "gcb clipboard manager"

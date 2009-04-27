@@ -609,6 +609,8 @@ void hide_selections_win();
 void hide_win0()
 {
 //  dbg("hide_win0\n");
+  if (!gwin0)
+    return;
   gtk_widget_hide(gwin0);
   hide_selections_win();
   hide_win_sym();

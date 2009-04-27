@@ -183,8 +183,9 @@ static void cb_button_sym(GtkButton *button, char *str)
       output_buffer_call_back();
     } else
       force_preedit_shift();
-  } else
+  } else {
     send_text_call_back(str);
+  }
 
   switch (current_CS->in_method) {
     case 3:

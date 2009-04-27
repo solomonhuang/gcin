@@ -2109,6 +2109,8 @@ ret:
 void tsin_reset()
 {
 //  dbg("tsin_reset\n");
+  if (!gwin0)
+    return;
   tsin_reset_in_pho0();
   clear_tsin_buffer();
 }

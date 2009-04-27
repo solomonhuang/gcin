@@ -295,6 +295,8 @@ char full_char_str[]="全";
 
 void disp_label_edit(char *str)
 {
+  if (!label_edit)
+    return;
   if (gcin_edit_display == GCIN_EDIT_DISPLAY_ON_THE_SPOT) {
     gtk_widget_hide(label_edit);
     return;
@@ -492,10 +494,8 @@ void close_gtab_pho_win();
 
 void hide_win_gtab()
 {
-//  dbg("hide_win_gtab gwin_gtab\n", gwin_gtab);
-  if (!gwin_gtab)
-    return;
-  gtk_widget_hide(gwin_gtab);
+  if (gwin_gtab)
+    gtk_widget_hide(gwin_gtab);
   close_gtab_pho_win();
   hide_win_sym();
 }
@@ -573,13 +573,3 @@ void win_gtab_disp_half_full()
 
   minimize_win_gtab();
 }
-
-#if 0
-void recreate_win_gtab()
-{
-//  puts("recreate_win_gtab");
-  destroy_win_gtab();
-  create_win_gtab();
-  create_win_gtab_gui();
-}
-#endif

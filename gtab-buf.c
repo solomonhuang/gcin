@@ -657,8 +657,11 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
   return attrN;
 }
 
+extern GtkWidget *gwin_gtab;
 void gtab_reset()
 {
+  if (!gwin_gtab)
+    return;
   clear_gtab_buf_all();
   clear_gbuf_sel();
   ClrIn();

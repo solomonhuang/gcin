@@ -179,8 +179,8 @@ send_it:
     }
   }
 
-#if 0
-  if (ksym>=' ' && ksym < 0x7e) {
+#if 1
+  if ((state&(ControlMask|ShiftMask|Mod1Mask|Mod4Mask|Mod5Mask))==ShiftMask && ksym>=' ' && ksym < 0x7e) {
     str = tt;
     tt[0]=ksym;
     tt[1]=0;

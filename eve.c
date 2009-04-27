@@ -282,9 +282,6 @@ void hide_in_win(ClientState *cs)
   }
 
   reset_current_in_win_xy();
-#if 0
-  hide_win_status();
-#endif
 }
 
 void show_win_pho();
@@ -586,7 +583,7 @@ void get_win_pho_geom();
 
 void update_active_in_win_geom()
 {
-//  dbg("update_active_in_win_geom\n");
+  dbg("update_active_in_win_geom\n");
   switch (current_CS->in_method) {
     case 3:
       get_win_pho_geom();
@@ -597,6 +594,9 @@ void update_active_in_win_geom()
       break;
 #endif
     case 10:
+      break;
+    case 12:
+      get_win_anthy_geom();
       break;
     default:
       get_win_gtab_geom();
@@ -1069,6 +1069,7 @@ int gcin_FocusIn(ClientState *cs)
 {
   Window win = cs->client_win;
 
+//  dbg("gcin_FocusIn\n");
   if (skip_window(win))
     return;
 
@@ -1146,6 +1147,7 @@ int gcin_FocusOut(ClientState *cs)
 {
   gint64 t = current_time();
 
+//  dbg("gcin_FocusOut\n");
   if (skip_window(cs->client_win))
     return;
 

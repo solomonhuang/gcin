@@ -6,9 +6,7 @@
 #include <libintl.h>
 
 #if USE_GCB
-char *gcb_pos[] = {
-  N_("關閉"), N_("左下"), N_("左上"), N_("右下"), N_("右上")
-};
+char *gcb_pos[] = { N_("左下"), N_("左上"), N_("右下"), N_("右上")};
 #endif
 
 static GdkColor gcin_win_gcolor_fg,
@@ -37,6 +35,7 @@ static GtkWidget *check_button_gcin_eng_phrase_enabled,
                  *label_win_color_test,
                  *opt_eng_ch_opts,
 #if USE_GCB
+                 *check_button_gcb_enabled,
                  *opt_gcb_pos,
 #endif
                  *opt_im_toggle_keys,
@@ -775,7 +774,7 @@ static GtkWidget *create_gcb_pos_opts()
   }
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcb_pos), menu_gcb_pos);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcb_pos), gcb_position);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcb_pos), gcb_position-1); // for backward compatibily
 
   return hbox;
 }
@@ -1309,8 +1308,9 @@ static gboolean cb_ok( GtkWidget *widget,
   }
 
 #if USE_GCB
+  save_gcin_conf_int(GCB_ENABLED, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcb_enabled)));
   idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcb_pos));
-  save_gcin_conf_int(GCB_POSITION, idx);
+  save_gcin_conf_int(GCB_POSITION, idx+1); // for backward compatbility
   int pos_x = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_x));
   save_gcin_conf_int(GCB_POSITION_X, pos_x);
   int pos_y = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_y));
@@ -1701,6 +1701,10 @@ static void create_main_win()
 #if USE_GCB
   GtkWidget *hbox_gcb_pos = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcb_pos, FALSE, FALSE, 0);
+  check_button_gcb_enabled = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), check_button_gcb_enabled,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcb_enabled),
+     gcb_enabled);
   GtkWidget *label_gcb_pos = gtk_label_new(_("剪貼區管理視窗位置&開關"));
   gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), label_gcb_pos,  FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), create_gcb_pos_opts(),  FALSE, FALSE, 0);

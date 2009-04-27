@@ -11,7 +11,7 @@ void (*f_anthy_set_string)(anthy_context_t ac, char *);
 extern int eng_ph;
 extern gint64 key_press_time;
 static GtkWidget *event_box_anthy;
-
+gint64 current_time();
 
 struct {
   char *en;
@@ -430,6 +430,8 @@ static void cursor_markup(int idx, char *s)
 
 void minimize_win_anthy()
 {
+  if (!win_anthy)
+    return;
   gtk_window_resize(GTK_WINDOW(win_anthy), 32, 12);
 }
 
@@ -633,8 +635,10 @@ gboolean feedkey_anthy(int kv, int kvstate)
   int shift_m=(kvstate&ShiftMask) > 0;
 //  printf("%x %c  %d\n", kv, kv, shift_m);
 
-  if (kv==XK_Shift_L||kv==XK_Shift_R)
+  if (kv==XK_Shift_L||kv==XK_Shift_R) {
+    puts("shift");
     key_press_time = current_time();
+  }
 
   if (!eng_ph)
     return 0;
@@ -1131,5 +1135,16 @@ ret:
 
 void gcin_anthy_reset()
 {
+  if (!win_anthy)
+    return;
   clear_all();
+}
+
+void get_win_anthy_geom()
+{
+  if (!win_anthy)
+    return;
+  gtk_window_get_position(GTK_WINDOW(win_anthy), &win_x, &win_y);
+
+  get_win_size(win_anthy, &win_xl, &win_yl);
 }
