@@ -515,7 +515,7 @@ void set_gbuf_c_sel(int v)
 
 void insert_gbuf_cursor1(char *s)
 {
-   if (!gtab_auto_select_by_phrase)
+   if (!gtab_phrase_on())
      return 0;
 //  printf("insert_gbuf_cursor1 %s\n", s);
    char **sel = tmalloc(char *, 1);
@@ -527,8 +527,10 @@ void insert_gbuf_cursor1(char *s)
 int insert_gbuf_cursor1_not_empty(char *s)
 {
 //  printf("insert_gbuf_cursor1_not_empty %s\n", s);
-   if (!gbufN || !gtab_auto_select_by_phrase)
+   if (!gbufN || !gtab_phrase_on()) {
      return 0;
+   }
+
    insert_gbuf_cursor1(s);
    return TRUE;
 }
@@ -577,9 +579,9 @@ void gtab_disp_sel()
   for(i=0; i < cur_inmd->M_DUP_SEL; i++) {
     int v = i + pg_idx;
     if (v >= pbuf->selN)
-      break;
-
-    strcpy(seltab[i], pbuf->sel[v]);
+      seltab[i][0]=0;
+    else
+      strcpy(seltab[i], pbuf->sel[v]);
   }
 
   if (pbuf->selN > page_len())
@@ -627,7 +629,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
   str[0]=0;
   *pcursor=0;
 
-  if (!(inmd[current_CS->in_method].flag & FLAG_AUTO_SELECT_BY_PHRASE))
+  if (!gtab_phrase_on())
     return 0;
 
   attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;

@@ -30,6 +30,12 @@ enum {
   FLAG_AUTO_SELECT_BY_PHRASE=8,
 };
 
+enum {
+  GTAB_AUTO_SELECT_BY_PHRASE_AUTO=0,
+  GTAB_AUTO_SELECT_BY_PHRASE_YES=1,
+  GTAB_AUTO_SELECT_BY_PHRASE_NO=2,
+};
+
 struct TableHead {
   int version;
   u_int flag;

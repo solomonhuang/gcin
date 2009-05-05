@@ -58,6 +58,7 @@ typedef struct {
     gboolean    fixed_pos;
     gboolean    b_gcin_protocol; // TRUE : gcin    FALSE: XIM
     gboolean    b_raise_window;
+    gboolean    use_preedit;
     int         fixed_x, fixed_y;
     int         in_method;
     XPoint	spot_location;	/* spot location, relative to client window */

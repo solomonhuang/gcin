@@ -439,7 +439,7 @@ static void disp_input()
 {
   int i;
 
-  if (gcin_edit_display & GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+  if (gcin_edit_display_ap_only())
     return;
 
 //  printf("cursor %d\n", cursor);
@@ -563,7 +563,7 @@ static void disp_select()
   int x,y;
   get_widget_xy(win_anthy, seg[cursor].label, &x, &y);
 //  printf("%x cusor %d %d\n", win_anthy, cursor, x);
-  y = gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT?win_y:win_y+win_yl;
+  y = gcin_edit_display_ap_only()?win_y:win_y+win_yl;
   disp_selections(x, y);
 }
 
@@ -983,7 +983,7 @@ int anthy_visible()
 extern gboolean force_show;
 void show_win_anthy()
 {
-  if (gcin_edit_display & GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+  if (gcin_edit_display_ap_only())
     return;
   if (!gcin_pop_up_win || !is_empty() || force_show ) {
     if (!anthy_visible())

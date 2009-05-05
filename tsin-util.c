@@ -103,6 +103,7 @@ static int phseq(u_char *a, u_char *b)
 
 void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec);
 
+static gboolean saved_phrase;
 
 gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t usecount)
 {
@@ -110,6 +111,8 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t 
   FILE *fw;
   u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) + 1 + sizeof(usecount_t)],
          sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) + 1 + sizeof(usecount_t)];
+
+  saved_phrase = TRUE;
 
   tbuf[0]=len;
   memcpy(&tbuf[1], &usecount, sizeof(usecount));  // usecount
@@ -240,7 +243,8 @@ static int qcmp_ts_gtab(const void *aa, const void *bb)
 #if USE_TSIN
 void build_ts_gtab(int rebuild)
 {
-  load_tsin_db();
+  if (!phidx)
+    load_tsin_db();
 
   if (!ts_gtab_hash)
     ts_gtab_hash = tmalloc(int, HASHN+1);
@@ -252,12 +256,14 @@ void build_ts_gtab(int rebuild)
   struct stat st_gtab, st_tsin32;
   FILE *fp;
 
+//  dbg("%s %s\n", fname, tsfname);
+
 #if 1
   if (!rebuild && !stat(fname, &st_gtab) && !stat(tsfname, &st_tsin32) &&
       st_tsin32.st_mtime < st_gtab.st_mtime) {
 
     if (fp=fopen(fname, "r")) {
-      puts("............... from tsgtab");
+      printf(".......... from %s\n", fname);
       fread(&ts_gtabN, sizeof(ts_gtabN), 1, fp);
       fread(ts_gtab_hash, sizeof(int), HASHN+1, fp);
       ts_gtab = tmalloc(int, ts_gtabN);
@@ -268,6 +274,7 @@ void build_ts_gtab(int rebuild)
   }
 #endif
 
+//  puts("oooooooooooooooooooooo");
 
   fseek(fph,0,SEEK_SET);
 
@@ -347,8 +354,10 @@ int find_match(char *str, int *eq_N, usecount_t *usecount)
   *eq_N  = 0;
   *usecount = 0;
 
-  if (!ts_gtabN)
+  if (!ts_gtabN || saved_phrase) {
+    saved_phrase = FALSE;
     build_ts_gtab(0);
+  }
 #if 0
   int bottom = 0;
   int top = ts_gtabN - 1;

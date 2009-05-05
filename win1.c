@@ -31,6 +31,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
     case 1:
       v = GPOINTER_TO_INT(data);
       tsin_sele_by_idx(v);
+      force_preedit_shift();
       break;
   }
 }

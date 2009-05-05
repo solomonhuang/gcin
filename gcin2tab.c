@@ -237,30 +237,34 @@ int main(int argc, char **argv)
     cmd_arg(&cmd, &arg);
   }
 
-  if (sequ(cmd,"%endkey")) {
-    strcpy(th.endkey, arg);
-    cmd_arg(&cmd, &arg);
+  for(;;) {
+    if (sequ(cmd,"%endkey")) {
+      strcpy(th.endkey, arg);
+      cmd_arg(&cmd, &arg);
+    } else
+    if (sequ(cmd,"%space_style")) {
+      th.space_style = atoi(arg);
+      cmd_arg(&cmd, &arg);
+    } else
+    if (sequ(cmd,"%keep_key_case")) {
+      th.flag |= FLAG_KEEP_KEY_CASE;
+      cmd_arg(&cmd, &arg);
+    } else
+    if (sequ(cmd,"%symbol_kbm")) {
+      th.flag |= FLAG_GTAB_SYM_KBM;
+      cmd_arg(&cmd, &arg);
+    } else
+    if (sequ(cmd,"%phase_auto_skip_endkey")) {
+      th.flag |= FLAG_PHRASE_AUTO_SKIP_ENDKEY;
+      cmd_arg(&cmd, &arg);
+    } else
+    if (sequ(cmd,"%flag_auto_select_by_phrase")) {
+      th.flag |= FLAG_AUTO_SELECT_BY_PHRASE;
+      cmd_arg(&cmd, &arg);
+    } else
+      break;
   }
 
-  if (sequ(cmd,"%space_style")) {
-    th.space_style = atoi(arg);
-    cmd_arg(&cmd, &arg);
-  }
-
-  if (sequ(cmd,"%keep_key_case")) {
-    th.flag |= FLAG_KEEP_KEY_CASE;
-    cmd_arg(&cmd, &arg);
-  }
-
-  if (sequ(cmd,"%symbol_kbm")) {
-    th.flag |= FLAG_GTAB_SYM_KBM;
-    cmd_arg(&cmd, &arg);
-  }
-
-  if (sequ(cmd,"%phase_auto_skip_endkey")) {
-    th.flag |= FLAG_PHRASE_AUTO_SKIP_ENDKEY;
-    cmd_arg(&cmd, &arg);
-  }
 
   if (!sequ(cmd,"%keyname") || !sequ(arg,"begin")) {
     p_err("%d:  %%keyname begin   expected, instead of %s %s", lineno, cmd, arg);

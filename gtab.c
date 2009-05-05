@@ -37,7 +37,7 @@ extern short gbufN;
 gboolean gtab_buf_select;
 
 #define gtab_full_space_auto_first (_gtab_space_auto_first & (GTAB_space_auto_first_any|GTAB_space_auto_first_full))
-#define AUTO_SELECT_BY_PHRASE (cur_inmd->flag & FLAG_AUTO_SELECT_BY_PHRASE)
+#define AUTO_SELECT_BY_PHRASE (gtab_phrase_on())
 
 /* for array30-like quick code */
 static char keyrow[]=
@@ -57,7 +57,11 @@ int key_col(char cha)
 
 gboolean gtab_phrase_on()
 {
-  return cur_inmd && cur_inmd->DefChars && gtab_auto_select_by_phrase;
+  int val = cur_inmd && cur_inmd->DefChars >500 &&
+(gtab_auto_select_by_phrase==GTAB_AUTO_SELECT_BY_PHRASE_YES||
+(gtab_auto_select_by_phrase==GTAB_AUTO_SELECT_BY_PHRASE_AUTO&&(cur_inmd->flag&FLAG_AUTO_SELECT_BY_PHRASE)));
+
+return val;
 }
 
 gboolean same_query_show_pho_win()
@@ -79,7 +83,7 @@ gboolean gtab_has_input()
   if (gtab_buf_select)
     return TRUE;
 
-  if (gbufN && gcin_edit_display!=GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+  if (gbufN && !gcin_edit_display_ap_only())
     return TRUE;
 
   return FALSE;
@@ -377,10 +381,6 @@ void init_gtab(int inmdno)
 
 //  current_CS->b_half_full_char = FALSE;
 
-  if (gtab_auto_select_by_phrase && inp->DefChars>500)
-    inp->flag |= FLAG_AUTO_SELECT_BY_PHRASE;
-  else
-    inp->flag &= ~FLAG_AUTO_SELECT_BY_PHRASE;
 
   if (!inmd[inmdno].filename || !strcmp(inmd[inmdno].filename,"-")) {
     dbg("filename is empty\n");
@@ -670,11 +670,6 @@ void init_gtab(int inmdno)
   inp->last_k_bitn = (((cur_inmd->key64 ? 64:32) / inp->keybits) - 1) * inp->keybits;
   inp->kmask = (1 << th.keybits) - 1;
 
-
-  if (gtab_auto_select_by_phrase && th.DefC>500)
-    inp->flag |= FLAG_AUTO_SELECT_BY_PHRASE;
-  else
-    inp->flag &= ~FLAG_AUTO_SELECT_BY_PHRASE;
 
 #if 0
   for(i='A'; i < 127; i++)
@@ -1164,6 +1159,7 @@ gboolean shift_char_proc(KeySym key, int kbstate)
     if (key >= 127)
       return FALSE;
 
+#if 0
     if (kbstate & LockMask) {
       if (key >= 'a' && key <= 'z')
         key-=0x20;
@@ -1171,6 +1167,7 @@ gboolean shift_char_proc(KeySym key, int kbstate)
       if (key >= 'A' && key <= 'Z')
         key+=0x20;
     }
+#endif
 
     if (current_CS->b_half_full_char)
       return full_char_proc(key);
@@ -1389,8 +1386,14 @@ next_page:
       if (ci==0) {
         if (current_CS->b_half_full_char)
           return full_char_proc(key);
-
+#if 1
+        if (gbufN) {
+          output_gbuf();
+	} else
+	  return 0;
+#else
         return insert_gbuf_cursor1_not_empty(" ");
+#endif
       } else
       if (!has_wild) {
 //        dbg("iii %d  defselN:%d   %d\n", sel1st_i, defselN, cur_inmd->M_DUP_SEL);

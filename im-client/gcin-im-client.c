@@ -537,7 +537,7 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 
   req.flag |= flags;
 
-  flags_backup = flags;
+  flags_backup = req.flag;
 
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_flags error");
@@ -549,7 +549,25 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 }
 
 
+void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_flag)
+{
+  GCIN_req req;
 
+  if (!gen_req(handle, GCIN_req_set_flags, &req))
+    return;
+
+  req.flag &= ~flags;
+
+  flags_backup = req.flag;
+
+  if (handle_write(handle, &req, sizeof(req)) <=0) {
+    error_proc(handle,"gcin_im_client_set_flags error");
+  }
+
+  if (handle_read(handle, ret_flag, sizeof(int)) <= 0) {
+    error_proc(handle, "cannot read reply str from gcin server");
+  }
+}
 
 
 int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor)

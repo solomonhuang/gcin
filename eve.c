@@ -595,9 +595,11 @@ void update_active_in_win_geom()
 #endif
     case 10:
       break;
+#if USE_ANTHY
     case 12:
       get_win_anthy_geom();
       break;
+#endif
     default:
       get_win_gtab_geom();
       break;
@@ -1187,6 +1189,8 @@ empty:
     return 0;
   }
 
+  cs->use_preedit = TRUE;
+
   switch(current_CS->in_method) {
     case 3:
     case 10:
@@ -1244,3 +1248,9 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
     return True;
 }
 #endif
+
+
+gboolean gcin_edit_display_ap_only()
+{
+  current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
+}

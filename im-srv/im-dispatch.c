@@ -202,6 +202,8 @@ void process_client_req(int fd)
           cs->b_raise_window = TRUE;
       }
 
+      cs->use_preedit = (req.flag & FLAG_GCIN_client_handle_use_preedit)>0;
+
       int rflags = 0;
       if (gcin_pop_up_win)
         rflags = FLAG_GCIN_srv_ret_status_use_pop_up;

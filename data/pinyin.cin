@@ -4,6 +4,7 @@
 %selkey 1234567890
 %endkey 1234.
 %space_style 2
+%flag_auto_select_by_phrase
 %keyname begin
 a Ａ
 b Ｂ

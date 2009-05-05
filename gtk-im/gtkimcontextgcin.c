@@ -498,6 +498,15 @@ gtk_im_context_gcin_set_use_preedit (GtkIMContext *context,
                                     gboolean      use_preedit)
 {
   GtkIMContextGCIN *context_gcin = GTK_IM_CONTEXT_GCIN (context);
+//  printf("gtk_im_context_gcin_set_use_preedit %x %d\n", context_gcin->gcin_ch, use_preedit);
+  if (!context_gcin->gcin_ch)
+    return;
+  int ret;
+  if (use_preedit)
+    gcin_im_client_set_flags(context_gcin->gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
+  else
+    gcin_im_client_clear_flags(context_gcin->gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
+
   context_gcin->preedit = use_preedit;
 }
 

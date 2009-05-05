@@ -69,7 +69,7 @@ gboolean pho_has_input();
 
 gboolean tsin_has_input()
 {
-  gboolean v = (gcin_edit_display!=GCIN_EDIT_DISPLAY_ON_THE_SPOT && c_len) || pho_has_input();
+  gboolean v = (!gcin_edit_display_ap_only() && c_len) || pho_has_input();
 //  dbg("tsin_has_input %d\n", v);
   return v;
 }

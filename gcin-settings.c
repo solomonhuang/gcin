@@ -12,7 +12,7 @@ int gcin_win_sym_click_close, gcin_edit_display;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
-int gtab_auto_select_by_phrase;
+int gtab_auto_select_by_phrase, gtab_auto_select_by_phrase_enable;
 int gtab_press_full_auto_send;
 int gtab_pre_select;
 int gtab_disp_partial_match;
@@ -92,7 +92,7 @@ void load_setttings()
 
   gtab_dup_select_bell = get_gcin_conf_int(GTAB_DUP_SELECT_BELL, 0);
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);
-  gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, 0);
+  gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, GTAB_AUTO_SELECT_BY_PHRASE_AUTO);
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
