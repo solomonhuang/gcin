@@ -924,7 +924,7 @@ char *htmlspecialchars(char *s, char out[])
 }
 
 
-void disp_selection(gboolean phrase_selected)
+void disp_selection0(gboolean phrase_selected, gboolean force_disp)
 {
   char pgstr[32];
   pgstr[0]=0;
@@ -1018,11 +1018,16 @@ void disp_selection(gboolean phrase_selected)
   if (len && tt[len-1] == '\n')
     tt[len-1] = 0;
 
-  if (gtab_pre_select || wild_mode || spc_pressed || last_full) {
+  if (gtab_pre_select || wild_mode || spc_pressed || last_full || force_disp) {
     disp_gtab_sel(tt);
   }
 }
 
+
+void disp_selection(gboolean phrase_selected)
+{
+  disp_selection0(phrase_selected, FALSE);
+}
 
 void wildcard()
 {

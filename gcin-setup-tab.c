@@ -15,7 +15,8 @@ static GdkColor gcin_win_gcolor_fg,
                 tsin_phrase_line_gcolor,
                 tsin_cursor_gcolor;
 
-static GtkClipboard *pclipboard, *opt_gcin_edit_display;
+static GtkClipboard *pclipboard;
+static GtkWidget *opt_gcin_edit_display;
 
 static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_pop_up_win,

@@ -456,7 +456,7 @@ void inc_gtab_usecount(char *str)
 {
   int len = strlen(str);
   if (!len)
-    return 0;
+    return;
 
 //  printf("inc %s\n", str);
 

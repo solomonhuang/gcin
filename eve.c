@@ -1252,5 +1252,5 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
 
 gboolean gcin_edit_display_ap_only()
 {
-  current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
+  return current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
 }

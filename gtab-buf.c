@@ -516,7 +516,7 @@ void set_gbuf_c_sel(int v)
 void insert_gbuf_cursor1(char *s)
 {
    if (!gtab_phrase_on())
-     return 0;
+     return;
 //  printf("insert_gbuf_cursor1 %s\n", s);
    char **sel = tmalloc(char *, 1);
    sel[0] = strdup(s);
@@ -587,7 +587,7 @@ void gtab_disp_sel()
   if (pbuf->selN > page_len())
     more_pg = 1;
 
-  disp_selection(FALSE);
+  disp_selection0(FALSE, TRUE);
   show_win_gtab();
 }
 

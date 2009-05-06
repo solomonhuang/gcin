@@ -163,8 +163,14 @@ void change_gtab_font_size()
 
 void disp_gtab_sel(char *s)
 {
+//  dbg("disp_gtab_sel '%s'\n", s);
   if (!label_gtab_sele)
     return;
+  if (!s[0])
+    gtk_widget_hide(label_gtab_sele);
+  else
+    gtk_widget_show(label_gtab_sele);
+
   gtk_label_set_markup(GTK_LABEL(label_gtab_sele), s);
   minimize_win_gtab();
   adj_gtab_win_pos();

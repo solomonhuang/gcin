@@ -13,7 +13,8 @@ static GtkWidget *check_button_root_style_use,
 static GtkWidget *opt_spc_opts;
 
 static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
-static GtkClipboard *pclipboard, *opt_gcin_edit_display;
+static GtkClipboard *pclipboard;
+static GtkWidget *opt_gcin_edit_display;
 GtkWidget *main_window;
 static GdkColor gcin_win_gcolor_fg, gcin_win_gcolor_bg, gcin_sel_key_gcolor;
 

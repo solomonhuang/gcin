@@ -679,15 +679,3 @@ void change_tsin_color()
 
   drawcursor();
 }
-
-
-void recreate_tsin_select_win();
-#if 0
-void recreate_tsin_win()
-{
-  destroy_win0();
-  create_win0();
-  create_win0_gui();
-  recreate_tsin_select_win();
-}
-#endif
