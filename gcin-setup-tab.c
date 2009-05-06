@@ -41,6 +41,7 @@ static GtkWidget *check_button_gcin_eng_phrase_enabled,
                  *opt_im_toggle_keys,
                  *opt_kbm_opts,
                  *opt_spc_opts,
+                 *opt_auto_select_by_phrase,
                  *opt_speaker_opts,
                  *spinner_gcin_font_size,
                  *spinner_gcin_font_size_gtab_in,
@@ -69,7 +70,6 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *spinner_tsin_buffer_size;
 
 static GtkWidget *check_button_gtab_dup_select_bell,
-                 *check_button_gtab_auto_select_by_phrase,
                  *check_button_gtab_press_full_auto_send,
                  *check_button_gtab_pre_select,
                  *check_button_gtab_disp_partial_match,
@@ -113,6 +113,17 @@ static struct {
   {N_("輸入空白"), TSIN_SPACE_OPT_INPUT},
 };
 int tsin_space_optionsN = sizeof(tsin_space_options) / sizeof(tsin_space_options[0]);
+
+
+struct {
+  char *str;
+  int num;
+} auto_select_by_phrase_opts[] = {
+  {N_("由.gtab指定開啟"), GTAB_AUTO_SELECT_BY_PHRASE_AUTO},
+  {N_("全部開啟"), GTAB_AUTO_SELECT_BY_PHRASE_YES},
+  {N_("全部關閉"), GTAB_AUTO_SELECT_BY_PHRASE_NO},
+  { NULL, 0},
+};
 
 
 static void callback_button_clicked_tsin_space_opt( GtkWidget *widget, gpointer data)
@@ -177,6 +188,32 @@ static GtkWidget *create_spc_opts()
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_spc_opts), menu_spc_opts);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt_spc_opts), current_idx);
+
+  return hbox;
+}
+
+
+static GtkWidget *create_auto_select_by_phrase_opts()
+{
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
+  
+  opt_auto_select_by_phrase = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt_auto_select_by_phrase, FALSE, FALSE, 0);
+  GtkWidget *menu_auto_select_by_phrase = gtk_menu_new ();
+
+  int i, current_idx=0;
+
+  for(i=0; auto_select_by_phrase_opts[i].str; i++) {
+    GtkWidget *item = gtk_menu_item_new_with_label (_(auto_select_by_phrase_opts[i].str));
+
+    if (auto_select_by_phrase_opts[i].num == gtab_auto_select_by_phrase)
+      current_idx = i;
+
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_auto_select_by_phrase), item);
+  }
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_auto_select_by_phrase), menu_auto_select_by_phrase);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_auto_select_by_phrase), current_idx);
 
   return hbox;
 }
@@ -1236,9 +1273,6 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_DUP_SELECT_BELL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_dup_select_bell)));
 
-  save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_auto_select_by_phrase)));
-
   save_gcin_conf_int(GTAB_PRE_SELECT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_pre_select)));
 
@@ -1282,6 +1316,9 @@ static gboolean cb_ok( GtkWidget *widget,
 
   idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
+
+  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_auto_select_by_phrase));
+  save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, auto_select_by_phrase_opts[idx].num);
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
 
@@ -1960,12 +1997,9 @@ static void create_main_win()
 
   GtkWidget *hbox_gtab_auto_select_by_phrase = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gtab_auto_select_by_phrase, FALSE, FALSE, 0);
-  check_button_gtab_auto_select_by_phrase = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase),check_button_gtab_auto_select_by_phrase,  FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_auto_select_by_phrase),
-     gtab_auto_select_by_phrase);
   GtkWidget *label_gtab_auto_select = gtk_label_new(_("由詞庫自動選擇字"));
   gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), label_gtab_auto_select,  FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), create_auto_select_by_phrase_opts(),  FALSE, FALSE, 0);
 
   GtkWidget *hbox_gtab_dup_select_bell = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gtab_dup_select_bell, FALSE, FALSE, 0);

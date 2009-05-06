@@ -12,7 +12,7 @@ int gcin_win_sym_click_close, gcin_edit_display;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
-int gtab_auto_select_by_phrase, gtab_auto_select_by_phrase_enable;
+int gtab_auto_select_by_phrase;
 int gtab_press_full_auto_send;
 int gtab_pre_select;
 int gtab_disp_partial_match;
@@ -144,7 +144,7 @@ void load_setttings()
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
   gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);
-#if 1
+#if 0
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_BOTH);
 #elif 1
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_ON_THE_SPOT);

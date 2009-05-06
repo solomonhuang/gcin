@@ -37,11 +37,12 @@ void load_gtab_list()
     if (strlen(line) < 2)
       continue;
 
+    if (line[0]=='#')
+      continue;
+
     sscanf(line, "%s %s %s %s", name, key, file, icon);
     if (strlen(name) < 1)
       break;
-    if (name[0]=='#')
-      continue;
 
     int keyidx = gcin_switch_keys_lookup(key[0]);
     if (keyidx < 0)

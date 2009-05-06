@@ -609,3 +609,19 @@ msgstr "编辑区显示"
 #: ../tray.c:206
 msgid "gcb(剪貼區暫存)"
 msgstr "gcb(剪贴区暂存)"
+
+#: ../gcin-setup-gtab.c:37
+msgid "由.gtab指定開啟"
+msgstr "由.gtab指定开启"
+
+#: ../gcin-setup-gtab.c:38
+msgid "全部開啟"
+msgstr "全部开启"
+
+#: ../gcin-setup-gtab.c:39
+msgid "全部關閉"
+msgstr "全部关闭"
+
+#: ../gtk-im/imgcin.c:27
+msgid "gcin Input Method"
+msgstr "gcin 输入法"
