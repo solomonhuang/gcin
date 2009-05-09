@@ -47,7 +47,10 @@ CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)
         -DDOC_DIR=\"$(DOC_DIR)\" \
         -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
-        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS)
+        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS) \
+        -DG_DISABLE_SINGLE_INCLUDES -DG_DISABLE_DEPRECATED \
+        -DGDK_DISABLE_SINGLE_INCLUDES -DGDK_DISABLE_DEPRECATED \
+        -DGTK_DISABLE_SINGLE_INCLUDES
 ifeq ($(USE_XIM),Y)
 IMdkitLIB = IMdkit/lib/libXimd.a
 CFLAGS += -DUSE_XIM=1
@@ -183,11 +186,11 @@ ifeq ($(USE_ANTHY),Y)
 gcin1_so += anthy.pico
 endif
 
-gcin1.so: $(gcin1_so)
+gcin1.so: $(gcin1_so) pho.o tsin.o eve.o gtab.o win-sym.o
 	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
 
 gcin2_so= t2s-lookup.pico
-gcin2.so: $(gcin2_so)
+gcin2.so: $(gcin2_so) gcin-conf.o
 	$(CC) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
 
 gtk_bug_fix.so: gtk_bug_fix.pico

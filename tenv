@@ -20,6 +20,7 @@ export LD_PRELOAD="./gtk-im/im-gcin-cur.so"
 export LD_LIBRARY_PATH="./im-client"
 export GTK_IM_MODULE=gcin
 #gedit a.txt
-leafpad
+#leafpad
 #pcmanx
+mozilla-thunderbird
 pkill gcin.test

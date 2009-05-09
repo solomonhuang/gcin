@@ -259,6 +259,7 @@ int main(int argc, char **argv)
       cmd_arg(&cmd, &arg);
     } else
     if (sequ(cmd,"%flag_auto_select_by_phrase")) {
+      dbg("flag_auto_select_by_phrase\n");
       th.flag |= FLAG_AUTO_SELECT_BY_PHRASE;
       cmd_arg(&cmd, &arg);
     } else

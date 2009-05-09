@@ -24,7 +24,7 @@
 
 #include <gdk/gdkx.h>
 #include <X11/Xatom.h>
-#include <gtk/gtkversion.h>
+#include <gtk/gtk.h>
 
 #define _(x) x
 #define N_(x) x

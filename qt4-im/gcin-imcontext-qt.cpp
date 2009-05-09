@@ -1,5 +1,6 @@
 #include "gcin-imcontext-qt.h"
 #include "gcin-common-qt.h"
+#include <stdio.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>

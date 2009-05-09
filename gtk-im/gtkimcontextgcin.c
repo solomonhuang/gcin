@@ -389,11 +389,17 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   }
 #endif
 
+  gboolean  preedit_changed = FALSE;
+
   if (xevent.type == KeyPress) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
-#if DBG || 0
-    printf("seq:%d jj %s result:%x %d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
+
+    if (result)
+       preedit_changed = TRUE;
+
+#if DBG
+    printf("seq:%d rstr:%s result:%x num_bytes:%d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
 #endif
     if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f
         && !(xevent.state & (Mod1Mask|ControlMask))) {
@@ -405,18 +411,12 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 
 #if NEW_GTK_IM
     // this one is for mozilla, I know it is very dirty
-    if (context_xim->is_mozilla) {
-      if (context_xim->dirty_fix_off) {
-        if (result)
-          g_signal_emit_by_name(context, "preedit_changed");
-      } else {
-        if (rstr || !result) {
+    if (context_xim->is_mozilla && !context_xim->dirty_fix_off) {
+        if (rstr || !result)
           add_cursor_timeout(context_xim);
-        }
-      }
     } else {
 //      printf("predit_changed\n");
-      if (result)
+      if (preedit_changed)
         g_signal_emit_by_name(context, "preedit_changed");
     }
 #endif
