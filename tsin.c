@@ -1132,6 +1132,11 @@ void add_to_tsin_buf_str(char *str)
 
 int tsin_sele_by_idx(int c)
 {
+  if (sel_pho) {
+    tsin_pho_sel(c);
+    return 0;
+  }
+
   int len = pre_sel[c].len;
 
 #if 0
@@ -1347,6 +1352,48 @@ static int cursor_delete()
 
 void case_inverse();
 void pho_play(phokey_t key);
+
+int tsin_pho_sel(int c)
+{
+         char *sel_text;
+         int len = fetch_user_selection(c, &sel_text);
+         int cpsta = chpho[c_idx].psta;
+         int sel_idx = c_idx;
+         if (c_idx == c_len)
+           sel_idx = c_len - len;
+
+         if (cpsta >= 0)
+           set_chpho_ch(&chpho[sel_idx], sel_text, len);
+         else
+           set_chpho_ch2(&chpho[sel_idx], sel_text, len);
+
+         set_fixed(sel_idx, len);
+
+         call_tsin_parse();
+
+         if (c_idx + len == c_len) {
+           ph_sta = -1;
+           draw_ul(c_idx, c_len);
+         }
+
+         if (len) {
+           prbuf();
+           current_page=sel_pho=ityp3_pho=0;
+           if (len == 1) {
+             hide_selections_win();
+             ph_sta = -1;
+             return 0;
+           }
+           else
+             ph_sta=-1;
+
+           hide_selections_win();
+         }
+
+
+         return 1;
+}
+
 
 int feedkey_pp(KeySym xkey, int kbstate)
 {
@@ -1672,41 +1719,10 @@ other_keys:
        char *pp;
        if ((pp=strchr(phkbm.selkey,xkey_lcase)) && sel_pho) {
          int c=pp-phkbm.selkey;
-         char *sel_text;
-         int len = fetch_user_selection(c, &sel_text);
-         int cpsta = chpho[c_idx].psta;
-         int sel_idx = c_idx;
-         if (c_idx == c_len)
-           sel_idx = c_len - len;
 
-         if (cpsta >= 0)
-           set_chpho_ch(&chpho[sel_idx], sel_text, len);
-         else
-           set_chpho_ch2(&chpho[sel_idx], sel_text, len);
-
-         set_fixed(sel_idx, len);
-
-         call_tsin_parse();
-
-         if (c_idx + len == c_len) {
-           ph_sta = -1;
-           draw_ul(c_idx, c_len);
-         }
-
-         if (len) {
-           prbuf();
-           current_page=sel_pho=ityp3_pho=0;
-           if (len == 1) {
-             hide_selections_win();
-             ph_sta = -1;
-             goto restart;
-           }
-           else
-             ph_sta=-1;
-
-           hide_selections_win();
-         }
-         return 1;
+         if (tsin_pho_sel(c))
+           return 1;
+         goto restart;
        }
 
        sel_pho=current_page=0;

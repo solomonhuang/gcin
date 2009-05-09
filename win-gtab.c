@@ -299,14 +299,23 @@ void toggle_half_full_char();
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 char full_char_str[]="全";
 
+void show_hide_label_edit()
+{
+  if (gcin_edit_display_ap_only() || !gtab_phrase_on()) {
+    gtk_widget_hide(label_edit);
+    return;
+  } else
+    gtk_widget_show(label_edit);
+}
+
+
 void disp_label_edit(char *str)
 {
   if (!label_edit)
     return;
-  if (gcin_edit_display_ap_only()) {
-    gtk_widget_hide(label_edit);
-    return;
-  }
+
+  show_hide_label_edit();
+
   gtk_label_set_markup(GTK_LABEL(label_edit), str);
 }
 
@@ -333,7 +342,8 @@ void create_win_gtab_gui_simple()
     top_bin = vbox_top;
   }
 
-  if (gtab_auto_select_by_phrase) {
+//  if (gtab_auto_select_by_phrase)
+  {
     label_edit = gtk_label_new(NULL);
     GtkWidget *align = gtk_alignment_new (0, 0.0, 0, 0);
     gtk_container_add (GTK_CONTAINER (align), label_edit);
@@ -427,8 +437,7 @@ void create_win_gtab_gui_simple()
   gtk_widget_show_all (gwin_gtab);
   gtk_widget_hide (gwin_gtab);
 
-  if (gcin_edit_display_ap_only())
-    gtk_widget_hide(label_edit);
+  show_hide_label_edit();
 
   set_disp_im_name();
   gtk_widget_hide(label_full);

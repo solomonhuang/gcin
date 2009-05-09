@@ -1543,8 +1543,9 @@ next:
             else
               insert_gbuf_cursor1(seltab[vv]);
           }
-          else
+          else {
             putstr_inp(seltab[vv]);
+          }
 
           if (gcin_pop_up_win && !gtab_has_input())
             hide_win_gtab();

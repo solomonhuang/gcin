@@ -122,6 +122,11 @@ static void clear_gtab_buf_all()
 
 void disp_gbuf()
 {
+#if 0
+  if (!gtab_phrase_on()) {
+    return;
+  }
+#endif
   char *bf=gen_buf_str_disp();
   disp_label_edit(bf);
 
@@ -523,7 +528,7 @@ void insert_gbuf_cursor1(char *s)
    insert_gbuf_cursor(sel, 1);
    clear_after_put();
 }
-
+#if 0
 int insert_gbuf_cursor1_not_empty(char *s)
 {
 //  printf("insert_gbuf_cursor1_not_empty %s\n", s);
@@ -534,6 +539,7 @@ int insert_gbuf_cursor1_not_empty(char *s)
    insert_gbuf_cursor1(s);
    return TRUE;
 }
+#endif
 
 void insert_gbuf_cursor_char(char ch)
 {
