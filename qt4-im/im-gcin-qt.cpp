@@ -66,8 +66,8 @@ QStringList GCINInputContextPlugin::languages (const QString &key)
 {
     if (gcin_languages.empty ()) {
         gcin_languages.push_back ("zh_TW");
-        gcin_languages.push_back ("zh_CN");
         gcin_languages.push_back ("zh_HK");
+        gcin_languages.push_back ("zh_CN");
         gcin_languages.push_back ("ja");
     }
     return gcin_languages;

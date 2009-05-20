@@ -121,7 +121,7 @@ void QGCINInputContext::resetClientState()
 void QGCINInputContext::close( const QString &errMsg )
 {
 //    printf("close\n");
-    qDebug( errMsg );
+    qDebug( "%s", (const char*) errMsg );
     emit deletionRequested();
 }
 

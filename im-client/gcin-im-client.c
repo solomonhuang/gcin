@@ -400,6 +400,7 @@ void gcin_im_client_focus_in(GCIN_client_handle *handle)
      handle->spot_location.y);
 }
 
+
 void gcin_im_client_focus_out(GCIN_client_handle *handle)
 {
 //  dbg("gcin_im_client_focus_out\n");
@@ -414,6 +415,44 @@ void gcin_im_client_focus_out(GCIN_client_handle *handle)
   }
 }
 
+
+void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr)
+{
+//  dbg("gcin_im_client_focus_out\n");
+  handle->flag &= ~FLAG_GCIN_client_handle_has_focus;
+  *rstr = NULL;
+
+  GCIN_req req;
+  if (!gen_req(handle, GCIN_req_focus_out2, &req))
+    return;
+
+  if (handle_write(handle, &req, sizeof(req)) <=0) {
+    error_proc(handle,"gcin_im_client_focus_out error");
+  }
+
+  GCIN_reply reply;
+  bzero(&reply, sizeof(reply));
+  if (handle_read(handle, &reply, sizeof(reply)) <=0) {
+    error_proc(handle, "cannot read reply from gcin server");
+    return FALSE;
+  }
+
+  to_gcin_endian_4(&reply.datalen);
+  to_gcin_endian_4(&reply.flag);
+
+  if (reply.datalen > 0) {
+    *rstr = malloc(reply.datalen);
+    if (handle_read(handle, *rstr, reply.datalen) <= 0) {
+      free(*rstr); *rstr = NULL;
+      error_proc(handle, "cannot read reply str from gcin server");
+      return FALSE;
+    }
+  }
+
+//  dbg("gcin_im_client_forward_key_event %x\n", reply.flag);
+
+  return reply.flag;
+}
 
 static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
                                           GCIN_req_t event_type,

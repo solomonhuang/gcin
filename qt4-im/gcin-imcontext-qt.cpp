@@ -150,8 +150,25 @@ void GCINIMContext::setFocusWidget(QWidget *widget)
     return;
 
   if (focused_widget != widget) {
+#if 0
+    if (focused_widget) {
+      char *rstr;
+      gcin_im_client_focus_out2(gcin_ch, &rstr);
+      if (rstr) {
+          QString inputText = QString::fromUtf8(rstr);
+          QInputMethodEvent commit_event;
+          commit_event.setCommitString (inputText);
+          sendEvent (commit_event);
+
+          QList<QAttribute> preedit_attributes;
+          QInputMethodEvent im_event (QString::fromUtf8(""), preedit_attributes);
+          sendEvent (im_event);
+      }
+    }
     focused_widget = widget;
+#else
     gcin_im_client_focus_out(gcin_ch);
+#endif
   }
 
   if (gcin_ch) {

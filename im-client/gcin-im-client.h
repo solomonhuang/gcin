@@ -33,6 +33,7 @@ GCIN_client_handle *gcin_im_client_open(Display *disp);
 void gcin_im_client_close(GCIN_client_handle *handle);
 void gcin_im_client_focus_in(GCIN_client_handle *handle);
 void gcin_im_client_focus_out(GCIN_client_handle *handle);
+void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr);
 void gcin_im_client_set_window(GCIN_client_handle *handle, Window win);
 void gcin_im_client_set_cursor_location(GCIN_client_handle *handle,
                                         int x, int y);

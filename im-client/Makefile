@@ -2,7 +2,7 @@ include ../config.mak
 
 
 SOFILE=libgcin-im-client.so
-SOFILEVER=libgcin-im-client.so.1.2.0
+SOFILEVER=libgcin-im-client.so.1.2.1
 
 .SUFFIXES:      .c .o .E
 WALL=-Wall
@@ -19,7 +19,7 @@ OBJS = gcin-im-client.o im-addr.o gcin-conf.o util.o gcin-crypt-fpic.o
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(SOFILEVER):   $(OBJS)
-	$(CC) $(SO_FLAGS) -Wl,-soname,libgcin-im-client.so.1 $(OBJS) -o $@
+	$(CC) $(SO_FLAGS) -Wl,-soname,libgcin-im-client.so.1 $(OBJS) -lX11 -o $@
 	ln -sf $(SOFILEVER) $(SOFILE)
 	ln -sf $(SOFILEVER) $(SOFILE).1
 	$(MAKE) -C ../gtk-im

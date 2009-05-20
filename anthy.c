@@ -608,7 +608,7 @@ static void next_page()
 }
 
 
-static int flush_input()
+int flush_anthy_input()
 {
   hide_selections_win();
 
@@ -658,7 +658,7 @@ gboolean feedkey_anthy(int kv, int kvstate)
       if (is_empty)
         return FALSE;
 send:
-      return flush_input();
+      return flush_anthy_input();
     case XK_Escape:
         if (state==STATE_SELECT) {
           state = STATE_CONVERT;
@@ -1057,7 +1057,7 @@ int feedkey_anthy_release(KeySym xkey, int kbstate)
    (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
      && xkey == XK_Shift_R))
           &&  current_time() - key_press_time < 300000) {
-          flush_input();
+          flush_anthy_input();
           key_press_time = 0;
           hide_selections_win();
           tsin_set_eng_ch(!eng_ph);

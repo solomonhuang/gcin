@@ -1212,7 +1212,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     return feedkey_pho(key, 0);
 
 
-  if (gtab_capslock_in_eng && (kbstate&LockMask)) {
+  if (gtab_capslock_in_eng && (kbstate&LockMask) && !BITON(cur_inmd->flag, FLAG_KEEP_KEY_CASE)) {
     if (key < 0x20 || key>=0x7f)
       goto shift_proc;
 

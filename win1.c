@@ -184,6 +184,7 @@ void disp_arrow_down()
   gtk_widget_show(arrow_down);
 }
 
+#if USE_TSIN
 void destroy_win1()
 {
   if (!gwin1)
@@ -192,6 +193,7 @@ void destroy_win1()
   frame=NULL;
   gwin1 = NULL;
 }
+#endif
 
 void change_win1_font()
 {

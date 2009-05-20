@@ -218,6 +218,7 @@ int read_tsin_phrase(char *str, usecount_t *usecount)
 }
 
 
+#if USE_TSIN
 int load_ts_gtab(int idx, char *tstr, usecount_t *usecount)
 {
   int ofs = ts_gtab[idx];
@@ -225,6 +226,7 @@ int load_ts_gtab(int idx, char *tstr, usecount_t *usecount)
   fseek(fph, ofs, SEEK_SET);
   return read_tsin_phrase(tstr, usecount);
 }
+#endif
 
 typedef struct {
   char ts[MAX_PHRASE_STR_LEN];

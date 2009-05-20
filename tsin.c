@@ -303,11 +303,13 @@ void tsin_reset_in_pho0()
   close_win_pho_near();
 }
 
+#if USE_TSIN
 void tsin_reset_in_pho()
 {
   clrin_pho_tsin();
   tsin_reset_in_pho0();
 }
+#endif
 
 gboolean flush_tsin_buffer()
 {
@@ -888,6 +890,7 @@ static void close_selection_win()
 
 void show_button_pho(gboolean bshow);
 
+#if USE_TSIN
 void tsin_set_eng_ch(int nmod)
 {
   eng_ph = nmod;
@@ -905,6 +908,7 @@ void tsin_set_eng_ch(int nmod)
   show_win0();
 #endif
 }
+#endif
 
 void tsin_toggle_eng_ch()
 {
@@ -912,6 +916,7 @@ void tsin_toggle_eng_ch()
   tsin_set_eng_ch(!eng_ph);
 }
 
+#if USE_TSIN
 void tsin_toggle_half_full()
 {
     tsin_half_full^=1;
@@ -921,6 +926,7 @@ void tsin_toggle_half_full()
     load_tray_icon();
 #endif
 }
+#endif
 
 
 #if 0
@@ -997,6 +1003,7 @@ void set_chpho_ch2(CHPHO *pchpho, char *utf8, int len)
 }
 
 
+#if USE_TSIN
 gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
 {
     int i;
@@ -1042,6 +1049,7 @@ gboolean add_to_tsin_buf(char *str, phokey_t *pho, int len)
 
     return TRUE;
 }
+#endif
 
 #if 1
 static void set_phrase_link(int idx, int len)
@@ -1108,6 +1116,7 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
 }
 
 
+#if USE_TSIN
 void add_to_tsin_buf_str(char *str)
 {
   char *pp = str;
@@ -1129,6 +1138,7 @@ void add_to_tsin_buf_str(char *str)
   bzero(pho, sizeof(pho));
   add_to_tsin_buf(str, pho, N);
 }
+#endif
 
 int tsin_sele_by_idx(int c)
 {
@@ -2064,6 +2074,7 @@ int feedkey_pp_release(KeySym xkey, int kbstate)
 }
 
 
+#if USE_TSIN
 void tsin_remove_last()
 {
   if (!c_len)
@@ -2071,6 +2082,7 @@ void tsin_remove_last()
   c_len--;
   c_idx--;
 }
+#endif
 
 
 gboolean save_phrase_to_db2(CHPHO *chph, int len)

@@ -19,8 +19,9 @@ sleep 1
 export LD_PRELOAD="./gtk-im/im-gcin-cur.so"
 export LD_LIBRARY_PATH="./im-client"
 export GTK_IM_MODULE=gcin
-gedit a.txt
+#gedit a.txt
 #leafpad
 #pcmanx
+firefox
 #mozilla-thunderbird
 pkill gcin.test

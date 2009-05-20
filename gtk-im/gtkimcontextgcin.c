@@ -469,7 +469,14 @@ gtk_im_context_gcin_focus_out (GtkIMContext *context)
 #endif
 
   if (context_xim->gcin_ch) {
-    gcin_im_client_focus_out(context_xim->gcin_ch);
+    char *rstr;
+    gcin_im_client_focus_out2(context_xim->gcin_ch , &rstr);
+
+    if (rstr) {
+      g_signal_emit_by_name (context, "commit", rstr);
+      g_signal_emit_by_name(context, "preedit_changed");
+      free(rstr);
+    }
   }
 
   return;

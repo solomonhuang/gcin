@@ -56,6 +56,7 @@ void send_text_call_back(char *text)
 
 void output_buffer_call_back()
 {
+//  dbg("output_buffer_call_back\n");
   swap_ptr(&callback_str_buffer, &output_buffer);
 
   if (output_buffer)
@@ -506,7 +507,7 @@ void disp_im_half_full()
 gboolean flush_tsin_buffer();
 void reset_gtab_all();
 
-static u_int orig_caps_state;
+//static u_int orig_caps_state;
 
 void init_state_chinese(ClientState *cs)
 {
@@ -559,9 +560,9 @@ void toggle_im_enabled(u_int kev_state)
 #endif
     } else {
       init_state_chinese(current_CS);
-
+#if 0
       orig_caps_state = kev_state & LockMask;
-
+#endif
       reset_current_in_win_xy();
 #if 1
       show_in_win(current_CS);
@@ -583,7 +584,7 @@ void get_win_pho_geom();
 
 void update_active_in_win_geom()
 {
-  dbg("update_active_in_win_geom\n");
+//  dbg("update_active_in_win_geom\n");
   switch (current_CS->in_method) {
     case 3:
       get_win_pho_geom();
@@ -1071,6 +1072,7 @@ int gcin_FocusIn(ClientState *cs)
 {
   Window win = cs->client_win;
 
+  gcin_reset0();
 //  dbg("gcin_FocusIn\n");
   if (skip_window(win))
     return;
@@ -1092,16 +1094,8 @@ int gcin_FocusIn(ClientState *cs)
 
   if (win == focus_win) {
     if (cs->im_state != GCIN_STATE_DISABLED) {
-#if 0
-      /* something changed in gtk or X11, it is not possible to move window if the window
-         is not visible
-       */
-      move_IC_in_win(cs);
-      show_in_win(cs);
-#else
       show_in_win(cs);
       move_IC_in_win(cs);
-#endif
 #if 0
       set_win_status_inmd(inmd[cs->in_method].cname);
 #endif
@@ -1149,6 +1143,7 @@ int gcin_FocusOut(ClientState *cs)
 {
   gint64 t = current_time();
 
+
 //  dbg("gcin_FocusOut\n");
   if (skip_window(cs->client_win))
     return;
@@ -1195,8 +1190,10 @@ empty:
     case 3:
     case 10:
       goto empty;
+#if USE_TSIN
     case 6:
       return tsin_get_preedit(str, attr, cursor);
+#endif
 #if USE_ANTHY
     case 12:
       return anthy_get_preedit(str, attr, cursor);
@@ -1211,20 +1208,23 @@ empty:
 
 
 
-void gcin_reset()
+void gcin_reset0()
 {
   if (!current_CS)
     return;
 //  dbg("gcin_reset\n");
+
   switch(current_CS->in_method) {
     case 3:
       pho_reset();
       return;
     case 10:
       return;
+#if USE_TSIN
     case 6:
       tsin_reset();
       return;
+#endif
 #if USE_ANTHY
     case 12:
       gcin_anthy_reset();
@@ -1236,6 +1236,9 @@ void gcin_reset()
   }
 }
 
+void gcin_reset()
+{
+}
 
 #if USE_XIM
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
@@ -1253,4 +1256,33 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
 gboolean gcin_edit_display_ap_only()
 {
   return current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
+}
+
+void flush_edit_buffer()
+{
+//  dbg("flush_edit_buffer\n");
+  if (!current_CS)
+    return;
+//  dbg("gcin_reset\n");
+  switch(current_CS->in_method) {
+#if USE_TSIN
+    case 6:
+      flush_tsin_buffer();
+      break;
+#endif
+#if USE_ANTHY
+    case 12:
+      flush_anthy_input();
+      break;
+#endif
+    default:
+      output_gbuf();
+//      dbg("metho %d\n", current_CS->in_method);
+  }
+#if 0
+  dbg("output_bufferN:%d\n", output_bufferN);
+  if (output_bufferN) {
+    output_buffer_call_back();
+  }
+#endif
 }

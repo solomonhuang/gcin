@@ -130,7 +130,7 @@ void disp_gbuf()
   char *bf=gen_buf_str_disp();
   disp_label_edit(bf);
 
-  if (gbufN)
+  if (gbufN && gtab_disp_key_codes)
     lookup_gtabn(gbuf[gbufN-1].ch, NULL);
 
   free(bf);
@@ -213,10 +213,12 @@ int output_gbuf()
 
     if (!gbuf[i].plen)
       i++;
+#if USE_TSIN
     else {
       inc_gtab_usecount(t);
       i+=gbuf[i].plen;
     }
+#endif
   }
 
 
@@ -304,8 +306,10 @@ static int gtab_parse_recur(int start, TSIN_PARSE *out,
         counter[j] = v;
         t /= selN;
 
+#if USE_TSIN
         if (selN > 10 && !ch_pos_find(gbuf[start+j].sel[v], j))
             break;
+#endif
         strcat(tt, gbuf[start+j].sel[v]);
       }
 
@@ -318,10 +322,12 @@ static int gtab_parse_recur(int start, TSIN_PARSE *out,
       usecount_t usecount;
       int eq_N;
 
+#if USE_TSIN
       int  ge_N = find_match(tt, &eq_N, &usecount);
       if (ge_N)
         has_ge = TRUE;
 //      dbg("b %s  ge:%d eq:%d\n", tt, ge_N, eq_N);
+#endif
 
       if (usecount <= maxusecount)
         continue;

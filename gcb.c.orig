@@ -18,9 +18,7 @@ static int maxButtonStrlen=9;
 // static GdkAtom atom_cutbuffer0;
 static char geomstr[5];
 static GtkWidget *snoop_button;
-#if !GTK_CHECK_VERSION(2,12,0)
 static GtkTooltips *button_bar_tips;
-#endif
 static GtkWidget *hist_window;
 static gchar **hist_strArr;
 static int hist_strArrN=10;
@@ -51,12 +49,8 @@ static update_hist_button()
     del_nl(tstr);
     gtk_button_set_label(GTK_BUTTON(hist_buttonArr[i]),tstr);
 #if 0
-#if GTK_CHECK_VERSION(2,12,0)
-    gtk_widget_set_tooltip_text (hist_buttonArr[i], hist_strArr[i]);
-#else
     gtk_tooltips_set_tip (GTK_TOOLTIPS (button_bar_tips),hist_buttonArr[i],
       hist_strArr[i],NULL);
-#endif
 #endif
   }
 }
@@ -125,11 +119,7 @@ static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer 
 
    set_win_title(text);
 
-#if GTK_CHECK_VERSION(2,12,0)
-   gtk_widget_set_tooltip_text (button, text);
-#else
    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_bar_tips), button, text,NULL);
-#endif
 
    g_free(tmpstr);
 
@@ -369,9 +359,7 @@ void gcb_main()
   g_signal_connect(G_OBJECT (hist_window),"focus-out-event",
     G_CALLBACK (hist_focus_out_callback), NULL);
 
-#if !GTK_CHECK_VERSION(2,12,0)
   button_bar_tips = gtk_tooltips_new ();
-#endif
 
   hbox = gtk_hbox_new (FALSE, 1);
   vbox = gtk_vbox_new (FALSE, 1);

@@ -22,5 +22,7 @@
 日本anthy = - kana-nippon.png
 greek ` greek.gtab greek.png
 latin-letters [ latin-letters.gtab latin-letters.png
+### russian by yuriy
+#russian [ russian.gtab
 帶調粵拼 ] jyutping.gtab jyutping.png
 亂倉打鳥 \ NewCJ3.gtab NewCJ3.png

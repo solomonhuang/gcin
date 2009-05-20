@@ -186,6 +186,31 @@ void process_client_req(int fd)
 #endif
       gcin_FocusOut(cs);
       break;
+    case GCIN_req_focus_out2:
+      {
+#if DBG
+      dbg_time("GCIN_req_focus_out2  %x\n", cs);
+#endif
+      gcin_FocusOut(cs);
+      flush_edit_buffer();
+
+      GCIN_reply reply;
+      bzero(&reply, sizeof(reply));
+
+      int datalen = reply.datalen =
+        output_bufferN ? output_bufferN + 1 : 0; // include '\0'
+      to_gcin_endian_4(&reply.flag);
+      to_gcin_endian_4(&reply.datalen);
+      write_enc(fd, &reply, sizeof(reply));
+
+//      dbg("server reply.flag %x\n", reply.flag);
+
+      if (output_bufferN) {
+        write_enc(fd, output_buffer, datalen);
+        clear_output_buffer();
+      }
+      }
+      break;
     case GCIN_req_set_cursor_location:
 #if DBG
       dbg_time("set_cursor_location %x %d %d\n", cs,

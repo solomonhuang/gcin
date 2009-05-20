@@ -162,12 +162,14 @@ gboolean feed_phrase(KeySym ksym, int state)
 
     if (str) {
 send_it:
+#if USE_TSIN
       if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
         add_to_tsin_buf_str(str);
         if (tsin_cursor_end())
           flush_tsin_buffer();
       }
       else
+#endif
       if (gtab_phrase_on()) {
         insert_gbuf_cursor1(str);
         if (gtab_cursor_end())
