@@ -50,7 +50,7 @@ struct _GtkIMContextGCIN
 #if NEW_GTK_IM
 static void cancel_timeout(GtkIMContextGCIN *context)
 {
-#if DBG
+#if DBG && 0
   printf("cancel_timeout %d\n", context->timeout_handle);
 #endif
   if (!context->timeout_handle)
@@ -527,10 +527,12 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
   printf("gtk_im_context_gcin_reset %x\n", context_gcin);
 #endif
 
+#if 0
   if (context_gcin->gcin_ch) {
     gcin_im_client_reset(context_gcin->gcin_ch);
     g_signal_emit_by_name(context, "preedit_changed");
   }
+#endif
 }
 
 /* Mask of feedback bits that we render

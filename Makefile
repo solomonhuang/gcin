@@ -73,10 +73,14 @@ endif
 ifeq ($(USE_TSIN),Y)
 CFLAGS += -DUSE_TSIN=1
 OBJS += $(gcin_tsin_o)
+gcin1_so += tsin-char.pico
 endif
 
 ifeq ($(USE_ANTHY),Y)
 CFLAGS += -DUSE_ANTHY=1
+ifeq ($(USE_TSIN),N)
+OBJS += $(gcin_tsin_o)
+endif
 endif
 
 ifeq ($(USE_GCB),Y)
@@ -179,8 +183,8 @@ pin-juyin:	$(OBJS_pin_juyin)
 #	$(CC) -o $@ $(OBJS_ANTHY) -lanthydic $(LDFLAGS)
 #	$(CC) -o $@ $(OBJS_ANTHY) $(LDFLAGS)
 
-gcin1_so= intcode.pico win-int.pico win-message.pico win-sym.pico \
-win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico tsin-char.pico
+gcin1_so += intcode.pico win-int.pico win-message.pico win-sym.pico \
+win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico
 
 ifeq ($(USE_ANTHY),Y)
 gcin1_so += anthy.pico

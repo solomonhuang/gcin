@@ -7,9 +7,9 @@ export XMODIFIERS=@im=SCIM
 #scim -d &
 #scim-input-pad &
 #gedit --new-window &
-mozilla-firefox
+#mozilla-firefox
 #kedit
-#gedit
+gedit
 #leafpad
 #amsn
 #abiword

@@ -92,11 +92,19 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GCIN_CAPSLOCK_LOWER,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower)));
 
+#if GTK_CHECK_VERSION(2,4,0)
+  int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_spc_opts));
+#else
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
+#endif
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
 
+#if GTK_CHECK_VERSION(2,4,0)
+  idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_auto_select_by_phrase));
+#else
   idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_auto_select_by_phrase));
+#endif
   save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, auto_select_by_phrase_opts[idx].num);
 
   send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
@@ -144,23 +152,37 @@ static GtkWidget *create_spc_opts()
   GtkWidget *label = gtk_label_new(_("空白鍵選項"));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
+#if GTK_CHECK_VERSION(2,4,0)
+  opt_spc_opts = gtk_combo_box_new_text ();
+#else
   opt_spc_opts = gtk_option_menu_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), opt_spc_opts, FALSE, FALSE, 0);
   GtkWidget *menu_spc_opts = gtk_menu_new ();
+#endif
+  gtk_box_pack_start (GTK_BOX (hbox), opt_spc_opts, FALSE, FALSE, 0);
 
   int i, current_idx=0;
 
   for(i=0; spc_opts[i].str; i++) {
+#if !GTK_CHECK_VERSION(2,4,0)
     GtkWidget *item = gtk_menu_item_new_with_label (_(spc_opts[i].str));
+#endif
 
     if (spc_opts[i].num == gtab_space_auto_first)
       current_idx = i;
 
+#if GTK_CHECK_VERSION(2,4,0)
+    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_spc_opts), _(spc_opts[i].str));
+#else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_spc_opts), item);
+#endif
   }
 
+#if GTK_CHECK_VERSION(2,4,0)
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_spc_opts), current_idx);
+#else
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_spc_opts), menu_spc_opts);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt_spc_opts), current_idx);
+#endif
 
   return hbox;
 }
@@ -169,23 +191,37 @@ static GtkWidget *create_auto_select_by_phrase_opts()
 {
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
   
+#if GTK_CHECK_VERSION(2,4,0)
+  opt_auto_select_by_phrase = gtk_combo_box_new_text ();
+#else
   opt_auto_select_by_phrase = gtk_option_menu_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), opt_auto_select_by_phrase, FALSE, FALSE, 0);
   GtkWidget *menu_auto_select_by_phrase = gtk_menu_new ();
+#endif
+  gtk_box_pack_start (GTK_BOX (hbox), opt_auto_select_by_phrase, FALSE, FALSE, 0);
 
   int i, current_idx=0;
 
   for(i=0; auto_select_by_phrase_opts[i].str; i++) {
+#if !GTK_CHECK_VERSION(2,4,0)
     GtkWidget *item = gtk_menu_item_new_with_label (_(auto_select_by_phrase_opts[i].str));
+#endif
 
     if (auto_select_by_phrase_opts[i].num == gtab_auto_select_by_phrase)
       current_idx = i;
 
+#if GTK_CHECK_VERSION(2,4,0)
+    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_auto_select_by_phrase), _(auto_select_by_phrase_opts[i].str));
+#else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_auto_select_by_phrase), item);
+#endif
   }
 
+#if GTK_CHECK_VERSION(2,4,0)
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_auto_select_by_phrase), current_idx);
+#else
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_auto_select_by_phrase), menu_auto_select_by_phrase);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt_auto_select_by_phrase), current_idx);
+#endif
 
   return hbox;
 }

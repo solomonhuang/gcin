@@ -625,3 +625,7 @@ msgstr "Disable all"
 #: ../gtk-im/imgcin.c:27
 msgid "gcin Input Method"
 msgstr "gcin Input Method"
+
+#: ../tray.c:218
+msgid "简体输出"
+msgstr "Simplified Chinese output"

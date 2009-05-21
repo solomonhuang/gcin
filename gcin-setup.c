@@ -311,7 +311,11 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   dbg("selkey color %s\n", cstr);
   save_gcin_conf_str(GCIN_SEL_KEY_COLOR, cstr);
 
+#if GTK_CHECK_VERSION(2,4,0)
+  int idx = gtk_combo_box_get_active (GTK_OPTION_MENU (opt_gcin_edit_display));
+#else
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcin_edit_display));
+#endif
   save_gcin_conf_int(GCIN_EDIT_DISPLAY, edit_disp[idx].keynum);
 
   g_free(cstr);
@@ -425,23 +429,37 @@ static GtkWidget *create_gcin_edit_display()
   GtkWidget *label = gtk_label_new(_("編輯區顯示"));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
+#if GTK_CHECK_VERSION(2,4,0)
+  opt_gcin_edit_display = gtk_combo_box_new_text ();
+#else
   opt_gcin_edit_display = gtk_option_menu_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), opt_gcin_edit_display, FALSE, FALSE, 0);
   GtkWidget *menu = gtk_menu_new ();
+#endif
+  gtk_box_pack_start (GTK_BOX (hbox), opt_gcin_edit_display, FALSE, FALSE, 0);
 
   int i, current_idx=0;
 
   for(i=0; edit_disp[i].keystr; i++) {
+#if !GTK_CHECK_VERSION(2,4,0)
     GtkWidget *item = gtk_menu_item_new_with_label (_(edit_disp[i].keystr));
+#endif
 
     if (edit_disp[i].keynum == gcin_edit_display)
       current_idx = i;
 
+#if GTK_CHECK_VERSION(2,4,0)
+    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_gcin_edit_display), _(edit_disp[i].keystr));
+#else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+#endif
   }
 
+#if GTK_CHECK_VERSION(2,4,0)
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcin_edit_display), current_idx);
+#else
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcin_edit_display), menu);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcin_edit_display), current_idx);
+#endif
 
   return hbox;
 }

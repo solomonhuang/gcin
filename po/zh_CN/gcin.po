@@ -625,3 +625,7 @@ msgstr "全部关闭"
 #: ../gtk-im/imgcin.c:27
 msgid "gcin Input Method"
 msgstr "gcin 输入法"
+
+#: ../tray.c:218
+msgid "简体输出"
+msgstr "简体输出"

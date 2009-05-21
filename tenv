@@ -22,6 +22,7 @@ export GTK_IM_MODULE=gcin
 #gedit a.txt
 #leafpad
 #pcmanx
-firefox
+#firefox
 #mozilla-thunderbird
+~/eclipse/eclipse
 pkill gcin.test
