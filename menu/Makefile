@@ -10,7 +10,7 @@ install:
 	   install gcin-setup.desktop /usr/share/applications; \
 	   install -d /usr/lib/menu; \
 	   install -m 644 $(MENUS) /usr/lib/menu; \
-	   which update-menus >& /dev/null && update-menus || exit 0; \
+	   which update-menus > /dev/null 2>&1 && update-menus || exit 0; \
 	else \
 	   install -d $(libdir)/menu; \
 	   install -m 644 $(MENUS) $(libdir)/menu; \

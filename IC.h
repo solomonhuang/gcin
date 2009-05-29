@@ -85,6 +85,8 @@ typedef struct {
   XIMS xims;
 } DUAL_XIM_ENTRY;
 
+#if 0
 extern DUAL_XIM_ENTRY *pxim_arr;
+#endif
 
 Window get_ic_win(IC *rec);

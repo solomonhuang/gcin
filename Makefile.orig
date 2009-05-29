@@ -142,7 +142,7 @@ phoa2d: $(OBJS_phoa2d)
 	$(CC) -o $@ $(OBJS_phoa2d) $(LDFLAGS)
 
 phod2a: $(OBJS_phod2a)
-	$(CC) -lX11 -o $@ $(OBJS_phod2a) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS_phod2a) $(LDFLAGS)
 
 tsa2d:  $(OBJS_tsa2d)
 	$(CC) -o $@ $(OBJS_tsa2d) $(LDFLAGS)

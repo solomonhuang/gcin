@@ -31,6 +31,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static IC *ic_list = (IC *)NULL;
 static IC *free_list = (IC *)NULL;
 
+#if 0
 static IC *ic_lists[2];
 static IC *free_lists[2];
 static int current_IC_index;
@@ -48,6 +49,7 @@ void switch_IC_index(int index)
         current_IC_index = index;
     }
 }
+#endif
 
 
 static void free_IC_list(IC *list)
@@ -331,6 +333,7 @@ void CreateIC(IMChangeICStruct *call_data)
     return;
 }
 
+#if 0
 void
 DestroyIC(call_data)
 IMChangeICStruct *call_data;
@@ -338,6 +341,7 @@ IMChangeICStruct *call_data;
     DeleteIC(call_data->icid);
     return;
 }
+#endif
 
 void SetIC(IMChangeICStruct * call_data)
 {

@@ -21,6 +21,8 @@ int output_bufferN;
 static char *output_buffer_raw, *output_buffer_raw_bak;
 static int output_buffer_rawN;
 
+void gcin_reset0();
+
 void send_fake_key_eve(KeySym key)
 {
   KeyCode kc = XKeysymToKeycode(dpy, key);
@@ -526,13 +528,6 @@ void toggle_im_enabled(u_int kev_state)
 
 
     if (current_CS->im_state != GCIN_STATE_DISABLED) {
-#if 0
-      if (current_CS->in_method== 6 && (kev_state & LockMask) != orig_caps_state &&
-          tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) {
-        send_fake_key_eve(XK_Caps_Lock);
-      }
-#endif
-
       if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
         current_CS->im_state = GCIN_STATE_CHINESE;
         disp_im_half_full();

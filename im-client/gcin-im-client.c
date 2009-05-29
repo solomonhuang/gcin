@@ -16,6 +16,8 @@
 
 static int flags_backup;
 
+Atom get_gcin_sockpath_atom(Display *dpy);
+
 static void save_old_sigaction_single(int signo, struct sigaction *act)
 {
   sigaction(signo, NULL, act);
@@ -434,7 +436,7 @@ void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr)
   bzero(&reply, sizeof(reply));
   if (handle_read(handle, &reply, sizeof(reply)) <=0) {
     error_proc(handle, "cannot read reply from gcin server");
-    return FALSE;
+    return;
   }
 
   to_gcin_endian_4(&reply.datalen);
@@ -445,13 +447,13 @@ void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr)
     if (handle_read(handle, *rstr, reply.datalen) <= 0) {
       free(*rstr); *rstr = NULL;
       error_proc(handle, "cannot read reply str from gcin server");
-      return FALSE;
+      return;
     }
   }
 
 //  dbg("gcin_im_client_forward_key_event %x\n", reply.flag);
 
-  return reply.flag;
+  return;
 }
 
 static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,

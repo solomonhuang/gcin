@@ -7,12 +7,14 @@
 #include <X11/Xatom.h>
 #include <sys/stat.h>
 #include <gcin.h>
+#include <arpa/inet.h>
 #include "gcin-protocol.h"
 #include "im-srv.h"
 
 int im_sockfd, im_tcp_sockfd;
 void get_gcin_im_srv_sock_path(char *outstr, int outstrN);
 void process_client_req(int fd);
+Atom get_gcin_sockpath_atom(Display *dpy);
 Server_IP_port srv_ip_port;
 static Window prop_win;
 static Atom addr_atom;
@@ -35,7 +37,7 @@ static void gen_passwd_idx()
 
   to_gcin_endian_4(&srv_ip_port.passwd.seed);
   XChangeProperty(dpy, prop_win , addr_atom, XA_STRING, 8,
-     PropModeReplace, (char *)&tsrv_ip_port, sizeof(srv_ip_port));
+     PropModeReplace, (unsigned char *)&tsrv_ip_port, sizeof(srv_ip_port));
 
   XSync(GDK_DISPLAY(), FALSE);
 }
@@ -46,7 +48,7 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
 #if 0
   dbg("im-srv: cb_new_gcin_client %s\n", type==Connection_type_unix ? "unix":"tcp");
 #endif
-  int newsockfd, clilen;
+  unsigned int newsockfd, clilen;
 
   if (type==Connection_type_unix) {
     struct sockaddr_un cli_addr;
@@ -163,7 +165,7 @@ void init_gcin_im_serv(Window win)
   strcpy(srv_sockpath.sock_path, sock_path);
   Atom sockpath_atom = get_gcin_sockpath_atom(dpy);
   XChangeProperty(dpy, prop_win , sockpath_atom, XA_STRING, 8,
-     PropModeReplace, (char *)&srv_sockpath, sizeof(srv_sockpath));
+     PropModeReplace, (unsigned char *)&srv_sockpath, sizeof(srv_sockpath));
 
 
   addr_atom = get_gcin_addr_atom(dpy);
@@ -200,7 +202,9 @@ void init_gcin_im_serv(Window win)
       break;
   }
 
+#if 0
   u_char *myip = (char *)&srv_ip_port.ip;
+#endif
   srv_ip_port.port = serv_addr_tcp.sin_port;
 
   dbg("server port bind to %s:%d\n", inet_ntoa(serv_addr_tcp.sin_addr), port);

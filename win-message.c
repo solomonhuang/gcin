@@ -63,7 +63,7 @@ static void create_win_message(char *icon, char *text, int duration)
 
   gtk_window_move(GTK_WINDOW(gwin_message), ox, oy);
 
-  g_timeout_add(duration, timeout_destroy_window, gwin_message);
+  g_timeout_add(duration, (GSourceFunc)timeout_destroy_window, gwin_message);
 }
 
 void execute_message(char *message)

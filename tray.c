@@ -237,7 +237,7 @@ static void create_menu()
     else
     if (mitems[i].check_dat) {
       item = gtk_check_menu_item_new_with_label (_(mitems[i].name));
-      gtk_check_menu_item_set_active(item, *mitems[i].check_dat);
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), *mitems[i].check_dat);
     }
     else
       item = gtk_menu_item_new_with_label (_(mitems[i].name));
@@ -261,7 +261,10 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
 {
   switch (event->button) {
     case 1:
-      toggle_im_enabled();
+      if (event->state & GDK_SHIFT_MASK)
+        inmd_switch_popup_handler(NULL, (GdkEvent *)event);
+      else
+        toggle_im_enabled();
       break;
     case 2:
 #if 0
@@ -341,7 +344,7 @@ gboolean create_tray()
   tray_da_win = da->window;
   // tray window is not ready ??
   if (!tray_da_win || !GTK_WIDGET_DRAWABLE(da)) {
-    gtk_widget_destroy(tray_icon);
+    gtk_widget_destroy(GTK_WIDGET(tray_icon));
     da = NULL;
     return;
   }

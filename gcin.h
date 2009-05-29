@@ -11,6 +11,7 @@
 #include "IMdkit.h"
 #include "Xi18n.h"
 #if GCIN_i18n_message
+#include <libintl.h>
 #define _(STRING) gettext(STRING)
 #else
 #define _(STRING) (STRING)

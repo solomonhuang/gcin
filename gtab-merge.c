@@ -268,7 +268,7 @@ int main(int argc, char **argv)
     u_int64_t kk;
     int k;
 
-    cmd_arg(tt, &cmd, &arg);
+    cmd_arg(tt, (char **)&cmd, (char **)&arg);
     if (!cmd[0] || !arg[0])
       continue;
     if (cmd[0]=='%')

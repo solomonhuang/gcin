@@ -1217,7 +1217,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
       goto shift_proc;
 
     if (gcin_capslock_lower)
-      case_inverse(&key, shift_m);
+      case_inverse((int *)&key, shift_m);
 
     if (gbufN)
       insert_gbuf_cursor_char(key);
@@ -1602,7 +1602,7 @@ next:
           if (ci==1) {
             int i;
             for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
-              utf8cpy(seltab[i], &cur_inmd->qkeys.quick1[inkey-1][i]);
+              utf8cpy(seltab[i], (char *)&cur_inmd->qkeys.quick1[inkey-1][i]);
             }
 
             defselN=cur_inmd->M_DUP_SEL;
@@ -1612,7 +1612,7 @@ next:
           if (ci==2 && !pselkey) {
             int i;
             for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
-              utf8cpy(seltab[i], &cur_inmd->qkeys.quick2[inch[0]-1][inkey-1][i]);
+              utf8cpy(seltab[i], (char *)&cur_inmd->qkeys.quick2[inch[0]-1][inkey-1][i]);
             }
 
             defselN=cur_inmd->M_DUP_SEL;

@@ -60,8 +60,7 @@ int feedkey_intcode(KeySym key)
     goto dispIn;
   }
   else
-  if (key<'0'||key>'F'||(key>'9' && key<'A')) {
-    if (current_intcode==INTCODE_BIG5 || key!=' ')
+  if ((key<'0'||key>'F'||(key>'9' && key<'A')) && (key!=' ')){
     return 0;
   }
 
@@ -86,7 +85,9 @@ dispIn:
     disp_int(i, dstr[h2i(inch[i])]);
   }
 
-  if (current_intcode==INTCODE_BIG5 && cin==4 || key==' ') {
+  if ((current_intcode==INTCODE_BIG5 && cin==4 ||
+       current_intcode==INTCODE_UTF32 && cin==6) &&
+      gtab_press_full_auto_send || key==' ') {
     u_char utf8[CH_SZ+1];
 
     if (!cin && key==' ')
@@ -107,7 +108,7 @@ dispIn:
         v |= h2i(inch[i]);
       }
 
-      utf32to8(utf8, &v);
+      utf32to8(utf8, (char *)&v);
     }
 
     sendkey_b5(utf8);

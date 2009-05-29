@@ -10,6 +10,8 @@ static GtkWidget *labels_sele[SELEN], *labels_seleR[SELEN];
 static GtkWidget *eve_sele[SELEN], *eve_seleR[SELEN];
 static GtkWidget *arrow_up, *arrow_down;
 
+void hide_selections_win();
+
 void create_win1()
 {
   if (gwin1)
@@ -56,7 +58,7 @@ void create_win1_gui()
   int i;
   for(i=0; i < SELEN; i++) {
     GtkWidget *align = gtk_alignment_new(0,0,0,0);
-    gtk_table_attach_defaults(table,align, 0,1,i,i+1);
+    gtk_table_attach_defaults(GTK_TABLE(table),align, 0,1,i,i+1);
     GtkWidget *event_box_pho = gtk_event_box_new();
     GtkWidget *label = gtk_label_new(NULL);
     gtk_container_add (GTK_CONTAINER (event_box_pho), label);
@@ -70,7 +72,7 @@ void create_win1_gui()
 
 
     GtkWidget *alignR = gtk_alignment_new(0,0,0,0);
-    gtk_table_attach_defaults(table, alignR, 1,2,i,i+1);
+    gtk_table_attach_defaults(GTK_TABLE(table), alignR, 1,2,i,i+1);
     GtkWidget *event_box_phoR = gtk_event_box_new();
     GtkWidget *labelR = gtk_label_new(NULL);
     gtk_container_add (GTK_CONTAINER (event_box_phoR), labelR);
@@ -162,7 +164,7 @@ void disp_selections(int x, int y)
 void raise_tsin_selection_win()
 {
   if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
-    gtk_window_present(gwin1);
+    gtk_window_present(GTK_WINDOW(gwin1));
 }
 
 

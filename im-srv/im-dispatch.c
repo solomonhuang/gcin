@@ -18,6 +18,13 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state);
 int gcin_FocusIn(ClientState *cs);
 int gcin_FocusOut(ClientState *cs);
 void update_in_win_pos();
+void hide_in_win(ClientState *cs);
+void init_state_chinese(ClientState *cs);
+void clear_output_buffer();
+void flush_edit_buffer();
+int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor);
+void gcin_reset();
+void dbg_time(char *fmt,...);
 
 extern char *output_buffer;
 extern int output_bufferN;
@@ -28,7 +35,7 @@ int write_enc(int fd, void *p, int n)
   if (!fd)
     return 0;
 
-  char *tmp = malloc(n);
+  unsigned char *tmp = malloc(n);
   memcpy(tmp, p, n);
 
   if (gcin_clients[fd].type == Connection_type_tcp) {
@@ -268,12 +275,12 @@ void process_client_req(int fd)
       dbg_time("Invalid request %x from:", req.req_no);
 
       struct sockaddr_in addr;
-      int len=sizeof(addr);
+      unsigned int len=sizeof(addr);
       bzero(&addr, sizeof(addr));
 
       if (!getpeername(fd, (struct sockaddr *)&addr, &len)) {
-        u_char addr_ch[4];
 #if 0
+        u_char addr_ch[4];
         memcpy(addr_ch, &addr.sin_addr.s_addr,sizeof(addr.sin_addr.s_addr));
         dbg("%d %d %d %d\n", addr_ch[0], addr_ch[1], addr_ch[2], addr_ch[3]);
 #else

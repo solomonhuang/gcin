@@ -67,7 +67,7 @@ void disp_pho_sub(GtkWidget *label, int index, char *pho)
     tn += n;
   }
 
-  gtk_label_set_text(label, s);
+  gtk_label_set_text(GTK_LABEL(label), s);
 }
 
 void exec_gcin_setup()
@@ -75,6 +75,9 @@ void exec_gcin_setup()
 #if DEBUG
   dbg("exec gcin\n");
 #endif
+
+  if (geteuid() < 100 || getegid() < 100)
+    return;
 
   char pidstr[32];
   sprintf(pidstr, "GCIN_PID=%d",getpid());
@@ -106,10 +109,10 @@ void set_no_focus(GtkWidget *win)
 {
   gdk_window_set_override_redirect(win->window, TRUE);
 #if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 6
-  gtk_window_set_accept_focus(win, FALSE);
+  gtk_window_set_accept_focus(GTK_WINDOW(win), FALSE);
 #endif
 #if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 6
-  gtk_window_set_focus_on_map (win, FALSE);
+  gtk_window_set_focus_on_map (GTK_WINDOW(win), FALSE);
 #endif
 }
 

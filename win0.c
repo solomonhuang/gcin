@@ -608,7 +608,7 @@ void show_win0()
 
   show_win_sym();
   if (current_CS->b_raise_window) {
-    gtk_window_present(gwin0);
+    gtk_window_present(GTK_WINDOW(gwin0));
     raise_tsin_selection_win();
   }
 }

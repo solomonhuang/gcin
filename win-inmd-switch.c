@@ -8,7 +8,11 @@ void cb_update_menu_select(GtkWidget  *item,  gpointer data)
 {
    int idx=GPOINTER_TO_INT(data);
 
+   if (current_CS->im_state != GCIN_STATE_CHINESE)
+     current_CS->im_state = GCIN_STATE_CHINESE;
+
    init_in_method(idx);
+
 }
 
 void create_inmd_switch()

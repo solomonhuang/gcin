@@ -12,7 +12,7 @@ int dpy_xl, dpy_yl;
 
 DUAL_XIM_ENTRY xim_arr[1];
 
-#if USE_XIM
+#if 0
 DUAL_XIM_ENTRY *pxim_arr;
 #endif
 
@@ -122,7 +122,9 @@ int MyTriggerNotifyHandler(IMTriggerNotifyStruct *call_data)
     }
 }
 
+#if 0
 void switch_IC_index(int index);
+#endif
 void CreateIC(IMChangeICStruct *call_data);
 void DeleteIC(CARD16 icid);
 void SetIC(IMChangeICStruct * call_data);
@@ -136,12 +138,14 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
 //  dbg("gcin_ProtoHandler %x ims\n", ims);
+#if 0
   int index=0;
 
   pxim_arr = &xim_arr[index];
   switch_IC_index(index);
 
 //  dbg("index:%d\n", index);
+#endif
 
   current_ims = ims;
 
@@ -481,7 +485,7 @@ int main(int argc, char **argv)
     lc = strdup(lc_ctype);
     lc[len] = 0;
 #else
-    lc = strndup(lc_ctype, len);
+    lc = g_strndup(lc_ctype, len);
 #endif
   }
   else

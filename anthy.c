@@ -13,6 +13,10 @@ extern gint64 key_press_time;
 static GtkWidget *event_box_anthy;
 gint64 current_time();
 
+void show_win_anthy();
+void hide_win_anthy();
+void change_anthy_font_size();
+
 struct {
   char *en;
   char *ro;
@@ -1090,7 +1094,7 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
       attrN=1;
 
     for(i=0; i < segN; i++) {
-      char *s = gtk_label_get_text(GTK_LABEL(seg[i].label));
+      char *s = (char *)gtk_label_get_text(GTK_LABEL(seg[i].label));
       int N = utf8_str_N(s);
       ch_N+=N;
       if (i < cursor)

@@ -2,13 +2,16 @@
 
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "** valid options:"
-    echo "  --use_xim=N : disable the support of XIM, exec size is 50k smaller"
+    echo "  --use_xim=N    : disable the support of XIM"
     echo "  --prefix=dir_name : install prefix(e.g. /usr)"
-    echo "  --new_gtk_im=Y/N :  enable/disable new gtk im module for firefox 1.5 over-the-spot"
-    echo "  --use_tray=N : disable the support of system tray, exec size is 12k smaller"
-    echo "  --use_i18n=Y : enable i18n"
-    echo "  --use_tsin=N : disable Tsin input method"
-    echo "  --use_gcb=N : disable gcb (gtk copy-paste buffer)"
+    echo "  --new_gtk_im=N : disable new gtk immodule for firefox over-the-spot"
+    echo "  --use_tray=N   : disable system tray"
+    echo "  --use_i18n=Y   : enable i18n"
+    echo "  --use_tsin=N   : disable Tsin input method"
+    echo "  --use_anthy=N  : disable Anthy input method"
+    echo "  --use_gcb=N    : disable gcb (gtk copy-paste buffer)"
+    echo "  --use_qt3=N    : disable Qt3 immodule"
+    echo "  --use_qt4=N    : disable Qt4 immodule"
     exit
 fi
 
@@ -41,6 +44,9 @@ use_tray='Y'
 use_i18n='N'
 use_tsin='Y'
 use_gcb='Y'
+use_anthy='Y'
+use_qt3='Y'
+use_qt4='Y'
 
 if [ "$GCIN_USE_XIM" ]; then
   use_xim=$GCIN_USE_XIM
@@ -61,6 +67,12 @@ for opt do
   --use_tsin=*) use_tsin=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_gcb=*) use_gcb=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_anthy*) use_anthy=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_qt3*) use_qt3=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_qt4*) use_qt4=`echo $opt | cut -d '=' -f 2`
   ;;
   esac
 done
@@ -118,8 +130,13 @@ if [ $? != 0 ]; then
   USE_ANTHY=N
   echo "It's ok if you don't want anthy support."
 else
-  USE_ANTHY=Y
-  echo "found."
+  if [ $use_anthy = "N" ]; then
+    USE_ANTHY='N'
+    echo "disabled."
+  else
+    USE_ANTHY='Y'
+    echo "found."
+  fi
 fi
 
 LIB='lib'
@@ -135,9 +152,14 @@ if [ -d  $QT_IM_DIR ]; then
 fi
 
 if [ $QT_IM = "Y" ]; then
-    echo "-> Yes, you have QT_IM_MODULE $QT_IM_DIR support"
+    if [ $use_qt3 = "N" ]; then
+        QT_IM='N'
+        echo "-> Yes, but disabled."
+    else
+        echo "-> Yes, you have Qt3 support."
+    fi
 else
-    echo "-> No, you don't have. It's ok if you don't want QT support."
+    echo "-> No, you don't have. It's ok if you don't want Qt3 immodule."
 fi
 
 
@@ -149,9 +171,14 @@ if [ -d  $QT4_IM_DIR ]; then
 fi
 
 if [ $QT4_IM = "Y" ]; then
-    echo "-> Yes, you have qt4 support"
+    if [ $use_qt4 = "N" ]; then
+        QT4_IM='N'
+        echo "-> Yes, but disabled."
+    else
+        echo "-> Yes, you have Qt4 support."
+    fi
 else
-    echo "-> No, you don't have. It's ok if you don't want QT support."
+    echo "-> No, you don't have. It's ok if you don't want Qt4 immodule."
 fi
 
 

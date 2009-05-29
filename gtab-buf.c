@@ -7,6 +7,8 @@
 #include "tsin.h"
 #include "tsin-parse.h"
 
+void disp_gbuf();
+
 extern gboolean gtab_buf_select;
 typedef struct {
   char ch[CH_SZ];

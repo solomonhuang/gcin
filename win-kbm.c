@@ -212,7 +212,7 @@ static void set_kbm_key(KeySym keysym, char *str)
         continue;
 
       GtkWidget *lab = keys[i][j].lab;
-      char *t = gtk_label_get_text(lab);
+      char *t = (char *)gtk_label_get_text(GTK_LABEL(lab));
       char tt[64];
 
       if (t && strcmp(t, str)) {

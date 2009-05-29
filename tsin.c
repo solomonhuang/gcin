@@ -1901,7 +1901,7 @@ llll2:
        return 1;
      }
 
-     if (typ_pho[0]==BACK_QUOTE_NO && typ_pho[1])
+     if (typ_pho[0]==L_BRACKET_NO||typ_pho[0]==R_BRACKET_NO || typ_pho[0]==BACK_QUOTE_NO && typ_pho[1])
        ityp3_pho = 1;
 
      if (key==0 || !ityp3_pho) {
@@ -1919,7 +1919,7 @@ llll2:
    } /* pho */
 
    if (!c_len && typ_pho[0]==BACK_QUOTE_NO && stop_idx - start_idx == 1)
-     send_text(ch_pho[start_idx].ch);  // it's ok since ,. are 3 byte
+     send_text(ch_pho[start_idx].ch);  // it's ok since ,. are 3 byte, last one \0
    else
      put_b5_char(ch_pho[start_idx].ch, key);
 
