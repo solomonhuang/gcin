@@ -2,20 +2,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <X11/Xlib.h>
-#include <X11/Xlocale.h>
-#include <X11/keysym.h>
+#include "os-dep.h"
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
 #include <string.h>
+#if UNIX
 #include "IMdkit.h"
 #include "Xi18n.h"
+#endif
 #if GCIN_i18n_message
 #include <libintl.h>
 #define _(STRING) gettext(STRING)
 #else
+#if UNIX
 #define _(STRING) (STRING)
+#else
+#define _(x) __utf16_8(x)
 #endif
+#endif
+
 #define N_(STRING) STRING
 
 typedef enum {
@@ -45,20 +49,21 @@ typedef enum {
 void *zmalloc(int n);
 #define tzmalloc(type,n)  (type*)zmalloc(sizeof(type) * (n))
 #define trealloc(p,type,n)  (type*)realloc(p, sizeof(type) * (n+1))
-
+#if UNIX
 extern Display *dpy;
-
+#endif
 
 void p_err(char *fmt,...);
 void dbg(char *fmt,...);
-
 
 extern GtkWidget *gwin0;
 extern GdkWindow *gdkwin0;
 extern Window xwin0;
 extern Window root;
+#if UNIX
 void loadIC();
 IC *FindIC(CARD16 icid);
+#endif
 extern ClientState *current_CS;
 
 enum {
@@ -67,7 +72,7 @@ enum {
   InputStyleOnSpot = 4
 };
 
-enum {
+typedef enum {
   Control_Space=0,
   Shift_Space=1,
   Alt_Space=2,
@@ -80,9 +85,9 @@ enum {
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift=4,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL=8,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR=16,
-} TSIN_CHINESE_ENGLISH_TOGGLE_KEY;
+};
 
-enum {
+typedef enum {
   TSIN_SPACE_OPT_SELECT_CHAR = 1,
   TSIN_SPACE_OPT_INPUT = 2,
 } TSIN_SPACE_OPT;
@@ -130,7 +135,9 @@ void utf8cpyn(char *t, char *s, int n);
 void utf8cpy_bytes(char *t, char *s, int n);
 
 void get_gcin_dir(char *tt);
+#if UNIX
 Atom get_gcin_atom(Display *dpy);
+#endif
 void get_sys_table_file_name(char *name, char *fname);
 char *half_char_to_full_char(KeySym xkey);
 void send_text(char *text);
@@ -142,8 +149,15 @@ void send_gcin_message(Display *dpy, char *s);
 void check_CS();
 void get_win_size(GtkWidget *win, int *width, int *height);
 void change_win_fg_bg(GtkWidget *win, GtkWidget *label);
-void set_no_focus();
-
+void set_no_focus(GtkWidget *win);
+void change_win_bg(GtkWidget *win);
+gboolean gcin_edit_display_ap_only();
+void char_play(char *utf8);
+void skip_utf8_sigature(FILE *fp);
+#if WIN32
+char *__utf16_8(wchar_t *s);
+void win32_init_win(GtkWidget *win);
+#endif
 
 #define BITON(flag, bit) ((flag) & (bit))
 
@@ -157,5 +171,3 @@ extern char gcin_switch_keys[];
 typedef int usecount_t;
 
 #define MAX_CIN_PHR (100*CH_SZ + 1)
-
-

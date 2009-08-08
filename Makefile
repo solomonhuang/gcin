@@ -2,7 +2,7 @@ OPTFLAGS=-g
 
 include config.mak
 
-.SUFFIXES:	.c .o .E .pico
+.SUFFIXES:	.c .o .E .pico .cpp
 
 gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
@@ -12,19 +12,18 @@ GCIN_SO= gcin1.so gcin2.so gtk_bug_fix.so
 
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o \
-     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o
+     $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
-             table-update.o locale.o gcin-settings.o gcin-common.o
+             table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
-                 gcin-settings.o gcin-conf.o table-update.o pinyin.o
-OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o
+                 gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o
+OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o gcin-icon.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
 OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
-OBJS_tsd2a=tsd2a.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
@@ -41,7 +40,7 @@ OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 
 
 #WALL=-Wall
-CFLAGS= $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -DDEBUG="0$(GCIN_DEBUG)" \
+CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -I./im-client -DDEBUG="0$(GCIN_DEBUG)" \
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" \
         -DGCIN_OGG_DIR=\"$(GCIN_OGG_DIR)\" \
         -DDOC_DIR=\"$(DOC_DIR)\" \
@@ -63,7 +62,7 @@ endif
 
 ifeq ($(USE_TRAY),Y)
 CFLAGS += -DTRAY_ENABLED=1
-OBJS += tray.o eggtrayicon.o
+OBJS += tray.o eggtrayicon.o tray-win32.o
 endif
 
 ifeq ($(USE_I18N),Y)
@@ -88,14 +87,23 @@ CFLAGS += -DUSE_GCB=1
 OBJS += gcb.o
 endif
 
-im-srv = im-srv/im-srv.a
+OBJ_IMSRV=im-addr.o im-dispatch.o im-srv.o gcin-crypt.o
 
 .c.E:
 	$(CC) $(CFLAGS) -E -o $@ $<
+
+.cpp.E:
+	$(CCX) $(CFLAGS) -E -o $@ $<
+
+.cpp.o:
+	$(CCX) $(CFLAGS) -c $<
+
 .c.pico:
 	$(CC) $(CFLAGS) -c -fpic -o $@ $<
+.cpp.pico:
+	$(CCX) $(CFLAGS) -c -fpic -o $@ $<
 
-PROGS=gcin tsd2a tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
+PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge gcin-setup-tab \
 	gcin-kbm-toggle
 PROGS_SYM=trad2sim
@@ -103,7 +111,6 @@ PROGS_CV=kbmcv pin-juyin
 
 all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec gtk_bug_fix.so
 	$(MAKE) -C data
-	$(MAKE) -C im-client
 	$(MAKE) -C gtk-im
 ifeq ($(USE_I18N),Y)
 	$(MAKE) -C po
@@ -111,17 +118,18 @@ endif
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im; fi
 
-gcin:   $(OBJS) $(IMdkitLIB) $(im-srv)
+gcin:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
 	LD_RUN_PATH=.:$(gcinlibdir) \
-	$(CC) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(im-srv) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
+	$(CCLD) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 	ln -sf $@ $@.test
 
 tslearn:        $(OBJS_TSLEARN)
-	$(CC) -o $@ $(OBJS_TSLEARN) $(LDFLAGS)
+	LD_RUN_PATH=.:$(gcinlibdir) \
+	$(CCLD) -o $@ $(OBJS_TSLEARN) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 juyin-learn:        $(OBJS_JUYIN_LEARN)
-	$(CC) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)
 	rm -f core.*
 sim2trad:        $(OBJS_sim2trad)
 	LD_RUN_PATH=.:$(gcinlibdir) \
@@ -130,58 +138,56 @@ sim2trad:        $(OBJS_sim2trad)
 trad2sim:	sim2trad
 	ln -sf sim2trad trad2sim
 
-gcin-setup:     $(OBJS_gcin_steup)
+gcin-setup:     $(OBJS_gcin_steup) im-client/libgcin-im-client.so
 	rm -f core.*
-	$(CC) -o $@ $(OBJS_gcin_steup) $(LDFLAGS)
+	export LD_RUN_PATH=$(gcinlibdir) ;\
+	$(CCLD) -o $@ $(OBJS_gcin_steup) -L./im-client -lgcin-im-client $(LDFLAGS)
 
-gcin-setup-tab: $(OBJS_gcin_setup_tab)
+gcin-setup-tab: $(OBJS_gcin_setup_tab) im-client/libgcin-im-client.so
 	rm -f core.*
-	$(CC) -o $@ $(OBJS_gcin_setup_tab) $(LDFLAGS)
+	export LD_RUN_PATH=$(gcinlibdir) ;\
+	$(CCLD) -o $@ $(OBJS_gcin_setup_tab) -L./im-client -lgcin-im-client $(LDFLAGS)
 
-phoa2d: $(OBJS_phoa2d)
-	$(CC) -o $@ $(OBJS_phoa2d) $(LDFLAGS)
+phoa2d: $(OBJS_phoa2d) im-client/libgcin-im-client.so
+	$(CCLD) -o $@ $(OBJS_phoa2d) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 phod2a: $(OBJS_phod2a)
-	$(CC) -lX11 -o $@ $(OBJS_phod2a) $(LDFLAGS)
+	$(CCLD) -lX11 -o $@ $(OBJS_phod2a) $(LDFLAGS)
 
-tsa2d:  $(OBJS_tsa2d)
-	$(CC) -o $@ $(OBJS_tsa2d) $(LDFLAGS)
-
-tsa2d32:  $(OBJS_tsa2d32)
-	$(CC) -o $@ $(OBJS_tsa2d32) $(LDFLAGS)
+tsa2d32:  $(OBJS_tsa2d32) im-client/libgcin-im-client.so
+	export LD_RUN_PATH=$(gcinlibdir) ;\
+	$(CCLD) -o $@ $(OBJS_tsa2d32) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 tsd2a:  $(OBJS_tsd2a)
-	$(CC) -o $@ $(OBJS_tsd2a) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_tsd2a) $(LDFLAGS)
 
 tsd2a32:  $(OBJS_tsd2a32)
-	$(CC) -o $@ $(OBJS_tsd2a32) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_tsd2a32) $(LDFLAGS)
 
 gcin2tab:  $(OBJS_gcin2tab)
-	$(CC) -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_gcin2tab) $(LDFLAGS)
 	rm -f data/*.gtab
 
 gtab-merge:  $(OBJS_gtab_merge)
-	$(CC) -o $@ $(OBJS_gtab_merge) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_gtab_merge) $(LDFLAGS)
 
 kbmcv:  $(OBJS_kbmcv)
-	$(CC) -o $@ $(OBJS_kbmcv) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_kbmcv) $(LDFLAGS)
 
 gcin-gb-toggle:	$(OBJS_gcin_gb_toggle)
-	$(CC) -o $@ $(OBJS_gcin_gb_toggle) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_gcin_gb_toggle) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 gcin-kbm-toggle:	$(OBJS_gcin_kbm_toggle)
-	$(CC) -o $@ $(OBJS_gcin_kbm_toggle) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_gcin_kbm_toggle) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 gcin-message:	$(OBJS_gcin_message)
-	$(CC) -o $@ $(OBJS_gcin_message) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_gcin_message) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 pin-juyin:	$(OBJS_pin_juyin)
-	$(CC) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
+	$(CCLD) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
 
-#OBJS_ANTHY = anthy.o locale.o util.o
-#anthy:	$(OBJS_ANTHY)
-#	$(CC) -o $@ $(OBJS_ANTHY) -lanthydic $(LDFLAGS)
-#	$(CC) -o $@ $(OBJS_ANTHY) $(LDFLAGS)
+im-client/libgcin-im-client.so:
+	$(MAKE) -C im-client
 
 gcin1_so += intcode.pico win-int.pico win-message.pico win-sym.pico \
 win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico
@@ -191,11 +197,11 @@ gcin1_so += anthy.pico
 endif
 
 gcin1.so: $(gcin1_so) pho.o tsin.o eve.o gtab.o win-sym.o
-	$(CC) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
+	$(CCLD) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
 
 gcin2_so= t2s-lookup.pico
 gcin2.so: $(gcin2_so) gcin-conf.o
-	$(CC) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
+	$(CCLD) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
 
 gtk_bug_fix.so: gtk_bug_fix.pico
 	$(CC) $(SO_FLAGS) -o $@ gtk_bug_fix.pico
@@ -207,7 +213,7 @@ gcin-gtab.so: $(gcin_gtab_so)
 
 gcin_tsin_so = tsin.pico tsin-util.pico win0.pico win1.pico win-pho-near.pico tsin-parse.pico
 gcin-tsin.so: $(gcin_tsin_so)
-	$(CC) -shared -o $@  $(gcin_tsin_so) $(LDFLAGS)
+	$(CCLD) -shared -o $@  $(gcin_tsin_so) $(LDFLAGS)
 
 gcin_pho_so=win-pho.pico pho.pico pho-util.pico pho-sym.pico table-update.pico pho-dbg.pico
 gcin-pho.so: $(gcin_pho_so)
@@ -215,9 +221,6 @@ gcin-pho.so: $(gcin_pho_so)
 
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
-
-$(im-srv):
-	$(MAKE) -C im-srv
 
 ibin:
 	install $(PROGS) $(bindir); \
@@ -258,7 +261,6 @@ clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean
 	$(MAKE) -C scripts clean
-	$(MAKE) -C im-srv clean
 	$(MAKE) -C im-client clean
 	$(MAKE) -C gtk-im clean
 	$(MAKE) -C qt-im clean
@@ -271,7 +273,7 @@ clean:
 	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' -o -name 'vgcore.*' ')' -exec rm {} \;
 
 .depend:
-	$(CC) $(CFLAGS) -MM *.c > $@
+	$(CCX) $(CFLAGS) -MM *.cpp > $@
 
 config.mak: VERSION.gcin configure
 	./configure

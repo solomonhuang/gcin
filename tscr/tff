@@ -5,10 +5,11 @@ rm -f core.*
 export LC_ALL=en_US
 export LC_CTYPE=en_US
 export LC_CTYPE=zh_TW.UTF-8
-#export LC_CTYPE=zh_TW.Big5
-export LANG=en_US
-export LANGUAGE=en_US
+export LC_CTYPE=zh_TW.Big5
+#export LANG=en_US
+#export LANGUAGE=en_US
 export XMODIFIERS=@im=gcin_test
+export GCIN_TABLE_DIR=../data
 #unset XMODIFIERS
 #export GTK_IM_MODULE=xim
 #export GTK_IM_MODULE=scim
@@ -17,9 +18,8 @@ locale
 ../gcin.test &
 sleep 1
 export LD_LIBRARY_PATH="../im-client"
-export LD_PRELOAD=../gtk-im/im-gcin.so
+export LD_PRELOAD=../gtk-im/im-gcin-cur.so
 #export LD_LIBRARY_PATH=/usr/lib/firefox
-#$LD_LIBRARY_PATH/mozilla-firefox-bin
 #valgrind $LD_LIBRARY_PATH/mozilla-firefox-bin
 firefox
 pkill gcin.test

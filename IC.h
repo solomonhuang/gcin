@@ -26,6 +26,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   Author: Hidetoshi Tajima(tajima@Eng.Sun.COM) Sun Microsystems, Inc.
 
 ******************************************************************/
+#if unix
 typedef struct {
     XRectangle	area;		/* area */
     XRectangle	area_needed;	/* area needed */
@@ -49,9 +50,14 @@ typedef struct {
     CARD32	line_space;	/* line spacing */
     Cursor	cursor;		/* cursor */
 } StatusAttributes;
+#endif
 
 typedef struct {
-    Window	client_win;	/* client window */
+#if WIN32
+    HWND	client_win;	/* client window */
+#else
+	Window	client_win;	/* client window */
+#endif
     INT32	input_style;	/* input style */
     GCIN_STATE_E im_state;
     gboolean    b_half_full_char;
@@ -66,27 +72,27 @@ typedef struct {
 
 
 typedef struct _IC {
+#if USE_XIM
     CARD16	id;		/* ic id */
+#endif
     Window	focus_win;	/* focus window */
     char	*resource_name;	/* resource name */
     char	*resource_class; /* resource class */
+#if USE_XIM
     PreeditAttributes pre_attr; /* preedit attributes */
     StatusAttributes sts_attr; /* status attributes */
-
+#endif
     ClientState cs;
     struct _IC	*next;
 } IC;
-
 
 typedef struct {
   char *server_locale;
   char xim_server_name[32];
   Window xim_xwin;
+#if USE_XIM
   XIMS xims;
-} DUAL_XIM_ENTRY;
-
-#if 0
-extern DUAL_XIM_ENTRY *pxim_arr;
 #endif
+} DUAL_XIM_ENTRY;
 
 Window get_ic_win(IC *rec);

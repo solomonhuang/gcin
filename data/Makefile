@@ -14,15 +14,15 @@ DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 all:	$(DATA)
 
 tsin32:	tsin.src ../tsa2d32
-	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../tsa2d32 $<
+	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../tsa2d32 $<
 
 tsin32.idx:	tsin32
 
 pho.tab:	 pho.tab.src ../phoa2d
-	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
+	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 pho-huge.tab:	 pho-huge.tab.src ../phoa2d
-	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD; ../phoa2d $<
+	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 t2s.dat:	t2s-file t2s-file.table
 	./t2s-file

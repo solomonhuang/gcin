@@ -1,10 +1,4 @@
-#include <dlfcn.h>
-void gdk_window_freeze_toplevel_updates_libgtk_only(){}
-void gdk_window_thaw_toplevel_updates_libgtk_only(){}
+#include <gtk/gtk.h>
 
-#if 0
-void __attribute__((constructor)) __open_init()
-{
-  puts("gtk_bug_fix loaded");
-}
-#endif
+void gdk_window_freeze_toplevel_updates_libgtk_only(GdkWindow *window) {}
+void gdk_window_thaw_toplevel_updates_libgtk_only(GdkWindow *window) {}

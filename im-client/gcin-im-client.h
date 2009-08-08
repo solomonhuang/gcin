@@ -59,6 +59,7 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_flags);
 
 void gcin_im_client_reset(GCIN_client_handle *handle);
+void gcin_im_client_message(GCIN_client_handle *handle, char *message);
 
 #include "gcin-im-client-attr.h"
 int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor);

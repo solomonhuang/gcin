@@ -45,7 +45,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0755)
 %doc README.html Changelog.html AUTHORS
 %{_bindir}/*
-%{_includedir}/*
 %{_datadir}/gcin/*
 %{_datadir}/man/man1/*
 %{_datadir}/icons/*

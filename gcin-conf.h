@@ -35,6 +35,7 @@
 #define GCIN_ENG_PHRASE_ENABLED "gcin-eng-phrase-enabled"
 #define GCIN_WIN_SYM_CLICK_CLOSE "gcin-win-sym-click-close"
 #define GCIN_SEL_KEY_COLOR "gcin-sel-key-color"
+#define GCIN_WIN32_ICON "gcin-win32-icon"
 
 #define GTAB_DUP_SELECT_BELL "gtab-dup-select-bell"
 #define GTAB_SPACE_AUTO_FIRST "gtab-space-auto-first"
@@ -116,7 +117,7 @@ extern int tsin_space_opt, tsin_tone_char_input;
 extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name, *gcin_sel_key_color;
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use;
-extern int gcin_init_im_enabled;
+extern int gcin_init_im_enabled, gcin_win32_icon;
 extern int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y, gcin_edit_display;
 
 void get_gcin_user_fname(char *name, char fname[]);

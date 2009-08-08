@@ -14,7 +14,7 @@ typedef struct {
 extern PHOKBM phkbm;
 
 typedef struct {
-  u_char ch[CH_SZ];
+  char ch[CH_SZ];
   short count;
 } PHO_ITEM;
 

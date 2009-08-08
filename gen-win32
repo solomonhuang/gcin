@@ -1,0 +1,25 @@
+cd
+rm -fr gcin-win32
+cp -a gcin gcin-win32
+cd gcin-win32
+make clean
+
+for i in *.cpp */*.cpp
+do
+  mv $i $i.orig
+  cp win32-utf8-signature.txt $i
+  cat $i.orig >> $i
+  rm -f $i.orig
+done
+
+cd data
+for i in phrase.table phrase-ctrl.table symbol-table
+do
+  awk 'sub("$", "\r")' $i > t.txt
+  mv t.txt $i
+done
+
+cd
+rm -f gcin-win32.7z
+7za a gcin-win32.7z gcin-win32
+chmod 644 ~/gcin-win32.7z

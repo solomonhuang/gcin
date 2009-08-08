@@ -4,6 +4,7 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
+#include <cstdio>
 #include "gcin-im-client.h"
 #include <QColor>
 #include <QPalette>
@@ -82,7 +83,7 @@ void GCINIMContext::update_preedit()
   preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
 
   const QWidget *focused_widget = qApp->focusWidget ();
-  if (!focused_widget) {
+  if (!focused_widget || !str || !*str) {
 free_mem:
     free(str);
     return;

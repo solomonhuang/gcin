@@ -1,9 +1,11 @@
 export GCIN_IM_CLIENT_NO_AUTO_EXEC=
-export GCIN_TABLE_DIR=./data
+export GCIN_TABLE_DIR=../data
 pkill gcin.test
 export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
-export LD_PRELOAD=./im-client/libgcin-im-client.so
+export LD_LIBRARY_PATH="../im-client"
+export LD_PRELOAD=../gtk-im/im-gcin-cur.so
 sleep 1; gedit &
+#sleep 1; firefox &
 gdb ../gcin.test
 pkill gedit

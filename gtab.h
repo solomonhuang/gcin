@@ -18,8 +18,8 @@ typedef struct {
 } ITEM64;
 
 typedef struct {
-  u_char quick1[46][10][CH_SZ];
-  u_char quick2[46][46][10][CH_SZ];
+  char quick1[46][10][CH_SZ];
+  char quick2[46][46][10][CH_SZ];
 } QUICK_KEYS;
 
 
@@ -80,14 +80,14 @@ typedef struct {
   u_int flag;
 #define MAX_CNAME (4*CH_SZ+1)
   char *cname;
-  u_char *keycol;
+  char *keycol;
   int KeyS;               /* number of keys needed */
   int MaxPress;           /* Max len of keystrike  ar30:5  changjei:5 */
   int DefChars;           /* defined chars */
-  u_char *keyname; // including ?*
-  u_char *keyname_lookup; // used by boshiamy only
+  char *keyname; // including ?*
+  char *keyname_lookup; // used by boshiamy only
   gtab_idx1_t *idx1;
-  u_char *keymap;
+  char *keymap;
   char selkey[MAX_SELKEY];
   u_char *sel1st;
   int M_DUP_SEL;

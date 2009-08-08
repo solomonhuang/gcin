@@ -1,0 +1,21 @@
+cd
+rm -fr gcin.bak
+mv gcin gcin.bak
+cp -a gcin-win32 gcin
+cd gcin
+for i in *.cpp */*.cpp
+do
+ echo $i
+ mv $i $i.tmp
+ tail -c +4 $i.tmp > $i
+ rm -f $i.tmp
+done
+
+chmod 755 gen-win32 gen-dist configure tenv tscr/* tval gcin_filter
+
+cd data
+for i in phrase.table phrase-ctrl.table symbol-table
+do
+  awk '{ sub("\r$", ""); print }' $i > t.txt
+  mv t.txt $i
+done

@@ -16,18 +16,11 @@ fi
 
 cd ~/.gcin
 
-if [ -f tsin -a ! -f tsin32 ]; then
-  echo "covert to new tsin32"
-  $2/tsd2a tsin > tmpfile
-  $2/tsa2d32 tmpfile
-fi
-
 diff1=''
 diff tsin-1.src $1/tsin-1.src >& /dev/null
 if [ $? != 0 ]; then
 diff1='Y'
 fi
-
 
 if [ ! -f tsin-1.src -o -n "$diff1" ]; then
   echo "merge tsin-1.src"

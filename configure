@@ -221,6 +221,8 @@ fi
 
 
 echo "CC=gcc" > config.mak
+echo "CCX=gcc -x c" >> config.mak
+echo "CCLD=gcc" >> config.mak
 echo "MAKE=$MAKE" >> config.mak
 echo "GTKINC=$GTKINC" >> config.mak
 echo "prefix=$prefix" >> config.mak

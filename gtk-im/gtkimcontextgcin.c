@@ -527,7 +527,7 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
   printf("gtk_im_context_gcin_reset %x\n", context_gcin);
 #endif
 
-#if 0
+#if 1
   if (context_gcin->gcin_ch) {
     gcin_im_client_reset(context_gcin->gcin_ch);
     g_signal_emit_by_name(context, "preedit_changed");
@@ -591,12 +591,18 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 #if 1
   GtkIMContextGCIN *context_gcin = GTK_IM_CONTEXT_GCIN (context);
   if (!context_gcin->gcin_ch) {
-    *str=strdup("");
+    *str=g_strdup("");
     return;
   }
 
+  char *tstr;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-  int attN = gcin_im_client_get_preedit(context_gcin->gcin_ch, str, att, cursor_pos);
+  int attN = gcin_im_client_get_preedit(context_gcin->gcin_ch, &tstr, att, cursor_pos);
+  if (tstr) {
+    *str=g_strdup(tstr);
+    free(tstr);
+  }
+
 #if DBG
   printf("gtk_im_context_gcin_get_preedit_string attN:%d '%s'\n", attN, *str);
 #endif
@@ -607,7 +613,7 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
   }
 #else
   if (str)
-    *str = strdup("");
+    *str = g_strdup("");
 #endif
 }
 
