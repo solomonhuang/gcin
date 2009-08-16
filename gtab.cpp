@@ -1065,7 +1065,7 @@ void wildcard()
       regstr[regstrN++]='.';
     } else {
       char c = inch[i] + '0';         // start from '0'
-      if (strchr("*.\()[]", c))
+      if (strchr("*.\\()[]", c))
       regstr[regstrN++] = '\\';
       regstr[regstrN++]=c;
     }
@@ -1211,6 +1211,7 @@ int gbuf_cursor_end();
 int gtab_buf_delete();
 void insert_gbuf_cursor(char **sel, int selN);
 void set_gbuf_c_sel(int v);
+void set_gtab_user_head();
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -1359,6 +1360,10 @@ shift_proc:
         reset_gtab_all();
         return 1;
       } else {
+        if (gbufN) {
+          set_gtab_user_head();
+          return 1;
+        }
         ClrIn();
         return 0;
       }

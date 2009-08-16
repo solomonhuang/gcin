@@ -173,7 +173,7 @@ void create_win_pho_gui_simple()
   /* This packs the button into the gwin_pho (a gtk container). */
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
 #if UNIX
-  label_full = gtk_label_new("ȫ");
+  label_full = gtk_label_new("全");
 #else
   label_full = gtk_label_new("Fu");
 #endif

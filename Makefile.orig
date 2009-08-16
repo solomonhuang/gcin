@@ -129,7 +129,7 @@ gcin:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
 	ln -sf $@ $@.test
 
 tslearn:        $(OBJS_TSLEARN)
-	export LD_RUN_PATH=$(gcinlibdir) ;\
+	LD_RUN_PATH=.:$(gcinlibdir) \
 	$(CCLD) -o $@ $(OBJS_TSLEARN) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 juyin-learn:        $(OBJS_JUYIN_LEARN)

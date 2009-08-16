@@ -113,6 +113,7 @@ static void free_pgbuf(GEDIT *p)
   for(i=0; i < p->selN; i++)
     free(p->sel[i]);
   free(p->sel);
+  p->flag = 0;
 }
 
 
@@ -262,6 +263,10 @@ gboolean check_gtab_fixed_mismatch(int idx, char *mtch, int plen)
   return FALSE;
 }
 
+void set_gtab_user_head()
+{
+  gbuf[gbuf_cursor].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
+}
 
 
 CACHE *cache_lookup(int start);

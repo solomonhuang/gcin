@@ -11,7 +11,7 @@ do
  rm -f $i.tmp
 done
 
-chmod 755 gen-win32 gen-dist configure tenv tscr/* tval gcin_filter
+chmod 755 gen-win32 gen-dist configure tenv tscr/* tval gcin_filter tgdb
 
 cd data
 for i in phrase.table phrase-ctrl.table symbol-table

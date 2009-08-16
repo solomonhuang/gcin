@@ -364,10 +364,6 @@ msgstr "Update data from clipboard"
 msgid "離開"
 msgstr "Exit"
 
-#: ../tray.c:228
-msgid "左:正/簡體 中:小鍵盤 右:選項"
-msgstr "Left: Toggle Traditional/Simplified Chinese\nMiddle: Keyboard\nRight: Preferences"
-
 #: ../tslearn.c:336
 msgid "按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"
 msgstr "Click middle button to paste data you want Tslearn to learn."
@@ -629,3 +625,11 @@ msgstr "gcin Input Method"
 #: ../tray.c:218
 msgid "简体输出"
 msgstr "Simplified Chinese output"
+
+#: ../tray.cpp:255 ../tray.cpp:258
+msgid "左:中英切換 中:小鍵盤 右:選項"
+msgstr "Left: Toggle alphabet-numeric mode\nMiddle: Virtual Keyboard\nRight: Preferences"
+
+#: ../about.cpp:79
+msgid "討論區"
+msgstr "Forum"

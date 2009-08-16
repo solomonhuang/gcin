@@ -29,8 +29,7 @@ static void callback_forum( GtkWidget *widget, gpointer   data)
 #if WIN32
 	ShellExecuteA(NULL, "open", FURL, NULL, NULL, SW_SHOWNORMAL);
 #else
-	char tt[128];
-	system("firefox "FURL);
+	html_browser(FURL);
 #endif
 }
 
@@ -82,9 +81,13 @@ void create_about_window()
 		      G_CALLBACK (callback_forum), NULL);
 
 
+#if UNIX
+    image = gtk_image_new_from_file (SYS_ICON_DIR"/gcin.png");
+#else
     char gcin_png[128];
     sys_icon_fname("gcin.png", gcin_png);
     image = gtk_image_new_from_file (gcin_png);
+#endif
 
     label_version = gtk_label_new ("version " GCIN_VERSION);
 

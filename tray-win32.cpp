@@ -108,23 +108,23 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 extern gboolean win_kbm_inited;
 
 #include "mitem.h"
+extern int win_kbm_on;
 
 static MITEM mitems_main[] = {
   {N_(_L("設定")), GTK_STOCK_PREFERENCES, exec_gcin_setup_},
   {N_(_L("重新執行gcin")), NULL, restart_gcin},
   {N_(_L("念出發音")), NULL, cb_tog_phospeak, &phonetic_speak},
+  {N_(_L("小鍵盤")), NULL, kbm_toggle_, &win_kbm_on},
 #if USE_GCB
   {N_(_L("gcb(剪貼區暫存)")), NULL, cb_tog_gcb, &gcb_enabled},
 #endif
   {NULL}
 };
 
-extern int win_kbm_on;
 
 static MITEM mitems_state[] = {
   {N_(_L("正->簡體")), NULL, cb_trad2sim},
   {N_(_L("簡->正體")), NULL, cb_sim2trad},
-  {N_(_L("小鍵盤")), NULL, kbm_toggle_, &win_kbm_on},
   {N_(_L("简体输出")), NULL, cb_trad_sim_toggle_, &gb_output},
   {NULL}
 };

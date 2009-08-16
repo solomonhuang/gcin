@@ -37,16 +37,16 @@
 #define XK_Up VK_UP + KOFS
 #define XK_Down VK_DOWN + KOFS
 #define XK_Right VK_RIGHT + KOFS
-#define XK_KP_0 VK_NUMPAD0 + KOFS
-#define XK_KP_1 VK_NUMPAD1 + KOFS
-#define XK_KP_2 VK_NUMPAD2 + KOFS
-#define XK_KP_3 VK_NUMPAD3 + KOFS
-#define XK_KP_4 VK_NUMPAD4 + KOFS
-#define XK_KP_5 VK_NUMPAD5 + KOFS
-#define XK_KP_6 VK_NUMPAD6 + KOFS
-#define XK_KP_7 VK_NUMPAD7 + KOFS
-#define XK_KP_8 VK_NUMPAD8 + KOFS
-#define XK_KP_9 VK_NUMPAD9 + KOFS
+#define XK_KP_0 (VK_NUMPAD0 + KOFS)
+#define XK_KP_1 (VK_NUMPAD1 + KOFS)
+#define XK_KP_2 (VK_NUMPAD2 + KOFS)
+#define XK_KP_3 (VK_NUMPAD3 + KOFS)
+#define XK_KP_4 (VK_NUMPAD4 + KOFS)
+#define XK_KP_5 (VK_NUMPAD5 + KOFS)
+#define XK_KP_6 (VK_NUMPAD6 + KOFS)
+#define XK_KP_7 (VK_NUMPAD7 + KOFS)
+#define XK_KP_8 (VK_NUMPAD8 + KOFS)
+#define XK_KP_9 (VK_NUMPAD9 + KOFS)
 
 #define XK_KP_Delete VK_DECIMAL + KOFS
 #define XK_KP_Insert VK_NUMPAD0 + KOFS

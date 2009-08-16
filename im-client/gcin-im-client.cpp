@@ -74,6 +74,7 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 	  if (strstr(current_exec, "\\gcin.exe"))
 		  return NULL;
   }
+  int retried;
 #endif
 
 //  dbg("gcin_im_client_reopen\n");
@@ -83,7 +84,6 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   char *addr;
   Server_IP_port srv_ip_port;
   int tcp = FALSE;
-  int retried;
   GCIN_client_handle *handle;
   u_char *pp;
   int rstatus;

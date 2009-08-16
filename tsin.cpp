@@ -1994,7 +1994,7 @@ restart:
 //         dbg("max_match_phrase_len: %d\n", max_match_phrase_len);
          break;
        } else
-       if (full_match) {  // tstr: ?�?�視?
+       if (full_match) {  // tstr: 選擇視窗
 //         dbg("last full_match\n");
          full_match = FALSE;
          ph_sta = -1;
@@ -2068,7 +2068,7 @@ restart:
 #if 0
        chpho[ph_sta].flag |= FLAG_CHPHO_PHRASE_HEAD;
 #endif
-       if (mdist==max_match_phrase_len) { // tstr: ?�?�視?
+       if (mdist==max_match_phrase_len) { // tstr: 選擇視窗
 //         dbg("full match .......... %d\n", ph_sta);
          ph_sta_last = ph_sta;
          ph_sta = -1;

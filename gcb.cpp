@@ -303,6 +303,8 @@ static gboolean  gcb_button_scroll_event(GtkWidget *widget,GdkEventScroll *event
     return TRUE;
 
   show_hist_window();
+
+  return FALSE;
 }
 
 gboolean hist_focus_out_callback(GtkWidget *widget, GdkEventFocus *event,

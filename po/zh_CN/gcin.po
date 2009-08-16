@@ -364,10 +364,6 @@ msgstr "自剪贴区更新"
 msgid "離開"
 msgstr "离开"
 
-#: ../tray.c:228
-msgid "左:正/簡體 中:小鍵盤 右:選項"
-msgstr "左:正/简体 中:小键盘 右:选项"
-
 #: ../tslearn.c:336
 msgid "按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"
 msgstr "按鼠标中键, 贴上你要 tslearn 学习的文章。"
@@ -629,3 +625,11 @@ msgstr "gcin 输入法"
 #: ../tray.c:218
 msgid "简体输出"
 msgstr "简体输出"
+
+#: ../tray.cpp:255 ../tray.cpp:258
+msgid "左:中英切換 中:小鍵盤 右:選項"
+msgstr "左:中英切换 中:小键盘 右:选项"
+
+#: ../about.cpp:79
+msgid "討論區"
+msgstr "讨论区"

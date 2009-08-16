@@ -956,7 +956,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
         else
           win_sym_enabled^=1;
       } else
-        win_sym_enabled==0;
+        win_sym_enabled=0;
 
       create_win_sym();
       if (win_sym_enabled) {
