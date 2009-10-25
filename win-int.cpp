@@ -101,11 +101,13 @@ void clear_int_code(int index)
 
 
 
+#if 0
 static void switch_intcode()
 {
   current_intcode ^= 1;
   adj_intcode_buttons();
 }
+#endif
 
 
 void clear_int_code_all()

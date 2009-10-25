@@ -615,9 +615,13 @@ void gtab_disp_sel()
 
   if (pbuf->selN > page_len())
     more_pg = 1;
-
+#if WIN32
+  show_win_gtab();
+  disp_selection0(FALSE, TRUE);
+#else
   disp_selection0(FALSE, TRUE);
   show_win_gtab();
+#endif
 }
 
 

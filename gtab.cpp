@@ -1349,6 +1349,7 @@ shift_proc:
     case XK_Escape:
       if (gtab_buf_select) {
         gtab_buf_select = 0;
+        reset_gtab_all();
         ClrSelArea();
         if (gcin_pop_up_win && !gtab_has_input())
           hide_win_gtab();
@@ -1403,7 +1404,7 @@ next_page:
 
       has_wild = has_wild_card();
 
-//      dbg("wild_mode:%d more_pg:%d ci:%d  has_wild:%d\n", wild_mode, more_pg, ci, has_wild);
+ //     dbg("wild_mode:%d more_pg:%d ci:%d  has_wild:%d\n", wild_mode, more_pg, ci, has_wild);
 
       if (wild_mode) {
         // request from tetralet
@@ -1535,14 +1536,18 @@ next:
         ClrIn();
       }
       if (key>=XK_KP_0 && key<=XK_KP_9) {
-        if (!ci)
-          return FALSE;
+        if (!ci) {
+		  if (gbufN) {
+            insert_gbuf_cursor_char(key - XK_KP_0 + '0');
+			return 1;
+		  }
+		  else
+            return 0;
+		}
         if (!strncmp(cur_inmd->filename, "dayi", 4)) {
           key = key - XK_KP_0 + '0';
           is_keypad = TRUE;
         }
-        else
-          return 0;
       }
 
       char *pendkey = strchr(cur_inmd->endkey, key);

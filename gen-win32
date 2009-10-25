@@ -1,6 +1,8 @@
+#!/bin/sh
+gcindir=`basename $PWD`
 cd
 rm -fr gcin-win32
-cp -a gcin gcin-win32
+cp -a $gcindir gcin-win32
 cd gcin-win32
 make clean
 

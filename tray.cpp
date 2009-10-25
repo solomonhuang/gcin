@@ -14,7 +14,6 @@ static GdkGC *gc;
 GdkWindow *tray_da_win;
 
 #define GCIN_TRAY_PNG "gcin-tray.png"
-static char gcin_icon[]=GCIN_ICON_DIR"/"GCIN_TRAY_PNG;
 static char *pixbuf_ch_fname;
 void exec_gcin_setup();
 

@@ -148,34 +148,33 @@ void dbg(char *format, ...) {
 }
 
 void p_err(char *format, ...) {
-#if _DBG
+
 	va_list ap;
 	va_start(ap, format);
-
+#if _DBG
 	init_dbgfp();
-
 	vfprintf_s(dbgfp, format, ap);
 	vprintf(format, ap);
 	fflush(dbgfp);
+#endif
 	char tt[512];
-
 	vsprintf_s(tt, sizeof(tt), format, ap);
 	MessageBoxA(NULL, tt, NULL, MB_OK);
 	exit(0);
 	va_end(ap);
-#endif
+
 }
 
-void ErrorExit(LPTSTR lpszFunction) 
-{ 
+void ErrorExit(LPTSTR lpszFunction)
+{
     // Retrieve the system error message for the last-error code
 
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError(); 
+    DWORD dw = GetLastError();
 
     FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
@@ -186,17 +185,17 @@ void ErrorExit(LPTSTR lpszFunction)
 
     // Display the error message and exit the process
 
-    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
-    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
+    StringCchPrintf((LPTSTR)lpDisplayBuf,
         LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("%s failed with error %d: %s"), 
-        lpszFunction, dw, lpMsgBuf); 
-    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+        TEXT("%s failed with error %d: %s"),
+        lpszFunction, dw, lpMsgBuf);
+    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
-    ExitProcess(dw); 
+    ExitProcess(dw);
 }
 #endif
 

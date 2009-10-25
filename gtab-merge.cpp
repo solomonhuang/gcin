@@ -1,4 +1,3 @@
-
 /*
 	Copyright (C) 2006-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
@@ -148,6 +147,11 @@ int qcmp_64(const void *aa, const void *bb)
 #define mtolower(ch) (ch>='A'&&ch<='Z'?ch+0x20:ch)
 
 static char kno[128];
+
+#if WIN32
+void init_gcin_program_files();
+ #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#endif
 
 int main(int argc, char **argv)
 {
@@ -357,7 +361,6 @@ int main(int argc, char **argv)
   bzero(def1,sizeof(def1));
   bzero(idx1,sizeof(idx1));
 
-  u_int64_t key_mask = KEY_MASK;
 
   for(i=0; i<chno; i++) {
     u_int64_t key = CONVT2(cur_inmd, i);

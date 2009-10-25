@@ -301,8 +301,6 @@ void get_win_pho_geom()
 
 void change_pho_font_size()
 {
-  int i;
-
   if (!top_bin)
     return;
 

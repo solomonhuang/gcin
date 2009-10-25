@@ -226,7 +226,7 @@ void change_win1_font()
 {
   int i;
 
-  GdkColor fg, bg;
+  GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
 
   for(i=0; i < SELEN; i++) {

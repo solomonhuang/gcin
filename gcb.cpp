@@ -102,16 +102,19 @@ static void place_gcb_win()
 #endif
 
 /* Signal handler called when the selections owner returns the data */
-static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
+void disp_gcb_selection(const gchar *text)
 {
   // dbg("selection_received '%s'\n", text);
    char *tmpstr;
-   GtkWidget *button = (GtkWidget *)data;
+   GtkWidget *button = snoop_button;
    int i;
    int textlen;
 
    if (!text || !text[0])
      return;
+
+  if (!buttonArr)
+	 return;
 
    for(i=0;i<buttonArrN;i++) {
      if (buttonStr[i] && !strcmp(buttonStr[i],text))
@@ -184,10 +187,15 @@ static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer 
 }
 
 
+void cb_selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
+{
+	disp_gcb_selection(text);
+}
+
+
 void get_selection()
 {
-  gtk_clipboard_request_text(pclipboard,selection_received,snoop_button);
-
+  gtk_clipboard_request_text(pclipboard, cb_selection_received,snoop_button);
 }
 
 
@@ -320,6 +328,12 @@ gboolean timeout_periodic_clipboard_fetch(void *data)
   get_selection();
   return TRUE;
 }
+
+static void cb_owner_change(GtkClipboard *clipboard, GdkEvent *event, gpointer ser_data)
+{
+  get_selection();
+}
+
 
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
@@ -484,6 +498,9 @@ void gcb_main()
 
 
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
-
+#if GTK_CHECK_VERSION(2,6,0) && UNIX
+  g_signal_connect(pclipboard, "owner-change", G_CALLBACK (cb_owner_change), NULL);
+#else
   g_timeout_add(3000, timeout_periodic_clipboard_fetch, NULL);
+#endif
 }

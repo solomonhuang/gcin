@@ -34,7 +34,7 @@ void gen(T2S *t, char *name)
   fclose(fw);
 }
 
-main()
+int main()
 {
   char *fname="t2s-file.table";
   FILE *fp=fopen(fname, "r");

@@ -283,7 +283,7 @@ void load_tray_icon_win32()
 
   char *icon_st=NULL;
   char fname_state[128];
-  if (current_CS && (current_CS->im_state == GCIN_STATE_ENG_FULL ||
+  if (current_CS && (current_CS->im_state == GCIN_STATE_ENG_FULL || current_CS->b_half_full_char ||
       current_CS->in_method==6 && tsin_half_full)) {
       if (gb_output)
         icon_st="full-simp.png";

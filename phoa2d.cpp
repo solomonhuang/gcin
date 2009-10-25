@@ -85,7 +85,6 @@ int main(int argc, char **argv)
 
     phokey_t kk=0;
     char *p = s;
-    int is_back_quote=0;
 
     while (*p && *p!=' ' && *p!=9) {
       if (kk==(BACK_QUOTE_NO << 9))

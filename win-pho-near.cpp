@@ -104,7 +104,6 @@ void create_win_pho_near(phokey_t pho)
 
     for (group2=find_group(2, t_typ_pho[2]); *group2 >=0; group2++) {
       mtyp_pho[2] = *group2;
-      int pitch;
 
       for (mtyp_pho[3]=0;  mtyp_pho[3]< 5; mtyp_pho[3]++) {
 //      dbg("  %d\n",mtyp_pho[2]);

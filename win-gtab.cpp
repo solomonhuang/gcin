@@ -187,7 +187,8 @@ void set_key_codes_label(char *s, int better)
     return;
 
   if (s && strlen(s))
-    gtk_widget_show(hbox_row2);
+    if (hbox_row2)
+      gtk_widget_show(hbox_row2);
   else {
     if (gtab_hide_row2 && hbox_row2) {
       gtk_widget_hide(hbox_row2);
@@ -202,7 +203,8 @@ void set_key_codes_label(char *s, int better)
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
 #if WIN32
   better_key_codes = better;
-  strcpy(str_key_codes, s);
+  if (s)
+    strcpy(str_key_codes, s);
 #endif
 }
 
@@ -286,6 +288,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
   }
 }
 
+#if 0
 extern char file_pin_float[];
 
 void get_win_gtab_geom();
@@ -307,6 +310,7 @@ static void cb_clicked_fixed_pos()
 
 //  set_currenet_IC_pin_image_pin();
 }
+#endif
 
 
 void toggle_half_full_char();
@@ -490,6 +494,7 @@ void change_win_gtab_style()
   gtk_widget_destroy(top_bin);
   top_bin = NULL;
   label_edit = NULL;
+  hbox_row2 = NULL;
 
   create_win_gtab_gui();
 }
@@ -550,6 +555,7 @@ void destroy_win_gtab()
   gtk_widget_destroy(gwin_gtab);
   gwin_gtab = NULL;
   top_bin = NULL;
+  hbox_row2 = NULL;
 }
 
 void hide_win_gtab()

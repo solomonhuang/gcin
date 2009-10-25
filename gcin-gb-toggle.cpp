@@ -1,6 +1,6 @@
 #include "gcin.h"
 
-main()
+int main()
 {
   gdk_init(NULL, NULL);
   send_gcin_message(GDK_DISPLAY(), GB_OUTPUT_TOGGLE);

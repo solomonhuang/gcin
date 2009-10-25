@@ -2,7 +2,7 @@
 #include <string.h>
 int utf8_str_N(char *str);
 
-main()
+int main()
 {
   FILE *fp;
 

@@ -6,6 +6,11 @@
 int phcount;
 void prph2(FILE *fp, phokey_t kk);
 
+#if WIN32
+void init_gcin_program_files();
+ #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#endif
+
 int main(int argc, char **argv)
 {
   FILE *fp;

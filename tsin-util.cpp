@@ -379,7 +379,6 @@ int find_match(char *str, int *eq_N, usecount_t *usecount)
 #endif
   int mid, tlen;
   char tstr[MAX_PHRASE_STR_LEN];
-  int matchN=0;
   usecount_t uc;
 #if 0
   dbg("bot top  %s %d %d %d\n", str, ts_gtabN, bottom, top);
@@ -412,7 +411,6 @@ int find_match(char *str, int *eq_N, usecount_t *usecount)
       bottom = mid;
       int i;
 
-      int totlen=0;
       for(i=mid; i>=0; i--) {
         tlen = load_ts_gtab(i, tstr, &uc);
 

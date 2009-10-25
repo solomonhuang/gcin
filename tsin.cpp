@@ -560,7 +560,7 @@ static gboolean chpho_eq_pho(int idx, phokey_t *phos, int len)
 
 static void get_sel_phrase0(int selidx, gboolean eqlen)
 {
-  int sti,edi,j;
+  int sti,edi;
   u_char len, mlen;
 
   mlen=c_len-selidx;
@@ -1179,6 +1179,10 @@ int tsin_sele_by_idx(int c)
 
 static gboolean pre_sel_handler(KeySym xkey)
 {
+#if WIN32
+  if (xkey >= 0x7f)
+    return 0;
+#endif
   static char shift_sele[]="!@#$%^&*()asdfghjkl:";
   static char noshi_sele[]="1234567890asdfghjkl;";
   char *p;
@@ -1776,7 +1780,7 @@ other_keys:
    if (xkey > 0x7e && !key_pad)
      return 0;
 
-   if (key_pad && !c_len)
+   if (key_pad && !c_len && !tsin_half_full)
      return 0;
 
    if (!eng_ph || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {

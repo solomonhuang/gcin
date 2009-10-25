@@ -2,7 +2,7 @@
 #include "gcin.h"
 #include "pho.h"
 
-main()
+int main()
 {
   FILE *fp;
   char fnamein[]="pin-juyin.src";

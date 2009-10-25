@@ -403,6 +403,7 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 }
 
 
+#if 0
 extern char file_pin_float[];
 
 static void cb_clicked_fixed_pos()
@@ -422,13 +423,16 @@ static void cb_clicked_fixed_pos()
 
 //  set_currenet_IC_pin_image_pin();
 }
+#endif
 
 void tsin_toggle_eng_ch();
 
+#if 0
 static void cb_clicked_eng_ph()
 {
   tsin_toggle_eng_ch();
 }
+#endif
 
 void set_no_focus();
 
@@ -567,7 +571,7 @@ void destroy_win0()
 {
   if (!gwin0)
     return;
-
+  bzero(chars, sizeof(chars));
   gtk_widget_destroy(gwin0);
   gwin0 = NULL;
   top_bin = NULL;

@@ -166,7 +166,6 @@ gboolean feed_phrase(KeySym ksym, int state)
     trN = tranN;
   }
 
-  extern int gbufN;
   char tt[2], *str;
 
   for(i=0; i < trN; i++) {

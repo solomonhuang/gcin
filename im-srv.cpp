@@ -143,13 +143,58 @@ static int get_ip_address(u_int *ip)
 #if WIN32
 
 static int my_port;
+static HWND hwndNextViewer;
+static UINT uFormat = (UINT)(-1);
+void get_selection();
+void disp_gcb_selection(const gchar *text);
 
 LRESULT wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg)
 	{
+#if 0
+		case WM_CREATE:
+			hwndNextViewer = SetClipboardViewer(hwnd);
+			break;
+        case WM_CHANGECBCHAIN:
+#if 1
+//			dbg("WM_CHANGECBCHAIN\n");
+            if ((HWND) wp == hwndNextViewer)
+              hwndNextViewer = (HWND) lp;
+            else if (hwndNextViewer != NULL)
+              SendMessage(hwndNextViewer, msg, wp, lp);
+			break;
+#endif
+		case WM_DRAWCLIPBOARD:
+			dbg("WM_DRAWCLIPBOARD\n");
+			static DWORD last_time;
+			DWORD tick;
+			tick = GetTickCount();
+			if (tick - last_time > 300) {
+				last_time = tick;
+#if 1
+				get_selection();
+#else
+				static UINT auPriorityList[] = {
+					CF_UNICODETEXT
+                };
+                uFormat = GetPriorityClipboardFormat(auPriorityList, 1);
+				if (OpenClipboard(hwnd)) {
+                  HGLOBAL hglb = GetClipboardData(uFormat);
+                  LPWSTR lpstr = (LPWSTR) GlobalLock(hglb);
+				  char buf[4096];
+				  utf16_to_8(lpstr, buf, sizeof(buf));
+				  disp_gcb_selection(buf);
+                  GlobalUnlock(hglb);
+                  CloseClipboard();
+                }
+#endif
+			}
+			SendMessage(hwndNextViewer, msg, wp, lp);
+			break;
+#endif
 		case GCIN_PORT_MESSAGE:
-			dbg("wndProc %d\n", my_port);
+//			dbg("wndProc %d\n", my_port);
 			return my_port;
 		default:
 			return DefWindowProc(hwnd, msg, wp, lp);

@@ -185,7 +185,7 @@ static int bigphoN;
 
 static GtkWidget *hbox_pho_sel;
 
-GtkWidget *destroy_pho_sel_area()
+void destroy_pho_sel_area()
 {
   gtk_widget_destroy(hbox_pho_sel);
 }
@@ -285,11 +285,9 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
   char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
   strcpy(current_str, utf8);
 
-  int current_strN = strlen(utf8);
   g_free(utf8);
 
   bigphoN = 0;
-  int i;
   char *p = current_str;
   while (*p) {
     big5char_pho *pbigpho = &bigpho[bigphoN++];
@@ -324,6 +322,10 @@ void do_exit()
 
 void load_tsin_db();
 void set_window_gcin_icon(GtkWidget *window);
+#if WIN32
+void init_gcin_program_files();
+#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#endif
 
 int main(int argc, char **argv)
 {
@@ -360,7 +362,7 @@ int main(int argc, char **argv)
 
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
-  char *text = _("按滑鼠中鍵, 貼上你要 tslearn 學習的文章。");
+  char *text = _(_L("按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"));
 
   gtk_text_buffer_set_text (buffer, text, -1);
 
@@ -373,18 +375,18 @@ int main(int argc, char **argv)
   hbox_buttons = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_buttons, FALSE, FALSE, 0);
 
-  GtkWidget *button_parse = gtk_button_new_with_label(_("標示已知詞"));
+  GtkWidget *button_parse = gtk_button_new_with_label(_(_L("標示已知詞")));
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_parse, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_parse), "clicked",
      G_CALLBACK (cb_button_parse), NULL);
 
-  GtkWidget *button_add = gtk_button_new_with_label(_("新增詞"));
+  GtkWidget *button_add = gtk_button_new_with_label(_(_L("新增詞")));
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_add, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_add), "clicked",
      G_CALLBACK (cb_button_add), NULL);
 
 
-  GtkWidget *button_quit = gtk_button_new_with_label(_("離開 tslearn"));
+  GtkWidget *button_quit = gtk_button_new_with_label(_(_L("離開 tslearn")));
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_quit, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_quit), "clicked",
      G_CALLBACK (do_exit), NULL);

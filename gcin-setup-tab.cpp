@@ -26,7 +26,9 @@ static GtkWidget *opt_gcin_edit_display;
 static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_pop_up_win,
                  *check_button_gcin_inner_frame,
+#if TRAY_ENABLED
                  *check_button_gcin_status_tray,
+#endif
                  *check_button_gcin_win_color_use;
 
 static GtkWidget *check_button_gcin_eng_phrase_enabled,
@@ -683,7 +685,7 @@ static int get_current_kbm_idx()
   char kbm_str[32];
   get_gcin_conf_fstr(PHONETIC_KEYBOARD, kbm_str, "zo-asdf");
 
-  int i, rval;
+  int i;
   for(i=0; kbm_sel[i].kbm; i++)
     if (!strcmp(kbm_sel[i].kbm, kbm_str)) {
       return i;
@@ -899,17 +901,6 @@ static void ts_import(const gchar *selected_filename)
 #else
    win32exec_script("ts-import.bat", (char *)selected_filename);
 #endif
-}
-
-static void cb_file_ts_import(GtkWidget *widget, gpointer user_data)
-{
-   GtkWidget *file_selector = (GtkWidget *)user_data;
-   const gchar *selected_filename;
-
-   selected_filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(file_selector));
-//   g_print ("Selected filename: %s\n", selected_filename);
-
-   ts_import(selected_filename);
 }
 
 static void cb_ts_import()
@@ -1171,7 +1162,6 @@ static gboolean cb_ok( GtkWidget *widget,
   int font_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size));
   save_gcin_conf_int(GCIN_FONT_SIZE, font_size);
 
-#if GTK_24
   char fname[128];
   strcpy(fname, gtk_font_button_get_font_name(GTK_FONT_BUTTON(font_sel)));
   int len = strlen(fname)-1;
@@ -1185,7 +1175,6 @@ static gboolean cb_ok( GtkWidget *widget,
   }
 
   save_gcin_conf_str(GCIN_FONT_NAME, fname);
-#endif
 
   int font_size_tsin_presel = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_tsin_presel));
   save_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PRESEL, font_size_tsin_presel);
@@ -1505,12 +1494,10 @@ static void create_main_win()
   GtkWidget *label_gcin_font_size_gtab_in = gtk_label_new(_(_L("gtab(倉頡…)輸入區字型大小")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_gtab_in), label_gcin_font_size_gtab_in, FALSE, FALSE, 0);
 
-#if GTK_24
   char tt[128];
   sprintf(tt, "%s %d", gcin_font_name, gcin_font_size);
   font_sel = gtk_font_button_new_with_font (tt);
   gtk_box_pack_start (GTK_BOX (vbox), font_sel, FALSE, FALSE, 0);
-#endif
 
   GtkWidget *hbox_gcin_pop_up_win = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX(vbox), hbox_gcin_pop_up_win, FALSE, FALSE, 0);
@@ -1587,7 +1574,6 @@ static void create_main_win()
   label_win_color_test = gtk_label_new(_(_L("測試目前狀態")));
   gtk_container_add (GTK_CONTAINER(event_box_win_color_test), label_win_color_test);
 
-  GdkColor color;
   gdk_color_parse(gcin_win_color_fg, &gcin_win_gcolor_fg);
   gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_fg);
   gdk_color_parse(gcin_win_color_bg, &gcin_win_gcolor_bg);
