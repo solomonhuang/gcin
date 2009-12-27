@@ -1,13 +1,11 @@
-make
+export LC_CTYPE=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
+
 pkill gcin.test
 ../gcin.test &
 
-export LC_ALL=zh_TW.Big5
-export LD_LIBRARY_PATH="../im-client"
+export LD_LIBRARY_PATH=../im-client
 export LD_PRELOAD=./im-gcin-cur.so
-#gdb /usr/bin/firefox
-gdb /usr/bin/gedit
-
-unset LD_PRELOAD
+#gdb gedit
+valgrind gedit
 pkill gcin.test

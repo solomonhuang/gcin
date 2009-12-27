@@ -75,7 +75,7 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
   dbg("im-srv: cb_new_gcin_client %s\n", type==Connection_type_unix ? "unix":"tcp");
 #endif
   unsigned int newsockfd;
-  int clilen;
+  socklen_t clilen;
 
 #if !WIN32
   if (type==Connection_type_unix) {
@@ -153,6 +153,7 @@ LRESULT wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 	switch (msg)
 	{
 #if 0
+// a very unreliable design in win32, cygwin/X sometimes flood WM_DRAWCLIPBOARD to gcin
 		case WM_CREATE:
 			hwndNextViewer = SetClipboardViewer(hwnd);
 			break;
@@ -166,12 +167,11 @@ LRESULT wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 #endif
 		case WM_DRAWCLIPBOARD:
+#if _DEBUG
 			dbg("WM_DRAWCLIPBOARD\n");
-			static DWORD last_time;
-			DWORD tick;
-			tick = GetTickCount();
-			if (tick - last_time > 300) {
-				last_time = tick;
+#endif
+
+			{
 #if 1
 				get_selection();
 #else
@@ -190,7 +190,10 @@ LRESULT wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
                 }
 #endif
 			}
-			SendMessage(hwndNextViewer, msg, wp, lp);
+
+			if (hwndNextViewer)
+				SendMessage(hwndNextViewer, msg, wp, lp);
+
 			break;
 #endif
 		case GCIN_PORT_MESSAGE:

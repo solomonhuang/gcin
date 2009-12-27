@@ -327,7 +327,6 @@ void update_win_kbm()
       if (!cur_inmd || !cur_inmd->DefChars)
         return;
 
-      char *keyname = &cur_inmd->keyname[1 * CH_SZ];
       for(i=127; i > 0; i--) {
         char k=cur_inmd->keymap[i];
         if (!k)

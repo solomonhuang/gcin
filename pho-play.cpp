@@ -36,6 +36,7 @@ int pho_play(phokey_t key)
   close(1);
   close(2);
   execlp("ogg123", "ogg123", tt, NULL);
+  return 0;
 }
 #else
 void ErrorExit(LPTSTR lpszFunction);
@@ -104,7 +105,11 @@ void char_play(char *utf8)
   if (!phosN)
     return;
 
+#if 0
   int i;
   for(i=0; i < phosN; i++)
     pho_play(phos[i]);
+#else
+  pho_play(phos[0]);
+#endif
 }

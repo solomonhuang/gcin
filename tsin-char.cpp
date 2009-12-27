@@ -135,13 +135,19 @@ static void build_chs()
 
 int ch_pos_find(char *ch, int pos)
 {
+//  utf8_putchar(ch);
+
   if (!chsN)
     build_chs();
 
   CH_ENT *p = find(ch);
 
-  if (!p)
+  if (!p) {
+//    puts("0");
     return 0;
+  }
 
-  return p->bits & (1<<pos);
+  int v = p->bits & (1<<pos);
+//  printf("%d\n", v);
+  return v;
 }

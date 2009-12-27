@@ -123,3 +123,10 @@ void load_gtab_list();
 #else
 #define NEED_SWAP (1)
 #endif
+
+typedef enum {
+  SAME_PHO_QUERY_none = 0,
+  SAME_PHO_QUERY_gtab_input = 1,
+  SAME_PHO_QUERY_pho_select = 2,
+} SAME_PHO_QUERY;
+extern SAME_PHO_QUERY same_pho_query_state;

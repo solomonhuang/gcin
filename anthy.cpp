@@ -8,7 +8,6 @@ void (*f_anthy_get_segment)(anthy_context_t ac, int,int,char *, int);
 void (*f_anthy_get_segment_stat)(anthy_context_t ac, int, struct anthy_segment_stat *);
 void (*f_anthy_commit_segment)(anthy_context_t ac, int, int);
 void (*f_anthy_set_string)(anthy_context_t ac, char *);
-extern int eng_ph;
 extern gint64 key_press_time;
 static GtkWidget *event_box_anthy;
 gint64 current_time();
@@ -316,7 +315,7 @@ static char keys[32];
 static short int keysN;
 static unsigned char jp[128];
 static short int jpN=0;
-static short selN, pageidx;
+static short pageidx;
 
 #define MAX_SEG_N 80
 typedef struct {
@@ -324,7 +323,7 @@ typedef struct {
   unsigned char selidx, selN;
 } SEG;
 static SEG seg[MAX_SEG_N];
-static short segN, segNa;
+static short segN;
 static short cursor;
 enum {
   STATE_ROMANJI=1,
@@ -372,7 +371,9 @@ void parse_key()
 
   for(i=0; i < anthy_romaji_mapN; i++) {
     char *en = anthy_romaji_map[i].en;
+#if 0
     char *ro = anthy_romaji_map[i].ro;
+#endif
     if (!strncmp(keys, en, keysN))
       preN++;
 
@@ -518,7 +519,7 @@ static void send_seg()
   clear_all();
 }
 
-static char merge_jp(char out[])
+static void merge_jp(char out[])
 {
   int i;
   for(i=0, out[0]=0; i < jpN; i++)
@@ -651,7 +652,7 @@ gboolean feedkey_anthy(int kv, int kvstate)
     key_press_time = current_time();
   }
 
-  if (!eng_ph)
+  if (!tsin_pho_mode())
     return 0;
 
   gboolean is_empty = !keysN && !jpN && !segN;
@@ -848,8 +849,8 @@ lab1:
       char tt[512];
       clear_seg_label();
       merge_jp(tt);
+      dbg("tt %s %d\n", tt, strlen(tt));
       (*f_anthy_set_string)(ac, tt);
-
       load_seg();
     } else
     if (state==STATE_CONVERT) {
@@ -894,7 +895,7 @@ int init_win_anthy()
   void *handle;
   char *error;
 
-  eng_ph = 1;
+  set_tsin_pho_mode();
 
   if (win_anthy)
     return TRUE;
@@ -1077,7 +1078,7 @@ int feedkey_anthy_release(KeySym xkey, int kbstate)
           flush_anthy_input();
           key_press_time = 0;
           hide_selections_win();
-          tsin_set_eng_ch(!eng_ph);
+          tsin_set_eng_ch(!tsin_pho_mode());
           return 1;
         } else
           return 0;
@@ -1091,7 +1092,6 @@ int feedkey_anthy_release(KeySym xkey, int kbstate)
 int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
 {
   int i;
-  int tn=0;
 
 //  dbg("anthy_get_preedit\n");
   str[0]=0;
@@ -1150,11 +1150,14 @@ ret:
 }
 
 
-void gcin_anthy_reset()
+int gcin_anthy_reset()
 {
   if (!win_anthy)
-    return;
+    return 0;
+  int v = !is_empty();
+
   clear_all();
+  return v;
 }
 
 void get_win_anthy_geom()

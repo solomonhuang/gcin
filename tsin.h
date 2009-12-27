@@ -3,8 +3,6 @@ extern int hashidx[];
 extern int *phidx;
 extern FILE *fph;
 
-extern int *ts_gtab;   // number of array is phcount
-
 typedef struct {
   phokey_t pho;
   char ch[CH_SZ];
@@ -27,3 +25,4 @@ void extract_pho(int chpho_idx, int plen, phokey_t *pho);
 gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi);
 void load_tsin_entry(int idx, char *len, usecount_t *usecount, phokey_t *pho, u_char *ch);
 gboolean check_fixed_mismatch(int chpho_idx, char *mtch, int plen);
+gboolean tsin_pho_mode();

@@ -22,4 +22,4 @@ cd
 
 export GCIN_USE_XIM=Y
 
-rpm -ba gcin.spec
+rpm -bb gcin.spec

@@ -32,10 +32,10 @@ pin-juyin.xlt:	../pin-juyin pin-juyin.src
 	../pin-juyin
 
 extr1:	extr1.c
-	cc $< ../util.o ../locale.o -o $@ $(LDFLAGS)
+	$(CC) $< ../util.o ../locale.o -o $@ $(LDFLAGS)
 
 t2s-file:	t2s-file.c
-	cc $< ../util.o ../locale.o -o $@ $(LDFLAGS)
+	$(CC) $< ../util.o ../locale.o -o $@ $(LDFLAGS)
 
 tsin-1.src:	extr1
 	./extr1 > $@

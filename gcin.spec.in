@@ -53,8 +53,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/control-center-2.0/capplets/*
 %{_libdir}/menu/*
 %{_libdir}/gtk-2.0/*
-%{_libdir}/qt3/plugins/inputmethods/*
-%{_libdir}/qt4/plugins/lib/inputmethods/*
+%{_libdir}/qt4/plugins/inputmethods/*
 %{_libdir}/gcin/*
 
 %post

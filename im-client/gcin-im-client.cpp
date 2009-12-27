@@ -271,11 +271,11 @@ retry_socket:
       goto next;
 	}
 #if WIN32
-	if (!init_winsock()) 
+	if (!init_winsock())
 	  goto next;
     inited_winsock = true;
 	goto retry_socket;
-#endif    
+#endif
   }
 
   dbg("sock %d\n", sockfd);
@@ -817,21 +817,18 @@ err_ret:
 #endif
   attN = -1;
   if (handle_read(handle, &attN, sizeof(attN))<=0) {
-    dbg("aaaa\n");
     goto err_ret;
   }
 
 //  dbg("attrN:%d\n", attN);
 
   if (attN>0 && handle_read(handle, att, sizeof(GCIN_PREEDIT_ATTR)*attN)<=0) {
-    dbg("www\n");
     goto err_ret;
   }
 
 
   tcursor=0;
   if (handle_read(handle, &tcursor, sizeof(tcursor))<=0) {
-    dbg("bbb\n");
     goto err_ret;
   }
 

@@ -27,7 +27,7 @@ static const GtkIMContextInfo gcin_info = {
   N_("gcin Input Method"),            /* Human readable name */
   GETTEXT_PACKAGE,		   /* Translation domain */
   GTK_LOCALEDIR,		   /* Dir for bindtextdomain (not strictly needed for "gtk+") */
-  "*"		           /* Languages for which this module is the default */
+  ""		           /* Languages for which this module is the default */
 //  "zh_TW"		           /* Languages for which this module is the default */
 };
 

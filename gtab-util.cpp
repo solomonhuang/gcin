@@ -1,7 +1,6 @@
 #include "gcin.h"
 #include "gtab.h"
 
-
 /* this function is used to avoid 4-byte bus-alignment */
 u_int64_t CONVT2(INMD *inmd, int i)
 {

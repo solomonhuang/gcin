@@ -9,7 +9,8 @@
 #include <process.h>
 #endif
 
-extern int tsin_half_full, gb_output, eng_ph;
+gboolean tsin_pho_mode();
+extern int tsin_half_full, gb_output;
 extern int win32_tray_disabled;
 GtkStatusIcon *icon_main, *icon_state;
 
@@ -268,7 +269,7 @@ void load_tray_icon_win32()
   }
 
   char tt[32];
-  if (current_CS && (current_CS->in_method==6 || current_CS->in_method==12) &&current_CS->im_state == GCIN_STATE_CHINESE && !eng_ph) {
+  if (current_CS && (current_CS->in_method==6 || current_CS->in_method==12) &&current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
     strcpy(tt, "en-");
     strcat(tt, iconame);
     iconame = tt;

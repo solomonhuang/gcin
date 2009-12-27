@@ -633,3 +633,11 @@ msgstr "Left: Toggle alphabet-numeric mode\nMiddle: Virtual Keyboard\nRight: Pre
 #: ../about.cpp:79
 msgid "討論區"
 msgstr "Forum"
+
+#: ../gcin-setup-list.cpp:364
+msgid "Ctrl-Shift 循環(必須關閉Windows按鍵"
+msgstr "Ctrl-Shift selections(Should turn off Windows key)"
+
+#: ../gcin-setup-list.cpp:656
+msgid "關閉鈴聲"
+msgstr "Turn off bell"

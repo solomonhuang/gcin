@@ -16,6 +16,9 @@ static char text_pho[6][CH_SZ];
 
 void bell()
 {
+  if (gcin_bell_off)
+    return;
+
 #if UNIX
   XBell(dpy, gcin_bell_volume);
 #else
@@ -26,6 +29,9 @@ void bell()
 
 void case_inverse(KeySym *xkey, int shift_m)
 {
+  if (*xkey > 0x7e)
+    return;
+
   if (shift_m) {
     if (islower(*xkey))
       *xkey-=0x20;

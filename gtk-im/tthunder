@@ -6,5 +6,5 @@ pkill gcin.test
 
 export LD_LIBRARY_PATH=../im-client
 export LD_PRELOAD=./im-gcin-cur.so
-firefox
+thunderbird
 pkill gcin.test

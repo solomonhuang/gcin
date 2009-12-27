@@ -737,7 +737,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
 }
 
 extern GtkWidget *gwin_gtab;
-void gtab_reset()
+int gtab_reset()
 {
 #if UNIX
   if (!gwin_gtab)
@@ -747,5 +747,5 @@ void gtab_reset()
   clear_gtab_buf_all();
   clear_gbuf_sel();
   ClrIn();
-  return;
+  return v;
 }

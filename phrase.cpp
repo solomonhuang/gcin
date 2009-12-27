@@ -81,7 +81,7 @@ void load_phrase(char *fname, time_t *modtime, struct keystruc *tr, int trN)
   if ((fp=watch_fopen(fname, modtime)) == NULL) {
     return;
   }
- 
+
 //  dbg("load succcc %s\n", fname);
 
   while (!feof(fp)) {
@@ -148,11 +148,7 @@ gboolean feed_phrase(KeySym ksym, int state)
   load_phrase("phrase.table", &file_modify_time, tran, tranN);
   load_phrase("phrase-ctrl.table", &ctrl_file_modify_time, tran_ctrl, tran_ctrlN);
 
-#if WIN32
   if (ksym < 0x7f && isupper(ksym))
-#else
-  if (isupper(ksym))
-#endif
     ksym = tolower(ksym);
 
   struct keystruc *tr;

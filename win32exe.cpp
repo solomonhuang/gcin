@@ -6,12 +6,21 @@
 
 char *gcin_program_files_path;
 char *gcin_script_path;
+bool get_reg_str(char *reg, char *out, DWORD outsz);
 
 void init_gcin_program_files()
 {
   char path[MAX_PATH];
-  SHGetFolderPathA(NULL, CSIDL_PROGRAM_FILES , NULL, SHGFP_TYPE_CURRENT, path);
-  strcat(path,"\\gcin");
+
+  if (!get_reg_str("gcin_dir", path, MAX_PATH)) {
+	SHGetFolderPathA(NULL, CSIDL_PROGRAM_FILES , NULL, SHGFP_TYPE_CURRENT, path);
+	strcat(path,"\\gcin");
+  }
+
+  char tt[MAX_PATH];
+  sprintf_s(tt, sizeof(tt), "GCIN_DIR=%s", path);
+  _putenv(tt);
+
   gcin_program_files_path = strdup(path);
   strcat(path, "\\script");
   gcin_script_path = strdup(path);
@@ -80,8 +89,7 @@ int win32exec_script(char *s, char *para)
     return -1;
   }
 #else
-  char sdir[256], cmd[256];
-  GetSystemDirectoryA(sdir, sizeof(sdir));
+char cmd[256];
 #if 0
   if (para)
     sprintf_s(cmd, sizeof(cmd), "%s\\cmd.exe \"%s\"\\%s %s", sdir, gcin_script_path, s, para);

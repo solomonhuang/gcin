@@ -215,6 +215,9 @@ void clr_tsin_cursor(int index)
 void disp_pho_sub(GtkWidget *label, int index, char *pho);
 void disp_tsin_pho(int index, char *pho)
 {
+  if (button_pho && !GTK_WIDGET_VISIBLE(button_pho))
+    gtk_widget_show(button_pho);
+
   disp_pho_sub(label_pho, index, pho);
 }
 
@@ -229,7 +232,6 @@ void clr_in_area_pho_tsin()
 
 void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
 {
-  int ofs=0;
   gtk_widget_show_all(widget);
   gdk_flush();
 
@@ -257,7 +259,7 @@ void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
     wx = win_xl;
 
   *rx = win_x + wx;
-  *ry = win_y + wy + ofs;
+  *ry = win_y + wy;
 }
 
 void getRootXY(Window win, int wx, int wy, int *tx, int *ty);
@@ -265,12 +267,10 @@ void disp_selections(int x, int y);
 void disp_tsin_select(int index)
 {
   int x,y;
-  int ofs=0;
 #if 0
   GtkWidget *widget =chars[index].line;
 
   if (!GTK_WIDGET_VISIBLE(widget)) {
-    ofs=2;
     widget = chars[index].vbox;
   }
 #endif
@@ -575,6 +575,9 @@ void destroy_win0()
   gtk_widget_destroy(gwin0);
   gwin0 = NULL;
   top_bin = NULL;
+  label_pho = NULL;
+  button_pho = NULL;
+  button_eng_ph = NULL;
 }
 #endif
 

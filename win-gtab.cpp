@@ -186,10 +186,10 @@ void set_key_codes_label(char *s, int better)
   if (!label_key_codes)
     return;
 
-  if (s && strlen(s))
+  if (s && strlen(s)) {
     if (hbox_row2)
       gtk_widget_show(hbox_row2);
-  else {
+  } else {
     if (gtab_hide_row2 && hbox_row2) {
       gtk_widget_hide(hbox_row2);
     }
@@ -521,9 +521,8 @@ void show_win_gtab()
 
   init_gtab(current_CS->in_method);
 
-  if (gcin_pop_up_win && !gtab_has_input() && !force_show)
+  if (gcin_pop_up_win && !gtab_has_input() && !force_show && same_pho_query_state==SAME_PHO_QUERY_none)
     return;
-
 
 //  dbg("show_win_gtab()\n");
 #if UNIX
@@ -556,6 +555,14 @@ void destroy_win_gtab()
   gwin_gtab = NULL;
   top_bin = NULL;
   hbox_row2 = NULL;
+  label_full=NULL;
+  label_gtab_sele = NULL;
+  bzero(labels_gtab, sizeof(labels_gtab));
+  label_input_method_name = NULL;
+  label_key_codes = NULL;
+  box_gtab_im_name = NULL;
+  label_page = NULL;
+  label_edit = NULL;
 }
 
 void hide_win_gtab()

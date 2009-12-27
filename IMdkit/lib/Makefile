@@ -14,7 +14,6 @@ all: libXimd.a
 libXimd.a: $(OBJ)
 	ar cr $@ $(OBJ)
 	ranlib $@
-	make -C ../..
 
 .c.o:
 	$(CC) $(CFLAGS) $(INC) $<

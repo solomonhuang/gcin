@@ -291,7 +291,6 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
   char *p = current_str;
   while (*p) {
     big5char_pho *pbigpho = &bigpho[bigphoN++];
-    int len;
 
     pbigpho->phokeysN = utf8_pho_keys(p, pbigpho->phokeys);
     p+=utf8_sz(p);
@@ -315,7 +314,7 @@ Display *dpy;
 
 void do_exit()
 {
-  send_gcin_message(dpy, "reload");
+  send_gcin_message(dpy, RELOAD_TSIN_DB);
 
   exit(0);
 }
@@ -400,4 +399,5 @@ int main(int argc, char **argv)
   gtk_widget_show_all(mainwin);
 
   gtk_main();
+  return 0;
 }

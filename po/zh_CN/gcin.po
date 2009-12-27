@@ -633,3 +633,11 @@ msgstr "左:中英切换 中:小键盘 右:选项"
 #: ../about.cpp:79
 msgid "討論區"
 msgstr "讨论区"
+
+#: ../gcin-setup-list.cpp:364
+msgid "Ctrl-Shift 循環(必須關閉Windows按鍵"
+msgstr "Ctrl-Shift 循环(必须关闭Windows按键"
+
+#: ../gcin-setup-list.cpp:656
+msgid "關閉鈴聲"
+msgstr "关闭铃声"

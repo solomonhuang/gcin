@@ -1,4 +1,4 @@
-set gcin_sys=%ProgramFiles%\gcin
+set gcin_sys=%GCIN_DIR%
 set gcin_table=%gcin_sys%\table
 set gcin_user=%APPDATA%\gcin
 set gcin_config=%gcin_user%\config

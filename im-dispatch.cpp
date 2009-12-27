@@ -298,7 +298,7 @@ void process_client_req(int fd)
       if (attrN > 0)
         write_enc(fd, attr, sizeof(GCIN_PREEDIT_ATTR)*attrN);
       write_enc(fd, &cursor, sizeof(cursor));
-//     dbg("uuuuuuuuuuuuuuuuu len:%d %d cursor:%d\n", len, attrN, cursor);
+//      dbg("uuuuuuuuuuuuuuuuu len:%d %d cursor:%d\n", len, attrN, cursor);
       }
       break;
     case GCIN_req_reset:
@@ -322,7 +322,7 @@ void process_client_req(int fd)
       dbg_time("Invalid request %x from:", req.req_no);
 
       struct sockaddr_in addr;
-      int len=sizeof(addr);
+      socklen_t len=sizeof(addr);
       bzero(&addr, sizeof(addr));
 
       if (!getpeername(fd, (struct sockaddr *)&addr, &len)) {

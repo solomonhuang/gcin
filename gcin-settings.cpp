@@ -6,7 +6,7 @@ int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_win_color_use;
 int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
-int gcin_im_toggle_keys;
+int gcin_im_toggle_keys, gcin_bell_off;
 int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
 int gcin_win_sym_click_close, gcin_edit_display, gcin_win32_icon;
 
@@ -146,6 +146,7 @@ void load_setttings()
   get_gcin_conf_str(GCIN_WIN_COLOR_FG, &gcin_win_color_fg, "white");
   get_gcin_conf_str(GCIN_WIN_COLOR_BG, &gcin_win_color_bg, "#005BFF");
   gcin_win_color_use = get_gcin_conf_int(GCIN_WIN_COLOR_USE, 0);
+  gcin_bell_off = get_gcin_conf_int(GCIN_BELL_OFF, 0);
 
 
 #if USE_GCB

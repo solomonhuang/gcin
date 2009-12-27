@@ -24,7 +24,7 @@ static GtkWidget *vbox;
 static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
-static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts;
+static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts, *check_button_gcin_bell_off;
 static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
 #if USE_GCB
        *check_button_gcb_enabled,
@@ -47,7 +47,7 @@ typedef struct
   GdkPixbuf *icon;
   gchar *key;
   gchar *file;
-#if UNIX
+#if 1
   gboolean used;
 #endif
   gboolean default_inmd;
@@ -60,7 +60,7 @@ enum
   COLUMN_ICON,
   COLUMN_KEY,
   COLUMN_FILE,
-#if UNIX
+#if 1
   COLUMN_USE,
 #endif
   COLUMN_DEFAULT_INMD,
@@ -113,7 +113,7 @@ add_items (void)
     foo.icon = gdk_pixbuf_new_from_file(icon_path, &err);
     foo.key = g_strdup(key);
     foo.file = g_strdup(file);
-#if UNIX
+#if 1
     foo.used = (gcin_flags_im_enabled & (1 << i)) != 0;
 #endif
     foo.default_inmd =  default_input_method == i;
@@ -155,7 +155,7 @@ create_model (void)
 			  g_array_index (articles, Item, i).key,
 			  COLUMN_FILE,
 			  g_array_index (articles, Item, i).file,
-#if UNIX
+#if 1
 			  COLUMN_USE,
                           g_array_index (articles, Item, i).used,
 #endif
@@ -197,6 +197,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
   save_gcin_conf_int(GCIN_WIN_SYM_CLICK_CLOSE,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close)));
 
+  save_gcin_conf_int(GCIN_BELL_OFF,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off)));
+
   if (opt_speaker_opts) {
 #if GTK_CHECK_VERSION(2,4,0)
     idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_speaker_opts));
@@ -236,7 +239,7 @@ static void cb_cancel (GtkWidget *widget, gpointer data)
 }
 
 int gcin_switch_keys_lookup(int key);
-#if UNIX
+#if 1
 static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer data)
 {
   GtkTreeModel *model = GTK_TREE_MODEL (data);
@@ -346,7 +349,7 @@ add_columns (GtkTreeView *treeview)
                                                "text", COLUMN_FILE,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
-#if UNIX
+
   // use column
   renderer = gtk_cell_renderer_toggle_new ();
   g_signal_connect (G_OBJECT (renderer), "toggled",
@@ -354,11 +357,15 @@ add_columns (GtkTreeView *treeview)
 
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
 
-  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, _(_L("Ctrl-Shift 循環")), renderer,
-                                               "active", COLUMN_USE,
-                                               NULL);
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),-1,
+#if UNIX
+	  _(_L("Ctrl-Shift 循環")),
+#else
+	  _(_L("Ctrl-Shift 循環(必須關閉Windows按鍵")),
 #endif
+	  renderer, "active", COLUMN_USE,
+                                               NULL);
+
   // default_inmd column
   renderer = gtk_cell_renderer_toggle_new ();
   g_signal_connect (G_OBJECT (renderer), "toggled",
@@ -646,6 +653,13 @@ void create_gtablist_window (void)
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close),
      gcin_win_sym_click_close);
 
+  GtkWidget *label_gcin_bell_off = gtk_label_new(_(_L("關閉鈴聲")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_bell_off,  FALSE, FALSE, 0);
+  check_button_gcin_bell_off = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close),check_button_gcin_bell_off,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off),
+     gcin_bell_off);
+
 
 #if USE_GCB
   GtkWidget *hbox_gcb_pos = gtk_hbox_new (FALSE, 10);
@@ -728,8 +742,11 @@ void create_gtablist_window (void)
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_ok), model);
   gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
-
+#if UNIX
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 520, 450);
+#else
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 640, 450);
+#endif
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",
                     G_CALLBACK (gtk_main_quit), NULL);

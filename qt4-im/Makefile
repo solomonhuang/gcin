@@ -1,22 +1,14 @@
 include ../config.mak
 QT=qt4
-QTIM=$(QT)/plugins/lib/inputmethods
+QTIM=$(QT)/plugins/inputmethods
 IMMODULES=$(libdir)/$(QTIM)
-ifeq ($(LIB), lib64)
-	IMMODULES_LOCAL=/usr/$(LIB)/qt4/plugins/lib64/inputmethods
-else
-	IMMODULES_LOCAL=/usr/$(LIB)/$(QTIM)
-endif
-QTINC=/usr/lib/$(QT)/include
 
-INCS=-I../im-client -I$(QTINC) -I/usr/include/X11 -I$(QTINC)/QtGui -I$(QTINC)/QtCore
+INCS=-I../im-client -I/usr/include/X11 `pkg-config QtCore QtGui --cflags`
 CXXFLAGS=$(OPTFLAGS) $(INCS) -Wall -D_REENTRANT -fPIC  -DQT4 -DQT_SHARED \
 -DQT_IMMODULE -DPIC
 OBJS= moc_gcin-qt.o gcin-qt.o im-gcin-qt.o gcin-imcontext-qt.o
 .SUFFIXES:	.c .cpp .a .so .E .h
-LDFLAGS=-L/usr/lib/$(QT)/$(LIB) -L/usr/X11R6/$(LIB) -L../im-client -lQtGui -lQtCore -lmng -ljpeg -lpng -lz \
--lXrender -lXrandr  -lXft -lfontconfig -lgcin-im-client \
--lXext -lX11 -lm -lSM -lICE -ldl -lpthread
+LDFLAGS=-L../im-client -lgcin-im-client -Wl,-rpath,$(gcinlibdir)
 all:    im-gcin.so
 
 .cpp.E:
@@ -31,8 +23,8 @@ im-gcin.so: $(OBJS)
 	rm -f core.*
 install:
 	if [ $(prefix) = /usr/local ]; then \
-		install -d $(IMMODULES_LOCAL); \
-		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
+		install -d $(DESTDIR)/$(QT4_IM_DIR); \
+		install -m 755 im-gcin.so $(DESTDIR)/$(QT4_IM_DIR); \
 	else \
 		install -d $(IMMODULES); \
                 install -m 755 im-gcin.so $(IMMODULES); \

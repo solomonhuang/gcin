@@ -22,6 +22,7 @@ void align_with_ui_window(GtkWidget *win)
 
 
 void align_with_ui_window(GtkWidget *win);
+int html_browser(char *fname);
 
 static void callback_forum( GtkWidget *widget, gpointer   data)
 {
@@ -74,7 +75,6 @@ void create_about_window()
     GtkWidget *separator = gtk_hseparator_new ();
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
-    char tt[512];
     GtkWidget *button_forum = gtk_button_new_with_label(_(_L("討論區")));
     gtk_box_pack_start(GTK_BOX(vbox), button_forum, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_forum), "clicked",

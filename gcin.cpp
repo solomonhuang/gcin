@@ -135,7 +135,6 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data);
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
 
 
-#define DEBUG 0
 
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
@@ -358,13 +357,14 @@ void message_cb(char *message)
    } else
    if (!strcmp(message, KBM_TOGGLE)) {
      kbm_toggle();
-   }
+   } else
 #if UNIX
-   else
    if (strstr(message, "#gcin_message")) {
      execute_message(message);
-   }
+   } else
 #endif
+   if (!strcmp(message, RELOAD_TSIN_DB))
+     load_tsin_db();
    else
      reload_data();
 }
@@ -480,6 +480,7 @@ gboolean delayed_start_cb(gpointer data)
 int main(int argc, char **argv)
 {
 
+//putenv("GDK_NATIVE_WINDOWS=1");
 #if WIN32
 #if 1
 	typedef BOOL (WINAPI* pImmDisableIME)(DWORD);
@@ -492,7 +493,6 @@ int main(int argc, char **argv)
 	}
 #endif
   init_gcin_program_files();
-
 
   init_gcin_im_serv(NULL);
 #endif
@@ -565,6 +565,8 @@ int main(int argc, char **argv)
   root=DefaultRootWindow(dpy);
 #endif
   dpy_xl = gdk_screen_width(), dpy_yl = gdk_screen_height();
+
+  dbg("display width:%d height:%d\n", dpy_xl, dpy_yl);
 
 #if UNIX
   start_inmd_window();

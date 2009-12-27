@@ -45,7 +45,7 @@ use_i18n='N'
 use_tsin='Y'
 use_gcb='Y'
 use_anthy='Y'
-use_qt3='Y'
+use_qt3='N'
 use_qt4='Y'
 
 if [ "$GCIN_USE_XIM" ]; then
@@ -145,7 +145,7 @@ LIB='lib64'
 fi
 
 QT_IM='N'
-QT_IM_DIR=/usr/lib/qt3/plugins/lib/inputmethods
+QT_IM_DIR=/usr/$LIB/qt3/plugins/inputmethods
 echo "testing if you have qt3 support"
 if [ -d  $QT_IM_DIR ]; then
   QT_IM='Y'
@@ -164,7 +164,7 @@ fi
 
 
 QT4_IM='N'
-QT4_IM_DIR=/usr/lib/qt4/plugins/lib/inputmethods
+QT4_IM_DIR=/usr/$LIB/qt4/plugins/inputmethods
 echo "testing if you have qt4 support"
 if [ -d  $QT4_IM_DIR ]; then
   QT4_IM='Y'
@@ -219,10 +219,14 @@ if [ $prefix = /usr ]; then
   OPTFLAGS="-O"
 fi
 
+if [ -z $CC ]; then
+  CC=gcc
+fi
 
-echo "CC=gcc" > config.mak
-echo "CCX=gcc -x c" >> config.mak
-echo "CCLD=gcc" >> config.mak
+echo "CC=$CC" > config.mak
+echo "CCX=$CC -x c" >> config.mak
+echo "CXX=$CC" >> config.mak
+echo "CCLD=$CC" >> config.mak
 echo "MAKE=$MAKE" >> config.mak
 echo "GTKINC=$GTKINC" >> config.mak
 echo "prefix=$prefix" >> config.mak
@@ -235,8 +239,7 @@ echo "datadir_r=$datadir" >> config.mak
 echo "libdir=\$(DESTDIR)$libdir" >> config.mak
 echo "gcinlibdir=\$(libdir)/gcin" >> config.mak
 echo "includedir=\$(DESTDIR)$includedir" >> config.mak
-
-echo "LDFLAGS+=$GTKLDFLAGS" >> config.mak
+echo "LDFLAGS=$GTKLDFLAGS -lX11" >> config.mak
 echo "GCIN_VERSION=$GCIN_VERSION" >> config.mak
 echo "GCIN_TABLE_DIR=\$(datadir_r)/gcin/table" >> config.mak
 echo "GCIN_OGG_DIR=\$(datadir_r)/gcin/ogg" >> config.mak
@@ -252,7 +255,9 @@ echo "GCIN_ICON_DIR_i=\$(datadir)/icons/gcin" >> config.mak
 echo "GCIN_BIN_DIR=\$(bindir_r)" >> config.mak
 echo "FREEBSD=$FREEBSD" >> config.mak
 echo "QT_IM=$QT_IM" >> config.mak
+echo "QT_IM_DIR=$QT_IM_DIR" >> config.mak
 echo "QT4_IM=$QT4_IM" >> config.mak
+echo "QT4_IM_DIR=$QT4_IM_DIR" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
 echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
 echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak
@@ -266,6 +271,13 @@ echo "USE_TSIN=$use_tsin" >> config.mak
 echo "USE_ANTHY=$USE_ANTHY" >> config.mak
 echo "USE_GCB=$use_gcb" >> config.mak
 
+if [ $prefix = /usr ]; then
+  echo "gcin_ld_run_path=\$(gcinlibdir)" >> config.mak
+  echo "LDFLAGS+=-Wl,-rpath,\$(gcinlibdir)" >> config.mak
+else
+  echo "gcin_ld_run_path=\$(PWD):\$(gcinlibdir)" >> config.mak
+#  echo "GCIN_DEBUG=1" >> config.mak
+fi
 
 cd menu
 for i in *.in

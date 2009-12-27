@@ -433,7 +433,7 @@ void move_IC_in_win(ClientState *cs)
    Window inpwin = cs->client_win;
 
    if (!inpwin) {
-	   dbg("no inpwin\n");
+//	   dbg("no inpwin\n");
       return;
    }
 
@@ -469,7 +469,7 @@ void move_IC_in_win(ClientState *cs)
    getRootXY(inpwin, inpx, inpy, &tx, &ty);
 
 #if DEBUG
-   dbg("move_IC_in_win %d %d   txy:%d %d\n", inpx, inpy, tx, ty);
+   dbg("move_IC_in_win inpxy:%d,%d txy:%d,%d\n", inpx, inpy, tx, ty);
 #endif
 
    move_in_win(cs, tx, ty+1);
@@ -550,12 +550,14 @@ void disp_im_half_full()
 
 gboolean flush_tsin_buffer();
 void reset_gtab_all();
+void set_tsin_pho_mode();
 
 //static u_int orig_caps_state;
 
 void init_state_chinese(ClientState *cs)
 {
   cs->im_state = GCIN_STATE_CHINESE;
+  set_tsin_pho_mode();
   if (!cs->in_method)
     init_in_method(default_input_method);
 }
@@ -675,6 +677,8 @@ gboolean win_is_visible()
         return FALSE;
       return gwin_gtab && GTK_WIDGET_VISIBLE(gwin_gtab);
   }
+
+  return FALSE;
 }
 
 
@@ -1264,7 +1268,8 @@ empty:
   return 0;
 }
 
-void pho_reset(),tsin_reset(),gcin_anthy_reset(),gtab_reset();
+void pho_reset();
+int tsin_reset(),gcin_anthy_reset(),gtab_reset();
 
 void gcin_reset()
 {

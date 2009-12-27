@@ -10,14 +10,8 @@
 #include "gcin-conf.h"
 #include "gcin-endian.h"
 
-typedef enum {
-  SAME_PHO_QUERY_none = 0,
-  SAME_PHO_QUERY_gtab_input = 1,
-  SAME_PHO_QUERY_pho_select = 2,
-} SAME_PHO_QUERY;
-
 static GTAB_space_pressed_E _gtab_space_auto_first;
-static SAME_PHO_QUERY same_pho_query_state = SAME_PHO_QUERY_none;
+SAME_PHO_QUERY same_pho_query_state = SAME_PHO_QUERY_none;
 static int S1, E1;
 extern char *TableDir;
 
@@ -704,9 +698,7 @@ gboolean init_in_method(int in_no);
 void hide_win_kbm();
 static void putstr_inp(char *p)
 {
-  int plen = strlen(p);
   extern int c_len;
-  usecount_t usecount;
 
   clear_page_label();
 
@@ -1170,8 +1162,6 @@ void insert_gbuf_cursor_char(char ch);
 
 gboolean shift_char_proc(KeySym key, int kbstate)
 {
-    char tt[2];
-
     if (key >= 127)
       return FALSE;
 
@@ -1212,6 +1202,7 @@ int gtab_buf_delete();
 void insert_gbuf_cursor(char **sel, int selN);
 void set_gbuf_c_sel(int v);
 void set_gtab_user_head();
+KeySym keypad_proc(KeySym xkey);
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -1335,6 +1326,7 @@ shift_proc:
       }
 
       break;
+    case XK_KP_Enter:
     case XK_Return:
       if (AUTO_SELECT_BY_PHRASE) {
         return output_gbuf();
@@ -1382,6 +1374,9 @@ shift_proc:
 
         goto next_pg;
       }
+
+      if (key==XK_KP_Subtract)
+        goto keypad_proc;
       return 0;
     case XK_Next:
     case XK_KP_Add:
@@ -1391,8 +1386,11 @@ next_page:
         if (pg_idx >=E1)
           pg_idx = S1;
         goto next_pg;
-      } else
+      } else {
+        if (key==XK_KP_Add)
+          goto keypad_proc;
         return 0;
+      }
     case ' ':
       if (invalid_spc && gtab_invalid_key_in)
         ClrIn();
@@ -1523,6 +1521,7 @@ direct_select:
     case '`':
       if (!cur_inmd->keymap[key]) {
         same_pho_query_state = SAME_PHO_QUERY_gtab_input;
+        disp_gtab_sel(_(_L("輸入要查的同音字，接著在注音視窗選字")));
         if (gcin_pop_up_win)
           show_win_gtab();
         init_gtab_pho_query_win();
@@ -1550,6 +1549,18 @@ next:
         }
       }
 
+      int keypad;
+keypad_proc:
+      keypad = keypad_proc(key);
+      if (keypad) {
+        if (!ci) {
+          if (gbufN) {
+            insert_gbuf_cursor_char(keypad);
+            return 1;
+          } else
+            return 0;
+        }
+      }
       char *pendkey = strchr(cur_inmd->endkey, key);
 
       pselkey=ptr_selkey(key);
@@ -1862,7 +1873,7 @@ refill:
     }
 
     if (gtab_unique_auto_send) {
-      char *first_str=NULL, nonemptyN=0;
+      char *first_str=NULL;
       for(i=0; i < page_len(); i++) {
         if (!seltab[i][0])
           continue;

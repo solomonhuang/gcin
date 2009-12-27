@@ -27,7 +27,7 @@ static void get_text_w_h(char *s, int *w, int *h)
 }
 
 #if USE_TSIN
-extern gboolean eng_ph, tsin_half_full;
+extern gboolean tsin_half_full;
 #endif
 
 static void draw_icon()
@@ -75,7 +75,7 @@ static void draw_icon()
       gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
     }
 #if USE_TSIN
-    if ((current_CS->in_method==6||current_CS->in_method==12) && current_CS->im_state == GCIN_STATE_CHINESE && !eng_ph) {
+    if ((current_CS->in_method==6||current_CS->in_method==12) && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
       static char efull[] = "ABC";
       gdk_color_parse("blue", &color_fg);
       gdk_gc_set_rgb_fg_color(gc, &color_fg);

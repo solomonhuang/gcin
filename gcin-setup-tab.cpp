@@ -51,6 +51,7 @@ static GtkWidget *check_button_gcin_eng_phrase_enabled,
                  *opt_spc_opts,
                  *opt_auto_select_by_phrase,
                  *opt_speaker_opts,
+                 *check_button_gcin_bell_off,
                  *spinner_gcin_font_size,
                  *spinner_gcin_font_size_gtab_in,
                  *spinner_gcin_font_size_pho_near,
@@ -275,7 +276,7 @@ typedef struct
   GdkPixbuf *icon;
   gchar *key;
   gchar *file;
-#if UNIX
+#if 1
   gboolean used;
 #endif
   gboolean default_inmd;
@@ -288,7 +289,7 @@ enum
   COLUMN_ICON,
   COLUMN_KEY,
   COLUMN_FILE,
-#if UNIX
+#if 1
   COLUMN_USE,
 #endif
   COLUMN_DEFAULT_INMD,
@@ -338,7 +339,7 @@ add_items (void)
     foo.key = g_strdup(key);
 
     foo.file = g_strdup(file);
-#if UNIX
+#if 1
     foo.used = (gcin_flags_im_enabled & (1 << i)) != 0;
 #endif
     foo.default_inmd =  default_input_method == i;
@@ -381,7 +382,7 @@ create_model (void)
 			  g_array_index (articles, Item, i).key,
 			  COLUMN_FILE,
 			  g_array_index (articles, Item, i).file,
-#if UNIX
+#if 1
 			  COLUMN_USE,
                           g_array_index (articles, Item, i).used,
 #endif
@@ -413,7 +414,7 @@ static void clear_all(GtkTreeModel *model)
   } while (gtk_tree_model_iter_next(model, &iter));
 }
 
-#if UNIX
+#if 1
 static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer data)
 {
   GtkTreeModel *model = GTK_TREE_MODEL (data);
@@ -507,17 +508,20 @@ add_columns (GtkTreeView *treeview)
                                                "text", COLUMN_FILE,
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
-#if UNIX
+
   // use column
   renderer = gtk_cell_renderer_toggle_new ();
   g_signal_connect (G_OBJECT (renderer), "toggled",
                     G_CALLBACK (toggled), model);
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
-  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, _(_L("Ctrl-Shift 循環")), renderer,
-                                               "active", COLUMN_USE,
-                                               NULL);
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),-1,
+#if UNIX
+	  _(_L("Ctrl-Shift 循環")),
+#else
+	  _(_L("Ctrl-Shift 循環(必須關閉Windows按鍵")),
 #endif
+	  renderer, "active", COLUMN_USE,
+                                               NULL);
 
   // default_inmd column
   renderer = gtk_cell_renderer_toggle_new ();
@@ -1288,6 +1292,9 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_eng_phrase_enabled)));
 
+  save_gcin_conf_int(GCIN_BELL_OFF,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off)));
+
   if (opt_speaker_opts) {
     idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_speaker_opts));
     save_gcin_conf_str(PHONETIC_SPEAK_SEL, pho_speaker[idx]);
@@ -1706,6 +1713,15 @@ static void create_main_win()
      gcin_win_sym_click_close);
   GtkWidget *label_gcin_win_sym_click_close = gtk_label_new(_(_L("符號視窗點選後自動關閉")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_win_sym_click_close,  FALSE, FALSE, 0);
+
+  GtkWidget *hbox_gcin_bell_off = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_bell_off, FALSE, FALSE, 0);
+  check_button_gcin_bell_off = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_bell_off),check_button_gcin_bell_off,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off),
+     gcin_bell_off);
+  GtkWidget *label_gcin_bell_off = gtk_label_new(_(_L("關閉鈴聲")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_bell_off), label_gcin_bell_off,  FALSE, FALSE, 0);
 
 #if USE_GCB
   GtkWidget *hbox_gcb_pos = gtk_hbox_new (FALSE, 0);

@@ -34,6 +34,7 @@
 #define DBG 0
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
+//gboolean is_gdm;
 
 struct _GtkIMContextGCIN
 {
@@ -44,6 +45,10 @@ struct _GtkIMContextGCIN
   GCIN_client_handle *gcin_ch;
   int timeout_handle;
   gboolean is_mozilla, dirty_fix_off, preedit;
+  char *pe_str;
+  GCIN_PREEDIT_ATTR *pe_att;
+  int pe_attN;
+  int pe_cursor;
 };
 
 
@@ -183,6 +188,12 @@ static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
   im_context_gcin->timeout_handle = 0;
+  char *pe_str;
+  im_context_gcin->pe_attN = 0;
+  im_context_gcin->pe_att = NULL;
+  im_context_gcin->pe_str = NULL;
+  im_context_gcin->pe_cursor = 0;
+
 #if DBG
   printf("gtk_im_context_gcin_init %x\n", im_context_gcin);
 #endif
@@ -205,10 +216,31 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
       im_context_gcin->is_mozilla = TRUE;
       break;
     }
+
+//    if (strstr(exec, "/gdm"))
+//      is_gdm = TRUE;
   }
 #endif
 // dirty hack for mozilla...
 }
+
+
+void clear_preedit(GtkIMContextGCIN *context_gcin)
+{
+  if (context_gcin->pe_str) {
+    free(context_gcin->pe_str);
+    context_gcin->pe_str = NULL;
+  }
+
+  if (context_gcin->pe_att) {
+    free(context_gcin->pe_att);
+    context_gcin->pe_att = NULL;
+    context_gcin->pe_attN = 0;
+  }
+
+  context_gcin->pe_cursor = 0;
+}
+
 
 static void
 gtk_im_context_gcin_finalize (GObject *obj)
@@ -217,6 +249,7 @@ gtk_im_context_gcin_finalize (GObject *obj)
   printf("gtk_im_context_gcin_finalize %x\n", obj);
 #endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (obj);
+  clear_preedit(context_xim);
 
 #if NEW_GTK_IM
   cancel_timeout(context_xim);
@@ -345,7 +378,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   unsigned char *buffer = static_buffer;
 //  char *buffer = static_buffer;
   gint buffer_size = sizeof(static_buffer) - 1;
-  gint num_bytes = 0;
+  gsize num_bytes = 0;
   KeySym keysym = 0;
   Status status;
   gboolean result = FALSE;
@@ -389,14 +422,62 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   }
 #endif
 
-  gboolean  preedit_changed = FALSE;
+  gboolean preedit_changed = FALSE;
+  gboolean context_has_str = context_xim->pe_str && context_xim->pe_str[0];
 
   if (xevent.type == KeyPress) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
+    preedit_changed = result;
 
-    if (result)
-       preedit_changed = TRUE;
+#if DBG
+    printf("result %d\n", result);
+#endif
+
+    char *tstr;
+    GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
+    int cursor_pos;
+    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos);
+    gboolean has_str = tstr && tstr[0];
+
+    if (!context_has_str && has_str) {
+#if DBG
+      printf("emit preedit-start\n");
+#endif
+      g_signal_emit_by_name (context, "preedit-start");
+    }
+
+    if (context_has_str != has_str || (tstr && context_xim->pe_str && strcmp(tstr, context_xim->pe_str))) {
+      if (context_xim->pe_str)
+        free(context_xim->pe_str);
+      context_xim->pe_str = tstr;
+//      preedit_changed = TRUE;
+    }
+
+
+    int attsz = sizeof(GCIN_PREEDIT_ATTR)*attN;
+    if (context_xim->pe_attN != attN ||
+      context_xim->pe_att && memcmp(context_xim->pe_att, att, attsz)) {
+//      printf("att changed pe_att:%x:%d %d\n", context_xim->pe_att, context_xim->pe_attN, attN);
+      context_xim->pe_attN = attN;
+      if (context_xim->pe_att)
+        free(context_xim->pe_att);
+
+      context_xim->pe_att = NULL;
+      if (attN)
+        context_xim->pe_att = malloc(attsz);
+      memcpy(context_xim->pe_att, att, attsz);
+//      printf("context_xim->pe_att %x\n", context_xim->pe_att);
+//      preedit_changed = TRUE;
+    }
+
+    if (context_xim->pe_cursor != cursor_pos) {
+#if DBG
+      printf("cursor changed %d %d\n", context_xim->pe_cursor, cursor_pos);
+#endif
+      context_xim->pe_cursor = cursor_pos;
+//      preedit_changed = TRUE;
+    }
 
 #if DBG
     printf("seq:%d rstr:%s result:%x num_bytes:%d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
@@ -416,8 +497,6 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
           add_cursor_timeout(context_xim);
     } else {
 //      printf("predit_changed\n");
-      if (preedit_changed)
-        g_signal_emit_by_name(context, "preedit_changed");
     }
 #endif
   }
@@ -425,6 +504,27 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
   }
+
+
+#if 1
+  if (preedit_changed) {
+#if DBG
+    printf("preedit-change\n");
+#endif
+    g_signal_emit_by_name(context_xim, "preedit_changed");
+  }
+#endif
+
+
+  if (rstr && context_has_str) {
+    clear_preedit(context_xim);
+#if DBG
+    printf("preedit-end\n");
+#endif
+    g_signal_emit_by_name (context, "preedit-end");
+  }
+
+
 #if DBG
   printf("seq:%d event->type:%d iiiii %d  %x %d rstr:%x\n",context_xim->gcin_ch->seq, event->type, result, keysym,
     num_bytes, rstr);
@@ -436,6 +536,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     g_signal_emit_by_name (context, "commit", rstr);
     free(rstr);
   }
+
 
   return result;
 }
@@ -449,7 +550,7 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
   printf("gtk_im_context_gcin_focus_in\n");
 #endif
   if (context_xim->gcin_ch) {
-#if NEW_GTK_IM
+#if NEW_GTK_IM && 0
     if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
       add_cursor_timeout(context_xim);
 #endif
@@ -474,9 +575,11 @@ gtk_im_context_gcin_focus_out (GtkIMContext *context)
 
     if (rstr) {
       g_signal_emit_by_name (context, "commit", rstr);
+      clear_preedit(context_xim);
       g_signal_emit_by_name(context, "preedit_changed");
       free(rstr);
     }
+
   }
 
   return;
@@ -527,10 +630,17 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
   printf("gtk_im_context_gcin_reset %x\n", context_gcin);
 #endif
 
+
 #if 1
   if (context_gcin->gcin_ch) {
     gcin_im_client_reset(context_gcin->gcin_ch);
-    g_signal_emit_by_name(context, "preedit_changed");
+    if (context_gcin->pe_str && context_gcin->pe_str[0]) {
+#if DBG
+      printf("clear %x\n", context_gcin);
+#endif
+      g_signal_emit_by_name(context, "preedit_changed");
+      clear_preedit(context_gcin);
+    }
   }
 #endif
 }
@@ -575,6 +685,7 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 				       PangoAttrList **attrs,
                                        gint           *cursor_pos)
 {
+
 #if DBG
   printf("gtk_im_context_gcin_get_preedit_string %x %x %x\n", str, attrs, cursor_pos);
 #endif
@@ -591,26 +702,31 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 #if 1
   GtkIMContextGCIN *context_gcin = GTK_IM_CONTEXT_GCIN (context);
   if (!context_gcin->gcin_ch) {
+empty:
     *str=g_strdup("");
     return;
   }
 
-  char *tstr;
-  GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-  int attN = gcin_im_client_get_preedit(context_gcin->gcin_ch, &tstr, att, cursor_pos);
-  if (tstr) {
-    *str=g_strdup(tstr);
-    free(tstr);
+  if (cursor_pos) {
+    *cursor_pos = context_gcin->pe_cursor;
+  }
+
+  if (context_gcin->pe_str) {
+    *str=g_strdup(context_gcin->pe_str);
+  } else {
+    goto empty;
   }
 
 #if DBG
-  printf("gtk_im_context_gcin_get_preedit_string attN:%d '%s'\n", attN, *str);
+  printf("gtk_im_context_gcin_get_preedit_string %x attN:%d '%s'\n", context_gcin->pe_att,
+    context_gcin->pe_attN, *str);
 #endif
   int i;
   if (attrs)
-  for(i=0; i < attN; i++) {
-    add_preedit_attr(*attrs, *str, &att[i]);
+  for(i=0; i < context_gcin->pe_attN; i++) {
+    add_preedit_attr(*attrs, *str, &(context_gcin->pe_att[i]));
   }
+
 #else
   if (str)
     *str = g_strdup("");

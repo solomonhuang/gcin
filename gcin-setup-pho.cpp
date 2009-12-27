@@ -33,7 +33,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_gcin_capslock_lower,
                  *spinner_tsin_buffer_size;
 
-static GtkWidget *opt_kbm_opts, *opt_eng_ch_opts, *opt_speaker_opts;
+static GtkWidget *opt_kbm_opts, *opt_eng_ch_opts;
 
 
 static struct {
@@ -75,7 +75,7 @@ int get_current_speaker_idx()
 
 static GtkWidget *gcin_kbm_window = NULL;
 
-static int new_select_idx, new_select_idx_tsin_sw, new_select_idx_tsin_space_opt;
+static int new_select_idx_tsin_space_opt;
 static GdkColor tsin_phrase_line_gcolor, tsin_cursor_gcolor;
 
 
@@ -154,10 +154,12 @@ static gboolean cb_ok( GtkWidget *widget,
 }
 
 
+#if 0
 static void callback_button_clicked_tsin_sw( GtkWidget *widget, gpointer data)
 {
   new_select_idx_tsin_sw = (int) data;
 }
+#endif
 
 
 static void callback_button_clicked_tsin_space_opt( GtkWidget *widget, gpointer data)
@@ -171,7 +173,7 @@ static int get_current_kbm_idx()
   char kbm_str[32];
   get_gcin_conf_fstr(PHONETIC_KEYBOARD, kbm_str, "zo-asdf");
 
-  int i, rval;
+  int i;
   for(i=0; kbm_sel[i].kbm; i++)
     if (!strcmp(kbm_sel[i].kbm, kbm_str)) {
       return i;
@@ -212,7 +214,7 @@ static gboolean close_kbm_window( GtkWidget *widget,
   return TRUE;
 }
 
-static GtkWidget *da_phrase_line, *da_cursor, *da_sel_key;
+static GtkWidget *da_phrase_line, *da_cursor;
 
 static void cb_save_tsin_phrase_line_color(GtkWidget *widget, gpointer user_data)
 {

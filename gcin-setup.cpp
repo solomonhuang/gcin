@@ -9,10 +9,11 @@
 static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_pop_up_win,
                  *check_button_gcin_inner_frame,
+#if TRAY_ENABLED
                  *check_button_gcin_status_tray,
+#endif
                  *check_button_gcin_win_color_use;
 
-static GtkWidget *opt_spc_opts;
 
 static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
 static GtkClipboard *pclipboard;
@@ -134,6 +135,7 @@ static void ts_import(const gchar *selected_filename)
 #endif
 }
 
+#if !GTK_CHECK_VERSION(2,4,0)
 static void cb_file_ts_import(GtkWidget *widget, gpointer user_data)
 {
    GtkWidget *file_selector = (GtkWidget *)user_data;
@@ -144,6 +146,7 @@ static void cb_file_ts_import(GtkWidget *widget, gpointer user_data)
 
    ts_import(selected_filename);
 }
+#endif
 
 static void cb_ts_import()
 {
@@ -259,11 +262,10 @@ int html_browser(char *fname)
 
 static void cb_help()
 {
-  char fname[512];
-
 #if UNIX
   html_browser(DOC_DIR"/README.html");
 #else
+  char fname[512];
   strcpy(fname, gcin_program_files_path);
   strcat(fname, "\\README.html");
   html_browser(fname);
@@ -675,7 +677,6 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX(hbox_win_color_fbg), button_fg, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_fg), "clicked",
                     G_CALLBACK (cb_gcin_win_color_fg), &colorsel[0]);
-  GdkColor color;
   gdk_color_parse(gcin_win_color_fg, &gcin_win_gcolor_fg);
   gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_fg);
   gdk_color_parse(gcin_win_color_bg, &gcin_win_gcolor_bg);
@@ -929,6 +930,7 @@ int main(int argc, char **argv)
   if (!(ctype && strstr(ctype, "zh_CN")))
     putenv("LANGUAGE=zh_TW.UTF-8");
 #endif
+
   exec_setup_scripts();
 
   init_TableDir();

@@ -21,7 +21,9 @@ static GtkWidget *hist_window;
 static gchar **hist_strArr;
 static int hist_strArrN=10;
 static GtkWidget **hist_buttonArr;
-
+#if WIN32
+static int fetch_start_tick=0;
+#endif
 static void del_nl(char *tmpstr)
 {
    int i;
@@ -184,6 +186,16 @@ void disp_gcb_selection(const gchar *text)
    hist_strArr[0]=g_strdup(text);
 
    update_hist_button();
+
+#if WIN32
+   // dirty trick to avoid the block caused by cygwin/X, make the clipboard mine
+   int d = GetTickCount() - fetch_start_tick;
+   dbg("tick %d\n", d);
+
+   if (d > 50) {
+	  gtk_clipboard_set_text(pclipboard, text, -1);
+   }
+#endif
 }
 
 
@@ -195,6 +207,9 @@ void cb_selection_received(GtkClipboard *pclip, const gchar *text, gpointer data
 
 void get_selection()
 {
+#if WIN32
+  fetch_start_tick = GetTickCount();
+#endif
   gtk_clipboard_request_text(pclipboard, cb_selection_received,snoop_button);
 }
 
@@ -305,8 +320,6 @@ gboolean  hist_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer u
 
 static gboolean  gcb_button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
 {
-  int winx,winy,i;
-
   if (event->direction!=GDK_SCROLL_DOWN)
     return TRUE;
 
@@ -346,7 +359,6 @@ void gcb_main()
 {
 
   GtkWidget *hbox,*vbox;
-  GtkWidget *proxy_invisible;
   int i;
 #if 1
   if (gcb_enabled==old_gcb_enabled && gcb_position==old_gcb_position && gcb_position_x==old_gcb_position_x
@@ -500,7 +512,7 @@ void gcb_main()
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
 #if GTK_CHECK_VERSION(2,6,0) && UNIX
   g_signal_connect(pclipboard, "owner-change", G_CALLBACK (cb_owner_change), NULL);
-#else
+#elif WIN32 && 1
   g_timeout_add(3000, timeout_periodic_clipboard_fetch, NULL);
 #endif
 }

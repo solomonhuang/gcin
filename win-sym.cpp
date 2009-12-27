@@ -178,7 +178,7 @@ void output_buffer_call_back();
 gboolean gtab_cursor_end(),gtab_phrase_on(), flush_tsin_buffer(), tsin_cursor_end();
 void insert_gbuf_cursor1(char *s), add_to_tsin_buf_str(char *str);
 
-extern int eng_ph, c_len;
+extern int c_len;
 extern short gbufN;
 static void cb_button_sym(GtkButton *button, char *str)
 {
@@ -350,6 +350,8 @@ static gboolean button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpo
       break;
     case GDK_SCROLL_DOWN:
       idx = (idx+1) % pagesN;
+      break;
+    default:
       break;
   }
 

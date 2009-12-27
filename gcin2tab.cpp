@@ -1,4 +1,3 @@
-
 /*
 	Copyright (C) 1995-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
@@ -224,7 +223,7 @@ int main(int argc, char **argv)
   if (!(sequ(cmd,"%prompt") || sequ(cmd,"%cname")) || !(*arg) )
     p_err("%d:  %%prompt prompt_name  expected", lineno);
   strncpy(th.cname, arg, MAX_CNAME);
-  printf("cname %s\n", th.cname);
+  dbg("cname %s\n", th.cname);
 
   cmd_arg(&cmd, &arg);
   if (!sequ(cmd,"%selkey") || !(*arg) )
@@ -302,7 +301,6 @@ int main(int argc, char **argv)
     dbg(".. quick keys defined\n");
     for(quick_def=0;;) {
       char k;
-      int len;
 
       cmd_arg(&cmd, &arg);
       if (sequ(cmd,"%quick")) break;
@@ -323,7 +321,7 @@ int main(int argc, char **argv)
           char tp[4];
           int len=u8cpy(tp, p);
 
-          if (utf8_eq(tp,"□"))
+          if (utf8_eq(tp,_(_L("□"))))
              tp[0]=0;
 
           u8cpy(th.qkeys.quick2[(int)k][(int)k1][N++], tp);
@@ -358,7 +356,7 @@ int main(int argc, char **argv)
 
     if (len > 5) {
       key64 = TRUE;
-      dbg("more than 5 keys, will use 64 bit");
+      dbg("more than 5 keys, will use 64 bit\n");
       break;
     }
   }
@@ -428,7 +426,7 @@ int main(int argc, char **argv)
       itar64[chno].oseq=chno;
     }
     else {
-      u_int key32 = kk;
+      u_int key32 = (u_int)kk;
 
       memcpy(&itar[chno].key, &key32, 4);
       itar[chno].oseq=chno;
@@ -500,7 +498,7 @@ int main(int argc, char **argv)
   u_int64_t keymask = KEY_MASK;
   for(i=0; i<chno; i++) {
     u_int64_t key = CONVT2(cur_inmd, i);
-    int kk = (key>>LAST_K_bitN) & keymask;
+    int kk = (int)((key>>LAST_K_bitN) & keymask);
 
     if (!def1[kk]) {
       idx1[kk]=(gtab_idx1_t)i;
@@ -516,7 +514,7 @@ int main(int argc, char **argv)
     p_err("Cannot create");
   }
 
-  printf("Defined Characters:%d\n", chno);
+  dbg("Defined Characters:%d\n", chno);
 
 #if NEED_SWAP
   swap_byte_4(&th.version);

@@ -31,7 +31,7 @@ int c_idx;
 extern int c_len;
 int ph_sta=-1, ph_sta_last=-1;  // phrase start
 static int sel_pho;
-gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
+// gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
 static int save_frm, save_to;
 static int current_page;
 static int startf;
@@ -51,6 +51,19 @@ static PRE_SEL pre_sel[10];
 static int pre_selN;
 
 void clrin_pho(), hide_win0();
+
+gboolean tsin_pho_mode()
+{
+  return current_CS && current_CS->tsin_pho_mode;
+}
+
+
+void set_tsin_pho_mode()
+{
+  if (current_CS)
+    current_CS->tsin_pho_mode = 1;
+}
+
 
 gboolean tsin_cursor_end()
 {
@@ -110,7 +123,7 @@ void drawcursor()
   last_cursor_idx = c_idx;
 
   if (c_idx == c_len) {
-    if (!eng_ph) {
+    if (!tsin_pho_mode()) {
       if (tsin_half_full) {
         disp_char(c_idx,"  ");
         set_cursor_tsin(c_idx);
@@ -342,7 +355,7 @@ void show_stat()
 #endif
   load_tray_icon_win32();
 #endif
-  disp_tsin_eng_pho(eng_ph);
+  disp_tsin_eng_pho(tsin_pho_mode());
 }
 
 void load_tsin_db();
@@ -899,30 +912,27 @@ void show_button_pho(gboolean bshow);
 #if USE_TSIN
 void tsin_set_eng_ch(int nmod)
 {
-  eng_ph = nmod;
+  if (current_CS)
+    current_CS->tsin_pho_mode = nmod;
+
+  if (current_CS->in_method==6) {
+    show_stat();
+    drawcursor();
+
+    if (!tsin_pho_mode())
+      clrin_pho_tsin();
+
+    show_button_pho(tsin_pho_mode());
+  }
+
   show_stat();
-  drawcursor();
-
-  if (!eng_ph)
-    clrin_pho_tsin();
-
-  show_button_pho(eng_ph);
-#if TRAY_ENABLED
-#if UNIX
-  load_tray_icon();
-#endif
-  load_tray_icon_win32();
-#endif
-#if 0
-  show_win0();
-#endif
 }
 #endif
 
 void tsin_toggle_eng_ch()
 {
   compact_win0_x();
-  tsin_set_eng_ch(!eng_ph);
+  tsin_set_eng_ch(!tsin_pho_mode());
 }
 
 #if USE_TSIN
@@ -1179,10 +1189,9 @@ int tsin_sele_by_idx(int c)
 
 static gboolean pre_sel_handler(KeySym xkey)
 {
-#if WIN32
   if (xkey >= 0x7f)
     return 0;
-#endif
+
   static char shift_sele[]="!@#$%^&*()asdfghjkl:";
   static char noshi_sele[]="1234567890asdfghjkl;";
   char *p;
@@ -1265,7 +1274,7 @@ static void call_tsin_parse()
   prbuf();
 }
 
-static KeySym keypad_proc(KeySym xkey)
+KeySym keypad_proc(KeySym xkey)
 {
   if (xkey <= XK_KP_9 && xkey >= XK_KP_0)
     xkey=xkey-XK_KP_0+'0';
@@ -1444,7 +1453,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
 //  dbg("feedkey_pp %x %x\n", xkey, kbstate);
 
   if (caps_eng_tog)
-    eng_ph = !(kbstate&LockMask);
+    current_CS->tsin_pho_mode = !(kbstate&LockMask);
 
   key_press_time = 0;
 
@@ -1456,9 +1465,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
    if (xkey==XK_Shift_L||xkey==XK_Shift_R)
       key_press_time = current_time();
 
-   if (!eng_ph && !c_len && gcin_pop_up_win && xkey!=XK_Caps_Lock) {
+   if (!tsin_pho_mode() && !c_len && gcin_pop_up_win && xkey!=XK_Caps_Lock) {
      hide_win0();
-
      gboolean is_ascii = xkey>=' ' && xkey<0x7f;
 
      if (caps_eng_tog && is_ascii) {
@@ -1471,8 +1479,9 @@ int feedkey_pp(KeySym xkey, int kbstate)
          send_text(half_char_to_full_char(xkey));
          return 1;
        }
-       else
+       else {
          return 0;
+       }
      }
    }
 
@@ -1644,13 +1653,17 @@ tab_phrase_end:
          }
          return 0;
        }
-
+pho_prev_page:
        current_page = current_page - phkbm.selkeyN;
        if (current_page < 0)
          current_page = 0;
 
        disp_current_sel_page();
        return 1;
+     case XK_Prior:
+       if (sel_pho)
+         goto pho_prev_page;
+       return 0;
      case XK_space:
        if (!c_len && !ityp3_pho && !typ_pho[0] && !typ_pho[1] && !typ_pho[2]
            && tsin_half_full) {
@@ -1670,7 +1683,7 @@ tab_phrase_end:
          goto asc_char;
        }
 
-       if (!eng_ph)
+       if (!tsin_pho_mode())
            goto asc_char;
      case XK_Down:
        if (!ityp3_pho && (typ_pho[0]||typ_pho[1]||typ_pho[2]) && xkey==XK_space) {
@@ -1706,6 +1719,10 @@ change_char:
 
        disp_current_sel_page();
        return 1;
+     case XK_Next:
+       if (sel_pho)
+         goto change_char;
+       return 0;
      case '\'':  // single quote
        if (phkbm.phokbm[xkey][0].num)
          goto other_keys;
@@ -1719,7 +1736,7 @@ change_char:
        }
      case 'q':
      case 'Q':
-       if (b_hsu_kbm && eng_ph)
+       if (b_hsu_kbm && tsin_pho_mode())
          goto change_char;
      default:
 other_keys:
@@ -1783,8 +1800,8 @@ other_keys:
    if (key_pad && !c_len && !tsin_half_full)
      return 0;
 
-   if (!eng_ph || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {
-       if (eng_ph && !shift_m && strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num) {
+   if (!tsin_pho_mode() || typ_pho[0]!=BACK_QUOTE_NO && (shift_m || key_pad || !phkbm.phokbm[xkey][0].num)) {
+       if (tsin_pho_mode() && !shift_m && strchr(hsu_punc, xkey) && !phkbm.phokbm[xkey][0].num) {
          if (pre_punctuation_hsu(xkey))
            return 1;
        }
@@ -1798,18 +1815,18 @@ asc_char:
             return 1;
           }
 
-          if (eng_ph && pre_punctuation(xkey))
+          if (tsin_pho_mode() && pre_punctuation(xkey))
             return 1;
         }
 
-        if (shift_m && eng_ph)  {
+        if (shift_m && tsin_pho_mode())  {
           char *ppp=strchr(ochars,xkey);
 
           if (!(kbstate&LockMask) && ppp && !((ppp-ochars) & 1))
             xkey=*(ppp+1);
 
         } else {
-          if (!eng_ph && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock
+          if (!tsin_pho_mode() && tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock
               && gcin_capslock_lower) {
             case_inverse(&xkey, shift_m);
           }
@@ -2173,11 +2190,16 @@ ret:
   return attrN;
 }
 
-void tsin_reset()
+int tsin_reset()
 {
 //  dbg("tsin_reset\n");
+#if UNIX
   if (!gwin0)
-    return;
+    return 0;
+#endif
+  int v = c_len > 0;
   tsin_reset_in_pho0();
   clear_tsin_buffer();
+
+  return v;
 }

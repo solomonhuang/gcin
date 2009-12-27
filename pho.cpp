@@ -7,7 +7,7 @@
 #include "pho.h"
 #include <sys/stat.h>
 #include <stdlib.h>
-
+#include "gtab.h"
 
 extern PHO_ITEM *ch_pho;
 
@@ -389,10 +389,16 @@ void inc_pho_count(phokey_t key, int ch_idx)
 void lookup_gtab(char *ch);
 gboolean is_gtab_query_mode();
 void set_gtab_target_displayed();
+extern short gbufN;
+void insert_gbuf_cursor1(char *s);
 
 void putkey_pho(u_short key, int idx)
 {
-  sendkey_b5(ch_pho[idx].ch);
+  if (same_pho_query_state==SAME_PHO_QUERY_pho_select && gbufN)
+    insert_gbuf_cursor1(ch_pho[idx].ch);
+  else
+    sendkey_b5(ch_pho[idx].ch);
+
   lookup_gtab(ch_pho[idx].ch);
 
   inc_pho_count(key, idx);

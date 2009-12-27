@@ -1,9 +1,10 @@
-#/bin/sh -f
+export LC_CTYPE=zh_TW.Big5
+export XMODIFIERS=@im=gcin_test
 
-#export LC_ALL=zh_TW.Big5
-export XMODIFIERS=@im=gcin
-export LD_LIBRARY_PATH="../im-client"
+pkill gcin.test
+../gcin.test &
 
-export LD_PRELOAD=./im-gcin.so
+export LD_LIBRARY_PATH=../im-client
+export LD_PRELOAD=./im-gcin-cur.so
 gedit
-#valgrind gedit
+pkill gcin.test
