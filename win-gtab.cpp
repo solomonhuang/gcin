@@ -181,10 +181,14 @@ void disp_gtab_sel(char *s)
   if (test_mode)
     return;
 
+
   if (!s[0])
     gtk_widget_hide(label_gtab_sele);
-  else
+  else {
+    if (gwin_gtab && !GTK_WIDGET_VISIBLE(gwin_gtab))
+       show_win_gtab();
     gtk_widget_show(label_gtab_sele);
+  }
 
 //  dbg("disp_gtab_sel '%s'\n", s);
 

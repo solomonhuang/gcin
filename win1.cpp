@@ -190,6 +190,9 @@ gboolean timeout_minimize_win1(gpointer data)
 
 void disp_selections(int x, int y)
 {
+  if (!gwin1)
+    p_err("disp_selections !gwin1");
+
   if (!GTK_WIDGET_VISIBLE(gwin1)) {
     gtk_widget_show(gwin1);
   }
