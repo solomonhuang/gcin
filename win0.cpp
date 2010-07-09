@@ -23,6 +23,7 @@ static struct {
   GtkWidget *vbox;
   GtkWidget *label;
   GtkWidget *line;
+  int x;
 } chars[MAX_PH_BF_EXT];
 
 
@@ -74,9 +75,11 @@ static void create_char(int index)
   GdkColor color_bg;
   gdk_color_parse(tsin_phrase_line_color, &color_bg);
 
-  for(i=index; i<=index+1 && i < MAX_PH_BF_EXT; i++) {
+  i = index;
+//  for(i=index; i<=index+1 && i < MAX_PH_BF_EXT; i++)
+  {
     if (chars[i].vbox)
-      continue;
+      return;
 
     GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
     gtk_box_pack_start (GTK_BOX (hbox_edit), vbox, FALSE, FALSE, 0);
@@ -257,13 +260,12 @@ void clr_in_area_pho_tsin()
    disp_tsin_pho(i, " ");
 }
 
-void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
+int get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
 {
   if (!win && !widget)
     p_err("get_widget_xy err");
 
-//  gtk_widget_show_all(widget);
-  gdk_flush();
+//  gdk_flush();
 
   GtkRequisition sz;
   gtk_widget_size_request(widget, &sz);
@@ -290,6 +292,7 @@ void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
 
   *rx = win_x + wx;
   *ry = win_y + wy;
+  return wx;
 }
 
 void getRootXY(Window win, int wx, int wy, int *tx, int *ty);
@@ -318,14 +321,20 @@ void disp_tsin_select(int index)
     getRootXY(current_CS->client_win, current_CS->spot_location.x, current_CS->spot_location.y, &x, &y);
   } else {
     int i;
-    for(i=0;i<=index;i++) {
-      if (!chars[i].vbox)
+	// bug in GTK, widget position is wrong, repeat util find one
+    for(i=index;i>=0; i--) {
+#if _DEBUG
+      if (!chars[i].vbox || !chars[index].label)
         p_err("err found");
+#endif
+      gtk_widget_show_now(chars[i].label);
       gtk_widget_show(chars[i].vbox);
-	  gtk_widget_show(chars[i].label);
+      int tx = get_widget_xy(gwin0, chars[i].vbox, &x, &y);
+
+      if (tx>=0)
+        break;
+//	  dbg("%d] %d\n", i, tx);
     }
-    gtk_widget_show(gwin0);
-    get_widget_xy(gwin0, widget, &x, &y);
   }
   disp_selections(x, y);
 }
@@ -479,7 +488,7 @@ void create_win0()
 {
   if (gwin0)
     return;
-#if _DEBUG
+#if _DEBUG && 0
   dbg("create_win0\n");
 #endif
   gwin0 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -635,7 +644,7 @@ void show_win0()
   if (test_mode)
     return;
 
-#if _DEBUG
+#if _DEBUG && 0
 	dbg("show_win0 pop:%d in:%d for:%d \n", gcin_pop_up_win, tsin_has_input(), force_show);
 #endif
   create_win0();

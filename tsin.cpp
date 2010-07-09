@@ -116,6 +116,9 @@ void drawcursor()
   clr_tsin_cursor(tss.last_cursor_idx);
   tss.last_cursor_idx = tss.c_idx;
 
+  if (!tss.c_len)
+    return;
+
   if (tss.c_idx == tss.c_len) {
     if (!tsin_pho_mode()) {
       if (tss.tsin_half_full) {
@@ -2189,7 +2192,7 @@ int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_
   int i;
   int tn=0;
   int attrN=0;
-#if _DEBUG
+#if _DEBUG && 0
   dbg("tsin_get_preedit\n");
 #endif
   for(i=0; i<tss.c_len; i++) {
@@ -2208,7 +2211,7 @@ fin:
   if (i==tss.c_idx && gcin_on_the_spot_key)
     get_in_area_pho_tsin_str(str+tn);
 
-#if _DEBUG
+#if _DEBUG && 0
   dbg("'%s'\n", str);
 #endif
   if (tss.c_len) {
