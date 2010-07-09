@@ -2195,6 +2195,7 @@ int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_
 #if _DEBUG && 0
   dbg("tsin_get_preedit\n");
 #endif
+
   for(i=0; i<tss.c_len; i++) {
     if (tn>=GCIN_PREEDIT_MAX_STR-4*CH_SZ-1)
       goto fin;

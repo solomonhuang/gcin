@@ -715,8 +715,10 @@ int get_DispInArea_str(char *out);
 
 int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub_comp_len)
 {
-  int i;
+  int i=0;
   int strN=0;
+  int attrN=0;
+  int ch_N=0;
 
 //  dbg("gtab_get_preedit\n");
   str[0]=0;
@@ -725,14 +727,11 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
 #if WIN32
   *sub_comp_len = ggg.ci > 0;
 #endif
+  gboolean ap_only = gcin_edit_display_ap_only();
 
-  if (!gtab_phrase_on())
-    return 0;
-
+  if (gtab_phrase_on()) {
   attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;
   attr[0].ofs0=0;
-  int attrN=0;
-  int ch_N=0;
 
   if (ggg.gbufN)
     attrN=1;
@@ -751,14 +750,16 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
       attrN++;
     }
 
-    if (gcin_on_the_spot_key && i==ggg.gbuf_cursor)
+    if (ap_only && gcin_on_the_spot_key && i==ggg.gbuf_cursor)
       strN += get_DispInArea_str(str+strN);
 
     memcpy(str+strN, s, len);
     strN+=len;
   }
+  }
 
-  if (gcin_on_the_spot_key && i==ggg.gbuf_cursor)
+
+  if (ap_only && gcin_on_the_spot_key && i==ggg.gbuf_cursor)
     strN += get_DispInArea_str(str+strN);
 
   str[strN]=0;
