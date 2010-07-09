@@ -281,13 +281,10 @@ void tsin_parse()
     for(ofsj=j=0; j < out[i].len; j++) {
       ofsj += u8cpy(tss.chpho[ofsi].ch, (char *)&out[i].str[ofsj]);
 
+      tss.chpho[ofsi].flag |= FLAG_CHPHO_PHRASE_BODY;
       if (out[i].flag & FLAG_TSIN_PARSE_PHRASE)
-#if 1
         tss.chpho[ofsi].psta = psta;
 
-#else
-        tss.chpho[ofsi].psta = out[i].start;
-#endif
       ofsi++;
     }
   }

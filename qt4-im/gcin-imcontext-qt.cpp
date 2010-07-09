@@ -80,6 +80,11 @@ void GCINIMContext::update_preedit()
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
   int attN = gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position);
 
+  if (gcin_ch) {
+    int ret;
+    gcin_im_client_set_flags(gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
+  }
+
   preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
 
   const QWidget *focused_widget = qApp->focusWidget ();

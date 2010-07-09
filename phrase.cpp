@@ -82,13 +82,14 @@ void load_phrase(char *fname, time_t *modtime, struct keystruc *tr, int trN)
   }
 
 //  dbg("load succcc %s\n", fname);
+  skip_utf8_sigature(fp);
 
   while (!feof(fp)) {
     int i,j;
     char str[512];
 
     kname[0]=str[0]=0;
-    fgets(ttt, sizeof(ttt), fp);
+    myfgets(ttt, sizeof(ttt), fp);
     if (ttt[0]=='#')
       continue;
     for(i=0; ttt[i]!=' ' && ttt[i]!=9 && ttt[i]; i++)

@@ -47,34 +47,19 @@ void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer dat)
   phonetic_speak= gtk_check_menu_item_get_active(checkmenuitem);
 }
 
-void close_all_clients();
+void show_inmd_menu();
 
-#if UNIX
-void restart_gcin0()
+void cb_inmd_menu(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
-  static char execbin[]=GCIN_BIN_DIR"/gcin";
-
-  signal(SIGCHLD, SIG_IGN);
-
-  int pid = fork();
-  if (!pid) {
-    close_all_clients();
-    sleep(1);
-    execl(execbin, "gcin", NULL);
-  } else
-    exit(0);
+  show_inmd_menu();
 }
-#endif
 
+void close_all_clients();
 void do_exit();
 
 void restart_gcin(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
-#if WIN32
   do_exit();
-#else
-  restart_gcin0();
-#endif
 }
 
 void gcb_main();
@@ -119,6 +104,9 @@ static MITEM mitems_main[] = {
   {N_(_L("重新執行gcin")), NULL, restart_gcin},
   {N_(_L("念出發音")), NULL, cb_tog_phospeak, &phonetic_speak},
   {N_(_L("小鍵盤")), NULL, kbm_toggle_, &win_kbm_on},
+#if UNIX
+  {N_(_L("選擇輸入法")), NULL, cb_inmd_menu, NULL},
+#endif
 #if USE_GCB
   {N_(_L("gcb(剪貼區暫存)")), NULL, cb_tog_gcb, &gcb_enabled},
 #endif
@@ -126,20 +114,25 @@ static MITEM mitems_main[] = {
 };
 
 
+void set_output_buffer_bak_to_clipboard();
+void set_output_buffer_bak_to_clipboard();
+static void cb_set_output_buffer_bak_to_clipboard(GtkCheckMenuItem *checkmenuitem, gpointer dat)
+{
+  set_output_buffer_bak_to_clipboard();
+}
+
 static MITEM mitems_state[] = {
   {N_(_L("正->簡體")), NULL, cb_trad2sim},
   {N_(_L("簡->正體")), NULL, cb_sim2trad},
   {N_(_L("简体输出")), NULL, cb_trad_sim_toggle_, &gb_output},
+  {N_(_L("送字到剪貼區")), NULL, cb_set_output_buffer_bak_to_clipboard},
   {NULL}
 };
 
 
 static GtkWidget *tray_menu, *tray_menu_state;
 
-
-gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 extern gboolean win_kbm_inited;
-
 
 void toggle_im_enabled();
 GtkWidget *create_tray_menu(MITEM *mitems)
@@ -212,7 +205,7 @@ void inmd_popup_tray();
 static void cb_activate(GtkStatusIcon *status_icon, gpointer user_data)
 {
 #if UNIX
-  dbg("cb_activate\n");
+//  dbg("cb_activate\n");
   toggle_im_enabled();
 
   GdkRectangle rect;
@@ -259,8 +252,7 @@ static void cb_activate_state(GtkStatusIcon *status_icon, gpointer user_data)
 
 static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
 {
-  dbg("cb_popup_state\n");
-
+//  dbg("cb_popup_state\n");
   switch (button) {
 
     case 1:
@@ -377,8 +369,10 @@ void load_tray_icon_win32()
 //	dbg("icon %s %s\n", fname, fname_state);
   }
 
+#if GTK_CHECK_VERSION(2,16,0)
   if (icon_state)
-    gtk_status_icon_set_tooltip(icon_state, _(tip));
+    gtk_status_icon_set_tooltip_text(icon_state, _(tip));
+#endif
 
   if (icon_main) {
     char tt[64];
@@ -387,7 +381,9 @@ void load_tray_icon_win32()
 
     if (!iconame || !strcmp(iconame, GCIN_TRAY_PNG) || !tsin_pho_mode())
       strcpy(tt, "English");
-    gtk_status_icon_set_tooltip(icon_main, tt);
+#if GTK_CHECK_VERSION(2,16,0)
+    gtk_status_icon_set_tooltip_text(icon_main, tt);
+#endif
   }
 
   return;

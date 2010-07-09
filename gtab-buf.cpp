@@ -86,6 +86,8 @@ static char *gen_buf_str()
   return out;
 }
 
+extern gboolean last_cursor_off;
+
 static char *gen_buf_str_disp()
 {
   if (!ggg.gbufN) {
@@ -98,7 +100,8 @@ static char *gen_buf_str_disp()
 
   gbuf[ggg.gbufN].ch = " ";
 
-  for(i=0;i<=ggg.gbufN;i++) {
+  int N = last_cursor_off ? ggg.gbufN-1:ggg.gbufN;
+  for(i=0;i<=N;i++) {
     char spec[MAX_CIN_PHR * 2];
     htmlspecialchars(gbuf[i].ch, spec);
     char www[MAX_CIN_PHR * 2];
@@ -425,9 +428,13 @@ int qcmp_gitem(const void *aa, const void *bb)
   return ((GITEM *)aa)->org_seq - ((GITEM *)bb)->org_seq;
 }
 
+void hide_row2_if_necessary();
+
 unich_t auto_end_punch[]=_L(", . ? : ; ! [ ] 「 」 ， 。 ？ ； ： 、 ～ ！ （ ）");
 GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key)
 {
+  hide_row2_if_necessary();
+
   if (!sel || !selN)
     return NULL;
 //  dbg("insert_gbuf_cursor %x\n", key);
@@ -684,6 +691,14 @@ int show_buf_select()
   return 1;
 }
 
+void gbuf_prev_pg()
+{
+  ggg.pg_idx -= page_len();
+  if (ggg.pg_idx < 0)
+    ggg.pg_idx = 0;
+
+  gtab_disp_sel();
+}
 
 void gbuf_next_pg()
 {
@@ -696,9 +711,12 @@ void gbuf_next_pg()
 
 #include "im-client/gcin-im-client-attr.h"
 
+int get_DispInArea_str(char *out);
+
 int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub_comp_len)
 {
   int i;
+  int strN=0;
 
 //  dbg("gtab_get_preedit\n");
   str[0]=0;
@@ -721,6 +739,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
 
   for(i=0; i < ggg.gbufN; i++) {
     char *s = gbuf[i].ch;
+    int len = strlen(s);
     int N = utf8_str_N(s);
     ch_N+=N;
     if (i < ggg.gbuf_cursor)
@@ -731,8 +750,18 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
       attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
       attrN++;
     }
-    strcat(str, s);
+
+    if (i==ggg.gbuf_cursor)
+      strN += get_DispInArea_str(str+strN);
+
+    memcpy(str+strN, s, len);
+    strN+=len;
   }
+
+  if (i==ggg.gbuf_cursor)
+    strN += get_DispInArea_str(str+strN);
+
+  str[strN]=0;
 
   attr[0].ofs1 = ch_N;
   return attrN;
@@ -773,6 +802,23 @@ void save_gtab_buf_phrase(KeySym key)
 
   create_win_save_phrase(wsp, len);
 }
+
+gboolean save_gtab_buf_shift_enter()
+{
+	if (ggg.gbuf_cursor== ggg.gbufN)
+		return 0;
+
+	int keys[512];
+	int N = ggg.gbufN - ggg.gbuf_cursor;
+	extract_gtab_key(ggg.gbuf_cursor, N, keys);
+	char *str = gen_buf_str();
+	save_phrase_to_db(keys, str, N, 1);
+
+	free(str);
+	gbuf_cursor_end();
+	return 1;
+}
+
 
 void load_tsin_db0(char *infname, gboolean is_gtab_i);
 void get_gcin_user_or_sys_fname(char *name, char fname[]);

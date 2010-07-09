@@ -144,6 +144,10 @@ void process_client_req(int fd)
     cs->client_win = req.client_win;
     cs->b_gcin_protocol = TRUE;
     cs->input_style = InputStyleOverSpot;
+#if WIN32
+	cs->use_preedit = TRUE;
+#endif
+
 #if UNIX
     if (gcin_init_im_enabled && new_cli)
 #endif
@@ -228,6 +232,7 @@ void process_client_req(int fd)
       }
 
       break;
+#if WIN32
     case GCIN_req_test_key_press:
     case GCIN_req_test_key_release:
       current_CS = cs;
@@ -249,6 +254,7 @@ void process_client_req(int fd)
       to_gcin_endian_4(&reply.datalen);
       write_enc(fd, &reply, sizeof(reply));
       break;
+#endif
     case GCIN_req_focus_in:
 #if DBG
       dbg_time("GCIN_req_focus_in  %x %d %d\n",cs, cs->spot_location.x, cs->spot_location.y);

@@ -159,7 +159,7 @@ int main(int argc, char **argv)
   if (argc < 2)
     p_err("must specify input file");
 
-  if ((fp=fopen(argv[1], "r"))==NULL) {
+  if ((fp=fopen(argv[1], "rb"))==NULL) {
      printf("Cannot open %s\n", argv[1]);
      exit(-1);
   }
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
   char keymap[128];
   char kno[128];
   bzero(kno, sizeof(kno));
-  fgets(s, sizeof(s), fp);
+  myfgets(s, sizeof(s), fp);
   puts(s);
   if (strstr(s, TSIN_GTAB_KEY)) {
     is_gtab = TRUE;
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
 
     lineCnt++;
 
-    fgets((char *)s,sizeof(s),fp);
+    myfgets((char *)s,sizeof(s),fp);
     len=strlen((char *)s);
     if (s[0]=='#')
       continue;

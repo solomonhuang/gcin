@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1995-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
+	Copyright (C) 1995-2008	Edward Liu, Hsin-Chu, Taiwan
 */
 
 #include <stdio.h>
@@ -16,7 +16,7 @@
 
 FILE *fr, *fw;
 int lineno;
-char tt[512];
+char tt[1024];
 
 
 char *skip_spc(char *s)
@@ -51,7 +51,7 @@ void get_line()
 {
   while (!feof(fr)) {
     bzero(tt, sizeof(tt));
-    fgets((char *)tt, 512, fr);
+	myfgets(tt, sizeof(tt), fr);
     lineno++;
 
     int len=strlen(tt);
@@ -170,8 +170,8 @@ int main(int argc, char **argv)
   char *phrbuf = NULL;
   int prbf_cou=0;
 
-  dbg("-- gcin2tab encoding UTF-8 --\n");
-  dbg("--- please use iconv -f big5 -t utf-8 if your file is in big5 encoding\n");
+  printf("-- gcin2tab encoding UTF-8 --\n");
+  printf("--- please use iconv -f big5 -t utf-8 if your file is in big5 encoding\n");
 
   if (argc<=1) {
           printf("Enter table file name [.cin] : ");
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
   strcat(fname_cin,".cin");
   strcat(fname_tab,".gtab");
 
-  if ((fr=fopen(fname_cin,"r"))==NULL)
+  if ((fr=fopen(fname_cin,"rb"))==NULL)
           p_err("Cannot open %s\n", fname_cin);
 
   skip_utf8_sigature(fr);
@@ -375,7 +375,7 @@ int main(int argc, char **argv)
   else
     cur_inmd->keybits = 7;
 
-  dbg("KeyNum:%d keybits:%d\n", KeyNum, cur_inmd->keybits);
+  printf("KeyNum:%d keybits:%d\n", KeyNum, cur_inmd->keybits);
 
   th.keybits = cur_inmd->keybits;
   cur_inmd->last_k_bitn = (((cur_inmd->key64 ? 64:32) / cur_inmd->keybits) - 1) * cur_inmd->keybits;
@@ -472,7 +472,7 @@ int main(int argc, char **argv)
 
 #define _sort qsort
 
-  dbg("MaxPress: %d\n", th.MaxPress);
+  printf("MaxPress: %d\n", th.MaxPress);
 
   th.DefC=chno;
   cur_inmd->DefChars = chno;
@@ -514,7 +514,7 @@ int main(int argc, char **argv)
     p_err("Cannot create");
   }
 
-  dbg("Defined Characters:%d\n", chno);
+  printf("Defined Characters:%d\n", chno);
 
 #if NEED_SWAP
   swap_byte_4(&th.version);

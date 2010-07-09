@@ -30,7 +30,6 @@ static void get_text_w_h(char *s, int *w, int *h)
 
 static void draw_icon()
 {
-//  dbg("draw_icon\n");
 #if 0
   return;
 #endif
@@ -108,7 +107,6 @@ static void draw_icon()
 gboolean create_tray(gpointer data);
 void update_tray_icon()
 {
-//  dbg("update_tray_icon\n");
   if (!gcin_status_tray)
     return;
 
@@ -122,7 +120,6 @@ void get_icon_path(char *iconame, char fname[]);
 
 void load_tray_icon()
 {
-//  dbg("load_tray_icon\n");
   if (!gcin_status_tray)
     return;
 
@@ -160,7 +157,7 @@ void load_tray_icon()
 #endif
   if (!fname[0]) {
     if (pixbuf_ch)
-      g_object_unref(pixbuf_ch);
+      gdk_pixbuf_unref(pixbuf_ch);
 
     pixbuf_ch = NULL;
     if (pixbuf_ch_fname)
@@ -171,7 +168,7 @@ void load_tray_icon()
     pixbuf_ch_fname = strdup(fname);
 
     if (pixbuf_ch)
-      g_object_unref(pixbuf_ch);
+      gdk_pixbuf_unref(pixbuf_ch);
 
     dbg("ch %s\n", fname);
     GError *err = NULL;
@@ -203,8 +200,6 @@ void cb_tog_gcb(GtkCheckMenuItem *checkmenuitem, gpointer dat);
 void kbm_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat);
 extern int win_kbm_on;
 
-void cb_inmd_menu(GtkCheckMenuItem *checkmenuitem, gpointer dat);
-
 static MITEM mitems[] = {
   {N_("設定"), GTK_STOCK_PREFERENCES, exec_gcin_setup_, NULL},
   {N_("重新執行gcin"), NULL, restart_gcin, NULL},
@@ -214,8 +209,7 @@ static MITEM mitems[] = {
 #endif
   {N_("正->簡體"), NULL, cb_trad2sim, NULL},
   {N_("簡->正體"), NULL, cb_sim2trad, NULL},
-  {N_("選擇輸入法"), NULL, cb_inmd_menu, NULL},
-  {N_("小鍵盤"), NULL, kbm_toggle_, NULL},
+  {N_("小鍵盤"), NULL, kbm_toggle_, &win_kbm_on},
   {N_("简体输出"), NULL, cb_trad_sim_toggle_, &gb_output},
   {NULL, NULL, NULL, NULL}
 };
@@ -276,8 +270,6 @@ gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
   if (!da)
     create_tray(NULL);
 
-//  dbg("cb_expose\n");
-
   draw_icon();
   return FALSE;
 }
@@ -307,7 +299,7 @@ gboolean create_tray(gpointer data)
 
   GError *err = NULL;
   if (pixbuf)
-    g_object_unref(pixbuf);
+    gdk_pixbuf_unref(pixbuf);
 
   char icon_fname[128];
   get_icon_path(GCIN_TRAY_PNG, icon_fname);

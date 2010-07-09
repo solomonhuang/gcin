@@ -1,6 +1,5 @@
 #include "gcin.h"
 
-
 #if UNIX
 static FILE *out_fp;
 
@@ -215,6 +214,39 @@ void *memdup(void *p, int n)
   memcpy(q, p, n);
   return q;
 }
+
+// can handle eol with \n \r \n\r \r\n
+char *myfgets(char *buf, int bufN, FILE *fp)
+{
+	char *out = buf;
+	int rN = 0;
+	while (!feof(fp) && out - buf < bufN) {
+		char a, b;
+		a = 0;
+		if (fread(&a, 1, 1, fp) != 1)
+			break;
+		if (a =='\n') {
+			b = 0;
+			if (fread(&b, 1, 1, fp)==1)
+				if (b!='\r')
+					fseek(fp, -1, SEEK_CUR);
+			break;
+		} else
+		if (a =='\r') {
+			b = 0;
+			if (fread(&b, 1, 1, fp)==1)
+				if (b!='\n')
+					fseek(fp, -1, SEEK_CUR);
+			break;
+		}
+
+		*(out++) = a;
+	}
+
+	*out = 0;
+	return buf;
+}
+
 
 #if GCIN_SVR
 #if WIN32

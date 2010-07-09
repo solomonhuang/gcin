@@ -20,7 +20,43 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>Changlog</title><meta content="Edward Liu" name="author"></head><body>** UTF-8 encoding **<br>
+1.5.0:<br>
+- <a href="http://hyperrate.com/thread.php?tid=18404">windows style tray icon 使用</a> gcin-message 時位置不對的問題。<br>
+- QT4 程式，雖然把編輯區的顯示設定成「應用程式編輯區」，卻仍然同時顯示的問題。<br>
+- gtab 詞庫自動選字現在可以用 Shift-Enter 新增詞了<br>
+- ctrl-1234567890 加入詞的方式現在會3秒鐘後自動加入了。window 位置改成左上角，且不會影響 focus。<br>
+- gtab 自動選字時不能用 page up/down 換頁的問題。<br>
+- latin-letters.cin 加入 '-' 當選擇鍵，這樣超過10鍵的 如 'ao' 鍵就不用換頁就可以直接選。<br>
+- gnome-do coredump 的問題，<a href="http://hyperrate.com/thread.php?tid=18909">thanks to</a> <a href="http://hyperrate.com/usr-info?uid=502&amp;eid=1">hilarycheng</a><br>
+- 新增「送字到剪貼區」的功能，主要是給 windows gcin 用的，因為 ctrl-alt-g,r 無法使用，在簡體切換那個 windows 式的 menu。<br>
+- 「簡易」simplex.cin 改成內定「由詞庫自動選字」<br>
+- mozilla thunderbird 3.0.4 如果 NEW_GTK_IM='Y' 會當掉，現在內定改成  NEW_GTK_IM='N'<br>
+- gcin-setup-&gt;開啟關閉→shift-space 可以設定 gtab 輸入法是否要切換全形英文<br>
+- tray icon menu 新增切換輸入法的選項<br>
+- 新增按鍵顯示於應用程式的選項。當此選項開啟時，會自動把編輯區的顯示設成「應用程式」，看起來就像新酷音的方式。詞音&amp;gtab 都適用。<br>
+- 在 Linux 重新執行 gcin 容易導致當掉的問題。<br>
+- 行列輸入法搭配詞庫自動選字，現在用 w1 w2 w3 w4 輸入符號現在可以直接用數字選字了。<br>
+<br>
 1.4.9:<br>
 - 編輯區有字時，mouse click 移動 cursor，編輯內容不會清除的問題。<br>
 <br>

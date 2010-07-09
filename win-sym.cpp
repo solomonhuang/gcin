@@ -37,14 +37,14 @@ FILE *watch_fopen(char *filename, time_t *pfile_modify_time)
 
   get_gcin_user_or_sys_fname(filename, fname);
 
-  if ((fp=fopen(fname, "r"))==NULL) {
+  if ((fp=fopen(fname, "rb"))==NULL) {
 #if UNIX
     strcat(strcat(strcpy(fname, TableDir), "/"), filename);
 #else
     strcat(strcat(strcpy(fname, TableDir), "\\"), filename);
 #endif
 
-    if ((fp=fopen(fname, "r"))==NULL)
+    if ((fp=fopen(fname, "rb"))==NULL)
      return NULL;
   }
 
@@ -112,19 +112,21 @@ static gboolean read_syms()
     char tt[1024];
 
     bzero(tt, sizeof(tt));
-    fgets(tt, sizeof(tt), fp);
-//    dbg(tt);
+    myfgets(tt, sizeof(tt), fp);
+//    dbg("%d] %s\n",strlen(tt), tt);
     int len=strlen(tt);
 
+#if 0
     if (!len)
       continue;
 
     if (tt[len-1]=='\n') {
       tt[len-1]=0;
-      if (tt[0]==0)
-        save_page();
-    } else
-      break;
+    }
+#endif
+
+    if (tt[0]==0)
+      save_page();
 
     if (tt[0]=='#')
       continue;

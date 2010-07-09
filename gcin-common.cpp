@@ -42,7 +42,9 @@ void case_inverse(KeySym *xkey, int shift_m)
 gint64 current_time()
 {
 #if WIN32
-  return GetTickCount()*1000;
+  gint64 v = (gint64)GetTickCount()*1000;
+//  dbg("v %lld\n", v);
+  return v;
 #else
   struct timeval tval;
 

@@ -202,6 +202,28 @@ void send_output_buffer_bak()
   send_text(output_buffer_raw_bak);
 }
 
+void set_output_buffer_bak_to_clipboard()
+{
+  char *text, *utf8_gbtext=NULL;
+
+  if (gb_output) {
+    int len = trad2sim(output_buffer_raw_bak, strlen(output_buffer_raw_bak),
+      &utf8_gbtext);
+    text = utf8_gbtext;
+  } else
+    text = output_buffer_raw_bak;
+
+#if UNIX && 0
+  GtkClipboard *pclipboard = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
+#else
+  GtkClipboard *pclipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+#endif
+
+  gtk_clipboard_set_text(pclipboard, text, -1);
+
+  free(utf8_gbtext);
+}
+
 void sendkey_b5(char *bchar)
 {
   char tt[CH_SZ+1];
@@ -560,7 +582,7 @@ void destroy_tray()
 
 void disp_tray_icon()
 {
-
+//  dbg("disp_tray_icon\n");
 //dbg("disp_tray_icon %d %d\n", current_gcin_win32_icon, gcin_win32_icon);
 #if UNIX
   if (current_gcin_win32_icon >= 0 && current_gcin_win32_icon != gcin_win32_icon) {
@@ -582,6 +604,7 @@ void disp_tray_icon()
 
 void disp_im_half_full()
 {
+//  dbg("disp_im_half_full\n");
 #if TRAY_ENABLED
   disp_tray_icon();
 #endif
@@ -736,9 +759,21 @@ extern char eng_full_str[];
 
 void toggle_half_full_char()
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
+
+  if (!gcin_shift_space_eng_full) {
+    current_CS->b_half_full_char = 0;
+    tss.tsin_half_full=0;
+    disp_im_half_full();
+    return;
+  }
+
   check_CS();
+
+//  dbg("toggle_half_full_char\n");
 
   if (current_method_type() == method_type_TSIN && current_CS->im_state == GCIN_STATE_CHINESE) {
     tsin_toggle_half_full();
@@ -746,20 +781,16 @@ void toggle_half_full_char()
   else {
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
       current_CS->im_state = GCIN_STATE_DISABLED;
-      disp_im_half_full();
       hide_in_win(current_CS);
-      return;
     } else
     if (current_CS->im_state == GCIN_STATE_DISABLED) {
-      if (gcin_shift_space_eng_full) {
-        toggle_im_enabled();
-        current_CS->im_state = GCIN_STATE_ENG_FULL;
-      } else
-        return;
+      toggle_im_enabled();
+      current_CS->im_state = GCIN_STATE_ENG_FULL;
     } else
     if (current_CS->im_state == GCIN_STATE_CHINESE) {
       current_CS->b_half_full_char = !current_CS->b_half_full_char;
     }
+
 //    dbg("current_CS->in_method %d\n", current_CS->in_method);
     disp_im_half_full();
   }
@@ -1382,12 +1413,11 @@ int xim_gcin_FocusOut(IMChangeFocusStruct *call_data)
 gboolean gcin_edit_display_ap_only()
 {
 #if WIN32
-//  if (test_mode)
+  if (test_mode)
     return TRUE;
-#else
+#endif
 //  dbg("gcin_edit_display_ap_only %d\n", current_CS->use_preedit)
   return current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
-#endif
 }
 
 void flush_anthy_input();
@@ -1421,6 +1451,7 @@ void flush_edit_buffer()
 #endif
 }
 
+#if WIN32
 void pho_save_gst(), tsin_save_gst(), gtab_save_gst();
 void pho_restore_gst(), tsin_restore_gst(), gtab_restore_gst();
 
@@ -1493,3 +1524,4 @@ gboolean Process2KeyRelease(KeySym keysym, u_int kev_state)
 
   return v;
 }
+#endif

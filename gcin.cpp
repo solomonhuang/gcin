@@ -62,7 +62,7 @@ void start_inmd_window()
 
 
 #if USE_XIM
-char locales[100]="zh_TW.Big5,zh_TW.UTF-8,zh_TW.UTF8,en_US.UTF-8,en_US.UTF8";
+char *lc;
 
 static XIMStyle Styles[] = {
 #if 1
@@ -257,7 +257,7 @@ void open_xim()
 #if 0
           IMLocale,               xim_arr[0].server_locale,
 #else
-          IMLocale,               locales,
+          IMLocale,               lc,
 #endif
           IMServerTransport,      "X/",      //Comm. protocol
           IMInputStyles,          &im_styles,   //faked styles
@@ -535,7 +535,6 @@ int main(int argc, char **argv)
   if (!lc_ctype)
     lc_ctype = "zh_TW.Big5";
 
-  char *lc;
 
   signal(SIGCHLD, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);
@@ -553,8 +552,6 @@ int main(int argc, char **argv)
   else
     lc = lc_ctype;
 
-  if (lc)
-    strcat(locales, lc);
 
   char *xim_server_name = get_gcin_xim_name();
 

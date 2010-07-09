@@ -23,7 +23,7 @@ OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o gcin-icon.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
 OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
-OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o
+OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o util.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
@@ -120,13 +120,14 @@ all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
 ifeq ($(USE_I18N),Y)
 	$(MAKE) -C po
 endif
+	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im; fi
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im; fi
 
 gcin:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
 	LD_RUN_PATH=$(gcin_ld_run_path) \
 	$(CCLD) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
-	rm -f core.*
+	rm -f core.* vgcore.*
 	ln -sf $@ $@.test
 
 gcin-nocur:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
@@ -250,6 +251,7 @@ install:
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
+	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im install; fi
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im install; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im install; fi
 	if [ $(prefix) = /usr/local ]; then \
@@ -276,6 +278,9 @@ clean:
 	$(MAKE) -C scripts clean
 	$(MAKE) -C im-client clean
 	$(MAKE) -C gtk-im clean
+ifeq ($(GTK3_IM), Y)
+	$(MAKE) -C gtk3-im clean
+endif
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C qt4-im clean
 	$(MAKE) -C man clean

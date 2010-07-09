@@ -1,7 +1,7 @@
 # http://www.calno.com/moto/gcin/cin/latin-letters.cin.bz2
 %ename latin-letters
 %prompt latin-letters
-%selkey 1234567890
+%selkey 1234567890-
 %endkey !/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 %space_style 2
 %keep_key_case
@@ -60,6 +60,7 @@ W	W
 X	X
 Y	Y
 Z	Z
+`	`
 %keyname end
 %chardef begin
 A	A	65	0041	LATIN CAPITAL LETTER A
@@ -318,3 +319,4 @@ z	ž	382	017E	LATIN SMALL LETTER Z WITH CARON
 /	/
 /	¿
 E	€
+`	`

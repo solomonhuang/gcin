@@ -9,6 +9,7 @@ int left_right_button_tips;
 int gcin_im_toggle_keys, gcin_bell_off;
 int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
 int gcin_win_sym_click_close, gcin_edit_display, gcin_win32_icon;
+int gcin_on_the_spot_key;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -165,4 +166,8 @@ void load_setttings()
 #else
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_OVER_THE_SPOT);
 #endif
+
+  gcin_on_the_spot_key = get_gcin_conf_int(GCIN_ON_THE_SPOT_KEY, 0);
+  if (gcin_on_the_spot_key)
+    gcin_edit_display = GCIN_EDIT_DISPLAY_ON_THE_SPOT;
 }

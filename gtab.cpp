@@ -20,6 +20,8 @@ GTAB_ST ggg = {.sel1st_i=MAX_SELKEY - 1};
 GTAB_ST ggg;
 #endif
 
+extern GtkWidget *gwin_gtab;
+
 static GTAB_space_pressed_E _gtab_space_auto_first;
 extern char *TableDir;
 
@@ -346,9 +348,15 @@ void close_gtab_pho_win()
 static void DispInArea()
 {
   int i;
-
+#if WIN32
   if (test_mode)
     return;
+#endif
+  if (gcin_on_the_spot_key && gcin_edit_display_ap_only()) {
+    if (gwin_gtab && GTK_WIDGET_VISIBLE(gwin_gtab))
+      hide_win_gtab();
+    return;
+  }
 
   for(i=0;i<ggg.ci;i++) {
     disp_gtab(i, (char *)&cur_inmd->keyname[ggg.inch[i] * CH_SZ]);
@@ -361,6 +369,26 @@ static void DispInArea()
     disp_gtab(i, "  ");
   }
 }
+
+int get_DispInArea_str(char *out)
+{
+  int outN=0, i;
+  for(i=0;i<ggg.ci;i++) {
+    char *p = (char *)&cur_inmd->keyname[ggg.inch[i] * CH_SZ];
+    if (*p & 0x80)
+      outN+=u8cpy(out+outN, p);
+    else {
+      int len = strlen(p);
+      memcpy(out+outN, p, len);
+      outN+=len;
+    }
+  }
+
+  out[outN]=0;
+//  dbg("get_DispInArea_str\n", out);
+  return outN;
+}
+
 
 void set_gtab_input_method_name(char *s);
 void case_inverse(KeySym *xkey, int shift_m);
@@ -728,17 +756,26 @@ void clear_after_put()
 void add_to_tsin_buf_str(char *str);
 gboolean init_in_method(int in_no);
 void hide_win_kbm();
+
+void hide_row2_if_necessary()
+{
+  if (!ggg.wild_mode && gtab_hide_row2 || !gtab_disp_key_codes) {
+    set_key_codes_label(NULL, 0);
+  }
+}
+
 static void putstr_inp(char *p)
 {
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   extern int c_len;
 
   clear_page_label();
 
-  if (!ggg.wild_mode && gtab_hide_row2 || !gtab_disp_key_codes)
-    set_key_codes_label(NULL, 0);
+//  dbg("gtab_hide_row2 %d\n", gtab_hide_row2);
+  hide_row2_if_necessary();
 
   char_play(p);
 
@@ -1229,7 +1266,7 @@ gboolean feed_phrase(KeySym ksym, int state);
 int gtab_buf_backspace();
 gboolean output_gbuf();
 int show_buf_select();
-void gbuf_next_pg();
+void gbuf_next_pg(), gbuf_prev_pg();
 void show_win_gtab();
 int gbuf_cursor_left();
 int gbuf_cursor_right();
@@ -1241,6 +1278,7 @@ void set_gbuf_c_sel(int v);
 void set_gtab_user_head();
 KeySym keypad_proc(KeySym xkey);
 void save_gtab_buf_phrase(KeySym key);
+gboolean save_gtab_buf_shift_enter();
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -1377,7 +1415,10 @@ shift_proc:
     case XK_KP_Enter:
     case XK_Return:
       if (AUTO_SELECT_BY_PHRASE) {
-        return output_gbuf();
+		if (shift_m) {
+		  return save_gtab_buf_shift_enter();
+		} else
+          return output_gbuf();
       }
       else
         return 0;
@@ -1416,6 +1457,11 @@ shift_proc:
         return 1;
       } else
       if (ggg.more_pg) {
+        if (ggg.gtab_buf_select) {
+          gbuf_prev_pg();
+          return 1;
+        }
+
         ggg.pg_idx -= page_len();
         if (ggg.pg_idx < ggg.S1)
           ggg.pg_idx = ggg.S1;
@@ -1429,7 +1475,12 @@ shift_proc:
     case XK_Next:
     case XK_KP_Add:
       if (ggg.more_pg) {
+        if (ggg.gtab_buf_select) {
+          gbuf_next_pg();
+          return 1;
+        }
 next_page:
+//        dbg("more...\n");
         ggg.pg_idx += page_len();
         if (ggg.pg_idx >=ggg.E1)
           ggg.pg_idx = ggg.S1;
@@ -1940,17 +1991,21 @@ refill:
       }
     }
   } else {
-//    dbg("more %d %d\n", ggg.more_pg,  ggg.total_matchN);
+//    dbg("more %d %d  skip_end:%d\n", ggg.more_pg,  ggg.total_matchN, cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY);
 next_pg:
     ggg.defselN=0;
     clr_seltab();
-    if (pendkey && (!(cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY) || !AUTO_SELECT_BY_PHRASE || ggg.ci==1))
+    if (pendkey && (!(cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY) || !AUTO_SELECT_BY_PHRASE || ggg.ci==1)) {
+//      dbg("zzzz\n");
       ggg.spc_pressed = 1;
+    }
 
     int full_send = gtab_press_full_auto_send && ggg.last_full;
 
-    if (AUTO_SELECT_BY_PHRASE && poo.same_pho_query_state != SAME_PHO_QUERY_gtab_input &&
-       (ggg.spc_pressed||full_send)) {
+//    dbg("flag %d\n",!(pendkey && (cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY)));
+    if (AUTO_SELECT_BY_PHRASE && !(pendkey && (cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY))
+        && poo.same_pho_query_state != SAME_PHO_QUERY_gtab_input &&
+        (ggg.spc_pressed||full_send)) {
       j = ggg.S1;
       int selN=0;
       char **sel = NULL;

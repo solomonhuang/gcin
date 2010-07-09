@@ -1,6 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 #include "win-sym.h"
+#include "gst.h"
 
 GtkWidget *gwin0;
 extern GtkWidget *gwin1;
@@ -224,10 +225,19 @@ void clr_tsin_cursor(int index)
 }
 
 void disp_pho_sub(GtkWidget *label, int index, char *pho);
+gboolean gcin_on_the_spot_key_is_on();
+void hide_win0();
+
 void disp_tsin_pho(int index, char *pho)
 {
   if (test_mode)
     return;
+
+  if (gcin_on_the_spot_key) {
+    if (gwin0 && GTK_WIDGET_VISIBLE(gwin0))
+      hide_win0();
+    return;
+  }
 
   if (button_pho && !GTK_WIDGET_VISIBLE(button_pho))
     gtk_widget_show(button_pho);
@@ -249,7 +259,10 @@ void clr_in_area_pho_tsin()
 
 void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
 {
-  gtk_widget_show_all(widget);
+  if (!win && !widget)
+    p_err("get_widget_xy err");
+
+//  gtk_widget_show_all(widget);
   gdk_flush();
 
   GtkRequisition sz;
@@ -303,8 +316,17 @@ void disp_tsin_select(int index)
 
   if (gcin_edit_display_ap_only()) {
     getRootXY(current_CS->client_win, current_CS->spot_location.x, current_CS->spot_location.y, &x, &y);
-  } else
+  } else {
+    int i;
+    for(i=0;i<=index;i++) {
+      if (!chars[i].vbox)
+        p_err("err found");
+      gtk_widget_show(chars[i].vbox);
+	  gtk_widget_show(chars[i].label);
+    }
+    gtk_widget_show(gwin0);
     get_widget_xy(gwin0, widget, &x, &y);
+  }
   disp_selections(x, y);
 }
 

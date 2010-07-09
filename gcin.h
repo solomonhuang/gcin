@@ -26,6 +26,10 @@
 #define gtk_widget_get_window(x) (x)->window
 #endif
 
+#if !GTK_CHECK_VERSION(2,15,0)
+#define gtk_status_icon_set_tooltip_text(x,y) gtk_status_icon_set_tooltip(x,y)
+#endif
+
 #if GTK_CHECK_VERSION(2,17,5)
 #undef GTK_WIDGET_NO_WINDOW
 #define GTK_WIDGET_NO_WINDOW !gtk_widget_get_has_window
@@ -71,6 +75,7 @@ typedef enum {
 
 #define tmalloc(type,n)  (type*)malloc(sizeof(type) * (n))
 void *zmalloc(int n);
+void *memdup(void *p, int n);
 #define tzmalloc(type,n)  (type*)zmalloc(sizeof(type) * (n))
 #define trealloc(p,type,n)  (type*)realloc(p, sizeof(type) * (n+1))
 #define tmemdup(p,type,n) (type*)memdup(p, sizeof(type) * n)
@@ -158,7 +163,7 @@ void utf8cpyN(char *t, char *s, int N);
 int utf8_str_N(char *str);
 void utf8cpyn(char *t, char *s, int n);
 void utf8cpy_bytes(char *t, char *s, int n);
-
+char *myfgets(char *buf, int bufN, FILE *fp);
 void get_gcin_dir(char *tt);
 #if UNIX
 Atom get_gcin_atom(Display *dpy);

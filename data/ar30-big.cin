@@ -27,6 +27,7 @@
 %selkey 1234567890
 %endkey 1234567890
 %space_style 2
+%phase_auto_skip_endkey
 %keyname begin
 a	1-
 b	5v
@@ -82265,7 +82266,7 @@ ibm	IBM
 linux	Linux
 gnome	GNOME
 kde	KDE
-gaim	gaim
+pidg	pidgin
 gcin	gcin
 xmms	xmms
 xine	xine

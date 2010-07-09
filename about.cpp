@@ -75,10 +75,16 @@ void create_about_window()
     GtkWidget *separator = gtk_hseparator_new ();
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
+#if GTK_CHECK_VERSION(2,18,9)
+   GtkWidget *label = gtk_label_new(_(_L("<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>")));
+   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+#else
     GtkWidget *button_forum = gtk_button_new_with_label(_(_L("討論區")));
     gtk_box_pack_start(GTK_BOX(vbox), button_forum, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_forum), "clicked",
 		      G_CALLBACK (callback_forum), NULL);
+#endif
 
 
 #if UNIX
@@ -97,10 +103,8 @@ void create_about_window()
 
     gtk_container_add (GTK_CONTAINER (about_window), vbox);
 
-    /* Create a new button */
     GtkWidget *button = gtk_button_new_with_label (_(_L("關閉")));
     gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 3);
-    /* Connect the "clicked" signal of the button to our callback */
     g_signal_connect (G_OBJECT (button), "clicked",
 		      G_CALLBACK (callback_close), (gpointer) "cool button");
 

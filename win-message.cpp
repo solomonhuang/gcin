@@ -10,6 +10,7 @@ static gboolean timeout_destroy_window(GtkWidget *win)
 GdkWindow *tray_da_win;
 #endif
 extern GdkWindow *tray_da_win;
+extern GtkStatusIcon *icon_main;
 
 static void create_win_message(char *icon, char *text, int duration)
 {
@@ -37,7 +38,7 @@ static void create_win_message(char *icon, char *text, int duration)
   int width, height;
   get_win_size(gwin_message, &width, &height);
 
-  int ox, oy, szx, szy;
+  int ox=-1, oy, szx, szy;
   if (tray_da_win) {
     gdk_window_get_origin  (tray_da_win, &ox, &oy);
     gdk_drawable_get_size(tray_da_win, &szx, &szy);
@@ -56,7 +57,29 @@ static void create_win_message(char *icon, char *text, int duration)
       ox = dpy_xl - width;
     if (ox < 0)
       ox = 0;
-  } else {
+  } else
+  if (icon_main) {
+    GdkRectangle rect;
+    GtkOrientation ori;
+    if (gtk_status_icon_get_geometry(icon_main, NULL, &rect, &ori)) {
+      dbg("rect %d,%d\n", rect.x, rect.y, rect.width, rect.height);
+      if (ori==GTK_ORIENTATION_HORIZONTAL) {
+        ox=rect.x;
+        if (rect.y > 100)
+          oy=rect.y - height;
+        else
+          oy=rect.y + rect.height;
+      } else {
+        oy=rect.y;
+        if (rect.x > 100)
+          ox=rect.x - width;
+        else
+          ox=rect.x + rect.width;
+      }
+    }
+  }
+
+  if (ox < 0) {
     ox = dpy_xl - width;
     oy = dpy_yl - height;
   }

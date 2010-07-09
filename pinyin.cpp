@@ -81,7 +81,7 @@ void load_pin_juyin()
   dbg("pinyin kbm %s\n", pinfname);
 
   FILE *fr;
-  if ((fr=fopen(pinfname,"r"))==NULL)
+  if ((fr=fopen(pinfname,"rb"))==NULL)
      p_err("Cannot open %s", pinfname);
 
   fread(&pin_juyinN, sizeof(short), 1, fr);

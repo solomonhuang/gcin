@@ -29,13 +29,15 @@ void load_gtab_list()
 
   get_gcin_user_fname(gtab_list, ttt);
 
-  if ((fp=fopen(ttt, "r"))==NULL) {
+  if ((fp=fopen(ttt, "rb"))==NULL) {
     get_sys_table_file_name(gtab_list, ttt);
-    if ((fp=fopen(ttt, "r"))==NULL)
+    if ((fp=fopen(ttt, "rb"))==NULL)
       p_err("cannot open %s", ttt);
   }
 
   dbg("load_gtab_list %s\n", ttt);
+
+  skip_utf8_sigature(fp);
 
   while (!feof(fp)) {
     char line[256];
@@ -50,7 +52,7 @@ void load_gtab_list()
     icon[0]=0;
 
     line[0]=0;
-    fgets(line, sizeof(line), fp);
+    myfgets(line, sizeof(line), fp);
     if (strlen(line) < 2)
       continue;
 

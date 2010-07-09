@@ -22,6 +22,8 @@
 #define GCIN_ENABLE_CTRL_ALT_SWITCH "gcin-enable-ctrl-alt-switch"
 #define GCIN_EDIT_DISPLAY "gcin-edit-display"
 #define GCIN_BELL_OFF "gcin-bell-off"
+#define GCIN_ON_THE_SPOT_KEY "gcin-on-the-spot-key"
+
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -89,7 +91,7 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
            gcin_capslock_lower, pho_hide_row2, pho_in_row1,
            gcin_eng_phrase_enabled, gtab_que_wild_card, gcin_win_sym_click_close,
-           gcin_bell_volume, gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch;
+           gcin_bell_volume, gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch, gcin_on_the_spot_key;
 
 extern int default_input_method;
 extern int left_right_button_tips;

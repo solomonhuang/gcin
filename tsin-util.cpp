@@ -141,7 +141,7 @@ inline static int get_phidx(int i)
 }
 
 
-int phokey_t_seq16(phokey_t *a, phokey_t *b, int len)
+inline int phokey_t_seq16(phokey_t *a, phokey_t *b, int len)
 {
   int i;
 
@@ -155,7 +155,7 @@ int phokey_t_seq16(phokey_t *a, phokey_t *b, int len)
 }
 
 
-int phokey_t_seq32(u_int *a, u_int *b, int len)
+inline int phokey_t_seq32(u_int *a, u_int *b, int len)
 {
   int i;
 
@@ -169,7 +169,7 @@ int phokey_t_seq32(u_int *a, u_int *b, int len)
 }
 
 
-int phokey_t_seq64(u_int64_t *a, u_int64_t *b, int len)
+inline int phokey_t_seq64(u_int64_t *a, u_int64_t *b, int len)
 {
   int i;
 
@@ -183,7 +183,7 @@ int phokey_t_seq64(u_int64_t *a, u_int64_t *b, int len)
 }
 
 
-int phokey_t_seq(void *a, void *b, int len)
+static int phokey_t_seq(void *a, void *b, int len)
 {
   if (ph_key_sz==2)
     return phokey_t_seq16((phokey_t *)a, (phokey_t *)b, len);

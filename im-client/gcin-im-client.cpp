@@ -425,6 +425,11 @@ static void error_proc(GCIN_client_handle *handle, char *msg)
   close(handle->fd);
 #endif
   handle->fd = 0;
+#if WIN32
+  Sleep(100);
+#else
+  usleep(100000);
+#endif
 }
 
 
@@ -555,7 +560,7 @@ void gcin_im_client_focus_in(GCIN_client_handle *handle)
 void gcin_im_client_focus_out(GCIN_client_handle *handle)
 {
   if (!handle)
-	  return;
+    return;
 
   GCIN_req req;
 //  dbg("gcin_im_client_focus_out\n");
@@ -574,6 +579,10 @@ void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr)
 {
   GCIN_req req;
   GCIN_reply reply;
+
+  if (!handle)
+    return;
+
 #if DBG
   dbg("gcin_im_client_focus_out2\n");
 #endif
@@ -738,6 +747,9 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 {
   GCIN_req req;
 
+  if (!handle)
+    return;
+
   if (!gen_req(handle, GCIN_req_set_flags, &req))
     return;
 
@@ -758,6 +770,9 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_flag)
 {
   GCIN_req req;
+
+  if (!handle)
+    return;
 
   if (!gen_req(handle, GCIN_req_set_flags, &req))
     return;
@@ -780,12 +795,13 @@ int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREE
 #if WIN32
 				,int *sub_comp_len
 #endif
-							   )
+			   )
 {
-	if (!handle)
-		return 0;
+  *str=NULL;
+  if (!handle)
+    return 0;
 
-	int attN, tcursor, str_len;
+  int attN, tcursor, str_len;
 #if DBG
   dbg("gcin_im_client_get_preedit\n");
 #endif

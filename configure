@@ -12,6 +12,7 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "  --use_gcb=N    : disable gcb (gtk copy-paste buffer)"
     echo "  --use_qt3=N    : disable Qt3 immodule"
     echo "  --use_qt4=N    : disable Qt4 immodule"
+    echo "  --use_gtk3=N   : disable GTK+ 3.x immodule"
     exit
 fi
 
@@ -38,8 +39,8 @@ fi
 
 prefix="/usr/local"
 use_xim='Y'
-#new_gtk_im='N'
-new_gtk_im='Y'
+new_gtk_im='N'
+#new_gtk_im='Y'
 use_tray='Y'
 use_i18n='N'
 use_tsin='Y'
@@ -47,6 +48,7 @@ use_gcb='Y'
 use_anthy='Y'
 use_qt3='N'
 use_qt4='Y'
+use_gtk3='Y'
 
 if [ "$GCIN_USE_XIM" ]; then
   use_xim=$GCIN_USE_XIM
@@ -74,6 +76,7 @@ for opt do
   ;;
   --use_qt4*) use_qt4=`echo $opt | cut -d '=' -f 2`
   ;;
+  --use_gtk3*) use_gtk3=`echo $opt | cut -d '=' -f 2`
   esac
 done
 
@@ -181,6 +184,23 @@ else
     echo "-> No, you don't have. It's ok if you don't want Qt4 immodule."
 fi
 
+GTK3_IM='N'
+echo "testing if you have GTK+ 3.x support"
+pkg-config --libs gtk+-3.0 > /dev/null 2> /dev/null
+if [ $? = 0 ]; then
+  GTK3_IM='Y'
+fi
+
+if [ $GTK3_IM = "Y" ]; then
+    if [ $use_gtk3 = "N" ]; then
+        GTK3_IM='N'
+        echo "-> Yes, but disabled."
+    else
+        echo "-> Yes, you have GTK+ 3.x support."
+    fi
+else
+    echo "-> No, you don't have. It's ok if you don't want GTK+ 3.x immodule."
+fi
 
 bindir=$prefix/bin
 datadir=$prefix/share
@@ -258,6 +278,7 @@ echo "QT_IM=$QT_IM" >> config.mak
 echo "QT_IM_DIR=$QT_IM_DIR" >> config.mak
 echo "QT4_IM=$QT4_IM" >> config.mak
 echo "QT4_IM_DIR=$QT4_IM_DIR" >> config.mak
+echo "GTK3_IM=$GTK3_IM" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
 echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
 echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak

@@ -16,30 +16,6 @@ int itemsN;
 PHO_ITEM pho_items[MAX_CHS];
 int pho_itemsN=0;
 
-
-void p_err(char *fmt,...)
-{
-  va_list args;
-
-  va_start(args, fmt);
-  fprintf(stderr,"gcin:");
-  vfprintf(stderr, fmt, args);
-  va_end(args);
-  fprintf(stderr,"\n");
-  exit(-1);
-}
-
-void dbg(char *fmt,...)
-{
-  va_list args;
-
-  va_start(args, fmt);
-  vprintf(fmt, args);
-  fflush(stdout);
-  va_end(args);
-}
-
-
 int qcmp_key(const void *aa, const void *bb)
 {
   PHITEM *a=(PHITEM *)aa;
@@ -68,7 +44,7 @@ int main(int argc, char **argv)
   if (argc > 1)
     fname = argv[1];
 
-  if ((fp=fopen(fname,"r"))==NULL)
+  if ((fp=fopen(fname,"rb"))==NULL)
     p_err("cannot open %s\n", fname);
 
 

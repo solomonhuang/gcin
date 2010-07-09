@@ -1,0 +1,22 @@
+#!/bin/bash
+
+export LC_CTYPE=zh_TW.UTF-8
+#export GTK_IM_MODULE=xim
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+#scim -d &
+#scim-input-pad &
+#gedit --new-window &
+#mozilla-firefox
+#kedit
+gedit
+#leafpad
+#amsn
+#abiword
+#mozilla-thunderbird
+
+#export LD_LIBRARY_PATH=/usr/lib/firefox-2.0.0.17
+#$LD_LIBRARY_PATH/mozilla-firefox-bin
+
+#cd ~/fm
+#./freemind.sh

@@ -49,7 +49,7 @@ void del_nl_spc(char *s)
 void get_line(char *tt)
 {
   while (!feof(fr)) {
-    fgets((char *)tt, 512, fr);
+    myfgets((char *)tt, 512, fr);
     lineno++;
 
     int len=strlen(tt);
@@ -259,7 +259,7 @@ int main(int argc, char **argv)
   fclose(fr);
   dbg("input phr_cou %d  DefC:%d  prbf_cou:%d\n", phr_cou, chno, prbf_cou);
 
-  if ((fr=fopen(argv[2], "r"))==NULL)
+  if ((fr=fopen(argv[2], "rb"))==NULL)
       p_err("cannot err open %s", argv[2]);
 
   skip_utf8_sigature(fr);

@@ -93,12 +93,12 @@ void get_gcin_conf_str(char *name, char **rstr, char *default_str)
 
   FILE *fp;
 
-  if ((fp=fopen(fname, "r")) == NULL) {
+  if ((fp=fopen(fname, "rb")) == NULL) {
     *rstr = strdup(default_str);
     return;
   }
 
-  fgets(out, sizeof(out), fp);
+  myfgets(out, sizeof(out), fp);
   int len = strlen(out);
   if (len && out[len-1]=='\n')
     out[len-1] = 0;

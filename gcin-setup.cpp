@@ -13,7 +13,8 @@ static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_status_tray,
                  *check_button_gcin_win32_icon,
 #endif
-                 *check_button_gcin_win_color_use;
+                 *check_button_gcin_win_color_use,
+                 *check_button_gcin_on_the_spot_key;
 
 
 static GtkWidget *gcin_kbm_window = NULL, *gcin_appearance_conf_window;
@@ -384,6 +385,7 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   g_free(cstr);
 
   save_gcin_conf_int(GCIN_WIN_COLOR_USE, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_color_use)));
+  save_gcin_conf_int(GCIN_ON_THE_SPOT_KEY, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_on_the_spot_key)));
 
   cstr = gtk_color_selection_palette_to_string(&gcin_sel_key_gcolor, 1);
   dbg("selkey color %s\n", cstr);
@@ -500,6 +502,22 @@ static gboolean cb_gcin_sel_key_color( GtkWidget *widget, gpointer data)
    return TRUE;
 }
 
+void cb_button_gcin_on_the_spot_key(GtkToggleButton *togglebutton, gpointer user_data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(togglebutton)))
+    return;
+  int i;
+  for (i=0; edit_disp[i].keystr; i++)
+   if (edit_disp[i].keynum == GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+   {
+#if GTK_CHECK_VERSION(2,4,0)
+     gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcin_edit_display), i);
+#else
+     gtk_option_menu_set_history(GTK_OPTION_MENU(opt_gcin_edit_display), i);
+#endif
+   }
+}
+
 static GtkWidget *create_gcin_edit_display()
 {
 
@@ -538,6 +556,16 @@ static GtkWidget *create_gcin_edit_display()
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcin_edit_display), menu);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcin_edit_display), current_idx);
 #endif
+
+  label = gtk_label_new(_(_L("按鍵顯示於\n應用程式")));
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+
+  check_button_gcin_on_the_spot_key = gtk_check_button_new ();
+  g_signal_connect (G_OBJECT (check_button_gcin_on_the_spot_key), "toggled",
+                    G_CALLBACK (cb_button_gcin_on_the_spot_key), NULL);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_on_the_spot_key),
+       gcin_on_the_spot_key);
+  gtk_box_pack_start (GTK_BOX (hbox), check_button_gcin_on_the_spot_key, FALSE, FALSE, 0);
 
   return hbox;
 }
