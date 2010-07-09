@@ -751,14 +751,14 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
       attrN++;
     }
 
-    if (i==ggg.gbuf_cursor)
+    if (gcin_on_the_spot_key && i==ggg.gbuf_cursor)
       strN += get_DispInArea_str(str+strN);
 
     memcpy(str+strN, s, len);
     strN+=len;
   }
 
-  if (i==ggg.gbuf_cursor)
+  if (gcin_on_the_spot_key && i==ggg.gbuf_cursor)
     strN += get_DispInArea_str(str+strN);
 
   str[strN]=0;
