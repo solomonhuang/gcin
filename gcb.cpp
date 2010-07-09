@@ -490,7 +490,7 @@ void gcb_main()
 
 
 #if 0
-  gdk_input_set_extension_events(mainwin->window, GDK_EXTENSION_EVENTS_ALL,
+  gdk_input_set_extension_events(gtk_widget_get_window(mainwin), GDK_EXTENSION_EVENTS_ALL,
                                  GDK_EXTENSION_EVENTS_ALL);
 #endif
 #if UNIX

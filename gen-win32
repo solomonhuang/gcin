@@ -15,7 +15,7 @@ do
 done
 
 cd data
-for i in phrase.table phrase-ctrl.table symbol-table *.cin
+for i in phrase.table phrase-ctrl.table symbol-table *.cin gtab.list
 do
   awk 'sub("$", "\r")' $i > t.txt
   mv t.txt $i

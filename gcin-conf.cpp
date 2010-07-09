@@ -6,6 +6,7 @@
 #else
 #include <shellapi.h>
 #include <shlobj.h>
+#include <io.h>
 #endif
 
 #if !CLIENT_LIB
@@ -47,13 +48,15 @@ void get_gcin_dir(char *tt)
 }
 
 
-void get_gcin_user_fname(char *name, char fname[])
+gboolean get_gcin_user_fname(char *name, char fname[])
 {
   get_gcin_dir(fname);
 #if UNIX
   strcat(strcat(fname,"/"),name);
+  return access(fname, R_OK)==0;
 #else
   strcat(strcat(fname,"\\"),name);
+  return (_access(fname, 04) >=0);
 #endif
 //  dbg("get_gcin_user_fname %s %s\n", name, fname);
 }
@@ -70,10 +73,12 @@ void get_gcin_conf_fname(char *name, char fname[])
 
 void get_gcin_user_or_sys_fname(char *name, char fname[])
 {
-  if (!getenv("GCIN_TABLE_DIR"))
-    get_gcin_user_fname(name, fname);
-  else
-    get_sys_table_file_name(name, fname);
+  if (!getenv("GCIN_TABLE_DIR")) {
+    if (get_gcin_user_fname(name, fname))
+      return;
+  }
+
+  get_sys_table_file_name(name, fname);
 }
 
 void get_gcin_conf_str(char *name, char **rstr, char *default_str)

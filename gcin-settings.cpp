@@ -122,7 +122,7 @@ void load_setttings()
 
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
-                                    TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock);
+                                    TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift);
   tsin_tone_char_input = get_gcin_conf_int(TSIN_TONE_CHAR_INPUT, 0);
 
   tsin_space_opt = get_gcin_conf_int(TSIN_SPACE_OPT, TSIN_SPACE_OPT_SELECT_CHAR);

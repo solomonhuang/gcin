@@ -19,3 +19,5 @@ typedef struct {
 void tsin_parse();
 void init_cache(int tc_len);
 CACHE *cache_lookup(int start);
+int tsin_parse_recur(int start, TSIN_PARSE *out,
+                     short *r_match_phr_N, short *r_no_match_ch_N);

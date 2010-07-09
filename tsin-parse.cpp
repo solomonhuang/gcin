@@ -5,10 +5,22 @@
 #include "gcin-conf.h"
 #include <math.h>
 #include "tsin-parse.h"
+#include "gtab-buf.h"
+#include "gst.h"
 
 #define DBG (0)
-
+extern gboolean tsin_is_gtab;
+extern int ph_key_sz;
 void add_cache(int start, int usecount, TSIN_PARSE *out, short match_phr_N, short no_match_ch_N, int tc_len);
+void extract_gtab_key(int start, int len, void *out);
+gboolean check_gtab_fixed_mismatch(int idx, char *mtch, int plen);
+
+static int tsin_parse_len;
+
+void set_tsin_parse_len(int len)
+{
+  tsin_parse_len = len;
+}
 
 int tsin_parse_recur(int start, TSIN_PARSE *out,
                      short *r_match_phr_N, short *r_no_match_ch_N)
@@ -17,57 +29,95 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
   double bestscore = -1;
   int bestusecount = 0;
   *r_match_phr_N = 0;
-  *r_no_match_ch_N = c_len - start;
+  *r_no_match_ch_N = tsin_parse_len - start;
 
 
-  for(plen=1; start + plen <= c_len && plen <= MAX_PHRASE_LEN; plen++) {
+  for(plen=1; start + plen <= tsin_parse_len && plen <= MAX_PHRASE_LEN; plen++) {
 #if DBG
     dbg("---- aa st:%d hh plen:%d ", start, plen);utf8_putchar(chpho[start].ch); dbg("\n");
 #endif
-    if (plen > 1 && (chpho[start+plen-1].flag & FLAG_CHPHO_PHRASE_USER_HEAD))
-      break;
+    if (plen > 1) {
+      if (tsin_is_gtab) {
+        if (gbuf[start+plen-1].flag & FLAG_CHPHO_PHRASE_USER_HEAD)
+          break;
+      } else
+        if (tss.chpho[start+plen-1].flag & FLAG_CHPHO_PHRASE_USER_HEAD)
+          break;
+    }
 
     phokey_t pp[MAX_PHRASE_LEN + 1];
+    u_int pp32[MAX_PHRASE_LEN + 1];
+    u_int64_t pp64[MAX_PHRASE_LEN + 1];
     int sti, edi;
     TSIN_PARSE pbest[MAX_PH_BF_EXT+1];
 #define MAXV 1000
     int maxusecount = 5-MAXV;
     int remlen;
     short match_phr_N=0, no_match_ch_N = plen;
+    void *ppp;
 
-    bzero(pbest, sizeof(TSIN_PARSE) * c_len);
+    if (ph_key_sz==2)
+      ppp=pp;
+    else if (ph_key_sz==4)
+      ppp=pp32;
+    else
+      ppp=pp64;
+
+    bzero(pbest, sizeof(TSIN_PARSE) * tsin_parse_len);
 
     pbest[0].len = plen;
     pbest[0].start = start;
     int i, ofs;
-    for(ofs=i=0; i < plen; i++)
-      ofs += utf8cpy((char *)pbest[0].str + ofs, chpho[start + i].ch);
+
+    if (tsin_is_gtab)
+      for(ofs=i=0; i < plen; i++)
+        ofs += utf8cpy((char *)pbest[0].str + ofs, gbuf[start + i].ch);
+    else
+      for(ofs=i=0; i < plen; i++)
+        ofs += utf8cpy((char *)pbest[0].str + ofs, tss.chpho[start + i].ch);
 
 #if DBG
-    dbg("st:%d hh plen:%d ", start, plen);utf8_putchar(chpho[start].ch); dbg("\n");
+    dbg("st:%d hh plen:%d ", start, plen);utf8_putchar(tss.chpho[start].ch); dbg("\n");
 #endif
 
-    extract_pho(start, plen, pp);
+    if (tsin_is_gtab)
+      extract_gtab_key(start, plen, ppp);
+    else
+      extract_pho(start, plen, (phokey_t *)ppp);
 
-    if (!tsin_seek(pp, plen, &sti, &edi)) {
-#if 1
+    if (!tsin_seek(ppp, plen, &sti, &edi)) {
+//      dbg("tsin_seek not found...\n");
       if (plen > 1)
         break;
-#endif
       goto next;
     }
 
+    phokey_t mtk[MAX_PHRASE_LEN];
+    u_int mtk32[MAX_PHRASE_LEN];
+    u_int64_t mtk64[MAX_PHRASE_LEN];
+    void *pho;
+
+    if (ph_key_sz==2)
+      pho=mtk;
+    else if (ph_key_sz==4)
+      pho=mtk32;
+    else
+      pho=mtk64;
+
     for (;sti < edi; sti++) {
-      phokey_t mtk[MAX_PHRASE_LEN];
       char mtch[MAX_PHRASE_LEN*CH_SZ+1];
       char match_len;
       usecount_t usecount;
 
-      load_tsin_entry(sti, &match_len, &usecount, mtk, (u_char *)mtch);
+      load_tsin_entry(sti, &match_len, &usecount, pho, (u_char *)mtch);
 
       if (match_len < plen)
         continue;
 
+      if (tsin_is_gtab) {
+        if (check_gtab_fixed_mismatch(start, mtch, plen))
+          continue;
+      } else
       if (check_fixed_mismatch(start, mtch, plen))
         continue;
 
@@ -75,9 +125,19 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
         usecount = 0;
 
       int i;
-      for(i=0;i < plen;i++)
-        if (mtk[i]!=pp[i])
-          break;
+      if (ph_key_sz==2) {
+        for(i=0;i < plen;i++)
+          if (mtk[i]!=pp[i])
+            break;
+      } else if (ph_key_sz==4) {
+        for(i=0;i < plen;i++)
+          if (mtk32[i]!=pp32[i])
+            break;
+      } else {
+        for(i=0;i < plen;i++)
+          if (mtk64[i]!=pp64[i])
+            break;
+      }
 
       if (i < plen)
         continue;
@@ -106,10 +166,17 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
 
 next:
-    if (!(chpho[start].ch[0] & 0x80) && !match_phr_N)
-      no_match_ch_N = 0;
 
-    remlen = c_len - (start + plen);
+    if (!match_phr_N) {
+      if (tsin_is_gtab) {
+        if (!(gbuf[start].ch[0] & 0x80))
+          no_match_ch_N = 0;
+      } else
+      if (!(tss.chpho[start].ch[0] & 0x80))
+        no_match_ch_N = 0;
+    }
+
+    remlen = tsin_parse_len - (start + plen);
 
 
     if (remlen) {
@@ -123,11 +190,11 @@ next:
         uc = pca->usecount;
         smatch_phr_N = pca->match_phr_N;
         sno_match_ch_N = pca->no_match_ch_N;
-        memcpy(&pbest[1], pca->best, (c_len - next) * sizeof(TSIN_PARSE));
+        memcpy(&pbest[1], pca->best, (tsin_parse_len - next) * sizeof(TSIN_PARSE));
       } else {
         uc = tsin_parse_recur(next, &pbest[1], &smatch_phr_N, &sno_match_ch_N);
 //        dbg("   gg %d\n", smatch_phr_N);
-        add_cache(next, uc, &pbest[1], smatch_phr_N, sno_match_ch_N, c_len);
+        add_cache(next, uc, &pbest[1], smatch_phr_N, sno_match_ch_N, tsin_parse_len);
       }
 
       match_phr_N += smatch_phr_N;
@@ -148,12 +215,12 @@ next:
       dbg("is best org %.4e\n", bestscore);
 #endif
       bestscore = score;
-      memcpy(out, pbest, sizeof(TSIN_PARSE) * (c_len - start));
+      memcpy(out, pbest, sizeof(TSIN_PARSE) * (tsin_parse_len - start));
 
 #if DBG
       dbg("    str:%d  ", start);
       int i;
-      for(i=0;  i < c_len - start; i++) {
+      for(i=0;  i < tsin_parse_len - start; i++) {
         utf8_putcharn(out[i].str, out[i].len);
       }
       dbg("\n");
@@ -173,7 +240,7 @@ next:
 
 void disp_ph_sta_idx(int idx);
 
-void free_cache();
+void free_cache(), load_tsin_db();
 void tsin_parse()
 {
   TSIN_PARSE out[MAX_PH_BF_EXT+1];
@@ -181,49 +248,53 @@ void tsin_parse()
 
   int i, ofsi;
 
-  if (c_len <= 1)
+  if (tss.c_len <= 1)
     return;
 
-  init_cache(c_len);
+  load_tsin_db();
+
+  set_tsin_parse_len(tss.c_len);
+
+  init_cache(tss.c_len);
 
   short smatch_phr_N, sno_match_ch_N;
   tsin_parse_recur(0, out, &smatch_phr_N, &sno_match_ch_N);
 #if 0
   puts("vvvvvvvvvvvvvvvv");
-  for(i=0;  i < c_len; i++) {
+  for(i=0;  i < tss.c_len; i++) {
     printf("%d:", out[i].len);
     utf8_putcharn(out[i].str, out[i].len);
   }
   dbg("\n");
 #endif
 
-  for(i=0; i < c_len; i++)
-    chpho[i].flag &= ~FLAG_CHPHO_PHRASE_HEAD;
+  for(i=0; i < tss.c_len; i++)
+    tss.chpho[i].flag &= ~(FLAG_CHPHO_PHRASE_HEAD|FLAG_CHPHO_PHRASE_BODY);
 
   for(ofsi=i=0; out[i].len; i++) {
     int j, ofsj;
     int psta = ofsi;
 
     if (out[i].flag & FLAG_TSIN_PARSE_PHRASE)
-        chpho[ofsi].flag |= FLAG_CHPHO_PHRASE_HEAD;
+        tss.chpho[ofsi].flag |= FLAG_CHPHO_PHRASE_HEAD;
 
     for(ofsj=j=0; j < out[i].len; j++) {
-      ofsj += u8cpy(chpho[ofsi].ch, (char *)&out[i].str[ofsj]);
+      ofsj += u8cpy(tss.chpho[ofsi].ch, (char *)&out[i].str[ofsj]);
 
       if (out[i].flag & FLAG_TSIN_PARSE_PHRASE)
 #if 1
-        chpho[ofsi].psta = psta;
+        tss.chpho[ofsi].psta = psta;
 
 #else
-        chpho[ofsi].psta = out[i].start;
+        tss.chpho[ofsi].psta = out[i].start;
 #endif
       ofsi++;
     }
   }
 
-  int ph_sta_idx = ph_sta;
-  if (chpho[c_len-1].psta>=0 && c_len - chpho[c_len-1].psta > 1) {
-    ph_sta_idx = chpho[c_len-1].psta;
+  int ph_sta_idx = tss.ph_sta;
+  if (tss.chpho[tss.c_len-1].psta>=0 && tss.c_len - tss.chpho[tss.c_len-1].psta > 1) {
+    ph_sta_idx = tss.chpho[tss.c_len-1].psta;
   }
 
 #if 1
@@ -231,8 +302,8 @@ void tsin_parse()
 #endif
 
 #if 0
-  for(i=0;i<c_len;i++)
-    utf8_putchar(chpho[i].ch);
+  for(i=0;i<tss.c_len;i++)
+    utf8_putchar(tss.chpho[i].ch);
   puts("");
 #endif
 

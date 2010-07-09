@@ -9,7 +9,7 @@
 #endif
 #include "gcin.h"
 #include "gtab.h"
-
+#include "gtab-buf.h"
 
 struct keystruc {
   char *kname;
@@ -63,9 +63,8 @@ extern char *TableDir;
 FILE *watch_fopen(char *filename, time_t *pfile_modify_time);
 gboolean output_gbuf();
 gboolean gtab_cursor_end();
-void insert_gbuf_cursor1(char *s);
 gboolean gtab_phrase_on(), tsin_cursor_end();
-gboolean flush_tsin_buffer();
+void flush_tsin_buffer();
 void add_to_tsin_buf_str(char *str);
 
 static time_t file_modify_time;
@@ -128,6 +127,7 @@ void load_phrase(char *fname, time_t *modtime, struct keystruc *tr, int trN)
     else
       tr[i].str = strdup(str);
   }
+
 }
 
 
@@ -147,6 +147,7 @@ gboolean feed_phrase(KeySym ksym, int state)
 //  dbg("ksym:%x %c\n", ksym, ksym);
   load_phrase("phrase.table", &file_modify_time, tran, tranN);
   load_phrase("phrase-ctrl.table", &ctrl_file_modify_time, tran_ctrl, tran_ctrlN);
+
 
   if (ksym < 0x7f && isupper(ksym))
     ksym = tolower(ksym);
@@ -173,7 +174,7 @@ gboolean feed_phrase(KeySym ksym, int state)
     if (str) {
 send_it:
 #if USE_TSIN
-      if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
+      if (current_method_type() == method_type_TSIN && current_CS->im_state == GCIN_STATE_CHINESE) {
         add_to_tsin_buf_str(str);
         if (tsin_cursor_end())
           flush_tsin_buffer();
@@ -181,17 +182,16 @@ send_it:
       else
 #endif
       if (gtab_phrase_on()) {
-        insert_gbuf_cursor1(str);
+        insert_gbuf_nokey(str);
         if (gtab_cursor_end())
           output_gbuf();
       } else
         send_text(str);
-
       return TRUE;
     }
   }
 
-#if 1
+#if 0
   if ((state&(ControlMask|ShiftMask|Mod1Mask|Mod4Mask|Mod5Mask))==ShiftMask && ksym>=' ' && ksym < 0x7e) {
     str = tt;
     tt[0]=ksym;

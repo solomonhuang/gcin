@@ -8,6 +8,7 @@
 #include "intcode.h"
 
 int current_intcode = INTCODE_UTF32;
+extern gboolean test_mode;
 
 static char inch[MAX_INTCODE];
 static int cin;
@@ -26,7 +27,7 @@ static int h2i(int x)
 
 static void utf32to8(char *t, char *s)
 {
-  unsigned int rn,wn=0;
+  gsize rn,wn=0;
   GError *err = NULL;
   char *utf8 = g_convert(s, 4, "UTF-8", "UTF-32", &rn, &wn, &err);
 
@@ -55,6 +56,9 @@ int feedkey_intcode(KeySym key)
 #endif
   key=toupper(key);
   if (key==XK_BackSpace||key==XK_Delete) {
+    if (test_mode)
+      return cin>0;
+
     if (cin)
       cin--;
     else
@@ -78,6 +82,12 @@ int feedkey_intcode(KeySym key)
       return 1;
   }
 
+  if (!cin && key==' ')
+    return 0;
+
+  if (test_mode)
+    return 1;
+
   if ((cin<MAX_INTCODE-1 || (current_intcode!=INTCODE_BIG5 && cin < MAX_INTCODE)) && key!=' ')
     inch[cin++]=key;
 
@@ -93,12 +103,9 @@ dispIn:
       gtab_press_full_auto_send || key==' ') {
     u_char utf8[CH_SZ+1];
 
-    if (!cin && key==' ')
-      return 0;
-
     if (current_intcode==INTCODE_BIG5) {
       u_char ttt[3];
-      ttt[3]=0;
+      ttt[2]=ttt[3]=0;
       ttt[0]=(h2i(inch[0])<<4)+h2i(inch[1]);
       ttt[1]=(h2i(inch[2])<<4)+h2i(inch[3]);
       big5_utf8((char *)ttt, (char *)utf8);

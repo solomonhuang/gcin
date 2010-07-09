@@ -12,6 +12,8 @@ typedef unsigned int CARD32;
 typedef __int64 u_int64_t;
 void win32exec(char *s);
 int win32exec_script(char *s, char *para=NULL);
+int win32exec_script_va(char *s, ...);
+int win32exec_va(char *s, ...);
 void win32exec_para(char *s, char *para);
 extern char *gcin_program_files_path;
 extern char *gcin_script_path;
@@ -30,6 +32,7 @@ typedef wchar_t unich_t;
 #define _L(x)      L ## x
 #else
 typedef char unich_t;
+void unix_exec(char *fmt,...);
 #define _L(x) x
 #include <X11/Xlib.h>
 #include <X11/Xlocale.h>

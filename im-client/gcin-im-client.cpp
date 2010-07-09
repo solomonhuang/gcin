@@ -381,8 +381,8 @@ void gcin_im_client_close(GCIN_client_handle *handle)
 static int gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
 {
 #if WIN32
-  if (req_no  & (GCIN_req_key_press|GCIN_req_key_release)) {
-    dbg("gen_req validate\n");
+  if (req_no  & (GCIN_req_key_press|GCIN_req_key_release|GCIN_req_test_key_press|GCIN_req_test_key_release)) {
+//    dbg("gen_req validate\n");
 	validate_handle(handle);
   }
 #else
@@ -444,8 +444,6 @@ static int handle_read(GCIN_client_handle *handle, void *ptr, int n)
     perror("handle_read");
 #endif
 
-  if (r<=0)
-    return r;
   return r;
 }
 #else
@@ -723,18 +721,18 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y
   }
 }
 
-
+// in win32, if win is NULL, this means gcin_im_client_set_cursor_location(x,y) is screen position
 void gcin_im_client_set_window(GCIN_client_handle *handle, Window win)
 {
   if (!handle)
 	  return;
 //  dbg("gcin_im_client_set_window %x\n", win);
+#if UNIX
   if (!win)
     return;
-
+#endif
   handle->client_win = win;
 }
-
 
 void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_flag)
 {
@@ -778,7 +776,11 @@ void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_
 }
 
 
-int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor)
+int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor
+#if WIN32
+				,int *sub_comp_len
+#endif
+							   )
 {
 	if (!handle)
 		return 0;
@@ -835,6 +837,17 @@ err_ret:
   if (cursor)
     *cursor = tcursor;
 
+
+#if WIN32
+  int tsub_comp_len;
+  tsub_comp_len=0;
+  if (handle_read(handle, &tsub_comp_len, sizeof(tsub_comp_len))<=0) {
+    goto err_ret;
+  }
+  if (sub_comp_len)
+	*sub_comp_len = tsub_comp_len;
+#endif
+
 #if DBG
   dbg("jjjjjjjjj %d tcursor:%d\n", attN, tcursor);
 #endif
@@ -884,3 +897,38 @@ void gcin_im_client_message(GCIN_client_handle *handle, char *message)
     error_proc(handle,"gcin_im_client_message error 2");
   }
 }
+
+
+#if TSF
+bool gcin_im_client_key_eaten(GCIN_client_handle *handle, int press_release,
+                                          KeySym key, u_int state)
+{
+  GCIN_reply reply;
+  GCIN_req req;
+
+  if (!gen_req(handle, press_release?GCIN_req_test_key_release:GCIN_req_test_key_press, &req))
+    return 0;
+
+  req.keyeve.key = key;
+  to_gcin_endian_4(&req.keyeve.key);
+  req.keyeve.state = state;
+  to_gcin_endian_4(&req.keyeve.state);
+
+
+  if (handle_write(handle, &req, sizeof(req)) <= 0) {
+    error_proc(handle, "cannot write to gcin server");
+    return FALSE;
+  }
+
+  bzero(&reply, sizeof(reply));
+  if (handle_read(handle, &reply, sizeof(reply)) <=0) {
+    error_proc(handle, "cannot read reply from gcin server");
+    return FALSE;
+  }
+
+  to_gcin_endian_4(&reply.datalen);
+  to_gcin_endian_4(&reply.flag);
+
+  return (reply.flag & GCIN_reply_key_processed) > 0;
+}
+#endif

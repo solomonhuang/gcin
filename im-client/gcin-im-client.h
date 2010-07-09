@@ -54,6 +54,10 @@ int gcin_im_client_forward_key_press2(GCIN_client_handle *handle,
 int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
                                           KeySym key, u_int state,
                                           char **rstr);
+#if WIN32
+bool gcin_im_client_key_eaten(GCIN_client_handle *handle, int press_release,
+                                          KeySym key, u_int state);
+#endif
 
 void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_flags);
 void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_flags);
@@ -62,7 +66,11 @@ void gcin_im_client_reset(GCIN_client_handle *handle);
 void gcin_im_client_message(GCIN_client_handle *handle, char *message);
 
 #include "gcin-im-client-attr.h"
+#if WIN32
+int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor, int *sub_comp_len);
+#else
 int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor);
+#endif
 
 #ifdef __cplusplus
 }

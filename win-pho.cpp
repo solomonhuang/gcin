@@ -102,7 +102,7 @@ void create_win_pho()
   gtk_container_set_border_width (GTK_CONTAINER (gwin_pho), 0);
   gtk_widget_realize (gwin_pho);
 #if UNIX
-  GdkWindow *gdkwin = gwin_pho->window;
+  GdkWindow *gdkwin = gtk_widget_get_window(gwin_pho);
   xwin_pho = GDK_WINDOW_XWINDOW(gdkwin);
   set_no_focus(gwin_pho);
 #else

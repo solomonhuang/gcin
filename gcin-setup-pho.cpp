@@ -164,7 +164,7 @@ static void callback_button_clicked_tsin_sw( GtkWidget *widget, gpointer data)
 
 static void callback_button_clicked_tsin_space_opt( GtkWidget *widget, gpointer data)
 {
-  new_select_idx_tsin_space_opt = (int) data;
+  new_select_idx_tsin_space_opt = (gsize) data;
 }
 
 
@@ -429,7 +429,7 @@ void create_kbm_window()
   int current_idx = get_currnet_tsin_space_option_idx();
   new_select_idx_tsin_space_opt = current_idx;
 
-  int i;
+  gsize i;
   for(i=0; i< tsin_space_optionsN; i++) {
     GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_space_opt, _(tsin_space_options[i].name));
     gtk_box_pack_start (GTK_BOX (box_tsin_space_opt), button, TRUE, TRUE, 0);

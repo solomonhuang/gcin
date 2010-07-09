@@ -33,8 +33,12 @@ void pho_load()
       char sys_file[256], vv[256];
 
       get_sys_table_file_name(sys_file, pho_tab);
+#if UNIX
       sprintf(vv,"cp %s %s\n", sys_file, phofname);
       system(vv);
+#else
+      CopyFileA(sys_file, phofname, FALSE);
+#endif
     }
   } else {
     get_sys_table_file_name(pho_tab, phofname);

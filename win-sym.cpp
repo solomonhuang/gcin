@@ -3,6 +3,7 @@
 #include "pho.h"
 #include "gtab.h"
 #include "win-sym.h"
+#include "gtab-buf.h"
 
 static GtkWidget *gwin_sym = NULL;
 static int cur_in_method;
@@ -175,8 +176,10 @@ void tsin_reset_in_pho(), reset_gtab_all(), clr_in_area_pho();
 void force_preedit_shift();
 gboolean output_gbuf();
 void output_buffer_call_back();
-gboolean gtab_cursor_end(),gtab_phrase_on(), flush_tsin_buffer(), tsin_cursor_end();
-void insert_gbuf_cursor1(char *s), add_to_tsin_buf_str(char *str);
+gboolean gtab_cursor_end(),gtab_phrase_on();
+void flush_tsin_buffer();
+gboolean tsin_cursor_end();
+void add_to_tsin_buf_str(char *str);
 
 extern int c_len;
 extern short gbufN;
@@ -188,7 +191,7 @@ static void cb_button_sym(GtkButton *button, char *str)
 //  dbg("cb_button_sym\n");
 
 #if USE_TSIN
-  if (current_CS->in_method == 6 && current_CS->im_state == GCIN_STATE_CHINESE) {
+  if (current_method_type() == method_type_TSIN && current_CS->im_state == GCIN_STATE_CHINESE) {
     add_to_tsin_buf_str(str);
     if (tsin_cursor_end()) {
       flush_tsin_buffer();
@@ -200,7 +203,7 @@ static void cb_button_sym(GtkButton *button, char *str)
   else
 #endif
   if (gtab_phrase_on()) {
-    insert_gbuf_cursor1(str);
+    insert_gbuf_nokey(str);
     if (gtab_cursor_end()) {
       output_gbuf();
       output_buffer_call_back();
@@ -210,17 +213,17 @@ static void cb_button_sym(GtkButton *button, char *str)
     send_text_call_back(str);
   }
 
-  switch (current_CS->in_method) {
-    case 3:
+  switch (current_method_type()) {
+    case method_type_PHO:
        clr_in_area_pho();
        break;
 #if USE_TSIN
-    case 6:
+    case method_type_TSIN:
        tsin_reset_in_pho();
        break;
 #endif
 #if USE_ANTHY
-    case 12:
+    case method_type_ANTHY:
        break;
 #endif
     default:
@@ -310,7 +313,7 @@ void str_to_all_phokey_chars(char *b5_str, char *out);
 
 static void sym_lookup_key(char *instr, char *outstr)
 {
-  if (current_CS->in_method == 3 || current_CS->in_method == 6) {
+  if (current_method_type() == method_type_PHO || current_method_type() == method_type_TSIN) {
     str_to_all_phokey_chars(instr, outstr);
   } else {
     outstr[0]=0;
@@ -381,7 +384,7 @@ void create_win_sym()
     p_err("bad current_CS %d\n", current_CS->in_method);
   }
 
-  if (current_CS->in_method != 3 && current_CS->in_method != 6 && current_CS->in_method != 12 && !cur_inmd)
+  if (current_method_type() != method_type_PHO && current_method_type() != method_type_TSIN && current_method_type() != method_type_ANTHY && !cur_inmd)
     return;
 
   if (read_syms() || cur_in_method != current_CS->in_method) {
@@ -476,7 +479,7 @@ void create_win_sym()
 
   gtk_widget_realize (gwin_sym);
 #if UNIX
-  GdkWindow *gdkwin_sym = gwin_sym->window;
+  GdkWindow *gdkwin_sym = gtk_widget_get_window(gwin_sym);
   set_no_focus(gwin_sym);
 #else
   win32_init_win(gwin_sym);

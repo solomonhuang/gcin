@@ -69,6 +69,9 @@ typedef struct {
     short       fixed_x, fixed_y;
     short       in_method;
     XPoint	spot_location;	/* spot location, relative to client window */
+#if USE_XIM
+    gboolean xim_preedit_started;
+#endif
 } ClientState;
 
 
@@ -77,9 +80,9 @@ typedef struct _IC {
     CARD16	id;		/* ic id */
 #endif
     Window	focus_win;	/* focus window */
+#if USE_XIM
     char	*resource_name;	/* resource name */
     char	*resource_class; /* resource class */
-#if USE_XIM
     PreeditAttributes pre_attr; /* preedit attributes */
     StatusAttributes sts_attr; /* status attributes */
 #endif
@@ -88,7 +91,7 @@ typedef struct _IC {
 } IC;
 
 typedef struct {
-  char *server_locale;
+//  char *server_locale;
   char xim_server_name[32];
   Window xim_xwin;
 #if USE_XIM

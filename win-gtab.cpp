@@ -1,7 +1,9 @@
 #include "gcin.h"
 #include "gtab.h"
 #include "win-sym.h"
+#include "gst.h"
 
+extern gboolean test_mode;
 static int current_gcin_inner_frame;
 static int current_gtab_in_row1;
 static int current_gtab_vertical_select;
@@ -36,6 +38,9 @@ static void adj_gtab_win_pos()
 
 void disp_gtab(int index, char *gtabchar)
 {
+  if (test_mode)
+    return;
+
   char utf8[512];
 
    if (!labels_gtab[index])
@@ -87,6 +92,8 @@ void set_gtab_input_error_color()
 
 void clear_gtab_input_error_color()
 {
+  if (test_mode)
+    return;
   set_gtab_input_color(NULL);
 }
 
@@ -106,7 +113,8 @@ void clear_gtab_in_area()
   }
 
   for(i=maxpress; i < 10; i++) {
-    gtk_widget_hide(labels_gtab[i]);
+    if (labels_gtab[i])
+      gtk_widget_hide(labels_gtab[i]);
   }
 }
 
@@ -168,6 +176,10 @@ void disp_gtab_sel(char *s)
 {
   if (!label_gtab_sele)
     return;
+
+  if (test_mode)
+    return;
+
   if (!s[0])
     gtk_widget_hide(label_gtab_sele);
   else
@@ -184,6 +196,9 @@ void disp_gtab_sel(char *s)
 void set_key_codes_label(char *s, int better)
 {
   if (!label_key_codes)
+    return;
+
+  if (test_mode)
     return;
 
   if (s && strlen(s)) {
@@ -261,7 +276,7 @@ void create_win_gtab()
   gtk_widget_realize (gwin_gtab);
 
 #if UNIX
-  GdkWindow *gdkwin = gwin_gtab->window;
+  GdkWindow *gdkwin = gtk_widget_get_window(gwin_gtab);
   set_no_focus(gwin_gtab);
   xwin_gtab = GDK_WINDOW_XWINDOW(gdkwin);
 #else
@@ -320,6 +335,9 @@ gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 
 void show_hide_label_edit()
 {
+  if (test_mode)
+    return;
+
   if (gcin_edit_display_ap_only() || !gtab_phrase_on()) {
     gtk_widget_hide(label_edit);
     return;
@@ -330,6 +348,9 @@ void show_hide_label_edit()
 
 void disp_label_edit(char *str)
 {
+  if (test_mode)
+    return;
+
   if (!label_edit)
     return;
 
@@ -506,6 +527,9 @@ extern gboolean force_show;
 
 void show_win_gtab()
 {
+  if (test_mode)
+    return;
+
   create_win_gtab();
   create_win_gtab_gui();
 #if WIN32
@@ -521,7 +545,7 @@ void show_win_gtab()
 
   init_gtab(current_CS->in_method);
 
-  if (gcin_pop_up_win && !gtab_has_input() && !force_show && same_pho_query_state==SAME_PHO_QUERY_none)
+  if (gcin_pop_up_win && !gtab_has_input() && !force_show && poo.same_pho_query_state==SAME_PHO_QUERY_none)
     return;
 
 //  dbg("show_win_gtab()\n");
@@ -567,6 +591,13 @@ void destroy_win_gtab()
 
 void hide_win_gtab()
 {
+#if WIN32
+  if (test_mode)
+    return;
+#endif
+  if (!gwin_gtab)
+    return;
+
 //  dbg("hide_win_gtab\n");
   if (gwin_gtab) {
 #if UNIX
@@ -582,6 +613,8 @@ void hide_win_gtab()
 
 void minimize_win_gtab()
 {
+  if (test_mode)
+    return;
   gtk_window_resize(GTK_WINDOW(gwin_gtab), 32, 12);
 }
 
@@ -622,6 +655,9 @@ char *get_full_str()
 
 void win_gtab_disp_half_full()
 {
+  if (test_mode)
+    return;
+
   if (label_full) {
     if (current_CS->im_state == GCIN_STATE_CHINESE && current_CS->b_half_full_char) {
       gtk_widget_show(label_full);

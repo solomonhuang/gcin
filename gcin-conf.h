@@ -122,7 +122,7 @@ extern int gcin_win_color_use, gcin_bell_off;
 extern int gcin_init_im_enabled, gcin_win32_icon;
 extern int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y, gcin_edit_display;
 
-void get_gcin_user_fname(char *name, char fname[]);
+gboolean get_gcin_user_fname(char *name, char fname[]);
 void get_gcin_conf_str(char *name, char **rstr, char *default_str);
 void get_gcin_conf_fstr(char *name, char rstr[], char *default_str);
 void save_gcin_conf_str(char *name, char *str);

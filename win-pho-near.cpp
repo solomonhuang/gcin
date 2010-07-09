@@ -78,7 +78,7 @@ void create_win_pho_near(phokey_t pho)
 
   gwin_pho_near = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_realize (gwin_pho_near);
-  GdkWindow *gdkwin = gwin_pho_near->window;
+  GdkWindow *gdkwin = gtk_widget_get_window(gwin_pho_near);
   set_no_focus(gwin_pho_near);
 
   GtkWidget *frame = gtk_frame_new(NULL);

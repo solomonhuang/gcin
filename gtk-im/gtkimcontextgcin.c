@@ -145,11 +145,17 @@ get_im (GtkIMContextGCIN *context_xim)
   GdkWindow *client_window = context_xim->client_window;
   GdkScreen *screen = gdk_drawable_get_screen (client_window);
   GdkDisplay *display = gdk_screen_get_display (screen);
-
-
   if (!context_xim->gcin_ch) {
     if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
       perror("cannot open gcin_ch");
+#if 1
+    context_xim->timeout_handle = 0;
+    context_xim->pe_attN = 0;
+    context_xim->pe_att = NULL;
+    context_xim->pe_str = NULL;
+    context_xim->pe_cursor = 0;
+#endif
+
 #if 0
     // coredump
     g_signal_connect (display, "closed",
@@ -188,11 +194,11 @@ static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
   im_context_gcin->timeout_handle = 0;
-  char *pe_str;
   im_context_gcin->pe_attN = 0;
   im_context_gcin->pe_att = NULL;
   im_context_gcin->pe_str = NULL;
   im_context_gcin->pe_cursor = 0;
+  im_context_gcin->gcin_ch = NULL;
 
 #if DBG
   printf("gtk_im_context_gcin_init %x\n", im_context_gcin);
@@ -227,6 +233,9 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 
 void clear_preedit(GtkIMContextGCIN *context_gcin)
 {
+  if (!context_gcin)
+    return;
+
   if (context_gcin->pe_str) {
     free(context_gcin->pe_str);
     context_gcin->pe_str = NULL;
@@ -410,7 +419,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   if (!lc_ctype || !strstr(lc_ctype, "UTF-8")) {
     int uni = gdk_keyval_to_unicode(event->keyval);
     if (uni) {
-      unsigned int rn;
+      gsize rn;
       GError *err = NULL;
       char *utf8 = g_convert((char *)&uni, 4, "UTF-8", "UTF-32", &rn, &num_bytes, &err);
 
@@ -424,6 +433,9 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 
   gboolean preedit_changed = FALSE;
   gboolean context_has_str = context_xim->pe_str && context_xim->pe_str[0];
+  char *tstr;
+  GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
+  int cursor_pos;
 
   if (xevent.type == KeyPress) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
@@ -434,9 +446,6 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     printf("result %d\n", result);
 #endif
 
-    char *tstr;
-    GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-    int cursor_pos;
     int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos);
     gboolean has_str = tstr && tstr[0];
 
@@ -503,6 +512,24 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   else {
     result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
+    preedit_changed = result;
+//    printf("release rstr %x %s\n", rstr, rstr?rstr:"");
+
+    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos);
+    gboolean has_str = tstr && tstr[0];
+
+    if (!context_has_str && has_str) {
+#if DBG
+      printf("emit preedit-start\n");
+#endif
+      g_signal_emit_by_name (context, "preedit-start");
+    }
+
+    if (context_has_str != has_str || (tstr && context_xim->pe_str && strcmp(tstr, context_xim->pe_str))) {
+      if (context_xim->pe_str)
+        free(context_xim->pe_str);
+      context_xim->pe_str = tstr;
+    }
   }
 
 
@@ -608,7 +635,9 @@ gtk_im_context_gcin_set_use_preedit (GtkIMContext *context,
                                     gboolean      use_preedit)
 {
   GtkIMContextGCIN *context_gcin = GTK_IM_CONTEXT_GCIN (context);
-//  printf("gtk_im_context_gcin_set_use_preedit %x %d\n", context_gcin->gcin_ch, use_preedit);
+#if DBG
+  printf("gtk_im_context_gcin_set_use_preedit %x %d\n", context_gcin->gcin_ch, use_preedit);
+#endif
   if (!context_gcin->gcin_ch)
     return;
   int ret;
@@ -638,8 +667,8 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
 #if DBG
       printf("clear %x\n", context_gcin);
 #endif
-      g_signal_emit_by_name(context, "preedit_changed");
       clear_preedit(context_gcin);
+      g_signal_emit_by_name(context, "preedit_changed");
     }
   }
 #endif
@@ -685,10 +714,17 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
 				       PangoAttrList **attrs,
                                        gint           *cursor_pos)
 {
+  GtkIMContextGCIN *context_gcin = GTK_IM_CONTEXT_GCIN (context);
 
 #if DBG
   printf("gtk_im_context_gcin_get_preedit_string %x %x %x\n", str, attrs, cursor_pos);
 #endif
+
+  if (context_gcin->gcin_ch && cursor_pos) {
+    int ret;
+    gcin_im_client_set_flags(context_gcin->gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
+    context_gcin->preedit = TRUE;
+  }
 
   if (cursor_pos)
       *cursor_pos = 0;
@@ -700,7 +736,6 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
     return;
 
 #if 1
-  GtkIMContextGCIN *context_gcin = GTK_IM_CONTEXT_GCIN (context);
   if (!context_gcin->gcin_ch) {
 empty:
     *str=g_strdup("");

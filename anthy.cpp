@@ -1,6 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 #include <anthy/anthy.h>
+extern gboolean test_mode;
 static anthy_context_t ac;
 void (*f_anthy_resize_segment)(anthy_context_t ac, int, int);
 void (*f_anthy_get_stat)(anthy_context_t ac, struct anthy_conv_stat *acs);
@@ -311,19 +312,21 @@ static int is_legal_char(int k)
   return 0;
 }
 
-static char keys[32];
+#define MAX_KEYS 32
+
+static char keys[MAX_KEYS];
 static short int keysN;
-static unsigned char jp[128];
+static unsigned char *jp;
 static short int jpN=0;
 static short pageidx;
 
-#define MAX_SEG_N 80
 typedef struct {
   GtkWidget *label;
   unsigned char selidx, selN;
 } SEG;
-static SEG seg[MAX_SEG_N];
+static SEG *seg;
 static short segN;
+#define MAX_SEG_N 100
 static short cursor;
 enum {
   STATE_ROMANJI=1,
@@ -334,7 +337,7 @@ static char state = STATE_ROMANJI;
 
 static GtkWidget *win_anthy;
 
-static int is_empty()
+static gboolean is_empty()
 {
   return !jpN && !segN && !keysN;
 }
@@ -348,11 +351,16 @@ static void auto_hide()
   }
 }
 
-static void append_jp(u_char rom_idx)
+static void insert_jp(u_char rom_idx)
 {
-//  printf("append %d %s\n", rom_idx, anthy_romaji_map[rom_idx].ro);
-  jp[jpN++]=rom_idx;
-  cursor = jpN;
+//  printf("append %d %s  cursor:%d\n", rom_idx, anthy_romaji_map[rom_idx].ro, cursor);
+  jp = trealloc(jp, unsigned char, jpN);
+  if (cursor < jpN)
+    memmove(jp+cursor+1, jp+cursor, jpN - cursor);
+
+  jp[cursor]=rom_idx;
+  cursor++;
+  jpN++;
 }
 
 void parse_key()
@@ -363,7 +371,7 @@ void parse_key()
   static char ch2[]="kstzdhbrpfgvcjmwy";
 
   if (keysN==2 && keys[0]==keys[1] && strchr(ch2, keys[0])) {
-    append_jp(0);
+    insert_jp(0);
     keys[1]=0;
     keysN=1;
     return;
@@ -397,7 +405,7 @@ void parse_key()
       exit(1);
     }
 
-    append_jp(eq);
+    insert_jp(eq);
 
     keys[0]=0;
     keysN=0;
@@ -412,12 +420,13 @@ void parse_key()
     keys[nlen] = 0;
     keysN = nlen;
 
-    append_jp(sendpre_i);
+    insert_jp(sendpre_i);
   }
 }
 
 static void clear_seg_label()
 {
+//  dbg("clear_seg_label\n");
   int i;
   for(i=0; i < MAX_SEG_N; i++) {
     gtk_label_set_text(GTK_LABEL(seg[i].label), NULL);
@@ -440,6 +449,18 @@ void minimize_win_anthy()
   gtk_window_resize(GTK_WINDOW(win_anthy), 32, 12);
 }
 
+static void disp_keys(int idx)
+{
+  int i;
+  char tt[2];
+  tt[1]=0;
+  for(i=0; i < keysN; i++) {
+    tt[0]=keys[i];
+    gtk_label_set_text(GTK_LABEL(seg[idx+i].label), tt);
+  }
+}
+
+
 static void disp_input()
 {
   int i;
@@ -447,24 +468,24 @@ static void disp_input()
   if (gcin_edit_display_ap_only())
     return;
 
-//  printf("cursor %d\n", cursor);
   clear_seg_label();
-  for(i=0; i < jpN; i++) {
-    if (i==cursor)
-      cursor_markup(i, anthy_romaji_map[jp[i]].ro);
+
+  int idx;
+  for(idx=i=0; i < jpN; i++) {
+    if (i==cursor) {
+      disp_keys(idx);
+      idx+=keysN;
+      cursor_markup(idx++, anthy_romaji_map[jp[i]].ro);
+    }
     else
-      gtk_label_set_text(GTK_LABEL(seg[i].label), anthy_romaji_map[jp[i]].ro);
+      gtk_label_set_text(GTK_LABEL(seg[idx++].label), anthy_romaji_map[jp[i]].ro);
   }
 
-  char tt[2];
-  tt[1]=0;
-  for(i=0; i < keysN; i++) {
-    tt[0]=keys[i];
-    gtk_label_set_text(GTK_LABEL(seg[jpN+i].label), tt);
+  if (cursor==jpN) {
+    disp_keys(idx);
+    idx+=keysN;
+    cursor_markup(idx, " ");
   }
-
-  if (cursor==jpN)
-    cursor_markup(jpN+keysN, " ");
 
   minimize_win_anthy();
 }
@@ -500,6 +521,7 @@ static void clear_all()
   keys[0]=0;
   keysN = 0;
   segN = 0;
+  cursor=0;
   auto_hide();
 }
 
@@ -590,8 +612,8 @@ static void load_seg()
 
         for(i=0; i < acs.nr_segment; i++) {
           (*f_anthy_get_segment)(ac, i, 0, buf, sizeof(buf));
-          seg[i].selidx = 0;
 
+          seg[i].selidx = 0;
           gtk_label_set_text(GTK_LABEL(seg[i].label), buf);
 
           struct anthy_segment_stat ss;
@@ -632,12 +654,8 @@ int flush_anthy_input()
     val = send_jp();
   }
 
-  jpN=0;
-  keysN = 0;
-  cursor = 0;
-  disp_input();
-  state = STATE_ROMANJI;
-  auto_hide();
+//  dbg("cursor %d\n", cursor);
+  clear_all();
   return val;
 }
 
@@ -647,17 +665,19 @@ gboolean feedkey_anthy(int kv, int kvstate)
   int shift_m=(kvstate&ShiftMask) > 0;
 //  printf("%x %c  %d\n", kv, kv, shift_m);
 
+  if (kvstate & ControlMask)
+    return FALSE;
+  if (kvstate & (Mod1Mask|Mod4Mask|Mod5Mask))
+    return FALSE;
+
   if (kv==XK_Shift_L||kv==XK_Shift_R) {
-    puts("shift");
     key_press_time = current_time();
   }
 
   if (!tsin_pho_mode())
     return 0;
 
-  gboolean is_empty = !keysN && !jpN && !segN;
-
-//  printf("empty %d\n", is_empty);
+  gboolean b_is_empty = is_empty();
 
   switch (kv) {
     case XK_F11:
@@ -666,8 +686,21 @@ gboolean feedkey_anthy(int kv, int kvstate)
     case XK_F12:
       system("kasumi -a &");
       return TRUE;
+    case XK_Up:
+    case XK_Down:
+      if (b_is_empty)
+        return FALSE;
+      if (state==STATE_CONVERT) {
+        state = STATE_SELECT;
+  //      puts("STATE_SELECT");
+        disp_select();
+      } else
+      if (state==STATE_SELECT) {
+        next_page();
+      }
+      return TRUE;
     case XK_Return:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
 send:
       return flush_anthy_input();
@@ -681,7 +714,7 @@ send:
           goto rom;
       return FALSE;
     case XK_BackSpace:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
 
       hide_selections_win();
@@ -711,7 +744,7 @@ rom:
       auto_hide();
       return TRUE;
     case XK_Delete:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
       if (state&STATE_ROMANJI) {
         if (keysN)
@@ -722,7 +755,7 @@ rom:
       auto_hide();
       return TRUE;
     case XK_Left:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
       if (state&STATE_ROMANJI) {
         if (keysN)
@@ -745,7 +778,7 @@ rom:
       }
       return TRUE;
     case XK_Right:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
       if (state&STATE_ROMANJI) {
         if (cursor < jpN)
@@ -764,7 +797,7 @@ rom:
       }
       return TRUE;
     case XK_Home:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
       cursor = 0;
       if (state&STATE_ROMANJI) {
@@ -775,7 +808,7 @@ rom:
       }
       return TRUE;
     case XK_End:
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
       if (state&STATE_ROMANJI) {
         cursor = jpN;
@@ -796,7 +829,7 @@ rom:
       next_page();
       return TRUE;
     case ' ':
-      if (is_empty)
+      if (b_is_empty)
         return FALSE;
       goto lab1;
     default:
@@ -836,7 +869,9 @@ rom:
 
 lab1:
   if (state==STATE_ROMANJI) {
-    keys[keysN++]=kv;
+    if (keysN < MAX_KEYS)
+      keys[keysN++]=kv;
+
     keys[keysN]=0;
     parse_key();
     disp_input();
@@ -849,7 +884,7 @@ lab1:
       char tt[512];
       clear_seg_label();
       merge_jp(tt);
-      dbg("tt %s %d\n", tt, strlen(tt));
+//      dbg("tt %s %d\n", tt, strlen(tt));
       (*f_anthy_set_string)(ac, tt);
       load_seg();
     } else
@@ -934,9 +969,9 @@ int init_win_anthy()
     return FALSE;
   }
 
-  int (*f_anthy_create_context)();
+  anthy_context_t (*f_anthy_create_context)();
   *(void **) (&f_anthy_create_context) = dlsym(handle, "anthy_create_context");
-  ac = (anthy_context_t)(*f_anthy_create_context)();
+  ac = (*f_anthy_create_context)();
   if (!ac) {
     printf("anthy_create_context err\n");
     return FALSE;
@@ -970,6 +1005,9 @@ int init_win_anthy()
 
   g_signal_connect(G_OBJECT(event_box_anthy),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
+
+  if (!seg)
+    seg=tzmalloc(SEG,MAX_SEG_N);
 
   for(i=0; i < MAX_SEG_N; i++) {
     seg[i].label = gtk_label_new(NULL);
@@ -1075,10 +1113,12 @@ int feedkey_anthy_release(KeySym xkey, int kbstate)
    (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
      && xkey == XK_Shift_R))
           &&  current_time() - key_press_time < 300000) {
-          flush_anthy_input();
-          key_press_time = 0;
-          hide_selections_win();
-          tsin_set_eng_ch(!tsin_pho_mode());
+          if (!test_mode) {
+            flush_anthy_input();
+            key_press_time = 0;
+            hide_selections_win();
+            tsin_set_eng_ch(!tsin_pho_mode());
+          }
           return 1;
         } else
           return 0;
@@ -1093,7 +1133,7 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
 {
   int i;
 
-//  dbg("anthy_get_preedit\n");
+//  dbg("anthy_get_preedit %d\n", cursor);
   str[0]=0;
   *pcursor=0;
 
@@ -1126,23 +1166,34 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
     if (jpN)
       attrN=1;
 
+    keys[keysN]=0;
+
+    int idx;
     for(i=0;i < jpN; i++) {
       char *s=anthy_romaji_map[jp[i]].ro;
       int N = utf8_str_N(s);
-      ch_N+=N;
-      if (i < cursor)
-        *pcursor+= N;
+//      dbg("%d]%s N:%d\n", i, s, N);
       if (i==cursor) {
-        attr[1].ofs0=*pcursor;
-        attr[1].ofs1=*pcursor+N;
+        strcat(str, keys);
+        ch_N+=keysN;
+        *pcursor = ch_N;
+        attr[1].ofs0=ch_N;
+        attr[1].ofs1=ch_N+N;
         attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
         attrN++;
       }
       strcat(str, s);
+      ch_N+=N;
     }
 
-    strcat(str, keys);
-    attr[0].ofs1 = ch_N + keysN;
+    if (cursor==jpN) {
+      *pcursor = ch_N;
+      strcat(str, keys);
+      ch_N+=keysN;
+    }
+
+    attr[0].ofs1 = ch_N;
+//    dbg("cursor %d  ch_N:%d  '%s'\n", *pcursor, ch_N, str);
   }
 
 ret:

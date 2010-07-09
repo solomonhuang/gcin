@@ -22,6 +22,30 @@
 
 #define N_(STRING) STRING
 
+#if !GTK_CHECK_VERSION(2,13,4)
+#define gtk_widget_get_window(x) (x)->window
+#endif
+
+#if GTK_CHECK_VERSION(2,17,5)
+#undef GTK_WIDGET_NO_WINDOW
+#define GTK_WIDGET_NO_WINDOW !gtk_widget_get_has_window
+#endif
+
+#if GTK_CHECK_VERSION(2,17,7)
+#undef GTK_WIDGET_VISIBLE
+#define GTK_WIDGET_VISIBLE gtk_widget_get_visible
+#endif
+
+#if GTK_CHECK_VERSION(2,17,10)
+#undef GTK_WIDGET_DRAWABLE
+#define GTK_WIDGET_DRAWABLE gtk_widget_is_drawable
+#endif
+
+#if GTK_CHECK_VERSION(2,19,5)
+#undef GTK_WIDGET_REALIZED
+#define GTK_WIDGET_REALIZED gtk_widget_get_realized
+#endif
+
 typedef enum {
   GCIN_STATE_DISABLED = 0,
   GCIN_STATE_ENG_FULL = 1,
@@ -49,6 +73,7 @@ typedef enum {
 void *zmalloc(int n);
 #define tzmalloc(type,n)  (type*)zmalloc(sizeof(type) * (n))
 #define trealloc(p,type,n)  (type*)realloc(p, sizeof(type) * (n+1))
+#define tmemdup(p,type,n) (type*)memdup(p, sizeof(type) * n)
 #if UNIX
 extern Display *dpy;
 #endif
@@ -163,10 +188,6 @@ void win32_init_win(GtkWidget *win);
 
 extern int gcin_switch_keysN;
 extern char gcin_switch_keys[];
-
-#if GTK_MAJOR_VERSION >=2 && GTK_MINOR_VERSION >= 4
-#define GTK_24 1
-#endif
 
 typedef int usecount_t;
 

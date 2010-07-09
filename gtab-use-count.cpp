@@ -29,12 +29,16 @@ void inc_gtab_use_count(char *s)
 {
   init_fp();
 
+  if (!(*s&0x80))
+    return;
+
   GTAB_USE_CNT c;
   rewind(fp_gtab_use_count);
 
   utf8_putchar(s);
 //  dbg("inc %d\n", ftell(fp_gtab_use_count));
   while (!feof(fp_gtab_use_count)) {
+    bzero(&c, sizeof(c));
     fread(&c, sizeof(c), 1, fp_gtab_use_count);
     if (memcmp(c.ch, s, CH_SZ))
       continue;

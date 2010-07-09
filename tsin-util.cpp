@@ -5,44 +5,48 @@
 #include "gcin.h"
 #include "pho.h"
 #include "tsin.h"
-
+#include "gtab.h"
 
 int hashidx[TSIN_HASH_N];
-int *phidx;
-FILE *fph;
+//static int *phidx;
+static FILE *fp_phidx;
+static FILE *fph;
 int phcount;
+int ph_key_sz; // bytes
+gboolean tsin_is_gtab;
+static int tsin_hash_shift;
 
-#if UNIX
-#define FNAME_MAX 64
-#else
-#define FNAME_MAX 128
-#endif
+#define PHIDX_SKIP  (sizeof(phcount) + sizeof(hashidx))
 
-char tsidxfname[FNAME_MAX]="";
+static char *current_tsin_fname;
 int ts_gtabN;
 static int *ts_gtab_hash;
 #define HASHN 256
 
 static int a_phcount;
-char tsfname[FNAME_MAX];
 
 void get_gcin_user_or_sys_fname(char *name, char fname[]);
 
 #if USE_TSIN
-void load_tsin_db()
+void load_tsin_db0(char *infname, gboolean is_gtab_i)
 {
-  if (!tsfname[0]) {
-    get_gcin_user_or_sys_fname("tsin32", tsfname);
-  }
+  char tsidxfname[512];
+//  dbg("cur %s %s\n", infname, current_tsin_fname);
 
-  strcpy(tsidxfname, tsfname);
+  if (current_tsin_fname && !strcmp(current_tsin_fname, infname))
+    return;
+
+  strcpy(tsidxfname, infname);
   strcat(tsidxfname, ".idx");
+
+//  dbg("tsidxfname %s\n", tsidxfname);
 
   FILE *fr;
 
-  if ((fr=fopen(tsidxfname,"rb"))==NULL) {
-    p_err("Cannot open %s\n", tsidxfname);
+  if ((fr=fopen(tsidxfname,"rb+"))==NULL) {
+    p_err("load_tsin_db0 A Cannot open '%s'\n", tsidxfname);
   }
+
 
   fread(&phcount,4,1,fr);
 #if     0
@@ -51,75 +55,178 @@ void load_tsin_db()
   a_phcount=phcount+256;
   fread(&hashidx,1,sizeof(hashidx),fr);
 
-  if (phidx)
-    free(phidx);
-
-  if ((phidx=tmalloc(int, a_phcount))==NULL)
-    p_err("malloc err pp 1");
-
-  fread(phidx,4, phcount, fr);
-  fclose(fr);
+  fp_phidx = fr;
 
   if (fph)
     fclose(fph);
 
-  dbg("tsfname: %s\n", tsfname);
+  dbg("tsfname: %s\n", infname);
 
-  if ((fph=fopen(tsfname,"rb+"))==NULL)
-    p_err("Cannot open %s", tsfname);
+  if ((fph=fopen(infname,"rb+"))==NULL)
+    p_err("load_tsin_db0 B Cannot open '%s'", infname);
+
+  free(current_tsin_fname);
+  current_tsin_fname = strdup(infname);
+
+  if (is_gtab_i) {
+    TSIN_GTAB_HEAD head;
+    fread(&head, sizeof(head), 1, fph);
+    if (head.keybits*head.maxkey > 32) {
+      ph_key_sz = 8;
+      tsin_hash_shift = TSIN_HASH_SHIFT_64;
+    }
+    else {
+      ph_key_sz = 4;
+      tsin_hash_shift = TSIN_HASH_SHIFT_32;
+    }
+  } else {
+    ph_key_sz = 2;
+    tsin_hash_shift = TSIN_HASH_SHIFT;
+  }
+  tsin_is_gtab = is_gtab_i;
 }
-#endif
 
 
-#if USE_TSIN
+
+
 void free_tsin()
 {
+  free(current_tsin_fname); current_tsin_fname=NULL;
+
   if (fph) {
     fclose(fph); fph = NULL;
   }
 
-  if (phidx) {
-    free(phidx); phidx = NULL;
+  if (fp_phidx) {
+    fclose(fp_phidx); fp_phidx=NULL;
   }
 }
+
+void load_tsin_db()
+{
+  char tsfname[512];
+  get_gcin_user_or_sys_fname("tsin32", tsfname);
+  load_tsin_db0(tsfname, FALSE);
+}
 #endif
+
+static void seek_fp_phidx(int i)
+{
+  fseek(fp_phidx, PHIDX_SKIP + i*sizeof(int), SEEK_SET);
+}
+
+void reload_tsin_db()
+{
+#if USE_TSIN
+  char tt[512];
+  if (!current_tsin_fname)
+    return;
+
+  strcpy(tt, current_tsin_fname);
+  free(current_tsin_fname); current_tsin_fname = NULL;
+  load_tsin_db0(tt, tsin_is_gtab);
+#endif
+}
+
+inline static int get_phidx(int i)
+{
+  seek_fp_phidx(i);
+  int t;
+  fread(&t, sizeof(int), 1, fp_phidx);
+
+  if (tsin_is_gtab)
+    t += sizeof(TSIN_GTAB_HEAD);
+
+  return t;
+}
+
+
+int phokey_t_seq16(phokey_t *a, phokey_t *b, int len)
+{
+  int i;
+
+  for (i=0;i<len;i++) {
+    if (a[i] > b[i]) return 1;
+    else
+    if (a[i] < b[i]) return -1;
+  }
+
+  return 0;
+}
+
+
+int phokey_t_seq32(u_int *a, u_int *b, int len)
+{
+  int i;
+
+  for (i=0;i<len;i++) {
+    if (a[i] > b[i]) return 1;
+    else
+    if (a[i] < b[i]) return -1;
+  }
+
+  return 0;
+}
+
+
+int phokey_t_seq64(u_int64_t *a, u_int64_t *b, int len)
+{
+  int i;
+
+  for (i=0;i<len;i++) {
+    if (a[i] > b[i]) return 1;
+    else
+    if (a[i] < b[i]) return -1;
+  }
+
+  return 0;
+}
+
+
+int phokey_t_seq(void *a, void *b, int len)
+{
+  if (ph_key_sz==2)
+    return phokey_t_seq16((phokey_t *)a, (phokey_t *)b, len);
+  if (ph_key_sz==4)
+    return phokey_t_seq32((u_int *)a, (u_int *)b, len);
+  if (ph_key_sz==8)
+    return phokey_t_seq64((u_int64_t*)a, (u_int64_t*)b, len);
+  return 0;
+}
 
 
 static int phseq(u_char *a, u_char *b)
 {
   u_char lena, lenb, mlen;
   int i;
-  phokey_t ka,kb;
 
   lena=*(a++); lenb=*(b++);
   a+=sizeof(usecount_t); b+=sizeof(usecount_t);   // skip usecount
 
   mlen=Min(lena,lenb);
+  u_int64_t ka[MAX_PHRASE_LEN], kb[MAX_PHRASE_LEN];
 
-  for(i=0;i<mlen; i++) {
-    memcpy(&ka, a, sizeof(phokey_t));
-    memcpy(&kb,b, sizeof(phokey_t));
-    if (ka > kb) return 1;
-    if (ka < kb) return -1;
-    a+=sizeof(phokey_t);
-    b+=sizeof(phokey_t);
-  }
+  memcpy(ka, a, ph_key_sz * mlen);
+  memcpy(kb, b, ph_key_sz * mlen);
+
+  int d = phokey_t_seq(a, b, mlen);
+  if (d)
+    return d;
 
   if (lena > lenb) return 1;
   if (lena < lenb) return -1;
   return 0;
 }
 
-void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec);
+void inc_dec_tsin_use_count(void *pho, char *ch, int N);
 
 static gboolean saved_phrase;
 
-gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t usecount)
+gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usecount)
 {
   int mid, ord = 0, ph_ofs, hashno, i;
-  FILE *fw;
-  u_char tbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) + 1 + sizeof(usecount_t)],
-         sbuf[MAX_PHRASE_LEN*(sizeof(phokey_t)+CH_SZ) + 1 + sizeof(usecount_t)];
+  u_char tbuf[MAX_PHRASE_LEN*(sizeof(u_int64_t)+CH_SZ) + 1 + sizeof(usecount_t)],
+         sbuf[MAX_PHRASE_LEN*(sizeof(u_int64_t)+CH_SZ) + 1 + sizeof(usecount_t)];
 
   saved_phrase = TRUE;
 
@@ -133,439 +240,136 @@ gboolean save_phrase_to_db(phokey_t *phkeys, char *utf8str, int len, usecount_t 
   dbg("'\n");
 #endif
 
-  memcpy(&tbuf[1 + sizeof(usecount_t)], phkeys, sizeof(phokey_t) * len);
-  memcpy(&tbuf[sizeof(phokey_t)*len + 1 + sizeof(usecount_t)], utf8str, tlen);
+  memcpy(&tbuf[1 + sizeof(usecount_t)], phkeys, ph_key_sz * len);
+  memcpy(&tbuf[ph_key_sz*len + 1 + sizeof(usecount_t)], utf8str, tlen);
 
-  hashno=phkeys[0] >> TSIN_HASH_SHIFT;
+  if (ph_key_sz==2)
+    hashno= *((phokey_t *)phkeys) >> TSIN_HASH_SHIFT;
+  else if (ph_key_sz==4)
+    hashno= *((u_int *)phkeys) >> TSIN_HASH_SHIFT_32;
+  else
+    hashno= *((u_int64_t *)phkeys) >> TSIN_HASH_SHIFT_64;
+
+//  dbg("hashno %d\n", hashno);
+
   if (hashno >= TSIN_HASH_N)
     return FALSE;
 
   for(mid=hashidx[hashno]; mid<hashidx[hashno+1]; mid++) {
-    ph_ofs=phidx[mid];
+    ph_ofs=get_phidx(mid);
+
     fseek(fph, ph_ofs, SEEK_SET);
     fread(sbuf,1,1,fph);
     fread(&sbuf[1], sizeof(usecount_t), 1, fph); // use count
-    fread(&sbuf[1+sizeof(usecount_t)], 1, (sizeof(phokey_t) + CH_SZ) * sbuf[0], fph);
+    fread(&sbuf[1+sizeof(usecount_t)], 1, (ph_key_sz + CH_SZ) * sbuf[0], fph);
     if ((ord=phseq(sbuf,tbuf)) >=0)
       break;
   }
 
 //  dbg("tlen:%d  ord:%d  %s\n", tlen, ord, utf8str);
-  if (!ord && !memcmp(&sbuf[sbuf[0]*sizeof(phokey_t)+1+sizeof(usecount_t)], utf8str, tlen)) {
+  if (!ord && !memcmp(&sbuf[sbuf[0]*ph_key_sz+1+sizeof(usecount_t)], utf8str, tlen)) {
 //    bell();
     dbg("Phrase already exists\n");
-    inc_dec_tsin_use_count(phkeys, utf8str, len, FALSE);
+    inc_dec_tsin_use_count(phkeys, utf8str, len);
     return FALSE;
   }
 
-  for(i=phcount;i>=mid;i--)
-    phidx[i+1]=phidx[i];
+  int wN = phcount - mid;
 
-  fseek(fph,0,SEEK_END);
-  ph_ofs=ftell(fph);
-  phidx[mid]=ph_ofs;
-  phcount++;
-  if (phcount>=a_phcount) {
-    a_phcount+=256;
-    if (!(phidx=trealloc(phidx, int, a_phcount*4))) {
-      p_err("tsin.c:realloc err");
-    }
+//  dbg("wN %d  phcount:%d mid:%d\n", wN, phcount, mid);
+
+  if (wN > 0) {
+    int *phidx = tmalloc(int, wN);
+    seek_fp_phidx(mid);
+    fread(phidx, sizeof(int), wN, fp_phidx);
+    seek_fp_phidx(mid+1);
+    fwrite(phidx, sizeof(int), wN, fp_phidx);
+    free(phidx);
   }
 
-  fwrite(tbuf, 1, sizeof(phokey_t)*len + tlen + 1+ sizeof(usecount_t), fph);
+  fseek(fph,0,SEEK_END);
+
+  ph_ofs=ftell(fph);
+  if (tsin_is_gtab)
+    ph_ofs -= sizeof(TSIN_GTAB_HEAD);
+
+//  dbg("ph_ofs %d  ph_key_sz:%d\n", ph_ofs, ph_key_sz);
+  seek_fp_phidx(mid);
+  fwrite(&ph_ofs, sizeof(int), 1, fp_phidx);
+  phcount++;
+
+  fwrite(tbuf, 1, ph_key_sz*len + tlen + 1+ sizeof(usecount_t), fph);
   fflush(fph);
 
   if (hashidx[hashno]>mid)
     hashidx[hashno]=mid;
 
-  hashno++;
-
-  for(;hashno<256;hashno++)
+  for(hashno++; hashno<TSIN_HASH_N; hashno++)
     hashidx[hashno]++;
 
-  if ((fw=fopen(tsidxfname,"wb"))==NULL) {
-    dbg("%s create err", tsidxfname);
-    return FALSE;
-  }
+  rewind(fp_phidx);
+  fwrite(&phcount, sizeof(phcount), 1, fp_phidx);
+  fwrite(&hashidx,sizeof(hashidx),1, fp_phidx);
+  fflush(fp_phidx);
 
-  fwrite(&phcount,4,1,fw);
-  fwrite(&hashidx,sizeof(hashidx),1,fw);
-  fwrite(phidx,4,phcount,fw);
-  fclose(fw);
+//  dbg("ofs %d\n", get_phidx(mid));
 
   return TRUE;
 }
 
 
-int *ts_gtab;
-
-int read_tsin_phrase(char *str, usecount_t *usecount)
-{
-  u_char len;
-  u_char pho[sizeof(phokey_t) * MAX_PHRASE_LEN];
-  len = 0;
-
-  fread(&len, 1, 1, fph);
-  if (len > MAX_PHRASE_LEN || len <=0)
-    return 0;
-  fread(usecount, sizeof(usecount_t), 1, fph); // use count
-  fread(pho, sizeof(phokey_t), len, fph);
-
-  int i;
-  int tlen = 0;
-
-  for(i=0; i < len; i++) {
-    fread(&str[tlen], 1, 1, fph);
-    int sz = utf8_sz(&str[tlen]);
-    fread(&str[tlen+1], 1, sz-1, fph);
-    tlen+=sz;
-  }
-
-  str[tlen] = 0;
-
-  return tlen;
-}
-
-
-#if USE_TSIN
-int load_ts_gtab(int idx, char *tstr, usecount_t *usecount)
-{
-  int ofs = ts_gtab[idx];
-
-  fseek(fph, ofs, SEEK_SET);
-  return read_tsin_phrase(tstr, usecount);
-}
-#endif
-
-typedef struct {
-  char ts[MAX_PHRASE_STR_LEN];
-  int ofs;
-} TS_TMP;
-
-static int qcmp_ts_gtab(const void *aa, const void *bb)
-{
-  TS_TMP *a = (TS_TMP *)aa, *b = (TS_TMP *)bb;
-
-  return strcmp(a->ts, b->ts);
-}
-
 #include <sys/stat.h>
 
-#if USE_TSIN
-void build_ts_gtab(int rebuild)
-{
-  if (!phidx)
-    load_tsin_db();
 
-  if (!ts_gtab_hash)
-    ts_gtab_hash = tmalloc(int, HASHN+1);
-
-  char fname[256];
-
-  get_gcin_user_or_sys_fname("tsin-gtabidx2", fname);
-
-  struct stat st_gtab, st_tsin32;
-  FILE *fp;
-
-//  dbg("%s %s\n", fname, tsfname);
-
-#if 1
-  if (!rebuild && !stat(fname, &st_gtab) && !stat(tsfname, &st_tsin32) &&
-      st_tsin32.st_mtime < st_gtab.st_mtime) {
-
-    if (fp=fopen(fname, "rb")) {
-      printf(".......... from %s\n", fname);
-      fread(&ts_gtabN, sizeof(ts_gtabN), 1, fp);
-      fread(ts_gtab_hash, sizeof(int), HASHN+1, fp);
-      ts_gtab = tmalloc(int, ts_gtabN);
-      fread(ts_gtab, sizeof(int), ts_gtabN, fp);
-      fclose(fp);
-      return;
-    }
-  }
-#endif
-
-//  puts("oooooooooooooooooooooo");
-
-  fseek(fph,0,SEEK_SET);
-
-  if (ts_gtab) {
-    free(ts_gtab);
-    ts_gtab = NULL;
-  }
-
-  TS_TMP *tstmp=NULL;
-  int tstmpN=0;
-  usecount_t usecount;
-
-
-  while (!feof(fph)) {
-    if (!(tstmp=trealloc(tstmp, TS_TMP, tstmpN + 1)))
-      p_err("tsin.c:realloc err");
-
-    tstmp[tstmpN].ofs = ftell(fph);
-
-    if (!read_tsin_phrase(tstmp[tstmpN].ts, &usecount))
-      break;
-
-    tstmpN++;
-  }
-
-  qsort(tstmp, tstmpN, sizeof(TS_TMP), qcmp_ts_gtab);
-
-  int i;
-  for(i=0; i <= HASHN;i++)
-    ts_gtab_hash[i] = -1;
-
-  ts_gtabN = tstmpN;
-  ts_gtab = tmalloc(int, ts_gtabN);
-
-  for(i=0; i < tstmpN; i++) {
-    ts_gtab[i] = tstmp[i].ofs;
-    usecount_t uc;
-    u_char tstr[MAX_CIN_PHR];
-    int tlen = load_ts_gtab(i, (char *)tstr, &uc);
-
-    if (ts_gtab_hash[tstr[0]] < 0)
-      ts_gtab_hash[tstr[0]] = i;
-  }
-
-  if (ts_gtab_hash[0]==-1)
-    ts_gtab_hash[0]=0;
-
-  ts_gtab_hash[HASHN]=ts_gtabN-1;
-  for(i=HASHN-1;i>=0;i--)
-    if (ts_gtab_hash[i] < 0)
-      ts_gtab_hash[i] = ts_gtab_hash[i+1];
-
-  for(i=1; i < HASHN; i++)
-    if (ts_gtab_hash[i] < 0)
-      ts_gtab_hash[i] = ts_gtab_hash[i-1];
-
-
-  if (fp=fopen(fname, "wb")) {
-    fwrite(&ts_gtabN, sizeof(ts_gtabN), 1, fp);
-    fwrite(ts_gtab_hash, sizeof(int), HASHN+1, fp);
-    fwrite(ts_gtab, sizeof(int), ts_gtabN, fp);
-    fclose(fp);
-  }
-
-  free(tstmp);
-}
-#endif
-
-
-
-#if USE_TSIN
-int find_match(char *str, int *eq_N, usecount_t *usecount)
-{
-  int len = strlen(str);
-  int ge_N = 0;
-
-  *eq_N  = 0;
-  *usecount = 0;
-
-  if (!ts_gtabN || saved_phrase) {
-    saved_phrase = FALSE;
-    build_ts_gtab(0);
-  }
-#if 0
-  int bottom = 0;
-  int top = ts_gtabN - 1;
-#else
-  int hashi = ((u_char *)str)[0];
-  int bottom=ts_gtab_hash[hashi];
-  int top=ts_gtab_hash[hashi+1];
-#endif
-  int mid, tlen;
-  char tstr[MAX_PHRASE_STR_LEN];
-  usecount_t uc;
-#if 0
-  dbg("bot top  %s %d %d %d\n", str, ts_gtabN, bottom, top);
-#endif
-  do {
-    mid = (bottom + top) /2;
-
-//    dbg("tstr:%s  %d %d %d\n", tstr, bottom, mid, top);
-    tlen = load_ts_gtab(mid, tstr, usecount);
-
-    if (!tlen) {  // error in db
-      dbg("error in db %s %d\n", str, mid);
-      build_ts_gtab(1);
-#if 1
-      return 0;
-#else
-	exit(0);
-#endif
-    }
-
-    int r = strncmp(str, tstr, len);
-
-    if (r < 0) {
-      top = mid - 1;
-    }
-    else
-    if (r > 0) {
-      bottom = mid + 1;
-    } else {
-      bottom = mid;
-      int i;
-
-      for(i=mid; i>=0; i--) {
-        tlen = load_ts_gtab(i, tstr, &uc);
-
-//	if (!strcmp(str,"水"))
-//        printf("< %s %s\n", str, tstr);
-
-        if (strncmp(str, tstr, len))
-          break;
-
-        ge_N++;
-        if (strcmp(str, tstr))
-          continue;
-
-        (*eq_N)++;
-        if (!*usecount)
-          *usecount = uc;
-
-        return ge_N;
-      }
-
-      for(i=mid+1; i<ts_gtabN; i++) {
-        tlen = load_ts_gtab(i, tstr, &uc);
-
-//	if (!strcmp(str,"水"))
-//        printf("> %s %s\n", str, tstr);
-
-        if (strncmp(str, tstr, len))
-          break;
-
-        ge_N++;
-        if (strcmp(str, tstr))
-          continue;
-
-        (*eq_N)++;
-        if (!*usecount)
-          *usecount = uc;
-
-        return ge_N;
-      }
-
-      return ge_N;
-    }
-
-  } while (bottom <= top);
-
-//  dbg("%d %d\n", bottom, top);
-  return 0;
-}
-#endif
-
-void inc_gtab_usecount(char *str)
-{
-  int len = strlen(str);
-  if (!len)
-    return;
-
-//  printf("inc %s\n", str);
-
-  if (!ts_gtabN)
-    build_ts_gtab(0);
-
-  int bottom = 0;
-  int top = ts_gtabN - 1;
-  int mid, tlen;
-  char tstr[MAX_PHRASE_STR_LEN];
-  usecount_t uc;
-
-  do {
-    mid = (bottom + top) /2;
-
-//    dbg("tstr:%s  %d %d %d\n", tstr, bottom, mid, top);
-    tlen = load_ts_gtab(mid, tstr, &uc);
-
-    if (!tlen) {  // error in db
-      dbg("inc_gtab_usecount error in db\n");
-      build_ts_gtab(1);
-      return;
-    }
-
-    int r = strcmp(str, tstr);
-
-    if (r < 0)
-      top = mid - 1;
-    else
-    if (r > 0) {
-      bottom = mid + 1;
-    } else {
-      uc++;
-      u_char len;
-      int ofs = ts_gtab[mid];
-      fseek(fph, ofs, SEEK_SET);
-      fread(&len, 1, 1, fph);
-      fwrite(&uc, sizeof(usecount_t), 1, fph); // use count
-      fflush(fph);
-      return;
-    }
-  } while (bottom <= top);
-
-  printf("inc_gtab_usecount failed %s\n", str);
-  return;
-}
-
-
-void load_tsin_entry(int idx, char *len, usecount_t *usecount, phokey_t *pho,
+void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho,
                     u_char *ch)
 {
   *usecount = 0;
 
+
   if (idx >= phcount) {
-    load_tsin_db(); // probably db changed, reload;
+    reload_tsin_db(); // probably db changed, reload;
     *len = 0;
     return;
   }
 
-  int ph_ofs=phidx[idx];
+  int ph_ofs=get_phidx(idx);
+//  dbg("idx %d:%d\n", idx, ph_ofs);
 
-  fseek(fph, ph_ofs, SEEK_SET);
+  fseek(fph, ph_ofs , SEEK_SET);
+  *len = 0;
   fread(len, 1, 1, fph);
 
   if (*len > MAX_PHRASE_LEN || *len <= 0) {
-    dbg("err: tsin db changed reload");
-    load_tsin_db(); // probably db changed, reload;
+    dbg("err: tsin db changed reload\n");
+    reload_tsin_db(); // probably db changed, reload;
     *len = 0;
     return;
   }
 
   fread(usecount, sizeof(usecount_t), 1, fph); // use count
-  fread(pho, sizeof(phokey_t), (int)(*len), fph);
+  fread(pho, ph_key_sz, (int)(*len), fph);
   if (ch)
     fread(ch, CH_SZ, (int)(*len), fph);
 }
 
 
-int phokey_t_seq(phokey_t *a, phokey_t *b, int len)
-{
-  int i;
-
-  for (i=0;i<len;i++) {
-    if (a[i] > b[i]) return 1;
-    else
-    if (a[i] < b[i]) return -1;
-  }
-
-  return 0;
-}
-
 // ***  r_sti<=  range  < r_edi
-gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
+gboolean tsin_seek(void *pho, int plen, int *r_sti, int *r_edi)
 {
   int mid, cmp;
-  phokey_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
+  u_int64_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
   u_char mlen, stch[MAX_PHRASE_LEN * CH_SZ];
   char len;
   usecount_t usecount;
-  int hashi= *pho >> TSIN_HASH_SHIFT;
+  int hashi;
+
+  if (ph_key_sz==2)
+    hashi= *((phokey_t *)pho) >> TSIN_HASH_SHIFT;
+  else if (ph_key_sz==4)
+    hashi= *((u_int *)pho) >> TSIN_HASH_SHIFT_32;
+  else
+    hashi= *((u_int64_t *)pho) >> TSIN_HASH_SHIFT_64;
 
   if (hashi >= TSIN_HASH_N)
     return FALSE;
@@ -609,7 +413,7 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
   for(sti = mid; sti>=0; sti--) {
     load_tsin_entry(sti, &len, &usecount, stk, stch);
 
-    if (len >= plen && !phokey_t_seq(stk, pho, plen))
+    if (!phokey_t_seq(stk, pho, plen) && len >= plen)
       continue;
     break;
   }
@@ -620,10 +424,12 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
   for(edi = mid; edi < phcount; edi++) {
     load_tsin_entry(edi, &len, &usecount, stk, stch);
 
-    if (len >= plen && !phokey_t_seq(stk, pho, plen))
+    if (!phokey_t_seq(stk, pho, plen) && len >= plen)
       continue;
     break;
   }
+
+//  dbg("sti %d %d\n", sti, edi);
 
   *r_sti = sti;
   *r_edi = edi;
@@ -631,8 +437,7 @@ gboolean tsin_seek(phokey_t *pho, int plen, int *r_sti, int *r_edi)
   return TRUE;
 }
 
-// och : orginal och;
-void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
+void inc_dec_tsin_use_count(void *pho, char *ch, int N)
 {
   int sti, edi;
 
@@ -653,7 +458,7 @@ void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
   for(idx=sti; idx < edi; idx++) {
     char len;
     usecount_t usecount, n_usecount;
-    phokey_t phi[MAX_PHRASE_LEN];
+    u_int64_t phi[MAX_PHRASE_LEN];
     char stch[MAX_PHRASE_LEN * CH_SZ];
 
     load_tsin_entry(idx, &len, &usecount, phi, (u_char *)stch);
@@ -671,18 +476,12 @@ void inc_dec_tsin_use_count(phokey_t *pho, char *ch, int N, gboolean b_dec)
 #if 0
     dbg("found match\n");
 #endif
-    int ph_ofs=phidx[idx];
+    int ph_ofs=get_phidx(idx);
+
     fseek(fph, ph_ofs + 1, SEEK_SET);
 
-    if (b_dec) {
-      if (usecount > -127)
-        n_usecount--;
-//      dbg("dec %d\n", n_usecount);
-    } else {
-      if (usecount < 0x3fffffff)
-        n_usecount++;
-//      dbg("inc %d\n", n_usecount);
-    }
+    if (usecount < 0x3fffffff)
+      n_usecount++;
 
     if (n_usecount != usecount) {
       fwrite(&n_usecount, sizeof(usecount_t), 1, fph); // use count

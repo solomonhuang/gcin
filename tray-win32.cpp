@@ -3,11 +3,13 @@
 #include "gtab.h"
 #include "win-sym.h"
 #include "eggtrayicon.h"
+#include <string.h>
 #if UNIX
 #include <signal.h>
 #else
 #include <process.h>
 #endif
+#include "gst.h"
 
 gboolean tsin_pho_mode();
 extern int tsin_half_full, gb_output;
@@ -46,19 +48,10 @@ void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 }
 
 void close_all_clients();
-void restart_gcin(GtkCheckMenuItem *checkmenuitem, gpointer dat)
+
+#if UNIX
+void restart_gcin0()
 {
-#if WIN32
-#if 0
-  char execbin[256];
-  strcpy(execbin, gcin_program_files_path);
-  strcat(execbin, "\\gcin");
-  close_all_clients();
-  _execl(execbin, "gcin", NULL);
-#else
-  exit(0);
-#endif
-#else
   static char execbin[]=GCIN_BIN_DIR"/gcin";
 
   signal(SIGCHLD, SIG_IGN);
@@ -70,9 +63,19 @@ void restart_gcin(GtkCheckMenuItem *checkmenuitem, gpointer dat)
     execl(execbin, "gcin", NULL);
   } else
     exit(0);
+}
+#endif
+
+void do_exit();
+
+void restart_gcin(GtkCheckMenuItem *checkmenuitem, gpointer dat)
+{
+#if WIN32
+  do_exit();
+#else
+  restart_gcin0();
 #endif
 }
-
 
 void gcb_main();
 void cb_tog_gcb(GtkCheckMenuItem *checkmenuitem, gpointer dat)
@@ -92,7 +95,7 @@ void cb_trad2sim(GtkCheckMenuItem *checkmenuitem, gpointer dat);
 void cb_trad_sim_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   cb_trad_sim_toggle();
-  dbg("checkmenuitem %x\n", checkmenuitem);
+//  dbg("checkmenuitem %x\n", checkmenuitem);
 }
 
 void exec_gcin_setup_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
@@ -158,16 +161,51 @@ GtkWidget *create_tray_menu(MITEM *mitems)
     } else
       item = gtk_menu_item_new_with_label (_(mitems[i].name));
 
-    g_signal_connect (G_OBJECT (item), "activate",
+    mitems[i].handler = g_signal_connect (G_OBJECT (item), "activate",
                       G_CALLBACK (mitems[i].cb), NULL);
 
     gtk_widget_show(item);
+    mitems[i].item = item;
 
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   }
 
   return menu;
 }
+
+void _null_cb(GtkCheckMenuItem *checkmenuitem, gpointer dat)
+{
+}
+
+void update_item_active(MITEM *mitems)
+{
+  int i;
+  for(i=0; mitems[i].name; i++)
+    if (mitems[i].check_dat) {
+      GtkWidget *item = mitems[i].item;
+      if (!item)
+        continue;
+
+      g_signal_handler_block(item, mitems[i].handler);
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), *mitems[i].check_dat);
+      g_signal_handler_unblock(item, mitems[i].handler);
+    }
+}
+
+void update_item_active_unix();
+
+void update_item_active_all()
+{
+  if (gcin_win32_icon) {
+    update_item_active(mitems_main);
+    update_item_active(mitems_state);
+  }
+#if UNIX
+  else
+    update_item_active_unix();
+#endif
+}
+
 
 void inmd_popup_tray();
 
@@ -188,7 +226,7 @@ static void cb_activate(GtkStatusIcon *status_icon, gpointer user_data)
 
 static void cb_popup(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
 {
-  dbg("cb_popup\n");
+//  dbg("cb_popup\n");
   switch (button) {
 #if UNIX
     case 1:
@@ -214,7 +252,7 @@ static void cb_popup(GtkStatusIcon *status_icon, guint button, guint activate_ti
 void toggle_half_full_char();
 static void cb_activate_state(GtkStatusIcon *status_icon, gpointer user_data)
 {
-  dbg("cb_activate\n");
+//  dbg("cb_activate\n");
   toggle_half_full_char();
 }
 
@@ -259,7 +297,14 @@ void load_tray_icon_win32()
 	  return;
 #endif
 
-  dbg("load_tray_icon_win32\n");
+//  dbg("load_tray_icon_win32\n");
+#if UNIX
+  char *tip;
+  tip="";
+#else
+  wchar_t *tip;
+  tip=L"";
+#endif
 
   char *iconame;
   if (!current_CS || current_CS->im_state == GCIN_STATE_DISABLED||current_CS->im_state == GCIN_STATE_ENG_FULL) {
@@ -269,13 +314,13 @@ void load_tray_icon_win32()
   }
 
   char tt[32];
-  if (current_CS && (current_CS->in_method==6 || current_CS->in_method==12) &&current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
+  if (current_CS && (current_method_type()==method_type_TSIN || current_method_type()==method_type_ANTHY) &&current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
     strcpy(tt, "en-");
     strcat(tt, iconame);
     iconame = tt;
   }
 
-  dbg("iconame %s\n", iconame);
+//  dbg("iconame %s\n", iconame);
   char fname[128];
   fname[0]=0;
   if (iconame)
@@ -284,57 +329,77 @@ void load_tray_icon_win32()
 
   char *icon_st=NULL;
   char fname_state[128];
-  if (current_CS && (current_CS->im_state == GCIN_STATE_ENG_FULL || current_CS->b_half_full_char ||
-      current_CS->in_method==6 && tsin_half_full)) {
-      if (gb_output)
-        icon_st="full-simp.png";
-      else
-        icon_st="full-trad.png";
+
+//  dbg("%d %d\n",current_CS->im_state,current_CS->b_half_full_char);
+
+  if (current_CS && (current_CS->im_state == GCIN_STATE_ENG_FULL ||
+      current_CS->im_state != GCIN_STATE_DISABLED && current_CS->b_half_full_char ||
+      current_method_type()==method_type_TSIN && tss.tsin_half_full)) {
+		if (gb_output) {
+          icon_st="full-simp.png";
+		   tip = _L("全形/簡體輸出");
+		}
+		else {
+          icon_st="full-trad.png";
+		  tip = _L("全形/正體輸出");
+		}
   } else {
-      if (gb_output)
+	  if (gb_output) {
         icon_st="half-simp.png";
-      else
+		tip= _L("半形/簡體輸出");
+	  }
+	  else {
         icon_st="half-trad.png";
+		tip = _L("半形/正體輸出");
+	  }
   }
+
   get_icon_path(icon_st, fname_state);
-  dbg("wwwwwwww %s\n", fname_state);
+//  dbg("wwwwwwww %s\n", fname_state);
 
 
   if (icon_main) {
-    dbg("set %s %s\n", fname, fname_state);
+//    dbg("set %s %s\n", fname, fname_state);
     gtk_status_icon_set_from_file(icon_main, fname);
     gtk_status_icon_set_from_file(icon_state, fname_state);
   }
   else {
-    dbg("gtk_status_icon_new_from_file a\n");
+//    dbg("gtk_status_icon_new_from_file a\n");
     icon_main = gtk_status_icon_new_from_file(fname);
     g_signal_connect(G_OBJECT(icon_main),"activate", G_CALLBACK (cb_activate), NULL);
     g_signal_connect(G_OBJECT(icon_main),"popup-menu", G_CALLBACK (cb_popup), NULL);
 
-	dbg("gtk_status_icon_new_from_file b\n");
+//	dbg("gtk_status_icon_new_from_file %s b\n", fname_state);
     icon_state = gtk_status_icon_new_from_file(fname_state);
     g_signal_connect(G_OBJECT(icon_state),"activate", G_CALLBACK (cb_activate_state), NULL);
     g_signal_connect(G_OBJECT(icon_state),"popup-menu", G_CALLBACK (cb_popup_state), NULL);
 
-	dbg("icon %s %s\n", fname, fname_state);
+//	dbg("icon %s %s\n", fname, fname_state);
+  }
+
+  if (icon_state)
+    gtk_status_icon_set_tooltip(icon_state, _(tip));
+
+  if (icon_main) {
+    char tt[64];
+    if (current_CS && current_CS->in_method && inmd[current_CS->in_method].cname[0])
+      strcpy(tt, inmd[current_CS->in_method].cname);
+
+    if (!iconame || !strcmp(iconame, GCIN_TRAY_PNG) || !tsin_pho_mode())
+      strcpy(tt, "English");
+    gtk_status_icon_set_tooltip(icon_main, tt);
   }
 
   return;
 }
 
-
-
 void init_tray_win32()
 {
-#if UNIX
-  if (!gcin_win32_icon)
-    return;
   load_tray_icon_win32();
-#else
-  load_tray_icon_win32();
-#endif
 }
 
-#if WIN32
-void update_tray_icon() {}
-#endif
+void destroy_tray_win32()
+{
+  g_object_unref(icon_main); icon_main = NULL;
+  g_object_unref(icon_state); icon_state = NULL;
+}

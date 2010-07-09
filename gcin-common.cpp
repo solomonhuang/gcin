@@ -2,12 +2,11 @@
 #include "pho.h"
 
 #if USE_TSIN
-extern gboolean flush_tsin_buffer();
+void flush_tsin_buffer();
 #endif
 
 PIN_JUYIN *pin_juyin;
 
-int c_len;
 int text_pho_N=3;
 
 gboolean b_use_full_space = TRUE;
@@ -54,6 +53,9 @@ gint64 current_time()
 
 void disp_pho_sub(GtkWidget *label, int index, char *pho)
 {
+  if (!label)
+    return;
+
   if (index>=text_pho_N)
     return;
 
@@ -93,6 +95,8 @@ void exec_gcin_setup()
   if (geteuid() < 100 || getegid() < 100)
     return;
 #else
+  if (getenv("WIN_LOGON"))
+    return;
 #endif
 
   char pidstr[32];
@@ -134,7 +138,7 @@ void set_label_space(GtkWidget *label)
 void set_no_focus(GtkWidget *win)
 {
 #if UNIX
-  gdk_window_set_override_redirect(win->window, TRUE);
+  gdk_window_set_override_redirect(gtk_widget_get_window(win), TRUE);
 #else
   gtk_window_set_decorated(GTK_WINDOW(win), FALSE);
   gtk_window_set_keep_above(GTK_WINDOW(win), TRUE);

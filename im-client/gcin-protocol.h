@@ -14,6 +14,8 @@ typedef enum {
   GCIN_req_reset = 0x80,
   GCIN_req_focus_out2 = 0x100,
   GCIN_req_message = 0x200,
+  GCIN_req_test_key_press = 0x400,
+  GCIN_req_test_key_release = 0x800,
 } GCIN_req_t;
 
 

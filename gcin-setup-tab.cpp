@@ -28,6 +28,7 @@ static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_inner_frame,
 #if TRAY_ENABLED
                  *check_button_gcin_status_tray,
+                 *check_button_gcin_win32_icon,
 #endif
                  *check_button_gcin_win_color_use;
 
@@ -134,7 +135,7 @@ struct {
 
 static void callback_button_clicked_tsin_space_opt( GtkWidget *widget, gpointer data)
 {
-  new_select_idx_tsin_space_opt = (int) data;
+  new_select_idx_tsin_space_opt = (gsize) data;
 }
 
 static int get_currnet_tsin_space_option_idx()
@@ -880,13 +881,28 @@ static void cb_ts_export()
        char gcin_dir[512];
        get_gcin_dir(gcin_dir);
        char cmd[256];
+       char fname[256];
+       char *filename=inmd[default_input_method].filename;
+
+       if (default_input_method==6)
+         get_gcin_user_fname("tsin32", fname);
+       else
+       if (filename) {
+         char tt[256];
+         strcat(strcpy(tt, filename), ".append.gtab.tsin-db");
+         if (!get_gcin_user_fname(tt, fname)) {
+           strcat(strcpy(tt, filename), ".tsin-db");
+           if (!get_gcin_user_fname(tt, fname))
+             p_err("cannot find %s", fname);
+         }
+       }
 #if UNIX
-       snprintf(cmd, sizeof(cmd), GCIN_BIN_DIR"/tsd2a32 %s/tsin32 > %s", gcin_dir, selected_filename);
+       snprintf(cmd, sizeof(cmd), GCIN_BIN_DIR"/tsd2a32 %s > %s", fname, selected_filename);
        int res = system(cmd);
        create_result_win(res);
 #else
        char para[256];
-       sprintf_s(para, sizeof(para), "\"%s\\tsin32\" -o \"%s\"", gcin_dir, selected_filename);
+       sprintf_s(para, sizeof(para), "\"%s\" -o \"%s\"", fname, selected_filename);
        win32exec_para("tsd2a32", para);
 #endif
    }
@@ -897,13 +913,23 @@ static void ts_import(const gchar *selected_filename)
 {
    char cmd[256];
 #if UNIX
-   snprintf(cmd, sizeof(cmd),
-      "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile",
-      getenv("HOME"), selected_filename);
-   int res = system(cmd);
-   create_result_win(res);
+   if (default_input_method==6) {
+     snprintf(cmd, sizeof(cmd),
+        "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile",
+        getenv("HOME"), selected_filename);
+     int res = system(cmd);
+     create_result_win(res);
+   } else {
+     char tt[512];
+     sprintf(tt, GCIN_SCRIPT_DIR"/tsin-gtab-import %s '%s'", inmd[default_input_method].filename,
+     selected_filename);
+     system(tt);
+   }
 #else
-   win32exec_script("ts-import.bat", (char *)selected_filename);
+   if (default_input_method==6)
+     win32exec_script("ts-import.bat", (char *)selected_filename);
+   else {
+   }
 #endif
 }
 
@@ -925,10 +951,16 @@ static void cb_ts_import()
 static void cb_ts_edit()
 {
 #if UNIX
-  char tt[512];
-  sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile ) &", utf8_edit);
-  dbg("exec %s\n", tt);
-  system(tt);
+  if (default_input_method==6) {
+    char tt[512];
+    sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile ) &", utf8_edit);
+    dbg("exec %s\n", tt);
+    system(tt);
+  } else {
+    char tt[512];
+    sprintf(tt, GCIN_SCRIPT_DIR"/tsin-gtab-edit %s", inmd[default_input_method].filename);
+    system(tt);
+  }
 #else
   win32exec_script("ts-edit.bat");
 #endif
@@ -1211,6 +1243,7 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_int(GCIN_INNER_FRAME, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_inner_frame)));
 #if TRAY_ENABLED
   save_gcin_conf_int(GCIN_STATUS_TRAY, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray)));
+  save_gcin_conf_int(GCIN_WIN32_ICON, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win32_icon)));
 #endif
 
   cstr = gtk_color_selection_palette_to_string(&gcin_win_gcolor_fg, 1);
@@ -1417,6 +1450,7 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_ts_edit), "clicked",
                     G_CALLBACK (cb_ts_edit), NULL);
 
+  if (default_input_method == 6) {
   GtkWidget *button_tslearn = gtk_button_new_with_label(_(_L("讓詞音從文章學習詞")));
   gtk_box_pack_start (GTK_BOX (vbox), button_tslearn, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_tslearn), "clicked",
@@ -1426,6 +1460,7 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox), button_ts_import_sys, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_ts_import_sys), "clicked",
                     G_CALLBACK (cb_ts_import_sys), NULL);
+  }
 
   GtkWidget *button_about = gtk_button_new_with_label(_(_L("關於 gcin")));
   gtk_box_pack_start (GTK_BOX (vbox), button_about, TRUE, TRUE, 0);
@@ -1554,6 +1589,14 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_status_tray, FALSE, FALSE, 0);
   GtkWidget *label_gcin_status_tray = gtk_label_new(_(_L("面板狀態(tray)")));
   gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), label_gcin_status_tray, FALSE, FALSE, 0);
+#if UNIX
+  check_button_gcin_win32_icon = gtk_check_button_new ();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_win32_icon),
+       gcin_win32_icon);
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_win32_icon, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_status_tray_windows_style = gtk_label_new(_(_L("Windows style")));
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), label_gcin_status_tray_windows_style, FALSE, FALSE, 0);
+#endif
 #endif
 
   GtkWidget *hbox_win_color_fbg = gtk_hbox_new (FALSE, 0);
@@ -1700,7 +1743,7 @@ static void create_main_win()
 #endif
 
   if (pho_speakerN) {
-    GtkWidget *labelspeaker = gtk_label_new(_(_L("發音選擇")));
+    GtkWidget *labelspeaker = gtk_label_new(_(_L("，發音選擇")));
     gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), labelspeaker, FALSE, FALSE, 0);
     gtk_container_add (GTK_CONTAINER (hbox_phonetic_speak), create_speaker_opts());
   }
@@ -1773,7 +1816,7 @@ static void create_main_win()
   int current_idx = get_currnet_tsin_space_option_idx();
   new_select_idx_tsin_space_opt = current_idx;
 
-  int i;
+  gsize i;
   for(i=0; i< tsin_space_optionsN; i++) {
     GtkWidget *button = gtk_radio_button_new_with_label (group_tsin_space_opt, _(tsin_space_options[i].name));
     gtk_box_pack_start (GTK_BOX (box_tsin_space_opt), button, TRUE, TRUE, 0);
@@ -2093,11 +2136,18 @@ void init_gcin_program_files();
 
 int main(int argc, char **argv)
 {
+#if UNIX
+  setenv("GCIN_BIN_DIR", GCIN_BIN_DIR, TRUE);
+  setenv("UTF8_EDIT", utf8_edit, TRUE);
+#endif
+
   exec_setup_scripts();
 
   init_TableDir();
 
   load_setttings();
+
+  load_gtab_list();
 
 #if GCIN_i18n_message
   gtk_set_locale();

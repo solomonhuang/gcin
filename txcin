@@ -1,5 +1,0 @@
-export LC_ALL=zh_TW.Big5
-export XMODIFIERS=@im=xcin.test
-export GTK_IM_MODULE=xim
-xcin -x xcin.test &
-gedit && pkill xcin

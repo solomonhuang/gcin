@@ -28,6 +28,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ******************************************************************/
 #include "gcin.h"
 
+
 static IC *ic_list = (IC *)NULL;
 static IC *free_list = (IC *)NULL;
 
@@ -141,10 +142,8 @@ void load_IC(IC *rec)
    }
 
    if (cs->input_style & InputStyleOnSpot) {
-#if 0
-     if (cs->b_im_enabled)
+     if (cs->im_state != GCIN_STATE_DISABLED)
        move_IC_in_win(cs);
-#endif
    } else
    if (cs->input_style & InputStyleOverSpot) {
      if (cs->im_state != GCIN_STATE_DISABLED)

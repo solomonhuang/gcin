@@ -62,9 +62,10 @@ void start_inmd_window()
 
 
 #if USE_XIM
+char locales[100]="zh_TW.Big5,zh_TW.UTF-8,zh_TW.UTF8,en_US.UTF-8,en_US.UTF8";
 
 static XIMStyle Styles[] = {
-#if 0
+#if 1
         XIMPreeditCallbacks|XIMStatusCallbacks,		//OnTheSpot
         XIMPreeditCallbacks|XIMStatusArea,		//OnTheSpot
         XIMPreeditCallbacks|XIMStatusNothing,		//OnTheSpot
@@ -72,7 +73,7 @@ static XIMStyle Styles[] = {
         XIMPreeditPosition|XIMStatusArea,		//OverTheSpot
         XIMPreeditPosition|XIMStatusNothing,		//OverTheSpot
         XIMPreeditPosition|XIMStatusNone,		//OverTheSpot
-#if 0
+#if 1
         XIMPreeditArea|XIMStatusArea,			//OffTheSpot
         XIMPreeditArea|XIMStatusNothing,		//OffTheSpot
         XIMPreeditArea|XIMStatusNone,			//OffTheSpot
@@ -133,8 +134,6 @@ void SetIC(IMChangeICStruct * call_data);
 void GetIC(IMChangeICStruct *call_data);
 int xim_gcin_FocusIn(IMChangeFocusStruct *call_data);
 int xim_gcin_FocusOut(IMChangeFocusStruct *call_data);
-
-
 
 int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
 {
@@ -255,12 +254,16 @@ void open_xim()
           IMServerWindow,         xim_arr[0].xim_xwin,        //input window
           IMModifiers,            "Xi18n",        //X11R6 protocol
           IMServerName,           xim_arr[0].xim_server_name, //XIM server name
-          IMLocale,               xim_arr[0].server_locale,  //XIM server locale
+#if 0
+          IMLocale,               xim_arr[0].server_locale,
+#else
+          IMLocale,               locales,
+#endif
           IMServerTransport,      "X/",      //Comm. protocol
           IMInputStyles,          &im_styles,   //faked styles
           IMEncodingList,         &encodings,
           IMProtocolHandler,      gcin_ProtoHandler,
-          IMFilterEventMask,      KeyPressMask,
+          IMFilterEventMask,      KeyPressMask|KeyReleaseMask,
           IMOnKeysList, &triggerKeys,
 //        IMOffKeysList, &triggerKeys,
           NULL)) == NULL) {
@@ -277,6 +280,7 @@ void load_tsin_conf(), load_setttings(), load_tab_pho_file();
 void disp_hide_tsin_status_row(), gcb_main(), update_win_kbm();
 void change_tsin_line_color(), change_win0_style(), change_tsin_color();
 void change_win_gtab_style();
+void update_item_active_all();
 
 static void reload_data()
 {
@@ -290,6 +294,8 @@ static void reload_data()
   change_tsin_color();
   if (win_kbm_inited)
     update_win_kbm();
+
+  update_item_active_all();
 #if USE_GCB
   gcb_main();
 #endif
@@ -323,14 +329,13 @@ static int xerror_handler(Display *d, XErrorEvent *eve)
 #if UNIX
 Atom gcin_atom;
 #endif
-void update_tray_icon(), load_tray_icon_win32(), toggle_gb_output();
+void disp_tray_icon(), toggle_gb_output();
 
 void cb_trad_sim_toggle()
 {
   toggle_gb_output();
 #if TRAY_ENABLED
-  update_tray_icon();
-  load_tray_icon_win32();
+  disp_tray_icon();
 #endif
 }
 void execute_message(char *message), show_win_kbm(), hide_win_kbm();
@@ -345,6 +350,9 @@ void kbm_toggle()
     hide_win_kbm();
 }
 
+
+void reload_tsin_db();
+
 void message_cb(char *message)
 {
 //   dbg("message '%s'\n", message);
@@ -354,6 +362,7 @@ void message_cb(char *message)
    } else
    if (!strcmp(message, GB_OUTPUT_TOGGLE)) {
      cb_trad_sim_toggle();
+     update_item_active_all();
    } else
    if (!strcmp(message, KBM_TOGGLE)) {
      kbm_toggle();
@@ -363,8 +372,9 @@ void message_cb(char *message)
      execute_message(message);
    } else
 #endif
-   if (!strcmp(message, RELOAD_TSIN_DB))
-     load_tsin_db();
+   if (!strcmp(message, RELOAD_TSIN_DB)) {
+     reload_tsin_db();
+   }
    else
      reload_data();
 }
@@ -407,7 +417,7 @@ void hide_win0();
 void destroy_win0();
 void destroy_win1();
 void destroy_win_gtab();
-void free_pho_mem(),free_tsin(),free_all_IC(), free_gtab(), free_phrase();
+void free_pho_mem(),free_tsin(),free_all_IC(), free_gtab(), free_phrase(), destroy_tray_win32();
 
 void do_exit()
 {
@@ -427,6 +437,9 @@ void do_exit()
   destroy_win_gtab();
 #endif
 
+#if WIN32
+  destroy_tray_win32();
+#endif
   gtk_main_quit();
 }
 
@@ -458,9 +471,11 @@ gboolean delayed_start_cb(gpointer data)
 #if TRAY_ENABLED
   if (gcin_status_tray) {
 #if UNIX
-    init_tray();
+    if (gcin_win32_icon)
+      init_tray_win32();
+    else
+      init_tray();
 #endif
-    init_tray_win32();
   }
 #endif
 
@@ -538,7 +553,9 @@ int main(int argc, char **argv)
   else
     lc = lc_ctype;
 
-  xim_arr[0].server_locale = lc;
+  if (lc)
+    strcat(locales, lc);
+
   char *xim_server_name = get_gcin_xim_name();
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);

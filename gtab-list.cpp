@@ -6,10 +6,26 @@ INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 char gtab_list[]=GTAB_LIST;
 
+struct {
+  char *id;
+  char method_type;
+} method_codes[] = {
+ {"!PHO", method_type_PHO},
+ {"!TSIN", method_type_TSIN},
+ {"!INT_CODE", method_type_INT_CODE},
+ {"!ANTHY", method_type_ANTHY},
+ {NULL}
+};
+
 void load_gtab_list()
 {
   char ttt[128];
   FILE *fp;
+
+  inmd[3].method_type = method_type_PHO;
+  inmd[6].method_type = method_type_TSIN;
+  inmd[10].method_type = method_type_INT_CODE;
+  inmd[12].method_type = method_type_ANTHY;
 
   get_gcin_user_fname(gtab_list, ttt);
 
@@ -51,6 +67,12 @@ void load_gtab_list()
 
     free(inmd[keyidx].filename);
     inmd[keyidx].filename = strdup(file);
+    int i;
+    for(i=0; method_codes[i].id; i++)
+      if (!strcmp(file, method_codes[i].id))
+        break;
+    if (method_codes[i].id)
+      inmd[keyidx].method_type = method_codes[i].method_type;
 
     free(inmd[keyidx].cname);
     inmd[keyidx].cname = strdup(name);

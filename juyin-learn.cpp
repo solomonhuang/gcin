@@ -4,14 +4,14 @@
 #if UNIX
 #include <libintl.h>
 #endif
+#include "gst.h"
 
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
 PIN_JUYIN *pin_juyin;
 int pin_juyinN;
 PHOKBM phkbm;
-char inph[8];
-char typ_pho[4];
+PHO_ST poo;
 int text_pho_N;
 
 gboolean b_pinyin;

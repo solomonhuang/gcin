@@ -104,10 +104,6 @@ msgstr "Add definitions for default input method"
 msgid "名稱"
 msgstr "Name"
 
-#: ../gcin-setup-list.c:258
-msgid "icon"
-msgstr "Icon"
-
 #: ../gcin-setup-list.c:268
 msgid "Ctrl-Alt-鍵"
 msgstr "Ctrl-Alt-Toggle Key"
@@ -385,38 +381,6 @@ msgstr "Exit"
 msgid "左鍵符號，右鍵設定"
 msgstr "Left: Symbol selection tables\nRight: Preferences"
 
-#: ../gcin-setup-tab.c:1224
-msgid "雜項"
-msgstr "Misc."
-
-#: ../gcin-setup-tab.c:1232
-msgid "ctrl 片語編輯"
-msgstr "Edit Ctrl phrases"
-
-#: ../gcin-setup-tab.c:1252
-msgid "剪貼區 正體字->簡體字"
-msgstr "Convert clipboard's Traditional Chinese to Simplified Chinese"
-
-#: ../gcin-setup-tab.c:1304
-msgid "通用"
-msgstr "General"
-
-#: ../gcin-setup-tab.c:1511
-msgid "，發音選擇"
-msgstr ", speaker:"
-
-#: ../gcin-setup-tab.c:1520
-msgid "注音/詞音"
-msgstr "Bopomofo/Tsin"
-
-#: ../gcin-setup-tab.c:1682
-msgid "倉頡/行列"
-msgstr "gtab IMs"
-
-#: ../gcin-setup-tab.c:1830
-msgid "內定輸入法"
-msgstr "Default IMs"
-
 #: ../gcin-setup-gtab.c:188
 msgid "外觀"
 msgstr "Appearance Settings"
@@ -641,3 +605,31 @@ msgstr "Ctrl-Shift selections(Should turn off Windows key)"
 #: ../gcin-setup-list.cpp:656
 msgid "關閉鈴聲"
 msgstr "Turn off bell"
+
+#: ../win-int.cpp:179
+msgid "內碼"
+msgstr "Encoding"
+
+#: ../gtab.cpp:1524
+msgid "輸入要查的同音字，接著在注音視窗選字"
+msgstr "Look up same phonetic characters"
+
+#: ../tray-win32.cpp:295
+msgid "全形/簡體輸出"
+msgstr "Double-width / Simplified Chinese output"
+
+#: ../tray-win32.cpp:299
+msgid "全形/正體輸出"
+msgstr "Double-width / Traditional Chinese output"
+
+#: ../tray-win32.cpp:304
+msgid "半形/簡體輸出"
+msgstr "Half-width / Simplified Chinese output"
+
+#: ../tray-win32.cpp:308
+msgid "半形/正體輸出"
+msgstr "Half-width / Traditional Chinese output"
+
+#: ../win-save-phrase.cpp:70
+msgid "加片語到詞庫"
+msgstr "Add phrase to Tsin's database"

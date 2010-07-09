@@ -4,7 +4,7 @@
 #include "win-sym.h"
 #include "eggtrayicon.h"
 #include <signal.h>
-
+#include "gst.h"
 
 #if UNIX
 static GdkPixbuf *pixbuf, *pixbuf_ch;
@@ -12,6 +12,7 @@ static PangoLayout* pango;
 static GtkWidget *da;
 static GdkGC *gc;
 GdkWindow *tray_da_win;
+static EggTrayIcon *egg_tray_icon;
 
 #define GCIN_TRAY_PNG "gcin-tray.png"
 static char *pixbuf_ch_fname;
@@ -26,9 +27,6 @@ static void get_text_w_h(char *s, int *w, int *h)
   pango_layout_get_pixel_size(pango, w, h);
 }
 
-#if USE_TSIN
-extern gboolean tsin_half_full;
-#endif
 
 static void draw_icon()
 {
@@ -42,7 +40,13 @@ static void draw_icon()
     (current_CS->im_state == GCIN_STATE_DISABLED||current_CS->im_state == GCIN_STATE_ENG_FULL) ?
     pixbuf : pixbuf_ch;
 
+#if GTK_CHECK_VERSION(2,17,7)
+  GtkAllocation dwdh;
+  gtk_widget_get_allocation(da, &dwdh);
+  int dw = dwdh.width, dh = dwdh.height;
+#else
   int dw = da->allocation.width, dh = da->allocation.height;
+#endif
   int w, h;
 
   GdkColor color_fg;
@@ -61,7 +65,7 @@ static void draw_icon()
   if (current_CS) {
     if (current_CS->b_half_full_char ||
 #if USE_TSIN
-        current_CS->in_method==6 && tsin_half_full &&
+        current_method_type()==method_type_TSIN && tss.tsin_half_full &&
 #endif
         current_CS->im_state == GCIN_STATE_CHINESE) {
       static char full[] = "全";
@@ -75,7 +79,7 @@ static void draw_icon()
       gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
     }
 #if USE_TSIN
-    if ((current_CS->in_method==6||current_CS->in_method==12) && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
+    if ((current_method_type()==method_type_TSIN||current_method_type()==method_type_ANTHY) && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
       static char efull[] = "ABC";
       gdk_color_parse("blue", &color_fg);
       gdk_gc_set_rgb_fg_color(gc, &color_fg);
@@ -100,7 +104,7 @@ static void draw_icon()
 gboolean create_tray(gpointer data);
 void update_tray_icon()
 {
-  if (!gcin_status_tray || gcin_win32_icon)
+  if (!gcin_status_tray)
     return;
 
   if (!da)
@@ -113,7 +117,7 @@ void get_icon_path(char *iconame, char fname[]);
 
 void load_tray_icon()
 {
-  if (!gcin_status_tray || gcin_win32_icon)
+  if (!gcin_status_tray)
     return;
 
   if (!da)
@@ -146,7 +150,14 @@ void load_tray_icon()
       gdk_pixbuf_unref(pixbuf_ch);
 
     GError *err = NULL;
-    pixbuf_ch = gdk_pixbuf_new_from_file(fname, &err);
+#if GTK_CHECK_VERSION(2,17,7)
+    GtkAllocation dwdh;
+    gtk_widget_get_allocation(da, &dwdh);
+    int dw = dwdh.width, dh = dwdh.height;
+#else
+    int dw = da->allocation.width, dh = da->allocation.height;
+#endif
+    pixbuf_ch = gdk_pixbuf_new_from_file_at_size(fname, dw, dh, &err);
   }
 
   update_tray_icon();
@@ -184,7 +195,7 @@ static MITEM mitems[] = {
   {N_("正->簡體"), NULL, cb_trad2sim, NULL},
   {N_("簡->正體"), NULL, cb_sim2trad, NULL},
   {N_("小鍵盤"), NULL, kbm_toggle_, &win_kbm_on},
-  {N_("简体输出"), NULL, cb_trad_sim_toggle_, NULL},
+  {N_("简体输出"), NULL, cb_trad_sim_toggle_, &gb_output},
   {NULL, NULL, NULL, NULL}
 };
 
@@ -192,6 +203,7 @@ static MITEM mitems[] = {
 static GtkWidget *tray_menu;
 
 GtkWidget *create_tray_menu(MITEM *mitems);
+void update_item_active_all();
 
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
 extern gboolean win_kbm_inited;
@@ -214,6 +226,8 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
       inmd_switch_popup_handler(NULL, (GdkEvent *)event);
 #else
       kbm_toggle();
+      dbg("win_kbm_on %d\n", win_kbm_on);
+      update_item_active_all();
 #endif
       break;
     case 3:
@@ -227,6 +241,14 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
 
   return TRUE;
 }
+
+void update_item_active(MITEM *mitems);
+
+void update_item_active_unix()
+{
+  update_item_active(mitems);
+}
+
 
 gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
 {
@@ -243,13 +265,13 @@ gboolean create_tray(gpointer data)
   if (da)
     return FALSE;
 
-  EggTrayIcon *tray_icon = egg_tray_icon_new ("gcin");
+  egg_tray_icon = egg_tray_icon_new ("gcin");
 
-  if (!tray_icon)
+  if (!egg_tray_icon)
     return FALSE;
 
   GtkWidget *event_box = gtk_event_box_new ();
-  gtk_container_add (GTK_CONTAINER (tray_icon), event_box);
+  gtk_container_add (GTK_CONTAINER (egg_tray_icon), event_box);
 #if GTK_CHECK_VERSION(2,12,0)
   gtk_widget_set_tooltip_text (event_box, _("左:中英切換 中:小鍵盤 右:選項"));
 #else
@@ -281,13 +303,13 @@ gboolean create_tray(gpointer data)
   g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(cb_expose), NULL);
 
   gtk_container_add (GTK_CONTAINER (event_box), da);
-  gtk_widget_set_size_request(GTK_WIDGET(tray_icon), pwidth, pheight);
+  gtk_widget_set_size_request(GTK_WIDGET(egg_tray_icon), pwidth, pheight);
 
-  gtk_widget_show_all (GTK_WIDGET (tray_icon));
-  tray_da_win = da->window;
+  gtk_widget_show_all (GTK_WIDGET (egg_tray_icon));
+  tray_da_win = gtk_widget_get_window(da);
   // tray window is not ready ??
   if (!tray_da_win || !GTK_WIDGET_DRAWABLE(da)) {
-    gtk_widget_destroy(GTK_WIDGET(tray_icon));
+    gtk_widget_destroy(GTK_WIDGET(egg_tray_icon));
     da = NULL;
     return FALSE;
   }
@@ -321,10 +343,14 @@ gboolean create_tray(gpointer data)
   return FALSE;
 }
 
+void destroy_tray_icon()
+{
+  gtk_widget_destroy(GTK_WIDGET(egg_tray_icon));
+  egg_tray_icon = NULL; da = NULL;
+}
+
 void init_tray()
 {
-  if (gcin_win32_icon)
-    return;
   g_timeout_add(5000, create_tray, NULL);
 }
 #endif

@@ -64,9 +64,8 @@ static void gen_passwd_idx()
 #endif
 
 #if WIN32
-
+typedef int socklen_t;
 #endif
-
 
 static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition condition)
 {
@@ -77,7 +76,7 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
   unsigned int newsockfd;
   socklen_t clilen;
 
-#if !WIN32
+#if UNIX
   if (type==Connection_type_unix) {
     struct sockaddr_un cli_addr;
 
@@ -98,6 +97,8 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
     perror("accept");
     return;
   }
+
+//  dbg("newsockfd %d\n", newsockfd);
 
   if (newsockfd >= gcin_clientsN) {
     gcin_clients = trealloc(gcin_clients, GCIN_ENT, newsockfd+1);

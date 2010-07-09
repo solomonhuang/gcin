@@ -161,7 +161,7 @@ int main(int argc, char **argv)
   struct TableHead th;
   int KeyNum;
   char kname[128][CH_SZ];
-  char keymap[64];
+  char keymap[128];
   int chno;
   gtab_idx1_t idx1[256];
   char def1[256];

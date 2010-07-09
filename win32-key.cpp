@@ -9,6 +9,7 @@ void dbg(char *format, ...);
 KeySym vk2gcin_key(UINT key, char asc, const BYTE* keystate)
 {
 	bool shift = IsKeyDown(keystate[VK_SHIFT]);
+	bool ctrl = IsKeyDown(keystate[VK_CONTROL]);
 
 	dbg("vk2gcin_key %x %x\n", key, asc);
 	if (shift && asc)
@@ -90,6 +91,11 @@ KeySym vk2gcin_key(UINT key, char asc, const BYTE* keystate)
 			if (asc) {
 				dbg("return asc %c\n", asc);
 				return asc;
+			}
+
+			if (ctrl && key>='0' && key<= '9') {
+				dbg("key 0..9\n");
+				return key;
 			}
 
 			dbg("unknown key %x\n", key);

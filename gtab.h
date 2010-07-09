@@ -67,7 +67,6 @@ struct TableHead {
 
 #define MAX_TAB_KEY_NUM (32/KeyBits)
 #define MAX_TAB_KEY_NUM64 (64/KeyBits)
-#define MAX_TAB_KEY_NUM64_6 (10)
 
 
 typedef u_int gtab_idx1_t;
@@ -75,7 +74,7 @@ typedef u_int gtab_idx1_t;
 typedef struct {
   ITEM *tbl;
   ITEM64 *tbl64;
-  QUICK_KEYS qkeys;
+  QUICK_KEYS *qkeys;
   int use_quick;
   u_int flag;
 #define MAX_CNAME (4*CH_SZ+1)
@@ -88,28 +87,37 @@ typedef struct {
   char *keyname_lookup; // used by boshiamy only
   gtab_idx1_t *idx1;
   char *keymap;
-  char selkey[MAX_SELKEY];
+  char *selkey;
   u_char *sel1st;
   int M_DUP_SEL;
   int phrnum;
   int *phridx;
   char *phrbuf;
-  char *filename;
+  char *filename, *filename_append;
   time_t file_modify_time;
   gboolean key64;        // db is 64 bit-long key
   int max_keyN;
   char *endkey;       // only pinin/ar30 use it
   GTAB_space_pressed_E space_style;
   char *icon;
-  u_char kmask, keybits, last_k_bitn;
+  u_char kmask, keybits, last_k_bitn, method_type;
   char WILD_QUES, WILD_STAR;
 } INMD;
+
+enum {
+  method_type_GTAB=1,
+  method_type_PHO=3,
+  method_type_TSIN=6,
+  method_type_INT_CODE=10,
+  method_type_ANTHY=12,
+};
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 u_int64_t CONVT2(INMD *inmd, int i);
 extern INMD *cur_inmd;
 void load_gtab_list();
+char current_method_type();
 
 #define LAST_K_bitN (cur_inmd->last_k_bitn)
 
@@ -124,9 +132,3 @@ void load_gtab_list();
 #define NEED_SWAP (1)
 #endif
 
-typedef enum {
-  SAME_PHO_QUERY_none = 0,
-  SAME_PHO_QUERY_gtab_input = 1,
-  SAME_PHO_QUERY_pho_select = 2,
-} SAME_PHO_QUERY;
-extern SAME_PHO_QUERY same_pho_query_state;

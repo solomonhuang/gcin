@@ -9,6 +9,7 @@ extern INMD *cur_inmd;
 static GtkWidget *gwin_kbm;
 static GdkColor red;
 int win_kbm_on;
+extern gboolean test_mode;
 
 enum {
   K_FILL=1,
@@ -172,7 +173,7 @@ static void create_win_kbm()
 #if WIN32
   win32_init_win(gwin_kbm);
 #else
-  GdkWindow *gdkwin_kbm = gwin_kbm->window;
+  GdkWindow *gdkwin_kbm = gtk_widget_get_window(gwin_kbm);
   set_no_focus(gwin_kbm);
 #endif
 }
@@ -217,8 +218,9 @@ static void move_win_kbm()
 
     if (r.y < 100)
       oy=r.y+r.height;
-    else
+    else {
       oy = r.y - height;
+    }
   } else {
     ox = dpy_xl - width;
     oy = dpy_yl - height - 16;
@@ -235,6 +237,7 @@ void show_win_kbm()
   }
 
   gtk_widget_show_all(gwin_kbm);
+  win_kbm_on = 1;
   move_win_kbm();
 }
 
@@ -361,5 +364,9 @@ void hide_win_kbm()
 {
   if (!gwin_kbm)
     return;
+  if (test_mode)
+    return;
+
+  win_kbm_on = 0;
   gtk_widget_hide(gwin_kbm);
 }

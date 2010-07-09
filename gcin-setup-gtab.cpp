@@ -145,13 +145,13 @@ static gboolean cb_gtab_edit_append( GtkWidget *widget,
   sprintf(exec, "%s %s", utf8_edit, append_fname);
   dbg("exec %s\n", exec);
   system(exec);
-  return TRUE;
 #else
   strcat(strcpy(append_fname, fname), ".append");
   char user_fname[512];
   get_gcin_user_fname(append_fname, user_fname);
   win32exec_script("gtab.append_prepare.bat", user_fname);
 #endif
+  return TRUE;
 }
 
 static GtkWidget *create_spc_opts()

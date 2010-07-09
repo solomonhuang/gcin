@@ -30,6 +30,9 @@ int gcin_clientsN;
 extern GCIN_PASSWD my_passwd;
 
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state);
+gboolean ProcessTestKeyPress(KeySym keysym, u_int kev_state);
+gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state);
+gboolean ProcessTestKeyRelease(KeySym keysym, u_int kev_state);
 int gcin_FocusIn(ClientState *cs);
 int gcin_FocusOut(ClientState *cs);
 void update_in_win_pos();
@@ -37,7 +40,7 @@ void hide_in_win(ClientState *cs);
 void init_state_chinese(ClientState *cs);
 void clear_output_buffer();
 void flush_edit_buffer();
-int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor);
+int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
 void gcin_reset();
 void dbg_time(char *fmt,...);
 
@@ -77,6 +80,10 @@ int write_enc(int fd, void *p, int n)
 extern "C" void gdk_input_remove	  (gint		     tag);
 #endif
 
+#if WIN32
+typedef int socklen_t;
+#endif
+
 static void shutdown_client(int fd)
 {
 //  dbg("client shutdown rn %d\n", rn);
@@ -96,7 +103,6 @@ static void shutdown_client(int fd)
 #endif
 }
 
-gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state);
 void message_cb(char *message);
 
 void process_client_req(int fd)
@@ -138,8 +144,10 @@ void process_client_req(int fd)
     cs->client_win = req.client_win;
     cs->b_gcin_protocol = TRUE;
     cs->input_style = InputStyleOverSpot;
-
-    if (gcin_init_im_enabled && new_cli) {
+#if UNIX
+    if (gcin_init_im_enabled && new_cli)
+#endif
+	{
       current_CS = cs;
       init_state_chinese(cs);
     }
@@ -183,10 +191,18 @@ void process_client_req(int fd)
 	  char *typ;
       typ="press";
 #endif
+#if 0
+      if (req.req_no==GCIN_req_key_press)
+        status = Process2KeyPress(req.keyeve.key, req.keyeve.state);
+      else {
+        status = Process2KeyRelease(req.keyeve.key, req.keyeve.state);
+#else
       if (req.req_no==GCIN_req_key_press)
         status = ProcessKeyPress(req.keyeve.key, req.keyeve.state);
       else {
         status = ProcessKeyRelease(req.keyeve.key, req.keyeve.state);
+#endif
+
 #if DBG
         typ="rele";
 #endif
@@ -211,6 +227,27 @@ void process_client_req(int fd)
         clear_output_buffer();
       }
 
+      break;
+    case GCIN_req_test_key_press:
+    case GCIN_req_test_key_release:
+      current_CS = cs;
+      to_gcin_endian_4(&req.keyeve.key);
+      to_gcin_endian_4(&req.keyeve.state);
+
+//	  dbg("serv key eve %x %x predit:%d\n",req.keyeve.key, req.keyeve.state, cs->use_preedit);
+
+      if (req.req_no==GCIN_req_test_key_press)
+        status = ProcessTestKeyPress(req.keyeve.key, req.keyeve.state);
+      else
+        status = ProcessTestKeyRelease(req.keyeve.key, req.keyeve.state);
+
+      if (status)
+        reply.flag |= GCIN_reply_key_processed;
+
+      reply.datalen = 0;
+      to_gcin_endian_4(&reply.flag);
+      to_gcin_endian_4(&reply.datalen);
+      write_enc(fd, &reply, sizeof(reply));
       break;
     case GCIN_req_focus_in:
 #if DBG
@@ -282,8 +319,8 @@ void process_client_req(int fd)
 #endif
       char str[GCIN_PREEDIT_MAX_STR];
       GCIN_PREEDIT_ATTR attr[GCIN_PREEDIT_ATTR_MAX_N];
-      int cursor;
-      int attrN = gcin_get_preedit(cs, str, attr, &cursor);
+      int cursor, sub_comp_len;
+      int attrN = gcin_get_preedit(cs, str, attr, &cursor, &sub_comp_len);
       if (gcin_edit_display&(GCIN_EDIT_DISPLAY_BOTH|GCIN_EDIT_DISPLAY_OVER_THE_SPOT))
         cursor=0;
       if (gcin_edit_display&GCIN_EDIT_DISPLAY_OVER_THE_SPOT) {
@@ -298,6 +335,9 @@ void process_client_req(int fd)
       if (attrN > 0)
         write_enc(fd, attr, sizeof(GCIN_PREEDIT_ATTR)*attrN);
       write_enc(fd, &cursor, sizeof(cursor));
+#if WIN32
+	  write_enc(fd, &sub_comp_len, sizeof(sub_comp_len));
+#endif
 //      dbg("uuuuuuuuuuuuuuuuu len:%d %d cursor:%d\n", len, attrN, cursor);
       }
       break;

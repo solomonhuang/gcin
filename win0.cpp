@@ -3,6 +3,7 @@
 #include "win-sym.h"
 
 GtkWidget *gwin0;
+extern GtkWidget *gwin1;
 Window xwin0;
 extern Display *dpy;
 static GtkWidget *top_bin;
@@ -10,8 +11,9 @@ int current_gcin_inner_frame;
 
 static GtkWidget *hbox_edit;
 static PangoAttrList* attr_list, *attr_list_blank;
+extern gboolean test_mode;
 
-void compact_win0();
+static void compact_win0();
 void move_win0(int x, int y);
 void get_win0_geom();
 gboolean gcin_edit_display_ap_only();
@@ -152,6 +154,9 @@ void disp_char(int index, char *ch)
 
 void hide_char(int index)
 {
+  if (test_mode)
+    return;
+
   if (!chars[index].vbox)
     return;
   gtk_label_set_text(GTK_LABEL(chars[index].label), "");
@@ -162,6 +167,9 @@ void hide_char(int index)
 void clear_chars_all()
 {
   int i;
+
+  if (test_mode)
+    return;
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     hide_char(i);
@@ -209,12 +217,18 @@ void clr_tsin_cursor(int index)
   if (!label)
     return;
 
+  if (test_mode)
+    return;
+
   gtk_label_set_attributes(GTK_LABEL(label), attr_list_blank);
 }
 
 void disp_pho_sub(GtkWidget *label, int index, char *pho);
 void disp_tsin_pho(int index, char *pho)
 {
+  if (test_mode)
+    return;
+
   if (button_pho && !GTK_WIDGET_VISIBLE(button_pho))
     gtk_widget_show(button_pho);
 
@@ -225,6 +239,9 @@ void disp_tsin_pho(int index, char *pho);
 void clr_in_area_pho_tsin()
 {
   int i;
+
+  if (test_mode)
+    return;
 
   for(i=0; i < text_pho_N; i++)
    disp_tsin_pho(i, " ");
@@ -267,6 +284,10 @@ void disp_selections(int x, int y);
 void disp_tsin_select(int index)
 {
   int x,y;
+
+  if (test_mode)
+    return;
+
 #if 0
   GtkWidget *widget =chars[index].line;
 
@@ -295,6 +316,9 @@ static void raw_move(int x, int y)
 {
   int xl, yl;
 
+  if (!gwin0)
+    return;
+
   get_win_size(gwin0, &xl, &yl);
 
   if (x + xl > dpy_xl)
@@ -308,6 +332,8 @@ static void raw_move(int x, int y)
 
 void compact_win0_x()
 {
+  if (test_mode)
+    return;
 #if 0
   int win_xl, win_yl;
   gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
@@ -321,7 +347,7 @@ void compact_win0_x()
   raw_move(best_win_x, best_win_y);
 }
 
-void compact_win0()
+static void compact_win0()
 {
   max_yl = 0;
   gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
@@ -337,7 +363,8 @@ void move_win0(int x, int y)
   best_win_x = x;
   best_win_y = y;
 
-  gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
+  if (gwin0)
+    gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
 
   if (x + win_xl > dpy_xl)
     x = dpy_xl - win_xl;
@@ -351,9 +378,17 @@ void move_win0(int x, int y)
 
 //  dbg("move_win0 %d,%d\n",x, y);
 
-  gtk_window_move(GTK_WINDOW(gwin0), x, y);
+  if (gwin0)
+    gtk_window_move(GTK_WINDOW(gwin0), x, y);
+
   win_x = x;
   win_y = y;
+
+#if WIN32
+  if (gwin1 && GTK_WIDGET_VISIBLE(gwin1)) {
+    gtk_window_move(GTK_WINDOW(gwin1), x, y);
+  }
+#endif
 
   move_win_sym();
 }
@@ -373,6 +408,9 @@ void disp_tsin_eng_pho(int eng_pho)
 void clear_tsin_line()
 {
   int i;
+
+  if (test_mode)
+    return;
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *line = chars[i].line;
@@ -403,28 +441,6 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 }
 
 
-#if 0
-extern char file_pin_float[];
-
-static void cb_clicked_fixed_pos()
-{
-
-  if (!current_CS)
-    return;
-
-  current_CS->fixed_pos^=1;
-
-//  dbg("cb_clicked_fixed_pos %d\n", current_CS->fixed_pos);
-
-  if (current_CS->fixed_pos) {
-    get_win0_geom();
-    current_CS->fixed_x = win_x;  current_CS->fixed_y = win_y;
-  }
-
-//  set_currenet_IC_pin_image_pin();
-}
-#endif
-
 void tsin_toggle_eng_ch();
 
 #if 0
@@ -451,7 +467,7 @@ void create_win0()
   gtk_container_set_border_width (GTK_CONTAINER (gwin0), 0);
   gtk_widget_realize (gwin0);
 #if UNIX
-  GdkWindow *gdkwin0 = gwin0->window;
+  GdkWindow *gdkwin0 = gtk_widget_get_window(gwin0);
   xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
   set_no_focus(gwin0);
 #else
@@ -594,6 +610,9 @@ void raise_tsin_selection_win();
 
 void show_win0()
 {
+  if (test_mode)
+    return;
+
 #if _DEBUG
 	dbg("show_win0 pop:%d in:%d for:%d \n", gcin_pop_up_win, tsin_has_input(), force_show);
 #endif
@@ -622,6 +641,8 @@ void show_win0()
 void hide_selections_win();
 void hide_win0()
 {
+  if (test_mode)
+    return;
   if (!gwin0)
     return;
 #if UNIX
@@ -683,6 +704,8 @@ char *get_full_str();
 
 void win_tsin_disp_half_full()
 {
+  if (test_mode)
+    return;
   gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
 
   compact_win0();

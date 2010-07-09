@@ -206,6 +206,16 @@ void *zmalloc(int n)
   return p;
 }
 
+void *memdup(void *p, int n)
+{
+  if (!p || !n)
+    return NULL;
+  void *q;
+  q = malloc(n);
+  memcpy(q, p, n);
+  return q;
+}
+
 #if GCIN_SVR
 #if WIN32
 #include <gdk/gdkwin32.h>

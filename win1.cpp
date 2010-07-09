@@ -11,6 +11,25 @@ static GtkWidget *eve_sele[SELEN], *eve_seleR[SELEN];
 static GtkWidget *arrow_up, *arrow_down;
 
 void hide_selections_win();
+gboolean tsin_page_up(), tsin_page_down();
+
+static gboolean button_scroll_event_tsin(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
+{
+  switch (event->direction) {
+    case GDK_SCROLL_UP:
+      tsin_page_up();
+      break;
+    case GDK_SCROLL_DOWN:
+      tsin_page_down();
+      break;
+    default:
+      break;
+  }
+
+  return TRUE;
+}
+
+
 
 void create_win1()
 {
@@ -24,12 +43,14 @@ void create_win1()
   gtk_widget_realize (gwin1);
 
 #if UNIX
-  GdkWindow *gdkwin1 = gwin1->window;
+  GdkWindow *gdkwin1 = gtk_widget_get_window(gwin1);
   xwin1 = GDK_WINDOW_XWINDOW(gdkwin1);
   set_no_focus(gwin1);
 #else
   win32_init_win(gwin1);
 #endif
+
+  g_signal_connect (G_OBJECT (gwin1), "scroll-event", G_CALLBACK (button_scroll_event_tsin), NULL);
 }
 
 void change_win1_font(), force_preedit_shift();
@@ -156,13 +177,16 @@ void set_sele_text(int i, char *text, int len)
 }
 
 #if WIN32
+static int timeout_handle;
 gboolean timeout_minimize_win1(gpointer data)
 {
   gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
   gtk_window_present(GTK_WINDOW(gwin1));
+  timeout_handle = 0;
   return FALSE;
 }
 #endif
+
 
 void disp_selections(int x, int y)
 {
@@ -180,7 +204,7 @@ void disp_selections(int x, int y)
 
   gtk_window_move(GTK_WINDOW(gwin1), x, y);
 #if WIN32
-  int timeout_handle = g_timeout_add(50, timeout_minimize_win1, NULL);
+  timeout_handle = g_timeout_add(50, timeout_minimize_win1, NULL);
 #endif
 }
 
@@ -195,6 +219,13 @@ void hide_selections_win()
 {
   if (!gwin1)
     return;
+#if WIN32
+  if (timeout_handle) {
+	  g_source_remove(timeout_handle);
+	  timeout_handle = 0;
+  }
+#endif
+
 #if WIN32
   gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
 #endif

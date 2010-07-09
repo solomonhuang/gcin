@@ -1,8 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
+#include "gst.h"
 
-extern char inph[];
-extern char typ_pho[4];
 extern void key_typ_pho(phokey_t phokey, u_char rtyp_pho[]);
 
 gboolean pin2juyin()
@@ -15,11 +14,11 @@ gboolean pin2juyin()
   for(i=0; i < pin_juyinN; i++) {
     memcpy(pin,  pin_juyin[i].pinyin, sizeof(pin_juyin[0].pinyin));
 
-    if (!strcmp(pin, inph))
+    if (!strcmp(pin, poo.inph))
       goto match;
   }
 #endif
-  int inphN = strlen(inph);
+  int inphN = strlen(poo.inph);
   for(i=0; i < pin_juyinN; i++) {
     memcpy(pin,  pin_juyin[i].pinyin, sizeof(pin_juyin[0].pinyin));
 
@@ -28,15 +27,15 @@ gboolean pin2juyin()
     if (pinN < inphN)
       continue;
 
-    if (!memcmp(pin, inph, inphN))
+    if (!memcmp(pin, poo.inph, inphN))
       break;
   }
 
   if (i==pin_juyinN)
     return FALSE;
 
-  bzero(typ_pho, sizeof(typ_pho));
-  key_typ_pho(pin_juyin[i].key, (u_char *)typ_pho);
+  bzero(poo.typ_pho, sizeof(poo.typ_pho));
+  key_typ_pho(pin_juyin[i].key, (u_char *)poo.typ_pho);
 
   return TRUE;
 }
@@ -48,15 +47,15 @@ gboolean inph_typ_pho_pinyin(int newkey)
 
   int i;
   for(i=0; i < 7; i++)
-    if (!inph[i])
+    if (!poo.inph[i])
       break;
   if (i==7)
     return FALSE;
 
-  inph[i] = newkey;
+  poo.inph[i] = newkey;
 
   if (typ==3) {
-    typ_pho[typ] = num;
+    poo.typ_pho[typ] = num;
     return TRUE;
   }
 
@@ -64,7 +63,7 @@ gboolean inph_typ_pho_pinyin(int newkey)
     if (newkey != ' ')
       bell();
 
-    inph[i]=0;
+    poo.inph[i]=0;
     return FALSE;
   }
 

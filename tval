@@ -8,6 +8,6 @@ valgrind --tool=memcheck --db-attach=yes ./gcin.test &
 #valgrind --tool=memcheck --leak-check=yes ./gcin.test &
 gcinpid=$!
 sleep 10
-gedit
-#leafpad
+#gedit
+leafpad
 pkill gcin.test

@@ -16,7 +16,7 @@ static void create_win_message(char *icon, char *text, int duration)
   GtkWidget *gwin_message = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_container_set_border_width (GTK_CONTAINER (gwin_message), 0);
   gtk_widget_realize (gwin_message);
-  GdkWindow *gdkwin = gwin_message->window;
+  GdkWindow *gdkwin = gtk_widget_get_window(gwin_message);
   set_no_focus(gwin_message);
 
   GtkWidget *hbox = gtk_hbox_new (FALSE, 0);
