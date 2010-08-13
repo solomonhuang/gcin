@@ -26,11 +26,23 @@ int html_browser(char *fname);
 
 static void callback_forum( GtkWidget *widget, gpointer   data)
 {
-#define FURL "http://hyperrate.com/dir.php?eid=67"
 #if WIN32
+#define FURL "http://hyperrate.com/dir.php?eid=215"
 	ShellExecuteA(NULL, "open", FURL, NULL, NULL, SW_SHOWNORMAL);
 #else
+#define FURL "http://hyperrate.com/dir.php?eid=67"
 	html_browser(FURL);
+#endif
+}
+
+
+static void callback_changelog( GtkWidget *widget, gpointer   data)
+{
+#define LOG_URL "http://cle.linux.org.tw/gcin/download/Changelog.html"
+#if WIN32
+	ShellExecuteA(NULL, "open", LOG_URL, NULL, NULL, SW_SHOWNORMAL);
+#else
+	html_browser(LOG_URL);
 #endif
 }
 
@@ -76,7 +88,10 @@ void create_about_window()
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
 #if GTK_CHECK_VERSION(2,18,9)
-   GtkWidget *label = gtk_label_new(_(_L("<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>")));
+   GtkWidget *label = gtk_label_new(_(_L("<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
+"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
+"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</a>\n"
+)));
    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 #else
@@ -84,6 +99,10 @@ void create_about_window()
     gtk_box_pack_start(GTK_BOX(vbox), button_forum, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_forum), "clicked",
 		      G_CALLBACK (callback_forum), NULL);
+    GtkWidget *button_changelog = gtk_button_new_with_label(_(_L("gcin改變記錄")));
+    gtk_box_pack_start(GTK_BOX(vbox), button_changelog, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (button_changelog), "clicked",
+		      G_CALLBACK (callback_changelog), NULL);
 #endif
 
 

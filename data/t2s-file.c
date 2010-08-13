@@ -2,6 +2,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "../t2s-file.h"
+#include "../util.h"
 
 T2S t2s[3000],s2t[3000];
 int t2sn;

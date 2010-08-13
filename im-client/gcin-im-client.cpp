@@ -28,8 +28,9 @@ static void save_old_sigaction_single(int signo, struct sigaction *act)
 {
   sigaction(signo, NULL, act);
 
-  if (act->sa_handler != SIG_IGN)
+  if (act->sa_handler != SIG_IGN) {
     signal(signo, SIG_IGN);
+  }
 }
 
 static void restore_old_sigaction_single(int signo, struct sigaction *act)
@@ -114,21 +115,15 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
       dbg("... try to start a new gcin server %s\n", execbin);
 
       int pid;
-      struct sigaction ori_act;
-      save_old_sigaction_single(SIGCHLD, &ori_act);
 
       if ((pid=fork())==0) {
-#if     FREEBSD
-        setpgid(0, getpid());
-#else
-        setpgrp();
-#endif
+        putenv("GCIN_DAEMON=");
         execl(execbin, "gcin", NULL);
       } else {
-        sleep(1);
+        int status;
+        // gcin will daemon()
+        waitpid(pid, &status, 0);
       }
-
-      restore_old_sigaction_single(SIGCHLD, &ori_act);
     }
   }
 

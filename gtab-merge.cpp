@@ -279,7 +279,7 @@ int main(int argc, char **argv)
     len=strlen(cmd);
 
     if (len > inp->max_keyN)
-      p_err("%d:  only <= %d keys is allowed '%s'", lineno, inp->max_keyN, cmd);
+      p_err("%d:  only <= %d keys is allowed '%s'  %s", lineno, inp->max_keyN, cmd, tt);
 
     kk=0;
     for(i=0;i<len;i++) {

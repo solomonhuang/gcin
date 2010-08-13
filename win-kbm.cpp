@@ -42,7 +42,7 @@ static KEY keys[][COLN]={
 
 {{XK_Shift_L,_L("  Shift  "),K_HOLD},{'z',_L(" z ")},{'x',_L(" x ")},{'c',_L(" c ")},{'v',_L(" v ")},{'b',_L(" b ")},{'n',_L(" n ")},{'m',_L(" m ")},{',',_L(" , ")},{'.',_L(" . ")},{'/',_L(" / ")},{XK_Shift_R,_L(" Shift"),K_HOLD|K_FILL},{XK_KP_Multiply,_L(" * "),8},
 {XK_Up,_L("↑"),8}},
-{{XK_Control_L,_L("Ctrl"),K_HOLD},{XK_Alt_R,_L("Alt"),K_HOLD},{' ',_L("Space"), 1},
+{{XK_Control_L,_L("Ctrl"),K_HOLD},{XK_Alt_L,_L("Alt"),K_HOLD},{' ',_L("Space"), 1}, {XK_Alt_R,_L("Alt"),K_HOLD}, {XK_Control_R,_L("Ctrl"),K_HOLD},
 {XK_Left, _L("←"),8},{XK_Down,_L("↓"),8},{XK_Right, _L("→"),8}}
 };
 
@@ -59,12 +59,15 @@ void mod_fg_all(GtkWidget *lab, GdkColor *col)
 }
 
 void send_fake_key_eve(KeySym key);
+#if WIN32
+void win32_FakeKey(UINT vk, bool key_press);
+#endif
+
 static void cb_button_click(GtkWidget *wid, KEY *k)
 {
   KeySym keysym=k->keysym;
 #if UNIX
   KeyCode kc = XKeysymToKeycode(dpy, keysym);
-#else
 #endif
   GtkWidget *laben = k->laben;
 
@@ -75,12 +78,14 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
 #if UNIX
       XTestFakeKeyEvent(dpy, kc, False, CurrentTime);
 #else
+	  win32_FakeKey(keysym, false);
 #endif
     }
     else {
 #if UNIX
       XTestFakeKeyEvent(dpy, kc, True, CurrentTime);
 #else
+	  win32_FakeKey(keysym, true);
 #endif
       k->flag |= K_PRESS;
       mod_fg_all(laben, &red);
@@ -98,6 +103,7 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
         KeyCode kcj = XKeysymToKeycode(dpy, keys[i][j].keysym);
         XTestFakeKeyEvent(dpy, kcj, False, CurrentTime);
 #else
+		win32_FakeKey(keys[i][j].keysym, false);
 #endif
         mod_fg_all(keys[i][j].laben, NULL);
       }
@@ -250,6 +256,10 @@ static char shift_chars_o[]="`1234567890-=[]\\;',./";
 static void set_kbm_key(KeySym keysym, char *str)
 {
   int i;
+
+  if (!gwin_kbm)
+    return;
+
   for(i=0;i<keysN;i++) {
     int j;
     for(j=0;j<COLN;j++) {
@@ -293,15 +303,18 @@ static void clear_kbm()
 
 void update_win_kbm()
 {
-  if (!current_CS)
+  if (!current_CS || !gwin_kbm)
     return;
 
   clear_kbm();
 
+ if (current_CS->im_state != GCIN_STATE_CHINESE)
+   goto ret;
+
   int i;
-  switch (current_CS->in_method) {
-    case 3:
-    case 6:
+  switch (current_method_type()) {
+    case method_type_PHO:
+    case method_type_TSIN:
       for(i=0; i < 128; i++) {
         int j;
         char tt[64];
@@ -321,9 +334,9 @@ void update_win_kbm()
         set_kbm_key(i, tt);
       }
       break;
-    case 10:
+    case method_type_INT_CODE:
 #if USE_ANTHY
-    case 12:
+    case method_type_ANTHY:
 #endif
       break;
     default:
@@ -355,6 +368,7 @@ void update_win_kbm()
       break;
   }
 
+ret:
   gtk_window_resize(GTK_WINDOW(gwin_kbm), 10, 10);
   move_win_kbm();
 }

@@ -24,10 +24,14 @@ tsin:
 	晚上有新光三越
 	自己所用
 	中文自行  → should popup 自行、字型、
+	斷線16分鐘
 	
 
 簡易:
        aa space -> should be able to skip to next page
+
+pinyin:
+	zhuang4 狀
 
 
 gtab-buf:

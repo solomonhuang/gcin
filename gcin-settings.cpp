@@ -75,8 +75,8 @@ void load_setttings()
   gcin_font_size_gtab_in = get_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, 10);
   gcin_font_size_pho_near = get_gcin_conf_int(GCIN_FONT_SIZE_PHO_NEAR, 14);
   gcin_input_style = get_gcin_conf_int(GCIN_INPUT_STYLE, InputStyleOverSpot);
-  gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 2000);
-  gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 2000);
+  gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 1600);
+  gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 1200);
   gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 1);
   gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 0);
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
@@ -159,9 +159,9 @@ void load_setttings()
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
   gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);
-#if 0
+#if 1
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_BOTH);
-#elif 1
+#elif 0
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_ON_THE_SPOT);
 #else
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_OVER_THE_SPOT);

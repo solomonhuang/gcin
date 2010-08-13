@@ -74,6 +74,13 @@ void show_inmd_menu()
   inmd_switch_popup_handler(NULL, (GdkEvent *)&eve);
 }
 
+void destroy_inmd_menu()
+{
+  if (!menu)
+    return;
+  gtk_widget_destroy(menu);
+  menu = NULL;
+}
 
 #if WIN32
 void inmd_popup_tray()

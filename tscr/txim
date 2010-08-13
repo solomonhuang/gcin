@@ -12,9 +12,9 @@ locale
 ../gcin.test &
 gcinpid=$!
 sleep 1
-gedit
+#gedit
 #leafpad
 #amsn
 #ie6
-#firefox
+firefox
 pkill gcin.test

@@ -82,12 +82,15 @@ extern "C" void gdk_input_remove	  (gint		     tag);
 
 #if WIN32
 typedef int socklen_t;
+#else
+#include <pwd.h>
 #endif
+
 
 static void shutdown_client(int fd)
 {
 //  dbg("client shutdown rn %d\n", rn);
-  gdk_input_remove(gcin_clients[fd].tag);
+  g_source_remove(gcin_clients[fd].tag);
 
   if (gcin_clients[fd].cs == current_CS) {
     hide_in_win(current_CS);
@@ -96,6 +99,13 @@ static void shutdown_client(int fd)
 
   free(gcin_clients[fd].cs);
   gcin_clients[fd].cs = NULL;
+#if UNIX
+  int uid = getuid();
+  struct passwd *pwd;
+  if ((pwd=getpwuid(uid)) && !strcmp(pwd->pw_name, "gdm")) {
+    exit(0);
+  }
+#endif
 #if UNIX
   close(fd);
 #else
@@ -150,6 +160,8 @@ void process_client_req(int fd)
 
 #if UNIX
     if (gcin_init_im_enabled && new_cli)
+#else
+    if (new_cli)
 #endif
 	{
       current_CS = cs;

@@ -34,7 +34,6 @@
 #define DBG 0
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
-//gboolean is_gdm;
 
 struct _GtkIMContextGCIN
 {
@@ -190,6 +189,7 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
   gobject_class->finalize = gtk_im_context_gcin_finalize;
 }
 
+
 static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
@@ -199,6 +199,7 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
   im_context_gcin->pe_str = NULL;
   im_context_gcin->pe_cursor = 0;
   im_context_gcin->gcin_ch = NULL;
+//  test_gdm();
 
 #if DBG
   printf("gtk_im_context_gcin_init %x\n", im_context_gcin);
@@ -222,9 +223,6 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
       im_context_gcin->is_mozilla = TRUE;
       break;
     }
-
-//    if (strstr(exec, "/gdm"))
-//      is_gdm = TRUE;
   }
 #endif
 // dirty hack for mozilla...
@@ -270,39 +268,6 @@ gtk_im_context_gcin_finalize (GObject *obj)
   }
 }
 
-/* Finds the GtkWidget that owns the window, or if none, the
- * widget owning the nearest parent that has a widget.
- */
-
-static GtkWidget *
-widget_for_window (GdkWindow *window)
-{
-  while (window)
-    {
-      gpointer user_data;
-      gdk_window_get_user_data (window, &user_data);
-      if (user_data)
-        return user_data;
-
-      window = gdk_window_get_parent (window);
-    }
-
-  return NULL;
-}
-
-
-#if 0
-static void update_in_toplevel (GtkIMContextGCIN *context_xim)
-{
-}
-static void
-on_client_widget_hierarchy_changed (GtkWidget       *widget,
-                                    GtkWidget       *old_toplevel,
-                                    GtkIMContextGCIN *context_xim)
-{
-  update_in_toplevel (context_xim);
-}
-#endif
 
 static void
 set_ic_client_window (GtkIMContextGCIN *context_xim,

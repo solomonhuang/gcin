@@ -43,7 +43,52 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>Changlog</title><meta content="Edward Liu" name="author"></head><body>** UTF-8 encoding **<br>
+1.5.5:<br>
+- <a href="http://hyperrate.com/thread.php?tid=19392#19392">gtab 開啟「按鍵顯示於應用程式」</a>不會自動送出第1字。<br>
+- .cin 檔案新增 %flag_disp_partial_match，使用此選項會強迫&nbsp; .gtab&nbsp; 開啟 預覽字 &amp;&nbsp; 預覽部分符合的字，主要是<a href="http://hyperrate.com/thread.php?tid=19382">給英文輸入的&nbsp; .cin </a>用的。 <br>
+- gtab 自動選字遇到有英文單字則無法修改的問題。<br>
+- windows 版 gcin 不會記憶詞音的英數狀態的問題。<br>
+- <a href="http://hyperrate.com/thread.php?tid=19467#19467">固定 gtab 按鍵區的大小</a>以減少 window 跳動。<br>
+-&nbsp; gtab pinyin 沒辦法輸入 zhuang4 的問題。<br>
+- caleb's GTK3 fix<br>
+- gcin-setup 內定輸入法開啟&amp;關閉輸入法清單新增「使用」的欄位，可以選擇是否要在輸入法選擇選單內。<br>
+- 如果是 gcin-im-client 執行的 gcin process，重新執行 gcin 後現在不會有 [gcin] &lt;defunct&gt; 一直出現了。<br>
+- gdm 在登入之後應該會自動關閉 gcin了，uid 必須為 gdm。<br>
+- gtab 輸入法不會顯示輸入法名稱的問題，感謝 LGJ 回報問題。<br>
+- gtab 預選列選擇部分符合的字，現在最後面的空白不會顯示了<br>
+- <span class="f12">gtab 輸入法的外加字詞在按兩次&nbsp; ctrl-space&nbsp; 後會自動&nbsp; reload 。<br>
+- .cin&nbsp; 無法定義超過&nbsp; 63 鍵 且&nbsp;  </span>鍵長 &gt;= 5 的問題。必須用 gcin2tab 重新產生 .gtab<br>
+- 螢幕小鍵盤改成有左右的 Ctrl &amp; Alt 鍵<br>
+- 詞音現在可以用 keypad (最右數字區) 的 +- 來換頁了。NumLock 關閉時，Home, ←→等鍵的功能也可以用了。<br>
+- <a href="http://hyperrate.com/thread.php?tid=19955#19955">gtab 編輯區內，兩個英文單字</a>之間會自動加空白。<br>
+- <a href="http://hyperrate.com/thread.php?tid=19975">QT build fix</a><br>
+- gtab 編輯區的依使用次數選擇內定字，現在連詞 &amp; 英文也可以使用了，不過現在會重新歸零計數。<br>
+<br>
 1.5.4:<br>
 - <a href="http://hyperrate.com/thread.php?tid=19373">按鍵顯示於應用程</a>式會造成不會開啟選擇視窗的問題。<br>
 <br>

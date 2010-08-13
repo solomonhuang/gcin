@@ -24,23 +24,36 @@ int output_bufferN;
 static char *output_buffer_raw, *output_buffer_raw_bak;
 static int output_buffer_rawN;
 gboolean test_mode;
+#if WIN32
+int last_input_method;
+#endif
 
+void init_gtab(int inmdno);
 
 char current_method_type()
 {
   if (!current_CS)
+#if UNIX
     return inmd[default_input_method].method_type;
+#else
+  {
+    if (!last_input_method)
+		last_input_method = default_input_method;
+	return inmd[last_input_method].method_type;
+  }
+#endif
   return inmd[current_CS->in_method].method_type;
 }
 
 
 #if WIN32
-void win32_FakeKey(UINT vk);
+void win32_FakeKey(UINT vk, bool key_pressed);
 #endif
 void send_fake_key_eve(KeySym key)
 {
 #if WIN32
-  win32_FakeKey(key);
+  win32_FakeKey(key, true);
+  win32_FakeKey(key, false);
 #else
   KeyCode kc = XKeysymToKeycode(dpy, key);
   XTestFakeKeyEvent(dpy, kc, True, CurrentTime);
@@ -297,8 +310,8 @@ void hide_win_anthy();
 void hide_in_win(ClientState *cs)
 {
   if (!cs) {
-#if DEBUG
-    dbg("hide_in_win: ic is null");
+#if 0
+    dbg("hide_in_win: ic is null\n");
 #endif
     return;
   }
@@ -357,7 +370,7 @@ gboolean force_show;
 void show_in_win(ClientState *cs)
 {
   if (!cs) {
-#if DEBUG
+#if 0
     dbg("show_in_win: ic is null");
 #endif
     return;
@@ -408,7 +421,7 @@ void move_in_win(ClientState *cs, int x, int y)
     y = gcin_root_y;
   }
 
-#if DEBUG || 0
+#if 0
   dbg("move_in_win %d %d\n",x, y);
 #endif
 #if 1
@@ -512,7 +525,7 @@ void move_IC_in_win(ClientState *cs)
    int tx,ty;
    getRootXY(inpwin, inpx, inpy, &tx, &ty);
 
-#if DEBUG
+#if 0
    dbg("move_IC_in_win inpxy:%d,%d txy:%d,%d\n", inpx, inpy, tx, ty);
 #endif
 
@@ -537,7 +550,7 @@ void update_in_win_pos()
     winx++; winy++;
 
     Window inpwin = current_CS->client_win;
-#if DEBUG
+#if 0
     dbg("update_in_win_pos\n");
 #endif
     if (inpwin) {
@@ -636,10 +649,17 @@ void init_state_chinese(ClientState *cs)
   cs->im_state = GCIN_STATE_CHINESE;
   set_tsin_pho_mode0(cs);
   if (!cs->in_method)
+#if UNIX
     init_in_method(default_input_method);
+#else
+  if (!last_input_method)
+	last_input_method = default_input_method;
+  init_in_method(last_input_method);
+#endif
 }
 
 gboolean output_gbuf();
+void update_win_kbm();
 
 void toggle_im_enabled()
 {
@@ -673,10 +693,16 @@ void toggle_im_enabled()
 #endif
       current_CS->im_state = GCIN_STATE_DISABLED;
 
+      update_win_kbm();
+
 #if TRAY_ENABLED
       disp_tray_icon();
 #endif
     } else {
+      if (!current_method_type())
+        init_gtab(current_CS->in_method);
+
+
       init_state_chinese(current_CS);
       reset_current_in_win_xy();
 #if 1
@@ -686,6 +712,8 @@ void toggle_im_enabled()
       update_in_win_pos();
       show_in_win(current_CS);
 #endif
+
+      update_win_kbm();
 
 #if TRAY_ENABLED
       disp_tray_icon();
@@ -797,7 +825,6 @@ void toggle_half_full_char()
 //  dbg("half full toggle\n");
 }
 
-void init_gtab(int inmdno);
 void init_inter_code();
 void init_tab_pp(gboolean init);
 void init_tab_pho();
@@ -809,7 +836,7 @@ void hide_win_kbm();
 extern gboolean win_sym_enabled;
 int init_win_anthy();
 void show_win_kbm();
-void update_win_kbm();
+void set_gtab_input_method_name(char *s);
 
 gboolean init_in_method(int in_no)
 {
@@ -878,8 +905,14 @@ gboolean init_in_method(int in_no)
         win_kbm_inited = 1;
         show_win_kbm();
       }
+
+      set_gtab_input_method_name(inmd[in_no].cname);
       break;
   }
+#if WIN32
+  if (current_CS && current_CS->in_method != last_input_method)
+	  last_input_method = current_CS->in_method;
+#endif
 
 #if TRAY_ENABLED
   disp_tray_icon();
@@ -897,10 +930,10 @@ gboolean init_in_method(int in_no)
 static void cycle_next_in_method()
 {
   int i;
-
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   for(i=0; i < MAX_GTAB_NUM_KEY; i++) {
     int v = ((current_CS->in_method + i) % MAX_GTAB_NUM_KEY) + 1;
     if (!(gcin_flags_im_enabled & (1<<v)))
@@ -1065,8 +1098,13 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     if (kidx <= 0)
       return FALSE;
 
+    if (!inmd[kidx].cname)
+      return FALSE;
+
     current_CS->im_state = GCIN_STATE_CHINESE;
+#if WIN32
     if (!test_mode)
+#endif
       init_in_method(kidx);
 
     return TRUE;

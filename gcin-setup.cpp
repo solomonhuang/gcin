@@ -26,7 +26,7 @@ static GdkColor gcin_win_gcolor_fg, gcin_win_gcolor_bg, gcin_sel_key_gcolor;
 typedef struct {
   GdkColor *color;
   char **color_str;
-  GtkColorSelectionDialog *color_selector;
+  GtkWidget *color_selector;
   unich_t *title;
 } COLORSEL;
 
@@ -419,9 +419,9 @@ static gboolean close_appearance_conf_window( GtkWidget *widget,
 static void cb_savecb_gcin_win_color_fg(GtkWidget *widget, gpointer user_data)
 {
   COLORSEL *sel = (COLORSEL *)user_data;
-  GtkColorSelectionDialog *color_selector = sel->color_selector;
+  GtkWidget *color_selector = sel->color_selector;
   GdkColor *col = sel->color;
-  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), col);
+  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_selector))), col);
 
   if (sel->color == &gcin_win_gcolor_fg)
     gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, col);
@@ -434,22 +434,24 @@ static gboolean cb_gcin_win_color_fg( GtkWidget *widget,
                                    gpointer   data)
 {
   COLORSEL *sel = (COLORSEL *)data;
-  GtkColorSelectionDialog *color_selector =
-  (GtkColorSelectionDialog *)gtk_color_selection_dialog_new (_(sel->title));
+  GtkWidget *color_selector = gtk_color_selection_dialog_new (_(sel->title));
 
   gdk_color_parse(*sel->color_str, sel->color);
 
   gtk_color_selection_set_current_color(
-          GTK_COLOR_SELECTION(color_selector->colorsel),
+          GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_selector))),
           sel->color);
 
+#if 0
   g_signal_connect (GTK_OBJECT (color_selector->ok_button),
                     "clicked",
                     G_CALLBACK (cb_savecb_gcin_win_color_fg),
                     (gpointer) sel);
+#endif
 
   sel->color_selector = color_selector;
 
+#if 0
   g_signal_connect_swapped (GTK_OBJECT (color_selector->ok_button),
                             "clicked",
                             G_CALLBACK (gtk_widget_destroy),
@@ -459,8 +461,14 @@ static gboolean cb_gcin_win_color_fg( GtkWidget *widget,
                             "clicked",
                             G_CALLBACK (gtk_widget_destroy),
                             (gpointer) color_selector);
+#endif
 
   gtk_widget_show((GtkWidget*)color_selector);
+#if 1
+  if (gtk_dialog_run(GTK_DIALOG(color_selector)) == GTK_RESPONSE_OK)
+    cb_savecb_gcin_win_color_fg((GtkWidget *)color_selector, (gpointer) sel);
+  gtk_widget_destroy(color_selector);
+#endif
   return TRUE;
 }
 
@@ -469,7 +477,7 @@ static GtkWidget *da_sel_key;
 static void cb_save_gcin_sel_key_color(GtkWidget *widget, gpointer user_data)
 {
   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
-  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_selector->colorsel), &gcin_sel_key_gcolor);
+  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(color_selector)), &gcin_sel_key_gcolor);
 
   gtk_widget_modify_bg(da_sel_key, GTK_STATE_NORMAL, &gcin_sel_key_gcolor);
 }
@@ -477,12 +485,13 @@ static void cb_save_gcin_sel_key_color(GtkWidget *widget, gpointer user_data)
 
 static gboolean cb_gcin_sel_key_color( GtkWidget *widget, gpointer data)
 {
-   GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)gtk_color_selection_dialog_new (_(_L("選擇鍵的顏色")));
+   GtkWidget *color_selector = gtk_color_selection_dialog_new (_(_L("選擇鍵的顏色")));
 
    gtk_color_selection_set_current_color(
-           GTK_COLOR_SELECTION(color_selector->colorsel),
+           GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_selector))),
            &gcin_sel_key_gcolor);
 
+#if 0
    g_signal_connect (GTK_OBJECT (color_selector->ok_button),
                      "clicked",
                      G_CALLBACK (cb_save_gcin_sel_key_color),
@@ -497,8 +506,14 @@ static gboolean cb_gcin_sel_key_color( GtkWidget *widget, gpointer data)
                              "clicked",
                              G_CALLBACK (gtk_widget_destroy),
                              (gpointer) color_selector);
+#endif
 
-   gtk_widget_show((GtkWidget*)color_selector);
+   gtk_widget_show(color_selector);
+#if 1
+   if (gtk_dialog_run(GTK_DIALOG(color_selector)) == GTK_RESPONSE_OK)
+     cb_save_gcin_sel_key_color(color_selector, (gpointer) color_selector);
+   gtk_widget_destroy(color_selector);
+#endif
    return TRUE;
 }
 
@@ -687,12 +702,12 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX(vbox_root_style), hbox_root_style, FALSE, FALSE, 0);
 
   GtkAdjustment *adj_root_style_x =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_root_x, 0.0, 1600.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_root_x, 0.0, 5120.0, 1.0, 1.0, 0.0);
   spinner_root_style_x = gtk_spin_button_new (adj_root_style_x, 0, 0);
   gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_x);
 
   GtkAdjustment *adj_root_style_y =
-   (GtkAdjustment *) gtk_adjustment_new (gcin_root_y, 0.0, 1200.0, 1.0, 1.0, 0.0);
+   (GtkAdjustment *) gtk_adjustment_new (gcin_root_y, 0.0, 2880.0, 1.0, 1.0, 0.0);
   spinner_root_style_y = gtk_spin_button_new (adj_root_style_y, 0, 0);
   gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_y);
 
@@ -1021,7 +1036,7 @@ int main(int argc, char **argv)
 
   load_setttings();
 
-  load_gtab_list();
+  load_gtab_list(FALSE);
 
 #if GCIN_i18n_message
   gtk_set_locale();

@@ -39,11 +39,12 @@ void gdk_input_remove	  (gint		     tag);
 void get_gcin_im_srv_sock_path(char *outstr, int outstrN);
 void process_client_req(int fd);
 
-static void cb_read_gcin_client_data(gpointer data, int source, GdkInputCondition condition)
+static gboolean cb_read_gcin_client_data(GIOChannel *source, GIOCondition condition, gpointer data)
 {
   int fd=GPOINTER_TO_INT(data);
 
   process_client_req(fd);
+  return TRUE;
 }
 
 #if UNIX
@@ -67,7 +68,7 @@ static void gen_passwd_idx()
 typedef int socklen_t;
 #endif
 
-static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition condition)
+static gboolean cb_new_gcin_client(GIOChannel *source, GIOCondition condition, gpointer data)
 {
   Connection_type type=(Connection_type) GPOINTER_TO_INT(data);
 #if 0
@@ -95,7 +96,7 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
 
   if (newsockfd < 0) {
     perror("accept");
-    return;
+    return FALSE;
   }
 
 //  dbg("newsockfd %d\n", newsockfd);
@@ -107,8 +108,13 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
 
   bzero(&gcin_clients[newsockfd], sizeof(gcin_clients[0]));
 
-  gcin_clients[newsockfd].tag = gdk_input_add(newsockfd, GDK_INPUT_READ, cb_read_gcin_client_data,
+#if WIN32
+  gcin_clients[newsockfd].tag = g_io_add_watch(g_io_channel_win32_new_socket(newsockfd), G_IO_IN, cb_read_gcin_client_data,
               GINT_TO_POINTER(newsockfd));
+#else
+  gcin_clients[newsockfd].tag = g_io_add_watch(g_io_channel_unix_new(newsockfd), G_IO_IN, cb_read_gcin_client_data,
+              GINT_TO_POINTER(newsockfd));
+#endif
 #if UNIX
   if (type==Connection_type_tcp) {
     gcin_clients[newsockfd].seed = srv_ip_port.passwd.seed;
@@ -116,6 +122,7 @@ static void cb_new_gcin_client(gpointer data, int source, GdkInputCondition cond
   }
 #endif
   gcin_clients[newsockfd].type = type;
+  return TRUE;
 }
 
 #if UNIX
@@ -287,8 +294,13 @@ void init_gcin_im_serv(Window win)
 
   dbg("im_sockfd:%d\n", im_sockfd);
 
+#if 0
   gdk_input_add(im_sockfd, GDK_INPUT_READ, cb_new_gcin_client,
                 GINT_TO_POINTER(Connection_type_unix));
+#else
+  g_io_add_watch(g_io_channel_unix_new(im_sockfd), G_IO_IN, cb_new_gcin_client,
+                GINT_TO_POINTER(Connection_type_unix));
+#endif
 
   Display *dpy = GDK_DISPLAY();
 
@@ -395,8 +407,13 @@ void init_gcin_im_serv(Window win)
   gen_passwd_idx();
 #endif
 
-  gdk_input_add(im_tcp_sockfd, GDK_INPUT_READ, cb_new_gcin_client,
+#if WIN32
+  g_io_add_watch(g_io_channel_win32_new_socket(im_tcp_sockfd), G_IO_IN, cb_new_gcin_client,
                 GINT_TO_POINTER(Connection_type_tcp));
+#else
+  g_io_add_watch(g_io_channel_unix_new(im_tcp_sockfd), G_IO_IN, cb_new_gcin_client,
+                GINT_TO_POINTER(Connection_type_tcp));
+#endif
 
 //  printf("im_sockfd: %d\n",im_sockfd);
 #if WIN32

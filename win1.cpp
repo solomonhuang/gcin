@@ -68,6 +68,16 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
   }
 }
 
+
+static void cb_arrow_up (GtkWidget *button, gpointer user_data)
+{
+  tsin_page_up();
+}
+static void cb_arrow_down (GtkWidget *button, gpointer user_data)
+{
+  tsin_page_down();
+}
+
 void create_win1_gui()
 {
   if (frame)
@@ -79,8 +89,12 @@ void create_win1_gui()
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER(frame), vbox_top);
 
+  GtkWidget *eve_box_up = gtk_event_box_new();
+  gtk_box_pack_start (GTK_BOX (vbox_top), eve_box_up, FALSE, FALSE, 0);
   arrow_up = gtk_arrow_new (GTK_ARROW_UP, GTK_SHADOW_IN);
-  gtk_box_pack_start (GTK_BOX (vbox_top), arrow_up, FALSE, FALSE, 0);
+  gtk_container_add(GTK_CONTAINER(eve_box_up), arrow_up);
+  g_signal_connect (G_OBJECT (eve_box_up), "button-press-event",
+                      G_CALLBACK (cb_arrow_up), NULL);
 
   GtkWidget *table = gtk_table_new(SELEN, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox_top), table, FALSE, FALSE, 0);
@@ -115,8 +129,12 @@ void create_win1_gui()
                    G_CALLBACK(mouse_button_callback), GINT_TO_POINTER(i));
   }
 
+  GtkWidget *eve_box_down = gtk_event_box_new();
+  gtk_box_pack_start (GTK_BOX (vbox_top), eve_box_down, FALSE, FALSE, 0);
   arrow_down = gtk_arrow_new (GTK_ARROW_DOWN, GTK_SHADOW_IN);
-  gtk_box_pack_start (GTK_BOX (vbox_top), arrow_down, FALSE, FALSE, 0);
+  gtk_container_add(GTK_CONTAINER(eve_box_down), arrow_down);
+  g_signal_connect (G_OBJECT (eve_box_down), "button-press-event",
+                      G_CALLBACK (cb_arrow_down), NULL);
 
   gtk_widget_show_all(gwin1);
   gdk_flush();

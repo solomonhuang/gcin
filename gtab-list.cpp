@@ -1,15 +1,13 @@
 #include "gcin.h"
 #include "gtab.h"
+#include "gtab-list.h"
 int gcin_switch_keys_lookup(int key);
 
 INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 char gtab_list[]=GTAB_LIST;
 
-struct {
-  char *id;
-  char method_type;
-} method_codes[] = {
+GTAB_LIST_S method_codes[] = {
  {"!PHO", method_type_PHO},
  {"!TSIN", method_type_TSIN},
  {"!INT_CODE", method_type_INT_CODE},
@@ -17,7 +15,7 @@ struct {
  {NULL}
 };
 
-void load_gtab_list()
+void load_gtab_list(gboolean skip_disabled)
 {
   char ttt[128];
   FILE *fp;
@@ -39,9 +37,17 @@ void load_gtab_list()
 
   skip_utf8_sigature(fp);
 
+  int i;
+  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+    INMD *pinmd = &inmd[i];
+    free(pinmd->filename); pinmd->filename=NULL;
+    free(pinmd->cname); pinmd->cname=NULL;
+    free(pinmd->icon); pinmd->icon=NULL;
+  }
+
   while (!feof(fp)) {
     char line[256];
-    char name[32];
+    char name_ar[32], *name=name_ar;
     char key[32];
     char file[32];
     char icon[128];
@@ -59,7 +65,11 @@ void load_gtab_list()
     if (line[0]=='#')
       continue;
 
+    if (skip_disabled && line[0]=='!')
+      continue;
+
     sscanf(line, "%s %s %s %s", name, key, file, icon);
+
     if (strlen(name) < 1)
       break;
 
@@ -67,7 +77,6 @@ void load_gtab_list()
     if (keyidx < 0)
       p_err("bad key value %s in %s\n", key, ttt);
 
-    free(inmd[keyidx].filename);
     inmd[keyidx].filename = strdup(file);
     int i;
     for(i=0; method_codes[i].id; i++)
@@ -76,10 +85,12 @@ void load_gtab_list()
     if (method_codes[i].id)
       inmd[keyidx].method_type = method_codes[i].method_type;
 
-    free(inmd[keyidx].cname);
+    if (name[0]=='!') {
+      name++;
+      inmd[keyidx].disabled = TRUE;
+    }
     inmd[keyidx].cname = strdup(name);
 
-    free(inmd[keyidx].icon);
     if (strlen(icon))
       inmd[keyidx].icon = strdup(icon);
   }

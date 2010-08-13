@@ -28,6 +28,7 @@ enum {
   FLAG_GTAB_SYM_KBM=2, // auto close, auto switch to default input method
   FLAG_PHRASE_AUTO_SKIP_ENDKEY=4,
   FLAG_AUTO_SELECT_BY_PHRASE=8,
+  FLAG_GTAB_DISP_PARTIAL_MATCH=0x10,
 };
 
 enum {
@@ -95,7 +96,8 @@ typedef struct {
   char *phrbuf;
   char *filename, *filename_append;
   time_t file_modify_time;
-  gboolean key64;        // db is 64 bit-long key
+  gboolean key64; // db is 64 bit-long key
+  gboolean disabled; // will not be display in the selection menu
   int max_keyN;
   char *endkey;       // only pinin/ar30 use it
   GTAB_space_pressed_E space_style;
@@ -116,7 +118,7 @@ extern INMD inmd[MAX_GTAB_NUM_KEY+1];
 
 u_int64_t CONVT2(INMD *inmd, int i);
 extern INMD *cur_inmd;
-void load_gtab_list();
+void load_gtab_list(gboolean);
 char current_method_type();
 
 #define LAST_K_bitN (cur_inmd->last_k_bitn)

@@ -24,6 +24,7 @@
 
 #if !GTK_CHECK_VERSION(2,13,4)
 #define gtk_widget_get_window(x) (x)->window
+#define gtk_color_selection_dialog_get_color_selection(x) (x)->colorsel
 #endif
 
 #if !GTK_CHECK_VERSION(2,15,0)
@@ -33,6 +34,8 @@
 #if GTK_CHECK_VERSION(2,17,5)
 #undef GTK_WIDGET_NO_WINDOW
 #define GTK_WIDGET_NO_WINDOW !gtk_widget_get_has_window
+#undef GTK_WIDGET_SET_FLAGS
+#define GTK_WIDGET_SET_FLAGS(x,y) gtk_widget_set_can_default(x,1)
 #endif
 
 #if GTK_CHECK_VERSION(2,17,7)
@@ -68,10 +71,10 @@ typedef enum {
 
 #if CLIENT_LIB
 #define p_err __gcin_p_err
-#define dbg __gcin_dbg
 #define zmalloc __gcin_zmalloc
 #endif
 
+#include "util.h"
 
 #define tmalloc(type,n)  (type*)malloc(sizeof(type) * (n))
 void *zmalloc(int n);
@@ -83,8 +86,6 @@ void *memdup(void *p, int n);
 extern Display *dpy;
 #endif
 
-void p_err(char *fmt,...);
-void dbg(char *fmt,...);
 
 extern GtkWidget *gwin0;
 extern GdkWindow *gdkwin0;

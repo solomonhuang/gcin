@@ -265,6 +265,11 @@ int main(int argc, char **argv)
       th.flag |= FLAG_AUTO_SELECT_BY_PHRASE;
       cmd_arg(&cmd, &arg);
     } else
+    if (sequ(cmd,"%flag_disp_partial_match")) {
+      dbg("flag_disp_partial_match\n");
+      th.flag |= FLAG_GTAB_DISP_PARTIAL_MATCH;
+      cmd_arg(&cmd, &arg);
+    } else
       break;
   }
 
@@ -337,6 +342,7 @@ int main(int argc, char **argv)
   long pos=ftell(fr);
   int olineno = lineno;
   gboolean key64 = FALSE;
+  int max_key_len = 0;
 
   while (!feof(fr)) {
     int len;
@@ -354,12 +360,10 @@ int main(int argc, char **argv)
 
     len=strlen(cmd);
 
-    if (len > 5) {
-      key64 = TRUE;
-      dbg("more than 5 keys, will use 64 bit\n");
-      break;
-    }
+    if (max_key_len < len)
+      max_key_len = len;
   }
+
 
   fseek(fr, pos, SEEK_SET);
   lineno=olineno;
@@ -374,6 +378,13 @@ int main(int argc, char **argv)
     cur_inmd->keybits = 6;
   else
     cur_inmd->keybits = 7;
+
+  if (cur_inmd->keybits * max_key_len > 32) {
+   cur_inmd->key64 = key64 = TRUE;
+  }
+
+  if (key64)
+    dbg("key64\n");
 
   printf("KeyNum:%d keybits:%d\n", KeyNum, cur_inmd->keybits);
 
@@ -420,6 +431,8 @@ int main(int argc, char **argv)
 
       kk|=(u_int64_t)k << ( LAST_K_bitN - i*th.keybits);
     }
+
+//    dbg("%s kk:%llx\n", cmd, kk);
 
     if (key64) {
       memcpy(&itar64[chno].key, &kk, 8);

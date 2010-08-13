@@ -127,7 +127,7 @@ static gboolean cb_gtab_edit_append( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
-  load_gtab_list();
+  load_gtab_list(FALSE);
   char *fname = inmd[default_input_method].filename;
   if (!fname)
     return TRUE;

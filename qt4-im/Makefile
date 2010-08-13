@@ -8,7 +8,7 @@ CXXFLAGS=$(OPTFLAGS) $(INCS) -Wall -D_REENTRANT -fPIC  -DQT4 -DQT_SHARED \
 -DQT_IMMODULE -DPIC
 OBJS= moc_gcin-qt.o gcin-qt.o im-gcin-qt.o gcin-imcontext-qt.o
 .SUFFIXES:	.c .cpp .a .so .E .h
-LDFLAGS=-L../im-client -lgcin-im-client -Wl,-rpath,$(gcinlibdir)
+LDFLAGS=-L../im-client -lgcin-im-client -Wl,-rpath,$(gcinlibdir) `pkg-config QtCore QtGui --libs`
 all:    im-gcin.so
 
 .cpp.E:

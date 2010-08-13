@@ -327,6 +327,9 @@ static gboolean update_cursor_position(gpointer data)
 {
   GtkIMContextGCIN *context = (GtkIMContextGCIN *)data;
 
+  if (!context)
+    return;
+
   g_signal_emit_by_name(context, "preedit_changed");
   cancel_timeout(context);
   return FALSE;
@@ -373,6 +376,7 @@ gtk_im_context_gcin_new (void)
   return GTK_IM_CONTEXT (result);
 }
 
+#include <gdk/gdkkeysyms.h>
 
 ///
 static gboolean
@@ -406,36 +410,35 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   xevent.state = event->state;
   xevent.keycode = event->hardware_keycode;
   xevent.same_screen = True;
-
-  char *rstr = NULL;
   num_bytes = XLookupString (&xevent, buffer, buffer_size, &keysym, NULL);
 
-  // If it is latin key, XLookupString only works for UTF-8 env
+  char *rstr = NULL;
 
 #if (!FREEBSD || MAC_OS)
-  char *lc_ctype = getenv("LC_CTYPE");
-  if (!lc_ctype || !strstr(lc_ctype, "UTF-8")) {
-    int uni = gdk_keyval_to_unicode(event->keyval);
-    if (uni) {
-      gsize rn;
-      GError *err = NULL;
-      char *utf8 = g_convert((char *)&uni, 4, "UTF-8", "UTF-32", &rn, &num_bytes, &err);
+//  if (event->type == GDK_KEY_PRESS)
+//    printf("kval %x %x\n",event->keyval, keysym);
 
-      if (utf8) {
-        strcpy(buffer, utf8);
-        g_free(utf8);
-      }
+  int uni = gdk_keyval_to_unicode(event->keyval);
+  if (uni) {
+    gsize rn;
+    GError *err = NULL;
+    char *utf8 = g_convert((char *)&uni, 4, "UTF-8", "UTF-32", &rn, &num_bytes, &err);
+
+    if (utf8) {
+//      printf("conv %s\n", utf8);
+      strcpy(buffer, utf8);
+      g_free(utf8);
     }
   }
 #endif
 
   gboolean preedit_changed = FALSE;
   gboolean context_has_str = context_xim->pe_str && context_xim->pe_str[0];
-  char *tstr;
+  char *tstr = NULL;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
   int cursor_pos;
 
-  if (xevent.type == KeyPress) {
+  if (event->type == GDK_KEY_PRESS) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
     preedit_changed = result;
@@ -489,7 +492,12 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 #if DBG
     printf("seq:%d rstr:%s result:%x num_bytes:%d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
 #endif
-    if (!rstr && !result && num_bytes && buffer[0]>=0x20 && buffer[0]!=0x7f
+    if (!rstr && !result && num_bytes &&
+#if 1
+   buffer[0]>=0x20 && buffer[0]!=0x7f
+#else
+   (event->keyval < 0xf000 || buffer[0]>=0x20 && buffer[0] < 0x7f)
+#endif
         && !(xevent.state & (Mod1Mask|ControlMask))) {
       rstr = (char *)malloc(num_bytes + 1);
       memcpy(rstr, buffer, num_bytes);

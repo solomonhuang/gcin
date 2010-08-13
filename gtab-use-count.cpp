@@ -2,11 +2,11 @@
 #include "gtab.h"
 
 typedef struct {
-  u_char ch[CH_SZ];
   int use_count;
+  u_char bytes, flag;
 } GTAB_USE_CNT;
 
-static char gtab_use_count_file[]="gtab-use-count";
+static char gtab_use_count_file[]="gtab-use-count2";
 static FILE *fp_gtab_use_count;
 
 static void init_fp()
@@ -29,23 +29,27 @@ void inc_gtab_use_count(char *s)
 {
   init_fp();
 
-  if (!(*s&0x80))
-    return;
+  int bytes = strlen(s);
 
   GTAB_USE_CNT c;
   rewind(fp_gtab_use_count);
 
-  utf8_putchar(s);
+//  dbg("zzz '%s' bytes:%d\n", s, bytes);
 //  dbg("inc %d\n", ftell(fp_gtab_use_count));
   while (!feof(fp_gtab_use_count)) {
+    char tt[512];
     bzero(&c, sizeof(c));
     fread(&c, sizeof(c), 1, fp_gtab_use_count);
-    if (memcmp(c.ch, s, CH_SZ))
+    if (c.bytes != bytes)
+      continue;
+    fread(tt, bytes, 1, fp_gtab_use_count);
+
+    if (memcmp(tt, s, bytes))
       continue;
 
     long ofs = ftell(fp_gtab_use_count);
 //    dbg("aa %d ofs:%d sz:%d\n", c.use_count, ofs, sizeof(c));
-    fseek(fp_gtab_use_count, - sizeof(c), SEEK_CUR);
+    fseek(fp_gtab_use_count, - (sizeof(c)+bytes) , SEEK_CUR);
 //    dbg("bb %d ofs:%d\n", c.use_count, ftell(fp_gtab_use_count));
 
     c.use_count++;
@@ -57,35 +61,44 @@ void inc_gtab_use_count(char *s)
   int fofs = ftell(fp_gtab_use_count);
 //  dbg("fofs: %d\n", fofs);
 
+#if 0
   int delta = fofs % sizeof(GTAB_USE_CNT);
   if (delta) // avoid incomplete write
     fseek(fp_gtab_use_count, - delta, SEEK_CUR);
+#endif
 
-  bzero(c.ch, CH_SZ);
+  bzero(&c, sizeof(c));
   c.use_count = 1;
-  memcpy(c.ch, s, CH_SZ);
+  c.bytes = bytes;
   fwrite(&c, sizeof(c), 1, fp_gtab_use_count);
+  fwrite(s, bytes, 1, fp_gtab_use_count);
   fflush(fp_gtab_use_count);
 }
 
 
 int get_gtab_use_count(char *s)
 {
-  if (strlen(s) > utf8_sz(s)) { // only character
-    return 0;
-  }
-
+  int bytes = strlen(s);
   init_fp();
+
+//  dbg("get_gtab_use_count %s\n", s);
 
   GTAB_USE_CNT c;
   rewind(fp_gtab_use_count);
   while (!feof(fp_gtab_use_count)) {
     fread(&c, sizeof(c), 1, fp_gtab_use_count);
-    if (!memcmp(c.ch, s, CH_SZ)) {
-//      printf("zz %s %d\n", s, c.use_count);
+    if (c.bytes != bytes)
+      continue;
+    char tt[512];
+    fread(tt, bytes, 1, fp_gtab_use_count);
+
+    if (!memcmp(tt, s, bytes)) {
+//      dbg("count found %s %d\n", s, c.use_count);
       return c.use_count;
     }
   }
+
+//  dbg("not found\n");
 
   return 0;
 }

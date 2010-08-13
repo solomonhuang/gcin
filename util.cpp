@@ -55,7 +55,8 @@ void dbg_time(char *fmt,...)
 }
 #endif
 
-void dbg(char *fmt,...)
+#if DEBUG
+void __gcin_dbg_(char *fmt,...)
 {
   va_list args;
 
@@ -66,6 +67,7 @@ void dbg(char *fmt,...)
   fflush(out_fp);
   va_end(args);
 }
+#endif
 
 #else
 #include <share.h>
@@ -80,10 +82,11 @@ void dbg(char *fmt,...)
 #if _DBG
 static FILE *dbgfp;
 #endif
-
+#if GCIN_SVR
 void dbg_time(char *fmt,...)
 {
 }
+#endif
 
 static void init_dbgfp()
 {
@@ -120,8 +123,8 @@ static void init_dbgfp()
 
 int utf8_to_big5(char *in, char *out, int outN);
 
-
-void dbg(char *format, ...) {
+#if DEBUG
+void __gcin_dbg_(char *format, ...) {
 #if _DBG
 	va_list ap;
 	va_start(ap, format);
@@ -145,6 +148,7 @@ void dbg(char *format, ...) {
 	va_end(ap);
 #endif
 }
+#endif
 
 void p_err(char *format, ...) {
 
@@ -164,6 +168,7 @@ void p_err(char *format, ...) {
 
 }
 
+#if GCIN_SVR
 void ErrorExit(LPTSTR lpszFunction)
 {
     // Retrieve the system error message for the last-error code
@@ -197,6 +202,8 @@ void ErrorExit(LPTSTR lpszFunction)
     ExitProcess(dw);
 }
 #endif
+#endif
+
 
 void *zmalloc(int n)
 {
@@ -204,6 +211,7 @@ void *zmalloc(int n)
   bzero(p, n);
   return p;
 }
+#if !GCIN_IME
 
 void *memdup(void *p, int n)
 {
@@ -219,7 +227,7 @@ void *memdup(void *p, int n)
 char *myfgets(char *buf, int bufN, FILE *fp)
 {
 	char *out = buf;
-	int rN = 0;
+//	int rN = 0;
 	while (!feof(fp) && out - buf < bufN) {
 		char a, b;
 		a = 0;
@@ -246,7 +254,7 @@ char *myfgets(char *buf, int bufN, FILE *fp)
 	*out = 0;
 	return buf;
 }
-
+#endif
 
 #if GCIN_SVR
 #if WIN32

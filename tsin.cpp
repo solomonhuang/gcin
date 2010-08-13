@@ -1548,6 +1548,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
           return 1;
         }
      case XK_Home:
+     case XK_KP_Home:
         close_selection_win();
         if (!tss.c_len)
           return 0;
@@ -1556,6 +1557,7 @@ int feedkey_pp(KeySym xkey, int kbstate)
         drawcursor();
         return 1;
      case XK_End:
+     case XK_KP_End:
         close_selection_win();
         if (!tss.c_len)
           return 0;
@@ -1564,8 +1566,10 @@ int feedkey_pp(KeySym xkey, int kbstate)
         drawcursor();
         return 1;
      case XK_Left:
+     case XK_KP_Left:
         return cursor_left();
      case XK_Right:
+     case XK_KP_Right:
         return cursor_right();
      case XK_Caps_Lock:
         if (caps_eng_tog) {
@@ -1597,6 +1601,7 @@ tab_phrase_end:
         }
         return 0;
      case XK_Delete:
+     case XK_KP_Delete:
         return cursor_delete();
      case XK_BackSpace:
         close_selection_win();
@@ -1668,6 +1673,7 @@ tab_phrase_end:
 
         return 1;
      case XK_Up:
+     case XK_KP_Up:
        if (!tss.sel_pho) {
          if (tss.c_len && tss.c_idx == tss.c_len) {
            int idx = tss.c_len-1;
@@ -1686,6 +1692,8 @@ tab_phrase_end:
        tsin_page_up();
        return 1;
      case XK_Prior:
+     case XK_KP_Prior:
+     case XK_KP_Subtract:
        return tsin_page_up();
      case XK_space:
        if (!tss.c_len && !poo.ityp3_pho && !poo.typ_pho[0] && !poo.typ_pho[1] && !poo.typ_pho[2]
@@ -1708,6 +1716,7 @@ tab_phrase_end:
        if (!tsin_pho_mode())
            goto asc_char;
      case XK_Down:
+     case XK_KP_Down:
        if (!poo.ityp3_pho && (poo.typ_pho[0]||poo.typ_pho[1]||poo.typ_pho[2]) && xkey==XK_space) {
          ctyp=3;
          kno=0;
@@ -1740,6 +1749,8 @@ change_char:
 
        return 1;
      case XK_Next:
+     case XK_KP_Next:
+     case XK_KP_Add:
        return tsin_page_down();
      case '\'':  // single quote
        if (phkbm.phokbm[xkey][0].num)

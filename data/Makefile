@@ -1,6 +1,8 @@
 include ../config.mak
 
 .SUFFIXES:	.kbmsrc .kbm .cin .gtab
+CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I.. -DDEBUG="0$(GCIN_DEBUG)" \
+
 
 DATA=pho.tab tsin32.idx \
      cj.gtab ar30.gtab ar30-big.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
@@ -32,10 +34,10 @@ pin-juyin.xlt:	../pin-juyin pin-juyin.src
 	../pin-juyin
 
 extr1:	extr1.c
-	$(CC) $< ../util.o ../locale.o -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $< ../util.o ../locale.o -o $@ $(LDFLAGS)
 
 t2s-file:	t2s-file.c
-	$(CC) $< ../util.o ../locale.o -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $< ../util.o ../locale.o -o $@ $(LDFLAGS)
 
 tsin-1.src:	extr1
 	./extr1 > $@

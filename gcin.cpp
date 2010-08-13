@@ -281,6 +281,8 @@ void disp_hide_tsin_status_row(), gcb_main(), update_win_kbm();
 void change_tsin_line_color(), change_win0_style(), change_tsin_color();
 void change_win_gtab_style();
 void update_item_active_all();
+void destroy_inmd_menu();
+void load_gtab_list(gboolean);
 
 static void reload_data()
 {
@@ -294,6 +296,9 @@ static void reload_data()
   change_tsin_color();
   if (win_kbm_inited)
     update_win_kbm();
+
+  destroy_inmd_menu();
+  load_gtab_list(TRUE);
 
   update_item_active_all();
 #if USE_GCB
@@ -449,7 +454,7 @@ void sig_do_exit(int sig)
 }
 
 char *get_gcin_xim_name();
-void load_phrase(), init_TableDir(),  load_gtab_list();
+void load_phrase(), init_TableDir();
 void init_im_serv(), init_tray(), exec_setup_scripts();
 void init_gcin_im_serv(Window win), gcb_main(), init_tray_win32();
 
@@ -494,6 +499,19 @@ gboolean delayed_start_cb(gpointer data)
 
 int main(int argc, char **argv)
 {
+#if UNIX
+  signal(SIGCHLD, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
+
+  if (getenv("GCIN_DAEMON")) {
+    daemon(1,1);
+#if FREEBSD
+    setpgid(0, getpid());
+#else
+    setpgrp();
+#endif
+  }
+#endif
 
 //putenv("GDK_NATIVE_WINDOWS=1");
 #if WIN32
@@ -535,10 +553,6 @@ int main(int argc, char **argv)
   if (!lc_ctype)
     lc_ctype = "zh_TW.Big5";
 
-
-  signal(SIGCHLD, SIG_IGN);
-  signal(SIGPIPE, SIG_IGN);
-
   char *t = strchr(lc_ctype, '.');
   if (t) {
     int len = t - lc_ctype;
@@ -568,7 +582,7 @@ int main(int argc, char **argv)
 
   init_TableDir();
   load_setttings();
-  load_gtab_list();
+  load_gtab_list(TRUE);
 
   gtk_init (&argc, &argv);
 

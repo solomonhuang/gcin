@@ -1,4 +1,3 @@
-#include <math.h>
 #include "gcin.h"
 #include "gtab.h"
 #include "gcin-conf.h"
@@ -67,15 +66,64 @@ void dump_gbuf()
   }
 }
 
-static char *gen_buf_str()
+static unich_t latin_chars[]=
+_L("ÀÁÂÃÄÅÆÆÇÈÉÊËÌÍÎÏÐÐÑÒÓÔÕÖØÙÚÛÜÝÞÞßàáâãäåææçèéêëìíîïððñòóôõöøùúûüýþþÿ")
+_L("ĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĲĳĳĴĵĶķĸĹĺĻļĽľĿŀŁł")
+_L("ŃńŅņŇňŉŊŋŌōŎŏŐőŒŒœœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽž");
+
+int en_word_len(char *bf)
+{
+  int i;
+  char *s;
+
+  for(s=bf;*s;) {
+    int sz = utf8_sz(s);
+    if (sz==1) {
+      if (!(*s >= 'A' && *s<='Z' || *s >= 'a' && *s<='z' || strchr("-_'", *s)))
+        break;
+    } else
+    if (sz==2) {
+      char *p;
+#if WIN32
+	  p = _(latin_chars);
+	  for (; *p; p+=2)
+#else
+      for (p=latin_chars; *p; p+=2)
+#endif
+        if (!memcmp(p, s, 2))
+          break;
+      if (!(*p))
+        break;
+    } else
+    if (sz>=3)
+      break;
+    s+=sz;
+  }
+
+  if (*s)
+    return 0;
+  return strlen(bf);
+}
+
+static char *gen_buf_str(int start, gboolean add_spc)
 {
   int i;
   char *out = tmalloc(char, 1);
   int outN=0;
 
-  for(i=0;i<ggg.gbufN;i++) {
+  gboolean last_en_word = FALSE;
+  for(i=start;i<ggg.gbufN;i++) {
     char *t = gbuf[i].ch;
     int len = strlen(t);
+
+    if (add_spc && en_word_len(t)) {
+      if (last_en_word) {
+        out = trealloc(out, char, outN+1);
+        out[outN++]=' ';
+      }
+      last_en_word = TRUE;
+    } else
+      last_en_word = FALSE;
 
     out = trealloc(out, char, outN+len+1);
     memcpy(out + outN, t, len);
@@ -98,13 +146,34 @@ static char *gen_buf_str_disp()
   char *out = tmalloc(char, 1);
   int outN=0;
 
+  out[0]=0;
   gbuf[ggg.gbufN].ch = " ";
+
+  gboolean last_is_en_word = FALSE;
 
   int N = last_cursor_off ? ggg.gbufN-1:ggg.gbufN;
   for(i=0;i<=N;i++) {
-    char spec[MAX_CIN_PHR * 2];
-    htmlspecialchars(gbuf[i].ch, spec);
-    char www[MAX_CIN_PHR * 2];
+    char addspc[MAX_CIN_PHR * 2 + 2];
+    char spec[MAX_CIN_PHR * 2 + 2];
+    int len = en_word_len(gbuf[i].ch);
+//    dbg("%d %d is_en:%d\n",i, len, last_is_en_word);
+
+    if (len) {
+      if (last_is_en_word) {
+        strcpy(addspc, " ");
+        strcat(addspc, gbuf[i].ch);
+      } else
+        strcpy(addspc, gbuf[i].ch);
+      last_is_en_word = TRUE;
+    } else {
+      last_is_en_word = FALSE;
+      strcpy(addspc, gbuf[i].ch);
+    }
+
+    htmlspecialchars(addspc, spec);
+//    dbg("addspc '%s'  spec:%s out:%s\n", addspc, spec, out);
+
+    char www[MAX_CIN_PHR * 2 + 2];
     char *t = spec;
 
     if (i==ggg.gbuf_cursor) {
@@ -112,13 +181,13 @@ static char *gen_buf_str_disp()
       t = www;
     }
 
-    int len = strlen(t);
+    len = strlen(t);
     out = trealloc(out, char, outN+len+1);
     memcpy(out + outN, t, len);
     outN+=len;
+    out[outN] = 0;
   }
 
-  out[outN] = 0;
   return out;
 }
 
@@ -153,11 +222,14 @@ static void clear_gtab_buf_all()
   disp_gbuf();
 }
 
+
+void minimize_win_gtab();
 void disp_gbuf()
 {
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   char *bf=gen_buf_str_disp();
   disp_label_edit(bf);
 
@@ -165,6 +237,8 @@ void disp_gbuf()
     lookup_gtabn(gbuf[ggg.gbufN-1].ch, NULL);
 
   free(bf);
+
+  minimize_win_gtab();
 }
 
 void clear_gbuf_sel()
@@ -195,10 +269,10 @@ int gbuf_cursor_right()
 {
   if (ggg.gbuf_cursor==ggg.gbufN)
     return ggg.gbufN;
-
+#if WIN32
   if (test_mode)
     return 1;
-
+#endif
   if (ggg.gtab_buf_select)
     clear_gbuf_sel();
   ggg.gbuf_cursor++;
@@ -210,10 +284,10 @@ int gbuf_cursor_home()
 {
   if (!ggg.gbufN)
     return 0;
-
+#if WIN32
   if (test_mode)
     return 1;
-
+#endif
   if (ggg.gtab_buf_select)
     clear_gbuf_sel();
 
@@ -227,10 +301,10 @@ int gbuf_cursor_end()
 {
   if (!ggg.gbufN)
     return 0;
-
+#if WIN32
   if (test_mode)
     return 1;
-
+#endif
   if (ggg.gtab_buf_select)
     clear_gbuf_sel();
 
@@ -246,28 +320,30 @@ gboolean output_gbuf()
 {
   if (!ggg.gbufN)
     return FALSE;
-
+#if WIN32
   if (test_mode)
     return TRUE;
-
-  char *bf=gen_buf_str();
+#endif
+  char *bf=gen_buf_str(0, TRUE);
 #if 0
   printf("out %s\n", bf);
 #endif
 
+#if 0
   // single character
   char *p;
   for(p=bf; *p; p+=utf8_sz(p))
     inc_gtab_use_count(p);
+#endif
 
   send_text(bf);
   free(bf);
-
 
   int i;
   for(i=0; i < ggg.gbufN;) {
     char t[MAX_CIN_PHR+1];
     t[0]=0;
+    inc_gtab_use_count(gbuf[i].ch);
 
     int j;
     for(j=i; j < i+gbuf[i].plen; j++)
@@ -390,8 +466,10 @@ void gtab_parse()
         k=0;
       }
 
-      gbuf[ofsi].ch = gbuf[ofsi].sel[k];
-      gbuf[ofsi].c_sel = k;
+      if (!(gbuf[ofsi].flag & FLAG_CHPHO_FIXED)) {
+        gbuf[ofsi].ch = gbuf[ofsi].sel[k];
+        gbuf[ofsi].c_sel = k;
+      }
       gbuf[ofsi].flag |= FLAG_CHPHO_PHRASE_BODY;
 
       ofsi++;
@@ -491,11 +569,13 @@ void set_gbuf_c_sel(int v)
 
   pbuf->c_sel = v + ggg.pg_idx;
   pbuf->ch = pbuf->sel[pbuf->c_sel];
+//  dbg("zzzsel v:%d %d %s\n",v, pbuf->c_sel,pbuf->ch);
   pbuf->flag |= FLAG_CHPHO_FIXED;
   ggg.gtab_buf_select = 0;
   disp_gtab_sel("");
   gtab_parse();
   disp_gbuf();
+//  dbg("zzzsel v:%d\n", pbuf->c_sel);
 }
 
 GEDIT *insert_gbuf_cursor1(char *s, u_int64_t key)
@@ -730,32 +810,46 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
   gboolean ap_only = gcin_edit_display_ap_only();
 
   if (gtab_phrase_on()) {
-  attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;
-  attr[0].ofs0=0;
+    attr[0].flag=GCIN_PREEDIT_ATTR_FLAG_UNDERLINE;
+    attr[0].ofs0=0;
 
-  if (ggg.gbufN)
-    attrN=1;
+    if (ggg.gbufN)
+      attrN=1;
 
-  for(i=0; i < ggg.gbufN; i++) {
-    char *s = gbuf[i].ch;
-    int len = strlen(s);
-    int N = utf8_str_N(s);
-    ch_N+=N;
-    if (i < ggg.gbuf_cursor)
-      *pcursor+=N;
-    if (i==ggg.gbuf_cursor) {
-      attr[1].ofs0=*pcursor;
-      attr[1].ofs1=*pcursor+N;
-      attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
-      attrN++;
+    gboolean last_is_en_word = FALSE;
+    for(i=0; i < ggg.gbufN; i++) {
+      char *s = gbuf[i].ch;
+      char tt[MAX_CIN_PHR+2];
+
+      if (en_word_len(s)) {
+        if (last_is_en_word) {
+          strcpy(tt, " ");
+          strcat(tt, s);
+          s = tt;
+        }
+        last_is_en_word = TRUE;
+      } else {
+        last_is_en_word = FALSE;
+      }
+
+      int len = strlen(s);
+      int N = utf8_str_N(s);
+      ch_N+=N;
+      if (i < ggg.gbuf_cursor)
+        *pcursor+=N;
+      if (i==ggg.gbuf_cursor) {
+        attr[1].ofs0=*pcursor;
+        attr[1].ofs1=*pcursor+N;
+        attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
+        attrN++;
+      }
+
+      if (ap_only && gcin_on_the_spot_key && i==ggg.gbuf_cursor)
+        strN += get_DispInArea_str(str+strN);
+
+      memcpy(str+strN, s, len);
+      strN+=len;
     }
-
-    if (ap_only && gcin_on_the_spot_key && i==ggg.gbuf_cursor)
-      strN += get_DispInArea_str(str+strN);
-
-    memcpy(str+strN, s, len);
-    strN+=len;
-  }
   }
 
 
@@ -812,7 +906,7 @@ gboolean save_gtab_buf_shift_enter()
 	int keys[512];
 	int N = ggg.gbufN - ggg.gbuf_cursor;
 	extract_gtab_key(ggg.gbuf_cursor, N, keys);
-	char *str = gen_buf_str();
+	char *str = gen_buf_str(ggg.gbuf_cursor, FALSE);
 	save_phrase_to_db(keys, str, N, 1);
 
 	free(str);
