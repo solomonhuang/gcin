@@ -11,6 +11,8 @@
 #define GCIN_FONT_SIZE_TSIN_PHO_IN "gcin-font-size-tsin-pho-in"
 #define GCIN_FONT_SIZE_GTAB_IN "gcin-font-size-gtab-in"
 #define GCIN_FONT_SIZE_PHO_NEAR "gcin-font-size-pho-near"
+#define GCIN_FONT_SIZE_WIN_KBM "gcin-font-size-win-kbm"
+#define GCIN_FONT_SIZE_WIN_KBM_EN "gcin-font-size-win-kbm-en"
 #define GCIN_INPUT_STYLE "gcin-input-style"
 #define GCIN_ROOT_X      "gcin-root-x"
 #define GCIN_ROOT_Y      "gcin-root-y"
@@ -45,6 +47,7 @@
 #define GTAB_SPACE_AUTO_FIRST "gtab-space-auto-first"
 #define GTAB_AUTO_SELECT_BY_PHRASE "gtab-auto-select-by_phrase"
 #define GTAB_PRE_SELECT "gtab-pre-select"
+#define GTAB_PHRASE_PRE_SELECT "gtab-phrase-pre-select"
 #define GTAB_PRESS_FULL_AUTO_SEND "gtab-press-full-auto-send"
 #define GTAB_DISP_PARTIAL_MATCH "gtab-disp-partial-match"
 #define GTAB_DISP_KEY_CODES "gtab-disp-key-codes"
@@ -85,7 +88,8 @@
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_font_size_pho_near,
-           gcin_font_size_gtab_in, gcin_inner_frame,
+           gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en,
+           gcin_inner_frame,
            gcin_flags_im_enabled, gcin_remote_client,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
@@ -99,7 +103,7 @@ extern int gtab_dup_select_bell;
 extern int gtab_space_auto_first;
 extern int gtab_auto_select_by_phrase;
 extern int gcin_im_toggle_keys;
-extern int gtab_pre_select;
+extern int gtab_pre_select, gtab_phrase_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
 extern int gtab_shift_phrase_key;

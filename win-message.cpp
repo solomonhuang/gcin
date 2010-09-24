@@ -25,6 +25,11 @@ static void create_win_message(char *icon, char *text, int duration)
 
   if (icon[0] != '-') {
     GtkWidget *image = gtk_image_new_from_file(icon);
+    if (text[0] == '-') {
+      GdkBitmap *bitmap = NULL;
+      gdk_pixbuf_render_pixmap_and_mask(gdk_pixbuf_new_from_file(icon, NULL), NULL, &bitmap, 128);
+      gtk_widget_shape_combine_mask(gwin_message, bitmap, 0, 0);
+    }
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
   }
 

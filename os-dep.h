@@ -3,7 +3,8 @@
 #if WIN32
 #include <windows.h>
 #include "win32-key.h"
-typedef HWND Window;
+//typedef HWND Window;
+typedef unsigned int Window; // HWND is actual a pointer, this breaks 64-bit IME & 32-bit gcin
 typedef void Display;
 typedef unsigned int u_int;
 typedef u_int KeySym;

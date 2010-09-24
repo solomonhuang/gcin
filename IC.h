@@ -53,11 +53,7 @@ typedef struct {
 #endif
 
 typedef struct {
-#if WIN32
-    HWND	client_win;	/* client window */
-#else
 	Window	client_win;	/* client window */
-#endif
     INT32	input_style;	/* input style */
     GCIN_STATE_E im_state;
     gboolean    b_half_full_char;

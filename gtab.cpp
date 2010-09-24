@@ -580,8 +580,13 @@ void init_gtab(int inmdno)
   fread(inp->keyname, CH_SZ, th.KeyS, fp);
   inp->WILD_QUES=th.KeyS+1;
   inp->WILD_STAR=th.KeyS+2;
+#if 0
   utf8cpy(&inp->keyname[inp->WILD_QUES*CH_SZ], _(_L("？")));  /* for wild card */
   utf8cpy(&inp->keyname[inp->WILD_STAR*CH_SZ], _(_L("＊")));
+#else
+  utf8cpy(&inp->keyname[inp->WILD_QUES*CH_SZ], "?");  /* for wild card */
+  utf8cpy(&inp->keyname[inp->WILD_STAR*CH_SZ], "*");
+#endif
 
   char *keyname = &inp->keyname[1 * CH_SZ];
 
@@ -1335,6 +1340,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   bzero(seltab_phrase, sizeof(seltab_phrase));
 
+#if 0
+  if (key>= XK_KP_0 && key<= XK_KP_9)
+	dbg("uuuu");
+#endif
+
 //  dbg("uuuuu %x %x   shift,ctrl:%d,%d\n", key, kbstate, shift_m, ctrl_m);
 
   if (!cur_inmd)
@@ -1464,7 +1474,9 @@ shift_proc:
       else
         return 0;
     case XK_Down:
+#if UNIX
     case XK_KP_Down:
+#endif
       if (AUTO_SELECT_BY_PHRASE)
         return show_buf_select();
       else
@@ -1492,7 +1504,9 @@ shift_proc:
         return 0;
       }
     case XK_Prior:
+#if UNIX
     case XK_KP_Prior:
+#endif
     case XK_KP_Subtract:
       if (ggg.wild_mode) {
         if (ggg.wild_page >= cur_inmd->M_DUP_SEL) ggg.wild_page-=cur_inmd->M_DUP_SEL;
@@ -1516,7 +1530,9 @@ shift_proc:
         goto keypad_proc;
       return 0;
     case XK_Next:
+#if UNIX
     case XK_KP_Next:
+#endif
     case XK_KP_Add:
       if (ggg.more_pg) {
         if (ggg.gtab_buf_select) {
@@ -1647,19 +1663,29 @@ direct_select:
       }
       return 0;
     case XK_Left:
+#if UNIX
     case XK_KP_Left:
+#endif
       return gbuf_cursor_left();
     case XK_Right:
+#if UNIX
     case XK_KP_Right:
+#endif
       return gbuf_cursor_right();
     case XK_Home:
+#if UNIX
     case XK_KP_Home:
+#endif
       return gbuf_cursor_home();
     case XK_End:
+#if UNIX
     case XK_KP_End:
+#endif
       return gbuf_cursor_end();
     case XK_Delete:
+#if UNIX
     case XK_KP_Delete:
+#endif
       return gtab_buf_delete();
     case XK_Shift_L:
     case XK_Shift_R:
@@ -1729,13 +1755,16 @@ keypad_proc:
         return 0;
       }
 
-#if 1
+#if 0
       if (key > 0x7f) {
         return 0;
       }
 #endif
 
-      inkey= cur_inmd->keymap[key];
+	  if (key < 0x7f)
+		inkey= cur_inmd->keymap[key];
+	  else
+		inkey = 0;
 
 //	  dbg("ggg.spc_pressed %d %d %d is_keypad:%d\n", ggg.spc_pressed, ggg.last_full, cur_inmd->MaxPress, is_keypad);
 

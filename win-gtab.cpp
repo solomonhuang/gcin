@@ -11,7 +11,7 @@ static int current_gtab_vertical_select;
 GtkWidget *gwin_gtab;
 static GtkWidget *top_bin;
 static GtkWidget *label_full, *label_gtab_sele;
-static GtkWidget *label_gtab;
+static GtkWidget *label_gtab = NULL;
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
 #if WIN32
@@ -63,7 +63,7 @@ void disp_gtab(char *str)
 
 void set_gtab_input_color(GdkColor *color)
 {
-  gtk_widget_modify_fg(label_gtab, GTK_STATE_NORMAL, color);
+  if (label_gtab) gtk_widget_modify_fg(label_gtab, GTK_STATE_NORMAL, color);
 }
 
 void set_gtab_input_error_color()

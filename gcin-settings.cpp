@@ -2,7 +2,8 @@
 #include "gtab.h"
 
 int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
-int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_win_color_use;
+int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en;
+int gcin_win_color_use;
 int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
@@ -15,7 +16,7 @@ int gtab_dup_select_bell;
 int gtab_space_auto_first;
 int gtab_auto_select_by_phrase;
 int gtab_press_full_auto_send;
-int gtab_pre_select;
+int gtab_pre_select, gtab_phrase_pre_select;
 int gtab_disp_partial_match;
 int gtab_disp_key_codes;
 int gtab_disp_im_name;
@@ -74,6 +75,8 @@ void load_setttings()
   gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
   gcin_font_size_gtab_in = get_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, 10);
   gcin_font_size_pho_near = get_gcin_conf_int(GCIN_FONT_SIZE_PHO_NEAR, 14);
+  gcin_font_size_win_kbm = get_gcin_conf_int(GCIN_FONT_SIZE_WIN_KBM, 10);
+  gcin_font_size_win_kbm_en = get_gcin_conf_int(GCIN_FONT_SIZE_WIN_KBM_EN, 8);
   gcin_input_style = get_gcin_conf_int(GCIN_INPUT_STYLE, InputStyleOverSpot);
   gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 1600);
   gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 1200);
@@ -108,6 +111,7 @@ void load_setttings()
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);
   gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, GTAB_AUTO_SELECT_BY_PHRASE_AUTO);
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
+  gtab_phrase_pre_select = get_gcin_conf_int(GTAB_PHRASE_PRE_SELECT, 1);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);

@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "intcode.h"
 
-static GtkWidget *gwin_int;
+GtkWidget *gwin_int;
 extern int current_intcode;
 
 static GtkWidget *button_int;
@@ -97,10 +97,6 @@ void clear_int_code(int index)
 }
 
 
-
-
-
-
 #if 0
 static void switch_intcode()
 {
@@ -125,17 +121,15 @@ void hide_win_int()
   gtk_widget_hide(gwin_int);
 }
 
-void show_win_int()
-{
-  if (!gwin_int)
-    return;
-  gtk_widget_show(gwin_int);
-}
+extern gboolean force_show;
+extern int intcode_cin;
 
 void move_win_int(int x, int y)
 {
   if (!gwin_int)
     return;
+
+  dbg("move_win_int %d %d\n",x,y);
 
   gtk_window_get_size(GTK_WINDOW(gwin_int), &win_xl, &win_yl);
 
@@ -153,6 +147,8 @@ void move_win_int(int x, int y)
   gtk_window_move(GTK_WINDOW(gwin_int), x, y);
 }
 
+void show_win_int();
+
 void create_win_intcode()
 {
   if (gwin_int) {
@@ -161,12 +157,14 @@ void create_win_intcode()
   }
 
   gwin_int = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+#if WIN32
+  set_no_focus(gwin_int);
+#endif
+
 //  gtk_window_set_default_size(GTK_WINDOW (gwin_int), 1, 1);
   gtk_container_set_border_width (GTK_CONTAINER (gwin_int), 0);
-  gtk_widget_realize (gwin_int);
-  GdkWindow *gdkwin = gtk_widget_get_window(gwin_int);
 
-  set_no_focus(gwin_int);
+  GdkWindow *gdkwin = gtk_widget_get_window(gwin_int);
 
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
@@ -200,6 +198,45 @@ void create_win_intcode()
 
   gtk_widget_show_all (gwin_int);
 
+  gtk_widget_realize (gwin_int);
+#if WIN32
+  win32_init_win(gwin_int);
+#else
+  set_no_focus(gwin_int);
+#endif
+
   adj_intcode_buttons();
   minimize_win();
+}
+
+void show_win_int()
+{
+  if (!gwin_int)
+    return;
+
+#if 0
+  if (gcin_pop_up_win && !intcode_cin && !force_show)
+    return;
+#endif
+
+#if UNIX
+  if (!GTK_WIDGET_VISIBLE(gwin_int))
+#endif
+  {
+    gtk_widget_show(gwin_int);
+    move_win_int(win_x, win_y);
+  }
+
+  gtk_widget_show(gwin_int);
+}
+
+
+void get_win_int_geom()
+{
+  if (!gwin_int)
+    return;
+
+  gtk_window_get_position(GTK_WINDOW(gwin_int), &win_x, &win_y);
+
+  get_win_size(gwin_int, &win_xl, &win_yl);
 }

@@ -101,14 +101,14 @@ extern int win_kbm_on;
 
 static MITEM mitems_main[] = {
   {N_(_L("設定")), GTK_STOCK_PREFERENCES, exec_gcin_setup_},
+#if USE_GCB
+  {N_(_L("gcb(剪貼區暫存)")), NULL, cb_tog_gcb, &gcb_enabled},
+#endif
   {N_(_L("重新執行gcin")), NULL, restart_gcin},
   {N_(_L("念出發音")), NULL, cb_tog_phospeak, &phonetic_speak},
   {N_(_L("小鍵盤")), NULL, kbm_toggle_, &win_kbm_on},
 #if UNIX
   {N_(_L("選擇輸入法")), NULL, cb_inmd_menu, NULL},
-#endif
-#if USE_GCB
-  {N_(_L("gcb(剪貼區暫存)")), NULL, cb_tog_gcb, &gcb_enabled},
 #endif
   {NULL}
 };

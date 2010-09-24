@@ -22,6 +22,7 @@ enum {
 typedef struct {
   KeySym keysym;
   unich_t *enkey;
+  char shift_key;
   char flag;
   char *imstr;
   GtkWidget *lab, *but, *laben;
@@ -29,21 +30,21 @@ typedef struct {
 
 #define COLN 19
 static KEY keys[][COLN]={
-{{XK_Escape,_L("Esc")},{XK_F1,_L("F1")},{XK_F2,_L("F2")},{XK_F3,_L("F3")},{XK_F4,_L("F4")},{XK_F5,_L("F5")},{XK_F6,_L("F6")},{XK_F7,_L("F7")},{XK_F8,_L("F8")},{XK_F9,_L("F9")},{XK_F10,_L("F10")},{XK_F11,_L("F11")},{XK_F12,_L("F12")},{XK_Print,_L("Pr"),8},{XK_Scroll_Lock,_L("Slk"),8},{XK_Pause,_L("Pau"),8}},
+{{XK_Escape,_L("Esc")},{XK_F1,_L("F1")},{XK_F2,_L("F2")},{XK_F3,_L("F3")},{XK_F4,_L("F4")},{XK_F5,_L("F5")},{XK_F6,_L("F6")},{XK_F7,_L("F7")},{XK_F8,_L("F8")},{XK_F9,_L("F9")},{XK_F10,_L("F10")},{XK_F11,_L("F11")},{XK_F12,_L("F12")},{XK_Print,_L("Pr"),0,8},{XK_Scroll_Lock,_L("Slk"),0,8},{XK_Pause,_L("Pau"),0,8}},
 
-{{'`',_L(" ` ")},{'1',_L(" 1 ")},{'2',_L(" 2 ")},{'3',_L(" 3 ")},{'4',_L(" 4 ")},{'5',_L(" 5 ")},{'6',_L(" 6 ")},{'7',_L(" 7 ")},{'8',_L(" 8 ")},{'9',_L(" 9 ")},{'0',_L(" 0 ")},{'-',_L(" - ")},{'=',_L(" = ")},
-{XK_BackSpace,_L("←"),1},
-{XK_Insert,_L("Ins"),8},{XK_Home,_L("Ho"),8}, {XK_Prior,_L("P↑"),8}},
+{{'`',_L(" ` "),'~'},{'1',_L(" 1 "), '!'},{'2',_L(" 2 "),'@'},{'3',_L(" 3 "),'#'},{'4',_L(" 4 "),'$'},{'5',_L(" 5 "),'%'},{'6',_L(" 6 "),'^'},{'7',_L(" 7 "),'&'},{'8',_L(" 8 "),'*'},{'9',_L(" 9 "),'('},{'0',_L(" 0 "),')'},{'-',_L(" - "),'_'},{'=',_L(" = "),'+'},
+{XK_BackSpace,_L("←"),0, K_FILL},
+{XK_Insert,_L("Ins"),0,8},{XK_Home,_L("Ho"),0,8}, {XK_Prior,_L("P↑"),0,8}},
 
-{{XK_Tab, _L("Tab")}, {'q',_L(" q ")},{'w',_L(" w ")},{'e',_L(" e ")},{'r',_L(" r ")},{'t',_L(" t ")}, {'y',_L(" y ")},{'u',_L(" u ")},{'i',_L(" i ")},{'o',_L(" o ")}, {'p',_L(" p ")},{'[',_L(" [ ")},{']',_L(" ] ")},{'\\',_L(" \\ "), 1},{XK_Delete,_L("Del"),8},{XK_End,_L("En"),8},
-{XK_Next,_L("P↓"),8}},
+{{XK_Tab, _L("Tab")}, {'q',_L(" q ")},{'w',_L(" w ")},{'e',_L(" e ")},{'r',_L(" r ")},{'t',_L(" t ")}, {'y',_L(" y ")},{'u',_L(" u ")},{'i',_L(" i ")},{'o',_L(" o ")}, {'p',_L(" p ")},{'[',_L(" [ "),'{'},{']',_L(" ] "),'}'},{'\\',_L(" \\ "),'|',K_FILL},{XK_Delete,_L("Del"),0,8},{XK_End,_L("En"),0,8},
+{XK_Next,_L("P↓"),0,8}},
 
-{{XK_Caps_Lock, _L("Caps")},{'a',_L(" a ")},{'s',_L(" s ")},{'d',_L(" d ")},{'f', _L(" f ")},{'g',_L(" g ")},{'h',_L(" h ")},{'j',_L(" j ")},{'k',_L(" k ")},{'l',_L(" l ")},{';',_L(" ; ")},{'\'',_L(" ' ")},{XK_Return,_L(" Enter "),1},{XK_Num_Lock,_L("Num"),8},{XK_KP_Add,_L(" + "),8}},
+{{XK_Caps_Lock, _L("Caps")},{'a',_L(" a ")},{'s',_L(" s ")},{'d',_L(" d ")},{'f', _L(" f ")},{'g',_L(" g ")},{'h',_L(" h ")},{'j',_L(" j ")},{'k',_L(" k ")},{'l',_L(" l ")},{';',_L(" ; "),':'},{'\'',_L(" ' "),'"'},{XK_Return,_L(" Enter "),0,1},{XK_Num_Lock,_L("Num"),0,8},{XK_KP_Add,_L(" + "),0,8}},
 
-{{XK_Shift_L,_L("  Shift  "),K_HOLD},{'z',_L(" z ")},{'x',_L(" x ")},{'c',_L(" c ")},{'v',_L(" v ")},{'b',_L(" b ")},{'n',_L(" n ")},{'m',_L(" m ")},{',',_L(" , ")},{'.',_L(" . ")},{'/',_L(" / ")},{XK_Shift_R,_L(" Shift"),K_HOLD|K_FILL},{XK_KP_Multiply,_L(" * "),8},
-{XK_Up,_L("↑"),8}},
-{{XK_Control_L,_L("Ctrl"),K_HOLD},{XK_Alt_L,_L("Alt"),K_HOLD},{' ',_L("Space"), 1}, {XK_Alt_R,_L("Alt"),K_HOLD}, {XK_Control_R,_L("Ctrl"),K_HOLD},
-{XK_Left, _L("←"),8},{XK_Down,_L("↓"),8},{XK_Right, _L("→"),8}}
+{{XK_Shift_L,_L("  Shift  "),0,K_HOLD},{'z',_L(" z ")},{'x',_L(" x ")},{'c',_L(" c ")},{'v',_L(" v ")},{'b',_L(" b ")},{'n',_L(" n ")},{'m',_L(" m ")},{',',_L(" , "),'<'},{'.',_L(" . "),'>'},{'/',_L(" / "),'?'},{XK_Shift_R,_L(" Shift"),0,K_HOLD|K_FILL},{XK_KP_Multiply,_L(" * "),0,8},
+{XK_Up,_L("↑"),0,8}},
+{{XK_Control_L,_L("Ctrl"),0,K_HOLD},{XK_Super_L,_L("◆")},{XK_Alt_L,_L("Alt"),0,K_HOLD},{' ',_L("Space"),0,1}, {XK_Alt_R,_L("Alt"),0,K_HOLD},{XK_Super_R,_L("◆")},{XK_Menu,_L("■")}, {XK_Control_R,_L("Ctrl"),0,K_HOLD},
+{XK_Left, _L("←"),0,8},{XK_Down,_L("↓"),0,8},{XK_Right, _L("→"),0,8}}
 };
 
 static int keysN=sizeof(keys)/sizeof(keys[0]);
@@ -63,35 +64,69 @@ void send_fake_key_eve(KeySym key);
 void win32_FakeKey(UINT vk, bool key_press);
 #endif
 
+void send_fake_key_eve2(KeySym key, gboolean press)
+{
+#if WIN32
+  win32_FakeKey(key, press);
+#else
+  KeyCode kc = XKeysymToKeycode(dpy, key);
+  XTestFakeKeyEvent(dpy, kc, press, CurrentTime);
+#endif
+}
+
+
+static int kbm_timeout_handle;
+
+static gboolean timeout_repeat(gpointer data)
+{
+  KeySym k = GPOINTER_TO_INT(data);
+
+  send_fake_key_eve2(k, TRUE);
+  return TRUE;
+}
+
+static gboolean timeout_first_time(gpointer data)
+{
+  KeySym k = GPOINTER_TO_INT(data);
+  send_fake_key_eve2(k, TRUE);
+  kbm_timeout_handle = g_timeout_add(50, timeout_repeat, data);
+  return FALSE;
+}
+
+
 static void cb_button_click(GtkWidget *wid, KEY *k)
 {
   KeySym keysym=k->keysym;
-#if UNIX
-  KeyCode kc = XKeysymToKeycode(dpy, keysym);
-#endif
   GtkWidget *laben = k->laben;
 
   if (k->flag & K_HOLD) {
     if (k->flag & K_PRESS) {
       k->flag &= ~K_PRESS;
       mod_fg_all(laben, NULL);
-#if UNIX
-      XTestFakeKeyEvent(dpy, kc, False, CurrentTime);
-#else
-	  win32_FakeKey(keysym, false);
-#endif
+	  send_fake_key_eve2(keysym, FALSE);
     }
     else {
-#if UNIX
-      XTestFakeKeyEvent(dpy, kc, True, CurrentTime);
-#else
-	  win32_FakeKey(keysym, true);
-#endif
+	  send_fake_key_eve2(keysym, TRUE);
       k->flag |= K_PRESS;
       mod_fg_all(laben, &red);
     }
   } else {
-    send_fake_key_eve(keysym);
+    kbm_timeout_handle = g_timeout_add(500, timeout_first_time, GINT_TO_POINTER(keysym));
+	send_fake_key_eve2(keysym, TRUE);
+  }
+}
+
+
+static void cb_button_release(GtkWidget *wid, KEY *k)
+{
+//    dbg("cb_button_release\n");
+    if (kbm_timeout_handle) {
+      g_source_remove(kbm_timeout_handle);
+      kbm_timeout_handle = 0;
+    }
+
+	send_fake_key_eve2(k->keysym, FALSE);
+
     int i;
     for(i=0;i<keysN;i++) {
       int j;
@@ -99,17 +134,10 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
         if (!(keys[i][j].flag & K_PRESS))
           continue;
         keys[i][j].flag &= ~K_PRESS;
-#if UNIX
-        KeyCode kcj = XKeysymToKeycode(dpy, keys[i][j].keysym);
-        XTestFakeKeyEvent(dpy, kcj, False, CurrentTime);
-#else
-		win32_FakeKey(keys[i][j].keysym, false);
-#endif
+		send_fake_key_eve2(keys[i][j].keysym, FALSE);
         mod_fg_all(keys[i][j].laben, NULL);
       }
     }
-
-  }
 }
 
 
@@ -151,7 +179,10 @@ static void create_win_kbm()
       if (!ppk->keysym)
         continue;
       GtkWidget *but=pk[j].but=gtk_button_new();
-      g_signal_connect (G_OBJECT (but), "clicked", G_CALLBACK (cb_button_click), ppk);
+      g_signal_connect (G_OBJECT (but), "pressed", G_CALLBACK (cb_button_click), ppk);
+      if (!(ppk->flag & K_HOLD))
+        g_signal_connect (G_OBJECT (but), "released", G_CALLBACK (cb_button_release), ppk);
+
       GtkWidget *hbox = (flag&K_AREA_R)?hboxr:hboxl;
 
       gtk_container_set_border_width (GTK_CONTAINER (but), 0);
@@ -165,11 +196,12 @@ static void create_win_kbm()
       gtk_container_set_border_width (GTK_CONTAINER (v), 0);
       gtk_container_add (GTK_CONTAINER (but), v);
       GtkWidget *laben = ppk->laben=gtk_label_new(_(ppk->enkey));
-      set_label_font_size(laben, 8);
+      set_label_font_size(laben, gcin_font_size_win_kbm_en);
       gtk_box_pack_start (GTK_BOX (v), laben, FALSE, FALSE, 0);
 
       if (i>0&&i<5) {
         GtkWidget *lab = ppk->lab = gtk_label_new("  ");
+//        set_label_font_size(lab, gcin_font_size_win_kbm);
         gtk_box_pack_start (GTK_BOX (v), lab, FALSE, FALSE, 0);
       }
     }
@@ -260,6 +292,9 @@ static void set_kbm_key(KeySym keysym, char *str)
   if (!gwin_kbm)
     return;
 
+  if (!(str[0] & 0x80) && strlen(str)==1)
+    return;
+
   for(i=0;i<keysN;i++) {
     int j;
     for(j=0;j<COLN;j++) {
@@ -283,7 +318,10 @@ static void set_kbm_key(KeySym keysym, char *str)
         str = tt;
       }
 
-      gtk_label_set_text(GTK_LABEL(lab), str);
+      if (lab) {
+        gtk_label_set_text(GTK_LABEL(lab), str);
+        set_label_font_size(lab, gcin_font_size_win_kbm);
+      }
     }
   }
 }
@@ -297,6 +335,9 @@ static void clear_kbm()
       GtkWidget *lab = keys[i][j].lab;
       if (lab)
         gtk_label_set_text(GTK_LABEL(lab), NULL);
+
+      if (keys[i][j].laben)
+        gtk_label_set_text(GTK_LABEL(keys[i][j].laben), _(keys[i][j].enkey));
     }
   }
 }
@@ -308,8 +349,32 @@ void update_win_kbm()
 
   clear_kbm();
 
- if (current_CS->im_state != GCIN_STATE_CHINESE)
+  if (current_CS->im_state != GCIN_STATE_CHINESE) {
+    if (current_CS->im_state == GCIN_STATE_DISABLED) {
+      int i;
+      for(i=0;i<keysN;i++) {
+        int j;
+        for(j=0;j<COLN;j++) {
+          char kstr[2];
+          kstr[1]=0;
+          kstr[0] = keys[i][j].shift_key;
+
+          if (keys[i][j].laben) {
+            if (kstr[0])
+              gtk_label_set_text(GTK_LABEL(keys[i][j].laben), kstr);
+            set_label_font_size(keys[i][j].laben, gcin_font_size_win_kbm_en);
+          }
+
+          if (keys[i][j].lab) {
+            if (kstr[0])
+              gtk_label_set_text(GTK_LABEL(keys[i][j].lab), _(keys[i][j].enkey));
+            set_label_font_size(keys[i][j].lab, gcin_font_size_win_kbm_en);
+          }
+        }
+      }
+   }
    goto ret;
+ }
 
   int i;
   switch (current_method_type()) {
@@ -378,9 +443,10 @@ void hide_win_kbm()
 {
   if (!gwin_kbm)
     return;
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   win_kbm_on = 0;
   gtk_widget_hide(gwin_kbm);
 }

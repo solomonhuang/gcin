@@ -198,7 +198,7 @@ void set_sele_text(int i, char *text, int len)
 static int timeout_handle;
 gboolean timeout_minimize_win1(gpointer data)
 {
-  gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
+  gtk_window_resize(GTK_WINDOW(gwin1), 10, 10);
   gtk_window_present(GTK_WINDOW(gwin1));
   timeout_handle = 0;
   return FALSE;
@@ -210,10 +210,11 @@ void disp_selections(int x, int y)
 {
   if (!gwin1)
     p_err("disp_selections !gwin1");
-
+#if WIN32
   if (!GTK_WIDGET_VISIBLE(gwin1)) {
     gtk_widget_show(gwin1);
   }
+#endif
 
   int win1_xl, win1_yl;
   get_win_size(gwin1, &win1_xl, &win1_yl);
@@ -226,6 +227,12 @@ void disp_selections(int x, int y)
   gtk_window_move(GTK_WINDOW(gwin1), x, y);
 #if WIN32
   timeout_handle = g_timeout_add(50, timeout_minimize_win1, NULL);
+#endif
+
+#if UNIX
+  if (!GTK_WIDGET_VISIBLE(gwin1)) {
+    gtk_widget_show(gwin1);
+  }
 #endif
 }
 

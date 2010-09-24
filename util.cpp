@@ -1,7 +1,9 @@
 #include "gcin.h"
 
 #if UNIX
+#if !defined CLIENT_LIB || defined DEBUG
 static FILE *out_fp;
+#endif
 
 void p_err(char *fmt,...)
 {
@@ -22,6 +24,7 @@ void p_err(char *fmt,...)
 #endif
 }
 
+#if !defined CLIENT_LIB || defined DEBUG
 static void init_out_fp()
 {
   if (!out_fp) {
@@ -35,6 +38,7 @@ static void init_out_fp()
       out_fp = stdout;
   }
 }
+#endif
 
 #if !CLIENT_LIB
 void dbg_time(char *fmt,...)

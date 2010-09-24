@@ -311,6 +311,7 @@ void change_gtab_font_size();
 void change_pho_font_size();
 void change_win_sym_font_size();
 void change_win_gtab_style();
+extern int win_kbm_on;
 
 static void change_font_size()
 {
@@ -321,6 +322,8 @@ static void change_font_size()
   change_win_sym_font_size();
   change_win0_style();
   change_win_gtab_style();
+  if (win_kbm_on)
+    update_win_kbm();
 //  change_win_pho_style();
 }
 

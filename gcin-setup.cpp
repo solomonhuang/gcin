@@ -312,6 +312,8 @@ static void cb_help()
 
 static GtkWidget *spinner_gcin_font_size, *spinner_gcin_font_size_tsin_presel,
                  *spinner_gcin_font_size_symbol,*spinner_gcin_font_size_pho_near,
+                 *spinner_gcin_font_size_win_kbm,
+                 *spinner_gcin_font_size_win_kbm_en,
                  *spinner_gcin_font_size_tsin_pho_in, *spinner_gcin_font_size_gtab_in, *spinner_root_style_x,
                  *spinner_root_style_y, *font_sel;
 
@@ -354,6 +356,11 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   int font_size_gtab_in = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_gtab_in));
   save_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, font_size_gtab_in);
+
+  int font_size_win_kbm = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_win_kbm));
+  save_gcin_conf_int(GCIN_FONT_SIZE_WIN_KBM, font_size_win_kbm);
+  int font_size_win_kbm_en = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcin_font_size_win_kbm_en));
+  save_gcin_conf_int(GCIN_FONT_SIZE_WIN_KBM_EN, font_size_win_kbm_en);
 
   int gcin_pop_up_win = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_pop_up_win));
   save_gcin_conf_int(GCIN_POP_UP_WIN, gcin_pop_up_win);
@@ -665,6 +672,23 @@ void create_appearance_conf_window()
    (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_gtab_in, 8.0, 32.0, 1.0, 1.0, 0.0);
   spinner_gcin_font_size_gtab_in = gtk_spin_button_new (adj_gcin_font_size_gtab_in, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_gtab_in), spinner_gcin_font_size_gtab_in, FALSE, FALSE, 0);
+
+  GtkWidget *hbox_gcin_font_size_win_kbm = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gcin_font_size_win_kbm, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_font_size_win_kbm = gtk_label_new(_(_L("小鍵盤字型大小")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_win_kbm), label_gcin_font_size_win_kbm, FALSE, FALSE, 0);
+  GtkAdjustment *adj_gcin_font_size_win_kbm =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_win_kbm, 8.0, 32.0, 1.0, 1.0, 0.0);
+  spinner_gcin_font_size_win_kbm = gtk_spin_button_new (adj_gcin_font_size_win_kbm, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_win_kbm), spinner_gcin_font_size_win_kbm, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_font_size_win_kbm_en = gtk_label_new(_(_L("英數")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_win_kbm), label_gcin_font_size_win_kbm_en, FALSE, FALSE, 0);
+  GtkAdjustment *adj_gcin_font_size_win_kbm_en =
+   (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_win_kbm_en, 8.0, 32.0, 1.0, 1.0, 0.0);
+  spinner_gcin_font_size_win_kbm_en = gtk_spin_button_new (adj_gcin_font_size_win_kbm_en, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_win_kbm), spinner_gcin_font_size_win_kbm_en, FALSE, FALSE, 0);
+
+
 
 #if GTK_CHECK_VERSION(2,4,0)
   char tt[128];

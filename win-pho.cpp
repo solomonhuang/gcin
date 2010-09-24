@@ -199,7 +199,7 @@ void create_win_pho_gui_simple()
     gtk_widget_set_tooltip_text (event_box_pho, _(_L("左鍵符號，右鍵設定")));
 #else
     GtkTooltips *button_gtab_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), event_box_pho, _(_L"左鍵符號，右鍵設定"),NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_gtab_tips), event_box_pho, _(_L("左鍵符號，右鍵設定")),NULL);
 #endif
   }
 
@@ -238,6 +238,14 @@ void show_win_pho()
 
   if (gcin_pop_up_win && !pho_has_input())
     return;
+
+#if UNIX
+  if (!GTK_WIDGET_VISIBLE(gwin_pho))
+#endif
+  {
+    gtk_widget_show(gwin_pho);
+    move_win_pho(win_x, win_y);
+  }
 
   gtk_widget_show(gwin_pho);
   if (current_CS->b_raise_window)

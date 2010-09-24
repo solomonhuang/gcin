@@ -471,7 +471,7 @@ void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
 #if WIN32
   POINT pt;
   pt.x = wx; pt.y = wy;
-  ClientToScreen(win, &pt);
+  ClientToScreen((HWND)win, &pt);
   *tx = pt.x; *ty=pt.y;
 #else
   Window ow;
@@ -514,7 +514,7 @@ void move_IC_in_win(ClientState *cs)
 #else
    if (inpwin) {
      RECT rect;
-	 GetClientRect(inpwin, &rect);
+	 GetClientRect((HWND)inpwin, &rect);
      if (inpx >= rect.right)
        inpx = rect.right - 1;
      if (inpy >= rect.bottom)
@@ -725,6 +725,7 @@ void get_win_gtab_geom();
 void get_win0_geom();
 void get_win_pho_geom();
 void get_win_anthy_geom();
+void get_win_int_geom();
 
 void update_active_in_win_geom()
 {
@@ -739,6 +740,7 @@ void update_active_in_win_geom()
       break;
 #endif
     case method_type_INT_CODE:
+	  get_win_int_geom();
       break;
 #if USE_ANTHY
     case method_type_ANTHY:
@@ -751,7 +753,7 @@ void update_active_in_win_geom()
   }
 }
 
-extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab;
+extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab, *gwin_int;
 int anthy_visible();
 
 gboolean win_is_visible()
@@ -766,7 +768,7 @@ gboolean win_is_visible()
       return gwin0 && GTK_WIDGET_VISIBLE(gwin0);
 #endif
     case method_type_INT_CODE:
-      break;
+	  return gwin_int && GTK_WIDGET_VISIBLE(gwin_int);
 #if USE_ANTHY
     case method_type_ANTHY:
       return anthy_visible();
@@ -792,6 +794,8 @@ void toggle_half_full_char()
     return;
 #endif
 
+  check_CS();
+
   if (!gcin_shift_space_eng_full) {
     current_CS->b_half_full_char = 0;
     tss.tsin_half_full=0;
@@ -799,7 +803,6 @@ void toggle_half_full_char()
     return;
   }
 
-  check_CS();
 
 //  dbg("toggle_half_full_char\n");
 
@@ -1363,6 +1366,8 @@ int gcin_FocusOut(ClientState *cs)
 int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
 int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor);
 int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub_comp_len);
+int int_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
+int pho_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
 
 int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len)
 {
@@ -1382,8 +1387,9 @@ empty:
 
   switch(current_method_type()) {
     case method_type_PHO:
+		return pho_get_preedit(str, attr, cursor, sub_comp_len);
     case method_type_INT_CODE:
-      goto empty;
+		return int_get_preedit(str, attr, cursor, sub_comp_len);
 #if USE_TSIN
     case method_type_TSIN:
       return tsin_get_preedit(str, attr, cursor, sub_comp_len);

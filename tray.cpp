@@ -10,7 +10,11 @@
 static GdkPixbuf *pixbuf, *pixbuf_ch;
 static PangoLayout* pango;
 static GtkWidget *da;
+#if !GTK_CHECK_VERSION(2,90,6)
 static GdkGC *gc;
+#else
+static cairo_t *gc;
+#endif
 GdkWindow *tray_da_win;
 static EggTrayIcon *egg_tray_icon;
 
@@ -56,14 +60,31 @@ static void draw_icon()
 //  dbg("wh %d,%d\n", dw,dh);
 
   gdk_color_parse("black", &color_fg);
+#if !GTK_CHECK_VERSION(2,90,6)
   gdk_gc_set_rgb_fg_color(gc, &color_fg);
+#else
+  gc = gdk_cairo_create (tray_da_win);
+  gdk_cairo_set_source_color (gc, &color_fg);
+#endif
 
   if (pix) {
     int ofs = (dh - gdk_pixbuf_get_height (pix))/2;
+#if !GTK_CHECK_VERSION(2,90,6)
     gdk_draw_pixbuf(tray_da_win, NULL, pix, 0, 0, 0, ofs, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
+#else
+    gdk_cairo_set_source_pixbuf (gc, pix, 0, ofs);
+    cairo_paint (gc);
+    cairo_destroy (gc);
+#endif
   } else {
     get_text_w_h(inmd[current_CS->in_method].cname, &w, &h);
+#if !GTK_CHECK_VERSION(2,90,6)
     gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
+#else
+    cairo_move_to (gc, 0, 0);
+    pango_cairo_show_layout (gc, pango);
+    cairo_destroy (gc);
+#endif
   }
 
   if (current_CS) {
@@ -74,33 +95,67 @@ static void draw_icon()
         current_CS->im_state == GCIN_STATE_CHINESE) {
       static char full[] = "全";
       get_text_w_h(full,  &w, &h);
+#if !GTK_CHECK_VERSION(2,90,6)
       gdk_draw_layout(tray_da_win, gc, dw - w, dh - h, pango);
+#else
+      cairo_move_to (gc, dw - w, dh - h);
+      pango_cairo_show_layout (gc, pango);
+      cairo_destroy (gc);
+#endif
     }
 
     if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
       static char efull[] = "A全";
       get_text_w_h(efull,  &w, &h);
+#if !GTK_CHECK_VERSION(2,90,6)
       gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
+#else
+      cairo_move_to (gc, 0, 0);
+      pango_cairo_show_layout (gc, pango);
+      cairo_destroy (gc);
+#endif
     }
 #if USE_TSIN
     if ((current_method_type()==method_type_TSIN||current_method_type()==method_type_ANTHY) && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
       static char efull[] = "ABC";
       gdk_color_parse("blue", &color_fg);
+#if !GTK_CHECK_VERSION(2,90,6)
       gdk_gc_set_rgb_fg_color(gc, &color_fg);
+#else
+      gc = gdk_cairo_create (tray_da_win);
+      gdk_cairo_set_source_color (gc, &color_fg);
+#endif
 
       get_text_w_h(efull,  &w, &h);
+#if !GTK_CHECK_VERSION(2,90,6)
       gdk_draw_layout(tray_da_win, gc, 0, 0, pango);
+#else
+      cairo_move_to (gc, 0, 0);
+      pango_cairo_show_layout (gc, pango);
+      cairo_destroy (gc);
+#endif
     }
 #endif
   }
 
   gdk_color_parse("red", &color_fg);
+#if !GTK_CHECK_VERSION(2,90,6)
   gdk_gc_set_rgb_fg_color(gc, &color_fg);
+#else
+  gc = gdk_cairo_create (tray_da_win);
+  gdk_cairo_set_source_color (gc, &color_fg);
+#endif
 
   if (gb_output) {
     static char sim[] = "简";
     get_text_w_h(sim,  &w, &h);
+#if !GTK_CHECK_VERSION(2,90,6)
     gdk_draw_layout(tray_da_win, gc, 0, dh - h, pango);
+#else
+    cairo_move_to (gc, 0, dh - h);
+    pango_cairo_show_layout (gc, pango);
+    cairo_destroy (gc);
+#endif
   }
 
 }
@@ -282,6 +337,7 @@ gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
   return FALSE;
 }
 
+GdkGC *gdk_gc_new (GdkDrawable *drawable);
 
 gboolean create_tray(gpointer data)
 {
@@ -350,7 +406,9 @@ gboolean create_tray(gpointer data)
   dbg("context %x %x\n", pango_layout_get_context(pango), context);
   dbg("font %x %x\n",pango_layout_get_font_description(pango), desc);
 #endif
+#if !GTK_CHECK_VERSION(2,90,6)
   gc = gdk_gc_new (tray_da_win);
+#endif
   return FALSE;
 }
 

@@ -3,7 +3,7 @@
 #include "win-sym.h"
 #include "gst.h"
 
-GtkWidget *gwin0;
+GtkWidget *gwin0 = NULL;
 extern GtkWidget *gwin1;
 Window xwin0;
 extern Display *dpy;
@@ -66,6 +66,16 @@ void set_label_font_size();
    gtk_main(), the coodinate of the widget is sometimes invalid.
    We use pre-create to overcome this bug.
 */
+
+void drawcursor();
+void open_select_pho();
+static void mouse_char_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
+{
+  tss.c_idx = GPOINTER_TO_INT(data);
+  drawcursor();
+  open_select_pho();
+}
+
 static void create_char(int index)
 {
   int i;
@@ -81,9 +91,13 @@ static void create_char(int index)
     if (chars[i].vbox)
       return;
 
+    GtkWidget *event_box = gtk_event_box_new();
+    chars[i].vbox = event_box;
+    g_signal_connect (G_OBJECT (event_box), "button-press-event",  G_CALLBACK (mouse_char_callback), GINT_TO_POINTER(index));
+
+    gtk_box_pack_start (GTK_BOX (hbox_edit), event_box, FALSE, FALSE, 0);
     GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (hbox_edit), vbox, FALSE, FALSE, 0);
-    chars[i].vbox = vbox;
+    gtk_container_add(GTK_CONTAINER(event_box), vbox);
 
     GtkWidget *label = gtk_label_new(NULL);
     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
@@ -100,8 +114,8 @@ static void create_char(int index)
     if (gcin_win_color_use)
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
 
-    gtk_widget_show(vbox);
-    gtk_widget_show(label);
+    gtk_widget_show_all(event_box);
+    gtk_widget_hide(separator);
   }
 }
 
@@ -152,15 +166,16 @@ void disp_char(int index, char *ch)
   if (win_x + win_xl >= dpy_xl)
     move_win0(dpy_xl - win_xl, win_y);
 
-  gtk_widget_show(chars[index].vbox);
-  gtk_widget_show(label);
+  gtk_widget_show_all(chars[index].vbox);
+  gtk_widget_hide(chars[index].line);
 }
 
 void hide_char(int index)
 {
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   if (!chars[index].vbox)
     return;
   gtk_label_set_text(GTK_LABEL(chars[index].label), "");
@@ -171,10 +186,10 @@ void hide_char(int index)
 void clear_chars_all()
 {
   int i;
-
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     hide_char(i);
   }
@@ -380,6 +395,7 @@ void compact_win0_x()
 
 static void compact_win0()
 {
+  if (! gwin0) return;
   max_yl = 0;
   gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
   raw_move(best_win_x, best_win_y);
@@ -588,7 +604,7 @@ static void create_win0_gui()
     gtk_widget_set_tooltip_text (button_pho, _(_L("左鍵符號，右鍵設定")));
 #else
     GtkTooltips *button_pho_tips = gtk_tooltips_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button_pho, _(_L"左鍵符號，右鍵設定"),NULL);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (button_pho_tips), button_pho, _(_L("左鍵符號，右鍵設定")),NULL);
 #endif
   }
 
@@ -641,8 +657,10 @@ void raise_tsin_selection_win();
 
 void show_win0()
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
 
 #if _DEBUG && 0
 	dbg("show_win0 pop:%d in:%d for:%d \n", gcin_pop_up_win, tsin_has_input(), force_show);

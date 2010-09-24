@@ -35,11 +35,7 @@ typedef struct {
 
 typedef struct {
   u_int req_no;  // to make the im server stateless, more is better
-#if WIN32
-  HWND client_win;
-#else
   u_int client_win;
-#endif
   u_int flag;
   u_int input_style;
   GCINpoint spot_location;
