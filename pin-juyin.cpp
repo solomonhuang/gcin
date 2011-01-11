@@ -32,13 +32,15 @@ int main()
       i+=utf8_sz(&ju[i]);
     }
 
+//    dbg("%s '%s' %d\n", pin, ju, kk);
+
     memcpy(pinju[pinjuN].pinyin, pin, sizeof(pinju[0].pinyin));
     pinju[pinjuN].key = kk;
     pinjuN++;
   }
 
   fclose(fp);
-  dbg("pinjuN:%d\n", pinjuN);
+  dbg("zz pinjuN:%d\n", pinjuN);
 
   char fnameout[]="pin-juyin.xlt";
 

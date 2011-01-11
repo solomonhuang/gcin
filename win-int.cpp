@@ -64,7 +64,7 @@ static GtkWidget *create_int_opts()
   int i;
   for(i=0; i < int_selN; i++) {
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_int_opts), int_sel[i].name);
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_int_opts), int_sel[i].name);
 #else
     GtkWidget *item = gtk_menu_item_new_with_label (int_sel[i].name);
 
@@ -157,6 +157,7 @@ void create_win_intcode()
   }
 
   gwin_int = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_int), FALSE);
 #if WIN32
   set_no_focus(gwin_int);
 #endif

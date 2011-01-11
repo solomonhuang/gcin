@@ -1,8 +1,9 @@
 #include "gcin.h"
 #include "pho.h"
+#include "gst.h"
 
 static GtkWidget *gwin1, *frame;
-Window xwin1;
+//Window xwin1;
 
 #define SELEN (12)
 
@@ -12,6 +13,24 @@ static GtkWidget *arrow_up, *arrow_down;
 
 void hide_selections_win();
 gboolean tsin_page_up(), tsin_page_down();
+static int c_config;
+
+static int current_config()
+{
+  return (tsin_tail_select_key<<9) | (pho_candicate_col_N<<5) | phkbm.selkeyN << 1|
+    pho_candicate_R2L;
+}
+
+static int idx_to_x(int tN, int i)
+{
+    if (tN > pho_candicate_col_N)
+      tN = pho_candicate_col_N;
+
+    int x = i % tN;
+    if (pho_candicate_R2L)
+      x = tN - 1 - x;
+    return x;
+}
 
 static gboolean button_scroll_event_tsin(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
 {
@@ -37,6 +56,7 @@ void create_win1()
     return;
 
   gwin1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin1), FALSE);
 #if WIN32
   set_no_focus(gwin1);
 #endif
@@ -44,7 +64,7 @@ void create_win1()
 
 #if UNIX
   GdkWindow *gdkwin1 = gtk_widget_get_window(gwin1);
-  xwin1 = GDK_WINDOW_XWINDOW(gdkwin1);
+//  xwin1 = GDK_WINDOW_XWINDOW(gdkwin1);
   set_no_focus(gwin1);
 #else
   win32_init_win(gwin1);
@@ -96,13 +116,28 @@ void create_win1_gui()
   g_signal_connect (G_OBJECT (eve_box_up), "button-press-event",
                       G_CALLBACK (cb_arrow_up), NULL);
 
-  GtkWidget *table = gtk_table_new(SELEN, 2, FALSE);
+  int c_rowN = (phkbm.selkeyN + pho_candicate_col_N - 1) / pho_candicate_col_N * pho_candicate_col_N;
+  int tablecolN = pho_candicate_col_N;
+
+  if (!tsin_tail_select_key)
+    tablecolN *= 2;
+
+  c_config = current_config();
+
+  GtkWidget *table = gtk_table_new(c_rowN, tablecolN, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox_top), table, FALSE, FALSE, 0);
 
   int i;
-  for(i=0; i < SELEN; i++) {
+  for(i=0; i < phkbm.selkeyN; i++)
+  {
+    int y = i/pho_candicate_col_N;
+    int x = idx_to_x(SELEN+1, i);
+
+    if (!tsin_tail_select_key)
+      x*=2;
+
     GtkWidget *align = gtk_alignment_new(0,0,0,0);
-    gtk_table_attach_defaults(GTK_TABLE(table),align, 0,1,i,i+1);
+    gtk_table_attach_defaults(GTK_TABLE(table),align, x,x+1,y,y+1);
     GtkWidget *event_box_pho = gtk_event_box_new();
     GtkWidget *label = gtk_label_new(NULL);
     gtk_container_add (GTK_CONTAINER (event_box_pho), label);
@@ -114,19 +149,20 @@ void create_win1_gui()
     g_signal_connect(G_OBJECT(event_box_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), GINT_TO_POINTER(i));
 
-
-    GtkWidget *alignR = gtk_alignment_new(0,0,0,0);
-    gtk_table_attach_defaults(GTK_TABLE(table), alignR, 1,2,i,i+1);
-    GtkWidget *event_box_phoR = gtk_event_box_new();
-    GtkWidget *labelR = gtk_label_new(NULL);
-    gtk_container_add (GTK_CONTAINER (event_box_phoR), labelR);
-    labels_seleR[i] = labelR;
-    eve_seleR[i] = event_box_phoR;
-    gtk_container_add (GTK_CONTAINER (alignR), event_box_phoR);
-    gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
-    set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
-    g_signal_connect(G_OBJECT(event_box_phoR),"button-press-event",
-                   G_CALLBACK(mouse_button_callback), GINT_TO_POINTER(i));
+    if (!tsin_tail_select_key) {
+      GtkWidget *alignR = gtk_alignment_new(0,0,0,0);
+      gtk_table_attach_defaults(GTK_TABLE(table), alignR, x+1,x+2,y,y+1);
+      GtkWidget *event_box_phoR = gtk_event_box_new();
+      GtkWidget *labelR = gtk_label_new(NULL);
+      gtk_container_add (GTK_CONTAINER (event_box_phoR), labelR);
+      labels_seleR[i] = labelR;
+      eve_seleR[i] = event_box_phoR;
+      gtk_container_add (GTK_CONTAINER (alignR), event_box_phoR);
+      gtk_label_set_justify(GTK_LABEL(labels_sele[i]),GTK_JUSTIFY_LEFT);
+      set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
+      g_signal_connect(G_OBJECT(event_box_phoR),"button-press-event",
+                     G_CALLBACK(mouse_button_callback), GINT_TO_POINTER(i));
+    }
   }
 
   GtkWidget *eve_box_down = gtk_event_box_new();
@@ -150,9 +186,10 @@ void clear_sele()
   if (!gwin1)
     create_win1();
 
-  for(i=0; i < SELEN; i++) {
+  for(i=0; i < phkbm.selkeyN; i++) {
     gtk_widget_hide(labels_sele[i]);
-    gtk_widget_hide(labels_seleR[i]);
+    if (labels_seleR[i])
+      gtk_widget_hide(labels_seleR[i]);
   }
 
   gtk_widget_hide(arrow_up);
@@ -166,7 +203,7 @@ void clear_sele()
 
 char *htmlspecialchars(char *s, char out[]);
 
-void set_sele_text(int i, char *text, int len)
+void set_sele_text(int tN, int i, char *text, int len)
 {
   char tt[128];
   char utf8[128];
@@ -176,21 +213,32 @@ void set_sele_text(int i, char *text, int len)
   char uu[32], selma[128];
 
   char cc[2];
-  cc[0]=phkbm.selkey[i];
+  cc[0]=pho_selkey[i];
   cc[1]=0;
+  char ul[128];
+  ul[0]=0;
 
-  sprintf(selma, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, htmlspecialchars(cc, uu));
+  if (tss.sel_pho && i==tss.pho_menu_idx)
+    strcpy(ul, " foreground=\"yellow\" background=\"black\"");
+  else
+    sprintf(ul, "foreground=\"%s\"",gcin_sel_key_color);
+
+  sprintf(selma, "<span %s>%s</span>", ul, htmlspecialchars(cc, uu));
+
+  int x = idx_to_x(tN, i);
+  char *sep= x?" ":"";
 
   if (tsin_tail_select_key) {
     char vv[128];
-    snprintf(tt, sizeof(tt), "%s %s", htmlspecialchars(utf8, vv), selma);
+    snprintf(tt, sizeof(tt), "%s%s%s", sep, htmlspecialchars(utf8, vv), selma);
   } else {
     gtk_label_set_text(GTK_LABEL(labels_seleR[i]), utf8);
     gtk_widget_show(labels_seleR[i]);
-    snprintf(tt, sizeof(tt), "%s ", selma);
+    snprintf(tt, sizeof(tt), "%s%s",sep, selma);
   }
 
   gtk_widget_show(labels_sele[i]);
+//  dbg("tt %s\n", tt);
   gtk_label_set_markup(GTK_LABEL(labels_sele[i]), tt);
 }
 
@@ -270,7 +318,6 @@ void disp_arrow_down()
   gtk_widget_show(arrow_down);
 }
 
-#if USE_TSIN
 void destroy_win1()
 {
   if (!gwin1)
@@ -279,7 +326,6 @@ void destroy_win1()
   frame=NULL;
   gwin1 = NULL;
 }
-#endif
 
 void change_win1_font()
 {
@@ -288,7 +334,7 @@ void change_win1_font()
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
 
-  for(i=0; i < SELEN; i++) {
+  for(i=0; i < phkbm.selkeyN; i++) {
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
     set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
     if (labels_sele[i])
@@ -296,8 +342,21 @@ void change_win1_font()
     if (labels_seleR[i])
       gtk_widget_modify_fg(labels_seleR[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
     change_win_bg(eve_sele[i]);
-    change_win_bg(eve_seleR[i]);
+    if (eve_seleR[i])
+      change_win_bg(eve_seleR[i]);
   }
 
   change_win_bg(gwin1);
+}
+
+void recreate_win1_if_nessary()
+{
+  if (!frame)
+    return;
+
+  dbg("%x %x\n", current_config(), c_config);
+  if (current_config() != c_config) {
+    gtk_widget_destroy(frame); frame = NULL;
+    create_win1_gui();
+  }
 }

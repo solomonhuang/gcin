@@ -20,7 +20,15 @@ static int myread(int fd, void *buf, int bufN)
 #if UNIX
   return read(fd, buf, bufN);
 #else
-  return recv(fd, (char *)buf, bufN, 0);
+  int ofs=0, toN = bufN;
+  while (toN) {
+    int n = recv(fd, ((char *)buf) + ofs, toN, 0);
+    if (!n || n == SOCKET_ERROR)
+      return -1;
+    ofs+=n;
+	toN-=n;
+  };
+  return bufN;
 #endif
 }
 
@@ -102,7 +110,8 @@ static void shutdown_client(int fd)
 #if UNIX
   int uid = getuid();
   struct passwd *pwd;
-  if ((pwd=getpwuid(uid)) && !strcmp(pwd->pw_name, "gdm")) {
+  if ((pwd=getpwuid(uid)) &&
+      (!strcmp(pwd->pw_name, "gdm") || !strcmp(pwd->pw_name, "kdm"))) {
     exit(0);
   }
 #endif
@@ -279,13 +288,14 @@ void process_client_req(int fd)
 #endif
       gcin_FocusOut(cs);
       break;
+#if UNIX
     case GCIN_req_focus_out2:
       {
 #if DBG
       dbg_time("GCIN_req_focus_out2  %x\n", cs);
 #endif
-      gcin_FocusOut(cs);
-      flush_edit_buffer();
+      if (gcin_FocusOut(cs))
+        flush_edit_buffer();
 
       GCIN_reply reply;
       bzero(&reply, sizeof(reply));
@@ -304,6 +314,7 @@ void process_client_req(int fd)
       }
       }
       break;
+#endif
     case GCIN_req_set_cursor_location:
 #if DBG
       dbg_time("set_cursor_location %x %d %d\n", cs,
@@ -367,11 +378,18 @@ void process_client_req(int fd)
 //        dbg("GCIN_req_message\n");
         short len=0;
         int rn = myread(fd, &len, sizeof(len));
+        if (rn <= 0) {
+cli_down:
+          shutdown_client(fd);
+          return;
+        }
+
         // only unix socket, no decrypt
         char buf[512];
         // message should include '\0'
         if (len > 0 && len < sizeof(buf)) {
-          myread(fd, buf, len);
+          if (myread(fd, buf, len)<=0)
+            goto cli_down;
           message_cb(buf);
         }
       }

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "gtab.h"
 #include "gst.h"
+#include "pho-status.h"
 
 PHO_ST poo;
 
@@ -49,6 +50,8 @@ phokey_t pho2key(char typ_pho[])
     return (BACK_QUOTE_NO<<9) | typ_pho[1];
 
   for(i=1; i < 4; i++) {
+//    if (typ_pho[i] == PHO_PINYIN_TONE1)
+//      continue;
     key =  typ_pho[i] | (key << typ_pho_len[i]) ;
   }
 
@@ -102,7 +105,7 @@ static void find_match_phos(u_char mtyp_pho[4], int *mcount, int newkey)
 
         int i;
         for(i=idx_pho[vv].start; i < idx_pho[vv+1].start; i++) {
-          if (utf8_sz(ch_pho[i].ch) > 1) {
+          if (utf8_sz(pho_idx_str(i)) > 1) {
 #if 0
             utf8_putchar(ch_pho[i].ch);
             dbg(" ");
@@ -125,7 +128,12 @@ static void find_match_phos(u_char mtyp_pho[4], int *mcount, int newkey)
 
 gboolean inph_typ_pho_pinyin(int newkey);
 
-gboolean inph_typ_pho(KeySym newkey)
+static int typ_pho_status()
+{
+  return poo.typ_pho[3] ? PHO_STATUS_OK_NEW:PHO_STATUS_OK;
+}
+
+int inph_typ_pho(KeySym newkey)
 {
   int i;
   int insert = -1;
@@ -136,7 +144,7 @@ gboolean inph_typ_pho(KeySym newkey)
 
   if (poo.typ_pho[0]==BACK_QUOTE_NO) {
     poo.typ_pho[1]=(char)newkey;
-    return TRUE;
+    return PHO_STATUS_OK;
   }
 
   int max_in_idx;
@@ -213,7 +221,7 @@ gboolean inph_typ_pho(KeySym newkey)
       find_match_phos(mtyp_pho, &mcount, newkey);
 
       if (mcount > MIN_M_PHO) {
-        return TRUE;
+        return typ_pho_status();
       }
     }
 
@@ -221,16 +229,16 @@ gboolean inph_typ_pho(KeySym newkey)
     find_match_phos(mtyp_pho, &mcount, newkey);
 
     if (mcount > MIN_M_PHO) {
-      return TRUE;
+      return typ_pho_status();
     }
   }
 
   if (mcount) {
     memcpy(poo.typ_pho, mtyp_pho, sizeof(poo.typ_pho));
-    return TRUE;
+    return typ_pho_status();
   }
 
-  return FALSE;
+  return PHO_STATUS_REJECT;
 }
 
 
@@ -312,8 +320,7 @@ gboolean get_start_stop_idx(phokey_t key, int *start_i, int *stop_i)
   return TRUE;
 }
 
-// given the pho key & the big5 char, return the idx in ch_pho
-
+// given the pho key & the utf8 char, return the idx in ch_pho
 int ch_key_to_ch_pho_idx(phokey_t phkey, char *utf8)
 {
   int start_i, stop_i;
@@ -322,8 +329,9 @@ int ch_key_to_ch_pho_idx(phokey_t phkey, char *utf8)
 
   int i;
   for(i=start_i; i<stop_i; i++) {
-    int u8len = utf8_sz(ch_pho[i].ch);
-    if (!memcmp(ch_pho[i].ch, utf8, u8len)) {
+    char *ch = pho_idx_str(i);
+    int u8len = utf8_sz(ch);
+    if (!memcmp(ch, utf8, u8len)) {
       return i;
     }
   }
@@ -344,16 +352,6 @@ void inc_pho_count(phokey_t key, int ch_idx)
   get_start_stop_idx(key, &start_i, &stop_i);
 
 //  dbg("start_i %d %d    %d %d\n", start_i, stop_i, poo.start_idx, poo.stop_idx);
-  if (ch_pho[ch_idx].count == 32767) {
-    int i;
-
-    for(i=start_i; i < stop_i; i++) {
-      if (ch_pho[i].count < 0)
-        continue;
-
-      ch_pho[i].count /= 2;
-    }
-  }
 
   ch_pho[ch_idx].count++;
 //  dbg("count %d\n", ch_pho[ch_idx].count);
@@ -392,12 +390,14 @@ void set_gtab_target_displayed();
 
 void putkey_pho(u_short key, int idx)
 {
-  if (poo.same_pho_query_state==SAME_PHO_QUERY_pho_select && ggg.gbufN)
-    insert_gbuf_nokey(ch_pho[idx].ch);
-  else
-    sendkey_b5(ch_pho[idx].ch);
+  char *pho_str = pho_idx_str(idx);
 
-  lookup_gtab(ch_pho[idx].ch);
+  if (poo.same_pho_query_state==SAME_PHO_QUERY_pho_select && ggg.gbufN)
+    insert_gbuf_nokey(pho_str);
+  else
+    send_text(pho_str);
+
+  lookup_gtab(pho_str);
 
   inc_pho_count(key, idx);
 
@@ -409,6 +409,7 @@ void putkey_pho(u_short key, int idx)
 }
 
 void load_pin_juyin();
+void recreate_win1_if_nessary();
 
 void load_tab_pho_file()
 {
@@ -434,37 +435,44 @@ void load_tab_pho_file()
 
   char kbmfname[MAX_GCIN_STR];
   FILE *fr;
-  char phokbm_name[MAX_GCIN_STR];
-#if 1
-  get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm_name, "zo-asdf");
-#else
-  strcpy(phokbm_name, "pinyin-asdf");
-#endif
+
   free(pin_juyin);
   pin_juyin = NULL;
 
-  if (!strstr(phokbm_name, "pinyin")) {
+  if (!strstr(pho_kbm_name, "pinyin")) {
     text_pho_N = 3;
   } else {
     load_pin_juyin();
   }
 
-  if (strcmp(phokbm_name, "hsu"))
+  if (strcmp(pho_kbm_name, "hsu"))
     b_hsu_kbm = FALSE;
   else
     b_hsu_kbm = TRUE;
 
-  strcat(phokbm_name, ".kbm");
+  char pho_kbm_name_kbm[128];
 
-  dbg("phokbm_name:%s\n", phokbm_name);
+  strcat(strcpy(pho_kbm_name_kbm, pho_kbm_name), ".kbm");
+  dbg("phokbm_name: %s\n", pho_kbm_name_kbm);
 
-  get_sys_table_file_name(phokbm_name, kbmfname);
+  get_sys_table_file_name(pho_kbm_name_kbm, kbmfname);
 
   if ((fr=fopen(kbmfname,"rb"))==NULL)
      p_err("Cannot open %s", kbmfname);
 
+  dbg("kbmfname %s\n", kbmfname);
+
   fread(&phkbm,sizeof(phkbm),1,fr);
   fclose (fr);
+  phkbm.selkeyN = strlen(pho_selkey);
+
+  dbg("pho_selkey %s\n", pho_selkey);
+
+  recreate_win1_if_nessary();
+#if 0
+  for(i='A'; i <= 'z'; i++)
+    dbg("%c %d %d\n", i, phkbm.phokbm[i][0].num, phkbm.phokbm[i][0].typ);
+#endif
 }
 
 
@@ -492,7 +500,7 @@ int feedkey_pho(KeySym xkey, int kbstate)
   char *pp=NULL;
   char kno;
   int i,j,jj=0,kk=0;
-  char out_buffer[(CH_SZ+2) * 10 + 4];
+  char out_buffer[512];
   int out_bufferN;
 
 
@@ -564,8 +572,14 @@ int feedkey_pho(KeySym xkey, int kbstate)
       out_bufferN=0;
 
       while(i<phkbm.selkeyN  && ii< poo.stop_idx) {
-        out_buffer[out_bufferN++] = phkbm.selkey[i];
-        int len = u8cpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+        out_buffer[out_bufferN]=0;
+        char tt[128];
+        sprintf(tt, "<span foreground=\"%s\">%c</span>",
+           gcin_sel_key_color, pho_selkey[i]);
+        int ttlen = strlen(tt);
+        memcpy(out_buffer+out_bufferN, tt, ttlen);
+        out_bufferN+=ttlen;
+        int len = u8cpy(&out_buffer[out_bufferN], pho_idx_str(ii));
         out_bufferN+=len;
         out_buffer[out_bufferN++] = ' ';
 
@@ -573,11 +587,17 @@ int feedkey_pho(KeySym xkey, int kbstate)
         i++;
       }
 
-      out_buffer[out_bufferN++] = poo.cpg ? '<' : ' ';
+      char *tt = poo.cpg ? "&lt;" : " ";
+      int ttlen = strlen(tt);
+      memcpy(out_buffer+out_bufferN, tt, ttlen);
+      out_bufferN+=ttlen;
 
       if (ii < poo.stop_idx) {
         out_buffer[out_bufferN++] = poo.cpg ? '\\' : ' ';
-        out_buffer[out_bufferN++] = '>';
+        tt = "&gt;";
+        ttlen = strlen(tt);
+        memcpy(out_buffer+out_bufferN, tt, ttlen);
+        out_bufferN+=strlen(tt);
       }
 
       out_buffer[out_bufferN] = 0;
@@ -592,8 +612,8 @@ int feedkey_pho(KeySym xkey, int kbstate)
       if ((kbstate & ShiftMask))
         return shift_char_proc(xkey, kbstate);
 
-      if ((pp=strchr(phkbm.selkey, xkey)) && poo.maxi && poo.ityp3_pho) {
-        int c=pp-phkbm.selkey;
+      if ((pp=strchr(pho_selkey, xkey)) && poo.maxi && poo.ityp3_pho) {
+        int c=pp-pho_selkey;
 
         if (c<poo.maxi) {
           putkey_pho(key, poo.start_idx + poo.cpg + c);
@@ -700,23 +720,38 @@ proc_state:
 
 
   out_bufferN=0;
+  out_buffer[0]=0;
 
   if (poo.ityp3_pho) {
     while(i< phkbm.selkeyN  && ii < poo.stop_idx) {
-      out_buffer[out_bufferN++] = phkbm.selkey[i];
-      int len = u8cpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+      char tt[128];
+      sprintf(tt, "<span foreground=\"%s\">%c</span>",
+         gcin_sel_key_color, pho_selkey[i]);
+      int ttlen = strlen(tt);
+      memcpy(out_buffer+out_bufferN, tt, ttlen);
+      out_bufferN+=ttlen;
+      strcat(out_buffer, tt);
+      char *pho_str = pho_idx_str(ii);
+      int len = strlen(pho_str);
+      memcpy(&out_buffer[out_bufferN], pho_str, len);
       out_bufferN+=len;
       out_buffer[out_bufferN++] = ' ';
 
       ii++;
-      i=i+1;
+      i=i++;
     }
 
-    out_buffer[out_bufferN++] = poo.cpg ? '<' : ' ';
+    char *tt = poo.cpg ? "&lt;" : " ";
+    int ttlen = strlen(tt);
+    memcpy(out_buffer+out_bufferN, tt, ttlen);
+    out_bufferN+=ttlen;
 
     if (ii < poo.stop_idx) {
       out_buffer[out_bufferN++] = poo.cpg ? '\\' : ' ';
-      out_buffer[out_bufferN++] = '>';
+      tt = "&gt;";
+      ttlen = strlen(tt);
+      memcpy(out_buffer+out_bufferN, tt, ttlen);
+      out_bufferN+=strlen(tt);
     } else {
       poo.cpg=0;
     }
@@ -724,7 +759,9 @@ proc_state:
     poo.maxi=i;
   } else {
     while(i<phkbm.selkeyN  && ii < poo.stop_idx) {
-      int len = u8cpy(&out_buffer[out_bufferN], ch_pho[ii].ch);
+      char *pho_str = pho_idx_str(ii);
+      int len = strlen(pho_str);
+      memcpy(&out_buffer[out_bufferN], pho_str, len);
       out_bufferN+=len;
 
       ii++;
@@ -733,7 +770,7 @@ proc_state:
     poo.maxi=i;
   }
 
-  out_buffer[out_bufferN] = 0;
+  out_buffer[out_bufferN]=0;
   disp_pho_sel(out_buffer);
 
   return 1;

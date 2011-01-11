@@ -81,7 +81,8 @@ Kp9 ╗
 # f1-f12 皆可用
 f1 A test
 f2 測試
-left ←
-right →
-down ↓
-up ↑
+# 由於會影響到應用程式的選擇，底下的關閉 
+#left ←
+#right →
+#down ↓
+#up ↑

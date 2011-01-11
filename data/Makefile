@@ -4,11 +4,10 @@ include ../config.mak
 CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I.. -DDEBUG="0$(GCIN_DEBUG)" \
 
 
-DATA=pho.tab tsin32.idx \
+DATA=pho.tab2 tsin32.idx \
      cj.gtab ar30.gtab ar30-big.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
-     et.kbm et-asdf.kbm et26.kbm et26-asdf.kbm zo.kbm zo-asdf.kbm \
-     pinyin.kbm pinyin-asdf.kbm dvorak.kbm mitac.kbm \
-     ibm.kbm tsin32 hsu.kbm pho-huge.tab simplex.gtab symbols.gtab russian.gtab \
+     et.kbm et26.kbm zo.kbm pinyin.kbm dvorak.kbm mitac.kbm \
+     ibm.kbm tsin32 hsu.kbm pho-huge.tab2 simplex.gtab symbols.gtab russian.gtab \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
      t2s.dat s2t.dat cj543.gtab
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
@@ -20,10 +19,10 @@ tsin32:	tsin.src ../tsa2d32
 
 tsin32.idx:	tsin32
 
-pho.tab:	 pho.tab.src ../phoa2d
+pho.tab2:	 pho.tab2.src ../phoa2d
 	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
-pho-huge.tab:	 pho-huge.tab.src ../phoa2d
+pho-huge.tab2:	 pho-huge.tab2.src ../phoa2d
 	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 t2s.dat:	t2s-file t2s-file.table

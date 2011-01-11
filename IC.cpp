@@ -28,6 +28,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ******************************************************************/
 #include "gcin.h"
 
+#undef DEBUG
 
 static IC *ic_list = (IC *)NULL;
 static IC *free_list = (IC *)NULL;
@@ -166,7 +167,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 
 	if (!current_CS)
           current_CS = cs;
-#if DEBUG
+#if DEBUG && 0
         dbg(".... StoreIC\n");
 #endif
 	for (i = 0; i < (int)call_data->ic_attr_num; i++, ic_attr++) {
@@ -291,7 +292,7 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 	}
 
 	load_IC(rec);
-#if DEBUG
+#if DEBUG && 0
         dbg("exit StoreIC\n");
 #endif
 }
@@ -307,7 +308,7 @@ void CreateIC(IMChangeICStruct *call_data)
     StoreIC(rec, call_data);
     call_data->icid = rec->id;
     load_IC(rec);
-#if DEBUG
+#if DEBUG && 0
     dbg("CreateIC  .. exit\n");
 #endif
     return;

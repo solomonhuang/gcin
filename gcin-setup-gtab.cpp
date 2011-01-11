@@ -107,7 +107,11 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 #endif
   save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, auto_select_by_phrase_opts[idx].num);
 
-  send_gcin_message(GDK_DISPLAY(), CHANGE_FONT_SIZE);
+  send_gcin_message(
+#if UNIX
+	  GDK_DISPLAY(),
+#endif
+	  CHANGE_FONT_SIZE);
   gtk_widget_destroy(gcin_gtab_conf_window); gcin_gtab_conf_window = NULL;
 
   return TRUE;
@@ -149,7 +153,11 @@ static gboolean cb_gtab_edit_append( GtkWidget *widget,
   strcat(strcpy(append_fname, fname), ".append");
   char user_fname[512];
   get_gcin_user_fname(append_fname, user_fname);
-  win32exec_script("gtab.append_prepare.bat", user_fname);
+  if (GetFileAttributesA(user_fname) == INVALID_FILE_ATTRIBUTES)
+    win32exec_script("gtab.append_prepare.bat", user_fname);
+  else {
+    win32exec_script("utf8-edit.bat", user_fname);
+  }
 #endif
   return TRUE;
 }
@@ -179,7 +187,7 @@ static GtkWidget *create_spc_opts()
       current_idx = i;
 
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_spc_opts), _(spc_opts[i].str));
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_spc_opts), _(spc_opts[i].str));
 #else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_spc_opts), item);
 #endif
@@ -218,7 +226,7 @@ static GtkWidget *create_auto_select_by_phrase_opts()
       current_idx = i;
 
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_auto_select_by_phrase), _(auto_select_by_phrase_opts[i].str));
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_auto_select_by_phrase), _(auto_select_by_phrase_opts[i].str));
 #else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_auto_select_by_phrase), item);
 #endif
@@ -244,6 +252,8 @@ void create_gtab_conf_window()
   load_setttings();
 
   gcin_gtab_conf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_position(GTK_WINDOW(gcin_gtab_conf_window), GTK_WIN_POS_MOUSE);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gcin_gtab_conf_window), FALSE);
 
   g_signal_connect (G_OBJECT (gcin_gtab_conf_window), "delete_event",
                     G_CALLBACK (close_gtab_conf_window),

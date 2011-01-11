@@ -53,6 +53,34 @@
 #define GTK_WIDGET_REALIZED gtk_widget_get_realized
 #endif
 
+#if GTK_CHECK_VERSION(2,21,8)
+#undef GDK_DISPLAY
+#define GDK_DISPLAY() GDK_DISPLAY_XDISPLAY(gdk_display_get_default())
+#endif
+
+#if GTK_CHECK_VERSION(2,91,0)
+#define GTK_OBJECT
+#endif
+
+#if !GTK_CHECK_VERSION(2,91,1)
+#define gtk_window_set_has_resize_grip(x,y);
+#define GTK_COMBO_BOX_TEXT GTK_COMBO_BOX
+#endif
+
+#if GTK_CHECK_VERSION(2,91,2)
+#define gtk_combo_box_new_text gtk_combo_box_text_new
+#define gtk_combo_box_append_text gtk_combo_box_text_append_text
+#define gtk_widget_hide_all gtk_widget_hide
+#endif
+
+#if GTK_CHECK_VERSION(2,91,6)
+#define GDK_WINDOW_XWINDOW GDK_WINDOW_XID
+#endif
+
+#if GTK_CHECK_VERSION(2,91,7)
+#define gdk_window_lookup_for_display gdk_x11_window_lookup_for_display
+#endif
+
 typedef enum {
   GCIN_STATE_DISABLED = 0,
   GCIN_STATE_ENG_FULL = 1,
@@ -176,7 +204,11 @@ void sendkey_b5(char *bchar);
 void send_ascii(char key);
 void bell();
 void set_label_font_size(GtkWidget *label, int size);
+#if UNIX
 void send_gcin_message(Display *dpy, char *s);
+#else
+void send_gcin_message(char *s);
+#endif
 void check_CS();
 void get_win_size(GtkWidget *win, int *width, int *height);
 void change_win_fg_bg(GtkWidget *win, GtkWidget *label);

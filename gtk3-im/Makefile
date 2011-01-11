@@ -3,6 +3,7 @@ include ../config.mak
 OBJS = imgcin.o gtkimcontextgcin.o
 GTK3IM=gtk-3.0/immodules
 GTKINC=`pkg-config --cflags gtk+-3.0`
+LDFLAGS=`pkg-config --libs gtk+-3.0`
 IMMODULES=$(libdir)/$(GTK3IM)
 IMMODULES_LOCAL=/usr/$(LIB)/$(GTK3IM)
 
@@ -29,11 +30,11 @@ all:	im-gcin.so im-gcin-cur.so
 
 im-gcin.so:     $(OBJS) ../im-client/libgcin-im-client.so
 	export LD_RUN_PATH=$(gcinlibdir) ;\
-	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@
+	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
 	rm -f core.*
 
 im-gcin-cur.so:     $(OBJS) ../im-client/libgcin-im-client.so
-	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@
+	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
 	rm -f core.*
 
 clean:
@@ -43,6 +44,7 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 		install -d $(IMMODULES_LOCAL); \
 		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
+		cd /usr/local/lib/gtk-3.0/3.0.0; gtk-query-immodules-3.0 > immodules.cache; \
 	else \
 		install -d $(IMMODULES); \
 		install -m 755 im-gcin.so $(IMMODULES); \

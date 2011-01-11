@@ -16,14 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../eggtrayicon.c:127
-msgid "Orientation"
-msgstr "Orientation"
-
-#: ../eggtrayicon.c:128
-msgid "The orientation of the tray."
-msgstr "The orientation of the tray."
-
 #: ../gcin-setup-gtab.c:131
 msgid "空白鍵選項"
 msgstr "Behavior of Space key"
@@ -157,8 +149,8 @@ msgid "gcin 注音/詞音設定"
 msgstr "Settings for Bopomofo and Tsin"
 
 #: ../gcin-setup-pho.c:320
-msgid "鍵盤排列方式"
-msgstr "Keymap selections"
+msgid "鍵盤排列方式/選擇鍵/選單每列字數"
+msgstr "Keymap/Selection keys/Candidates per line"
 
 #: ../gcin-setup-pho.c:327
 msgid "詞音輸入[中/英]切換"
@@ -275,10 +267,6 @@ msgstr "System tray support"
 #: ../gcin-setup.c:497
 msgid "顏色選擇"
 msgstr "Color selection"
-
-#: ../gcin-setup.c:513
-msgid "測試目前狀態"
-msgstr "Preview"
 
 #: ../gcin-setup.c:517
 msgid "前景顏色"
@@ -419,60 +407,28 @@ msgid "按滿按空白不送出第一字(倉頡, 行列)"
 msgstr "Does not send first character"
 
 #: ../gcin-setup-pho.c:9 ../gcin-setup-tab.c:584
-msgid "標準 standard"
-msgstr "Standard style"
-
-#: ../gcin-setup-pho.c:10 ../gcin-setup-tab.c:585
-msgid "標準 standard 使用 asdf 選擇"
-msgstr "Standard style with asdf selection"
+msgid "標準"
+msgstr "Standard"
 
 #: ../gcin-setup-pho.c:11 ../gcin-setup-tab.c:586
-msgid "倚天 Eten"
-msgstr "Eten style"
-
-#: ../gcin-setup-pho.c:12 ../gcin-setup-tab.c:587
-msgid "倚天 Eten 使用 asdf 選擇"
-msgstr "Eten style with asdf selection"
+msgid "倚天"
+msgstr "Eten"
 
 #: ../gcin-setup-pho.c:13 ../gcin-setup-tab.c:588
 msgid "倚天 26 鍵"
-msgstr "Eten 26 keys style"
-
-#: ../gcin-setup-pho.c:14 ../gcin-setup-tab.c:589
-msgid "倚天 26 鍵,使用 asdf 選擇"
-msgstr "Eten 26 keys style with asdf selection"
+msgstr "Eten, 26 keys"
 
 #: ../gcin-setup-pho.c:15 ../gcin-setup-tab.c:590
 msgid "許氏(國音,自然)"
-msgstr "Mr. Hsu's style"
+msgstr "Mr. Hsu's"
 
 #: ../gcin-setup-pho.c:16 ../gcin-setup-tab.c:591
-msgid "聲調拼音"
-msgstr "Phonetic Pinyin style"
-
-#: ../gcin-setup-pho.c:17 ../gcin-setup-tab.c:592
-msgid "聲調拼音, 使用 asdf 選擇"
-msgstr "Phonetic Pinyin style with asdf selection"
-
-#: ../gcin-setup-pho.c:18 ../gcin-setup-tab.c:593
-msgid "Dvorak"
-msgstr "Dvorak style"
-
-#: ../gcin-setup-pho.c:19 ../gcin-setup-tab.c:594
-msgid "IBM"
-msgstr "IBM's style"
+msgid "拼音"
+msgstr "Pinyin"
 
 #: ../gcin-setup-pho.c:20 ../gcin-setup-tab.c:595
 msgid "神通"
-msgstr "Mitac's style"
-
-#: ../gcin-setup-pho.c:44 ../gcin-setup-tab.c:541
-msgid "CapsLock"
-msgstr "CapsLock"
-
-#: ../gcin-setup-pho.c:45 ../gcin-setup-tab.c:542
-msgid "Tab"
-msgstr "Tab"
+msgstr "Mitac"
 
 #: ../gcin-setup-pho.c:46 ../gcin-setup-tab.c:543
 msgid "Shift(限非 XIM)"
@@ -494,10 +450,6 @@ msgstr "Select other same phonetic characters"
 msgid "輸入空白"
 msgstr "Send space to Tsin buffer"
 
-#: ../gcin-setup-pho.c:508 ../gcin-setup-tab.c:1725
-msgid "啟用詞音緩衝區編輯模式"
-msgstr "Enable Tsin VI editing mode"
-
 #: ../gcin-setup-tab.c:779 ../gcin-setup.c:63
 msgid "結果失敗"
 msgstr "Failed"
@@ -515,11 +467,11 @@ msgid "念出發音"
 msgstr "Text-to-speech"
 
 #: ../tray.c:179
-msgid "正->簡體"
+msgid "正→簡體"
 msgstr "Traditional Chinese -> Simplified Chinese"
 
 #: ../tray.c:180
-msgid "簡->正體"
+msgid "簡→正體"
 msgstr "Simplified Chinese -> Traditional Chinese"
 
 #: ../tray.c:181
@@ -582,10 +534,6 @@ msgstr "Enable all"
 msgid "全部關閉"
 msgstr "Disable all"
 
-#: ../gtk-im/imgcin.c:27
-msgid "gcin Input Method"
-msgstr "gcin Input Method"
-
 #: ../tray.c:218
 msgid "简体输出"
 msgstr "Simplified Chinese output"
@@ -633,3 +581,75 @@ msgstr "Half-width / Traditional Chinese output"
 #: ../win-save-phrase.cpp:70
 msgid "加片語到詞庫"
 msgstr "Add phrase to Tsin's database"
+
+#: ../about.cpp:93
+msgid ""
+"<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
+"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
+"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</"
+"a>\n"
+msgstr ""
+"<a href='http://hyperrate.com?eid=67'>Click to forum of gcin</a>\n"
+"<a href='http://hyperrate.com?eid=215'>Windows version of gcin</a>\n"
+"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>Changelog of gcin</"
+"a>\n"
+
+#: ../gcin-setup.cpp:593
+msgid ""
+"按鍵顯示於\n"
+"應用程式"
+msgstr ""
+"Show keycodes on\n"
+"application window"
+
+#: ../win-save-phrase.cpp:104
+msgid "%d 秒後自動加入"
+msgstr "Auto-append after %d second(s)"
+
+#: ../about.cpp:104
+msgid "gcin改變記錄"
+msgstr "Changelog of gcin"
+
+#: ../gcin-setup.cpp:690
+msgid "小鍵盤字型大小"
+msgstr "Font size of virtual keyboard"
+
+#: ../tslearn.cpp:368
+msgid "按 ctrl-V, 貼上你要 tslearn 學習的文章。"
+msgstr "Press Ctrl-V to paste data you want Tslearn to learn."
+
+#: ../gcin-setup.cpp:696
+msgid "英數"
+msgstr "Alphabet-numeric"
+
+#: ../tray-win32.cpp:128
+msgid "送字到剪貼區"
+msgstr "Send data to clipboard"
+
+#: ../tray-win32.cpp:111 ../tray.cpp:272
+msgid "選擇輸入法"
+msgstr "Select input methods"
+
+#: ../gcin-setup-pho.cpp:598
+msgid "\\鍵切換jkx鍵編輯模式"
+msgstr "\\ key to toggle jkx keys editing mode"
+
+#: ../gcin-setup.cpp:790
+msgid "取代主題顏色"
+msgstr "Replace colors of theme"
+
+#: ../gcin-setup.cpp:820
+msgid "選擇鍵顏色"
+msgstr "Color of selection key"
+
+#: ../gcin-setup.cpp:491
+msgid ""
+"<span foreground=\"%s\" font=\"%d\">7</span><span font=\"%d\">測試</span>"
+msgstr ""
+"<span foreground=\"%s\" font=\"%d\">7</span><span font=\"%d\">test</span>"
+
+#: ../gcin-setup.cpp:495
+msgid ""
+"<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">測試</span>"
+msgstr ""
+"<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">test</span>"

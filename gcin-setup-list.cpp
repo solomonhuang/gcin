@@ -259,7 +259,11 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 
-  send_gcin_message(GDK_DISPLAY(), "reload");
+  send_gcin_message(
+#if UNIX
+	  GDK_DISPLAY(),
+#endif
+	  "reload");
 }
 
 static void cb_cancel (GtkWidget *widget, gpointer data)
@@ -522,7 +526,7 @@ static GtkWidget *create_im_toggle_keys()
       current_idx = i;
 
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_im_toggle_keys), imkeys[i].keystr);
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_im_toggle_keys), imkeys[i].keystr);
 #else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_im_toggle_keys), item);
 #endif
@@ -564,7 +568,7 @@ static GtkWidget *create_speaker_opts()
       current_idx = i;
 
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_speaker_opts), pho_speaker[i]);
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_speaker_opts), pho_speaker[i]);
 #else
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_speaker_opts), item);
 #endif
@@ -598,7 +602,7 @@ static GtkWidget *create_gcb_pos_opts()
 
   for(i=0; i<sizeof(gcb_pos)/sizeof(gcb_pos[0]); i++) {
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_gcb_pos), _(gcb_pos[i]));
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_gcb_pos), _(gcb_pos[i]));
 #else
     GtkWidget *item = gtk_menu_item_new_with_label (_(gcb_pos[i]));
 
@@ -630,8 +634,10 @@ void create_gtablist_window (void)
 
   /* create gtab_list_window, etc */
   gtablist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
- gtk_window_set_title (GTK_WINDOW (gtablist_window), _(_L("輸入法選擇"))
-);
+  gtk_window_set_position(GTK_WINDOW(gtablist_window), GTK_WIN_POS_MOUSE);
+
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gtablist_window), FALSE);
+ gtk_window_set_title (GTK_WINDOW (gtablist_window), _(_L("輸入法選擇")));
   gtk_container_set_border_width (GTK_CONTAINER (gtablist_window), 1);
 
   g_signal_connect (G_OBJECT (gtablist_window), "destroy",

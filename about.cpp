@@ -1,4 +1,5 @@
 #include "gcin.h"
+#include "gcin-version.h"
 
 static GtkWidget *about_window;
 
@@ -60,6 +61,7 @@ void create_about_window()
 
     /* Create a new about_window */
     about_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(about_window), FALSE);
 
     gtk_window_set_title (GTK_WINDOW (about_window), _(_L("關於 gcin")));
 
@@ -89,8 +91,8 @@ void create_about_window()
 
 #if GTK_CHECK_VERSION(2,18,9)
    GtkWidget *label = gtk_label_new(_(_L("<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
-"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
-"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</a>\n"
+_L("<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n")
+_L("<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</a>\n")
 )));
    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
@@ -114,7 +116,7 @@ void create_about_window()
     image = gtk_image_new_from_file (gcin_png);
 #endif
 
-    label_version = gtk_label_new ("version " GCIN_VERSION);
+    label_version = gtk_label_new ("version " GCIN_VERSION "  " __DATE__);
 
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 3);
     gtk_box_pack_start (GTK_BOX (hbox), label_version, FALSE, FALSE, 3);

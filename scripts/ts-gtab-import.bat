@@ -1,8 +1,8 @@
 set gcin_sys=%GCIN_DIR%
 set gcin_bin=%gcin_sys%\bin
 set gcin_script=%gcin_sys%\script
-set gcin_user=%APPDATA%\gcin
-cd %gcin_user%
+set gcin_user=%APPDATA_GCIN%
+cd /d %gcin_user%
 
 set _f=%1
 set f=%_f%.append.gtab.tsin-db

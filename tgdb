@@ -1,10 +1,13 @@
+#!/bin/bash -f
 export GCIN_IM_CLIENT_NO_AUTO_EXEC=
 export GCIN_TABLE_DIR=./data
+export GCIN_ERR_COREDUMP=
 pkill gcin.test
 export LC_ALL=zh_TW.Big5
 export XMODIFIERS=@im=gcin_test
 export LD_PRELOAD=./im-client/libgcin-im-client.so
 sleep 1; leafpad &
 export GCIN_OUTPUT_FILTER=./gcin_filter
+#export GCIN_PHO_KBM=pinyin-asdf
 gdb ./gcin.test
 pkill gedit

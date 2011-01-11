@@ -38,3 +38,13 @@ void prph(phokey_t kk)
 {
 	prph2(stdout, kk);
 }
+
+
+void prphs(phokey_t *ks, int ksN)
+{
+  int i;
+  for(i=0;i<ksN;i++) {
+    prph(ks[i]); dbg(" ");
+  }
+}
+

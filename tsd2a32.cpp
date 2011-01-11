@@ -30,29 +30,28 @@ int main(int argc, char **argv)
   }
 
   for(i=1; i < argc;) {
-	if (!strcmp(argv[i], "-nousecount")) {
-		i++;
-	    pr_usecount = FALSE;
-	} else
-	if (!strcmp(argv[i], "-o")) {
-		if (i==argc-1)
-			p_err("-o need out file name");
-		fname_out = argv[i+1];
-		i+=2;
-	} else
-		fname = argv[i++];
+    if (!strcmp(argv[i], "-nousecount")) {
+      i++;
+      pr_usecount = FALSE;
+    } else
+    if (!strcmp(argv[i], "-o")) {
+      if (i==argc-1)
+        p_err("-o need out file name");
+        fname_out = argv[i+1];
+        i+=2;
+    } else
+      fname = argv[i++];
   }
 
   FILE *fp_out;
 
   if (!fname_out) {
-	  fp_out = stdout;
-  }
-  else {
-	  dbg("use %s\n", fname_out);
-	  fp_out = fopen(fname_out, "w");
-	  if (!fp_out)
-		  p_err("cannot create %s\n", fname_out);
+    fp_out = stdout;
+  } else {
+    dbg("%s use %s\n", argv[0], fname_out);
+    fp_out = fopen(fname_out, "w");
+    if (!fp_out)
+      p_err("cannot create %s\n", fname_out);
   }
 
   if ((fp=fopen(fname,"rb"))==NULL)
@@ -139,5 +138,6 @@ int main(int argc, char **argv)
 stop:
   fclose(fp);
   fclose(fp_out);
-  return 0;
+
+  exit(0);
 }

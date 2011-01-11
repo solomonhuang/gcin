@@ -367,9 +367,8 @@ static void DispInArea()
 #endif
 
 //  dbg("sel1st:%d\n", ggg.sel1st_i);
-
-  if (gcin_on_the_spot_key && gcin_edit_display_ap_only()) {
-    if (gwin_gtab && GTK_WIDGET_VISIBLE(gwin_gtab))
+  if (gcin_on_the_spot_key) {
+    if (gwin_gtab && GTK_WIDGET_VISIBLE(gwin_gtab) && poo.same_pho_query_state == SAME_PHO_QUERY_none)
       hide_win_gtab();
     return;
   }
@@ -1319,13 +1318,12 @@ int gbuf_cursor_right();
 int gbuf_cursor_home();
 int gbuf_cursor_end();
 int gtab_buf_delete();
-GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key);
 void set_gbuf_c_sel(int v);
 void set_gtab_user_head();
 KeySym keypad_proc(KeySym xkey);
 void save_gtab_buf_phrase(KeySym key);
 gboolean save_gtab_buf_shift_enter();
-
+gboolean win_sym_page_up(), win_sym_page_down();
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -1473,6 +1471,10 @@ shift_proc:
       }
       else
         return 0;
+    case XK_Up:
+      if (gtab_has_input())
+        return TRUE;
+      return FALSE;
     case XK_Down:
 #if UNIX
     case XK_KP_Down:
@@ -1528,7 +1530,8 @@ shift_proc:
 
       if (key==XK_KP_Subtract)
         goto keypad_proc;
-      return 0;
+
+      return win_sym_page_up();
     case XK_Next:
 #if UNIX
     case XK_KP_Next:
@@ -1548,7 +1551,7 @@ next_page:
       } else {
         if (key==XK_KP_Add)
           goto keypad_proc;
-        return 0;
+        return win_sym_page_down();
       }
     case ' ':
       if (ggg.invalid_spc && gtab_invalid_key_in)
@@ -1561,7 +1564,7 @@ next_page:
 
       has_wild = has_wild_card();
 
- //     dbg("ggg.wild_mode:%d ggg.more_pg:%d ggg.ci:%d  has_wild:%d\n", ggg.wild_mode, ggg.more_pg, ggg.ci, has_wild);
+//      dbg("ggg.wild_mode:%d ggg.more_pg:%d ggg.ci:%d  has_wild:%d\n", ggg.wild_mode, ggg.more_pg, ggg.ci, has_wild);
 
       if (ggg.wild_mode) {
         // request from tetralet
@@ -1575,6 +1578,7 @@ next_page:
           ggg.wild_page=0;
 
         wildcard();
+        ggg.spc_pressed = TRUE;
         return 1;
       } else
       if (ggg.more_pg && !(_gtab_space_auto_first & GTAB_space_auto_first_any)) {
@@ -1622,6 +1626,7 @@ direct_select:
 
       ggg.last_full=0;
       ggg.spc_pressed=1;
+//      dbg("spc_pressed=1\n");
 
       if (has_wild) {
         ggg.wild_page=0;
@@ -2097,7 +2102,7 @@ next_pg:
         sel[selN++] = load_tblidx(j);
         j++;
       }
-      insert_gbuf_cursor(sel, selN, ggg.kval);
+      insert_gbuf_cursor(sel, selN, ggg.kval, FALSE);
       clear_after_put();
       return 1;
     } else {

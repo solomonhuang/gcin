@@ -9,11 +9,16 @@ int pho_lookup(char *s, char *num, char *typ)
 {
   int i;
   char tt[CH_SZ+1], *pp;
+  int len = utf8_sz(s);
+
+  if (utf8_eq(s, "１")) {
+    *num = 0;
+    *typ = 3;
+    return TRUE;
+  }
 
   if (!(*s&0x80))
     return *s-'0';
-
-  int len = utf8_sz(s);
 
   bchcpy(tt, s);
   tt[len]=0;
@@ -24,12 +29,12 @@ int pho_lookup(char *s, char *num, char *typ)
   }
 
   if (!pp)
-    return 0;
+    return FALSE;
 
   *typ=i;
   *num=(pp - pho_chars[i])/3;
 
-  return 1;
+  return TRUE;
 }
 
 void swap_char(char *a, char *b)
@@ -72,11 +77,11 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  fgets(s,sizeof(s),fp);
-  len=strlen(s);
-  s[len-1]=0;
-  strcpy(phkb.selkey, s);
-  phkb.selkeyN = strlen(s);
+//  fgets(s,sizeof(s),fp);
+//  len=strlen(s);
+//  s[len-1]=0;
+//  strcpy(phkb.selkey, s);
+//  phkb.selkeyN = strlen(s);
 
   while (!feof(fp)) {
     s[0]=0;
@@ -92,7 +97,7 @@ int main(int argc, char **argv)
       break;
 
     if (!pho_lookup(s, &num, &typ))
-      p_err("err found");
+      p_err("err found %s", s);
 
     int utf8sz = utf8_sz(s);
     chk=s[utf8sz + 1];
@@ -105,12 +110,16 @@ int main(int argc, char **argv)
         phkb.phokbm[(int)chk][i].num=num;
         phkb.phokbm[(int)chk][i].typ=typ;
 
-//        printf("%c %d %d  i:%d\n", chk, num, typ, i);
+//       printf("%c %d %d  i:%d\n", chk, num, typ, i);
         break;
       }
     }
   }
   fclose(fp);
+
+  if (strstr(fnamesrc, "pinyin"))
+    phkb.phokbm[' '][0].num=0;
+    phkb.phokbm[' '][0].typ=3;
 
   if ((fp=fopen(fnameout,"w"))==NULL) {
     printf("Cannot create %s\n", fnameout);

@@ -12,6 +12,8 @@ typedef struct {
   struct PRE_SEL *pre_sel;
   int pre_selN;
   int last_cursor_idx;
+  int pho_menu_idx;
+//  int pho_sel_menu_idx;
 } TSIN_ST;
 extern TSIN_ST tss;
 

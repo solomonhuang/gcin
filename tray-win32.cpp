@@ -10,6 +10,7 @@
 #include <process.h>
 #endif
 #include "gst.h"
+#include "pho-kbm-name.h"
 
 gboolean tsin_pho_mode();
 extern int tsin_half_full, gb_output;
@@ -104,7 +105,7 @@ static MITEM mitems_main[] = {
 #if USE_GCB
   {N_(_L("gcb(剪貼區暫存)")), NULL, cb_tog_gcb, &gcb_enabled},
 #endif
-  {N_(_L("重新執行gcin")), NULL, restart_gcin},
+  {N_(_L("重新執行gcin")), GTK_STOCK_QUIT, restart_gcin},
   {N_(_L("念出發音")), NULL, cb_tog_phospeak, &phonetic_speak},
   {N_(_L("小鍵盤")), NULL, kbm_toggle_, &win_kbm_on},
 #if UNIX
@@ -121,9 +122,27 @@ static void cb_set_output_buffer_bak_to_clipboard(GtkCheckMenuItem *checkmenuite
   set_output_buffer_bak_to_clipboard();
 }
 
+void load_setttings(), load_tab_pho_file();;
+void update_win_kbm();
+void update_win_kbm_inited();
+extern gboolean win_kbm_inited;
+static void cb_fast_phonetic_kbd_switch(GtkCheckMenuItem *checkmenuitem, gpointer dat)
+{
+  char bak[128], cur[128];
+  get_gcin_conf_fstr(PHONETIC_KEYBOARD, cur, "");
+  get_gcin_conf_fstr(PHONETIC_KEYBOARD_BAK, bak, "");
+
+  save_gcin_conf_str(PHONETIC_KEYBOARD, bak);
+  save_gcin_conf_str(PHONETIC_KEYBOARD_BAK, cur);
+  load_setttings();
+  load_tab_pho_file();
+  update_win_kbm_inited();
+}
+
 static MITEM mitems_state[] = {
-  {N_(_L("正->簡體")), NULL, cb_trad2sim},
-  {N_(_L("簡->正體")), NULL, cb_sim2trad},
+  {NULL, NULL, cb_fast_phonetic_kbd_switch},
+  {N_(_L("正→簡體")), NULL, cb_trad2sim},
+  {N_(_L("簡→正體")), NULL, cb_sim2trad},
   {N_(_L("简体输出")), NULL, cb_trad_sim_toggle_, &gb_output},
   {N_(_L("送字到剪貼區")), NULL, cb_set_output_buffer_bak_to_clipboard},
   {NULL}
@@ -132,7 +151,6 @@ static MITEM mitems_state[] = {
 
 static GtkWidget *tray_menu, *tray_menu_state;
 
-extern gboolean win_kbm_inited;
 
 void toggle_im_enabled();
 GtkWidget *create_tray_menu(MITEM *mitems)
@@ -140,8 +158,11 @@ GtkWidget *create_tray_menu(MITEM *mitems)
   GtkWidget *menu = gtk_menu_new ();
 
   int i;
-  for(i=0; mitems[i].name; i++) {
+  for(i=0; mitems[i].cb; i++) {
     GtkWidget *item;
+
+    if (!mitems[i].name)
+      continue;
 
     if (mitems[i].stock_id) {
       item = gtk_image_menu_item_new_with_label (_(mitems[i].name));
@@ -264,11 +285,45 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
       kbm_toggle();
       break;
     case 3:
+    {
+      char bak[128], cur[128];
+      get_gcin_conf_fstr(PHONETIC_KEYBOARD, cur, "");
+      get_gcin_conf_fstr(PHONETIC_KEYBOARD_BAK, bak, "");
+      if (bak[0] && strcmp(bak, cur)) {
+        char kbm[128];
+
+        strcpy(kbm, bak);
+        char *p=strchr(kbm, ' ');
+
+        if (p) {
+          *(p++)=0;
+          int i;
+          for(i=0;kbm_sel[i].name;i++)
+            if (!strcmp(kbm_sel[i].kbm, kbm)) {
+              break;
+            }
+
+          if (kbm_sel[i].kbm) {
+            static unich_t tt[32];
+#if UNIX
+            sprintf(tt, "注音換 %s %s", kbm_sel[i].name, p);
+#else
+            swprintf(tt, L"注音換 %s %S", kbm_sel[i].name, p);
+#endif
+            mitems_state[0].name = tt;
+          }
+        }
+
+        gtk_widget_destroy(tray_menu_state);
+        tray_menu_state = NULL;
+      }
+
       if (!tray_menu_state)
         tray_menu_state = create_tray_menu(mitems_state);
 
       gtk_menu_popup(GTK_MENU(tray_menu_state), NULL, NULL, NULL, NULL, button, activate_time);
       break;
+    }
   }
 }
 

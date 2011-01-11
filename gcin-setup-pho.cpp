@@ -1,24 +1,14 @@
 #include "gcin.h"
 #include "pho.h"
+#include "pho-kbm-name.h"
 
-
-static struct {
-  unich_t *name;
-  char *kbm;
-}  kbm_sel[]= {
- {N_(_L("標準 standard")), "zo"},
- {N_(_L("標準 standard 使用 asdf 選擇")), "zo-asdf"},
- {N_(_L("倚天 Eten")), "et"},
- {N_(_L("倚天 Eten 使用 asdf 選擇")), "et-asdf"},
- {N_(_L("倚天 26 鍵")), "et26"},
- {N_(_L("倚天 26 鍵,使用 asdf 選擇")), "et26-asdf"},
- {N_(_L("許氏(國音,自然)")), "hsu"},
- {N_(_L("聲調拼音")), "pinyin"},
- {N_(_L("聲調拼音, 使用 asdf 選擇")), "pinyin-asdf"},
- {N_(_L("Dvorak")), "dvorak"},
- {N_(_L("IBM")), "ibm"},
- {N_(_L("神通")), "mitac"},
- {NULL, NULL}
+struct {
+  char *kstr;
+  int RL;
+} selkeys[]={
+{"123456789",0}, {"asdfghjkl;",0}, {"asdfzxcv",0},
+{"fdsavcxz",1}, {"rewfdsvcx",1}, {"fdsvcxrew",1},
+{NULL}
 };
 
 static GtkWidget *check_button_tsin_phrase_pre_select,
@@ -29,11 +19,12 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_tsin_tone_char_input,
                  *check_button_tsin_tab_phrase_end,
                  *check_button_tsin_tail_select_key,
-		 *check_button_tsin_buffer_editing_mode,
+                 *check_button_tsin_buffer_editing_mode,
                  *check_button_gcin_capslock_lower,
-                 *spinner_tsin_buffer_size;
+                 *spinner_tsin_buffer_size,
+                 *spinner_pho_candicate_col_N;
 
-static GtkWidget *opt_kbm_opts, *opt_eng_ch_opts;
+static GtkWidget *opt_kbm_opts, *opt_selkeys, *opt_eng_ch_opts;
 
 
 static struct {
@@ -88,7 +79,30 @@ static gboolean cb_ok( GtkWidget *widget,
 #else
   int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_kbm_opts));
 #endif
-  save_gcin_conf_str(PHONETIC_KEYBOARD, kbm_sel[idx].kbm);
+
+#if GTK_CHECK_VERSION(2,4,0)
+  int idx_selkeys = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_selkeys));
+#else
+  int idx_selkeys = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_selkeys));
+#endif
+
+  pho_candicate_col_N = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_pho_candicate_col_N));
+
+  if (pho_candicate_col_N > strlen(selkeys[idx_selkeys].kstr))
+    pho_candicate_col_N = strlen(selkeys[idx_selkeys].kstr);
+
+  dbg("pho_candicate_col_N %d\n", pho_candicate_col_N);
+
+  char tt[128];
+  sprintf(tt, "%s %s %d %d", kbm_sel[idx].kbm, selkeys[idx_selkeys].kstr, pho_candicate_col_N, selkeys[idx_selkeys].RL);
+
+  char phokbm_name[128];
+  get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm_name, "");
+
+  if (strcmp(phokbm_name, tt)) {
+    save_gcin_conf_str(PHONETIC_KEYBOARD_BAK, phokbm_name);
+  }
+  save_gcin_conf_str(PHONETIC_KEYBOARD, tt);
 
 #if GTK_CHECK_VERSION(2,4,0)
   idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_eng_ch_opts));
@@ -146,7 +160,11 @@ static gboolean cb_ok( GtkWidget *widget,
   save_gcin_conf_str(TSIN_CURSOR_COLOR, cstr);
   g_free(cstr);
 
-  send_gcin_message(GDK_DISPLAY(), "reload kbm");
+  send_gcin_message(
+#if UNIX
+	  GDK_DISPLAY(),
+#endif
+	  "reload kbm");
 
   gtk_widget_destroy(gcin_kbm_window); gcin_kbm_window = NULL;
 
@@ -170,16 +188,13 @@ static void callback_button_clicked_tsin_space_opt( GtkWidget *widget, gpointer 
 
 static int get_current_kbm_idx()
 {
-  char kbm_str[32];
-  get_gcin_conf_fstr(PHONETIC_KEYBOARD, kbm_str, "zo-asdf");
-
   int i;
   for(i=0; kbm_sel[i].kbm; i++)
-    if (!strcmp(kbm_sel[i].kbm, kbm_str)) {
+    if (!strcmp(kbm_sel[i].kbm, pho_kbm_name)) {
       return i;
     }
 
-  p_err("phonetic-keyboard->%s is not valid", kbm_str);
+  p_err("phonetic-keyboard->%s is not valid", pho_kbm_name);
   return 0;
 }
 
@@ -325,7 +340,7 @@ static GtkWidget *create_kbm_opts()
 
   for(i=0; kbm_sel[i].name; i++) {
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_kbm_opts), _(kbm_sel[i].name));
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_kbm_opts), _(kbm_sel[i].name));
 #else
     GtkWidget *item = gtk_menu_item_new_with_label (_(kbm_sel[i].name));
 
@@ -339,6 +354,39 @@ static GtkWidget *create_kbm_opts()
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_kbm_opts), menu_kbm_opts);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt_kbm_opts), current_idx);
 #endif
+
+#if GTK_CHECK_VERSION(2,4,0)
+  opt_selkeys = gtk_combo_box_new_text ();
+#else
+  opt_selkeys = gtk_option_menu_new ();
+  GtkWidget *menu_selkey = gtk_menu_new ();
+#endif
+  gtk_box_pack_start (GTK_BOX (hbox), opt_selkeys, FALSE, FALSE, 0);
+
+  current_idx = 0;
+  for(i=0; selkeys[i].kstr; i++) {
+#if GTK_CHECK_VERSION(2,4,0)
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_selkeys), selkeys[i].kstr);
+#else
+    GtkWidget *item = gtk_menu_item_new_with_label (selkeys[i].kstr);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu_selkeys), item);
+#endif
+
+    if (!strcmp(selkeys[i].kstr, pho_selkey))
+      current_idx = i;
+  }
+
+#if GTK_CHECK_VERSION(2,4,0)
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_selkeys), current_idx);
+#else
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_selkeys), menu_kbm_opts);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_selkeys), current_idx);
+#endif
+
+  GtkAdjustment *adj =
+   (GtkAdjustment *) gtk_adjustment_new (pho_candicate_col_N, 1, 10, 1.0, 1.0, 0.0);
+  spinner_pho_candicate_col_N = gtk_spin_button_new (adj, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox), spinner_pho_candicate_col_N, FALSE, FALSE, 0);
 
   return hbox;
 }
@@ -363,7 +411,7 @@ static GtkWidget *create_eng_ch_opts()
 
   for(i=0; i < tsin_eng_ch_swN; i++) {
 #if GTK_CHECK_VERSION(2,4,0)
-    gtk_combo_box_append_text (GTK_COMBO_BOX (opt_eng_ch_opts), _(tsin_eng_ch_sw[i].name));
+    gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_eng_ch_opts), _(tsin_eng_ch_sw[i].name));
 #else
     GtkWidget *item = gtk_menu_item_new_with_label (_(tsin_eng_ch_sw[i].name));
 
@@ -396,6 +444,8 @@ void create_kbm_window()
   load_setttings();
 
   gcin_kbm_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_position(GTK_WINDOW(gcin_kbm_window), GTK_WIN_POS_MOUSE);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gcin_kbm_window), FALSE);
 
   g_signal_connect (G_OBJECT (gcin_kbm_window), "delete_event",
                     G_CALLBACK (close_kbm_window),
@@ -419,7 +469,7 @@ void create_kbm_window()
   gtk_box_pack_start (GTK_BOX (hbox_lr), vbox_r, TRUE, TRUE, 10);
 
 
-  GtkWidget *frame_kbm = gtk_frame_new(_(_L("鍵盤排列方式")));
+  GtkWidget *frame_kbm = gtk_frame_new(_(_L("鍵盤排列方式/選擇鍵/選單每列字數")));
   gtk_box_pack_start (GTK_BOX (vbox_l), frame_kbm, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_kbm), 1);
   gtk_container_add (GTK_CONTAINER (frame_kbm), create_kbm_opts());
@@ -549,7 +599,7 @@ void create_kbm_window()
 
   GtkWidget *hbox_tsin_buffer_editing_mode = gtk_hbox_new(FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_buffer_editing_mode , TRUE, TRUE, 1);
-  GtkWidget *label_tsin_buffer_editing_mode = gtk_label_new(_(_L("啟用詞音緩衝區編輯模式")));
+  GtkWidget *label_tsin_buffer_editing_mode = gtk_label_new(_(_L("\\鍵切換jkx鍵編輯模式")));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_buffer_editing_mode), label_tsin_buffer_editing_mode, TRUE, TRUE, 0);
   check_button_tsin_buffer_editing_mode = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_tsin_buffer_editing_mode), check_button_tsin_buffer_editing_mode, FALSE, FALSE, 0);

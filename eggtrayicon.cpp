@@ -377,6 +377,7 @@ egg_tray_icon_manager_window_destroyed (EggTrayIcon *icon)
   egg_tray_icon_update_manager_window (icon, TRUE);
 }
 
+#if !GTK_CHECK_VERSION(2,91,0)
 static gboolean
 transparent_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer user_data)
 {
@@ -391,6 +392,7 @@ make_transparent_again (GtkWidget *widget, GtkStyle *previous_style,
 {
 	gdk_window_set_back_pixmap(gtk_widget_get_window(widget), NULL, TRUE);
 }
+#endif
 
 static void
 make_transparent (GtkWidget *widget, gpointer user_data)
@@ -404,11 +406,13 @@ make_transparent (GtkWidget *widget, gpointer user_data)
 
 	gtk_widget_set_app_paintable (widget, TRUE);
 	gtk_widget_set_double_buffered (widget, FALSE);
+#if !GTK_CHECK_VERSION(2,91,0)
 	gdk_window_set_back_pixmap (gtk_widget_get_window(widget), NULL, TRUE);
 	g_signal_connect (widget, "expose_event",
 	                 G_CALLBACK (transparent_expose_event), NULL);
 	g_signal_connect_after (widget, "style_set",
 	                       G_CALLBACK (make_transparent_again), NULL);
+#endif
 }
 
 static void

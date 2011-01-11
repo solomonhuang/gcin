@@ -15,6 +15,7 @@ extern GtkStatusIcon *icon_main;
 static void create_win_message(char *icon, char *text, int duration)
 {
   GtkWidget *gwin_message = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_message), FALSE);
   gtk_container_set_border_width (GTK_CONTAINER (gwin_message), 0);
   gtk_widget_realize (gwin_message);
   GdkWindow *gdkwin = gtk_widget_get_window(gwin_message);
@@ -26,9 +27,34 @@ static void create_win_message(char *icon, char *text, int duration)
   if (icon[0] != '-') {
     GtkWidget *image = gtk_image_new_from_file(icon);
     if (text[0] == '-') {
+#if GTK_CHECK_VERSION(2,91,0)
+      GdkPixbuf *pixbuf = NULL;
+      GdkPixbufAnimation *anime = NULL;
+      switch(gtk_image_get_storage_type(GTK_IMAGE(image))) {
+        case GTK_IMAGE_PIXBUF:
+          pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(image));
+          break;
+        case GTK_IMAGE_ANIMATION:
+          anime = gtk_image_get_animation(GTK_IMAGE(image));
+          pixbuf = gdk_pixbuf_animation_get_static_image(anime);
+          break;
+        default:
+          break;
+      }
+      cairo_surface_t *img = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf));
+      cairo_t *cr = cairo_create(img);
+      gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+      cairo_paint(cr);
+      cairo_region_t *mask = gdk_cairo_region_create_from_surface(img);
+      gtk_widget_shape_combine_region(gwin_message, mask);
+      cairo_region_destroy(mask);
+      cairo_destroy(cr);
+      cairo_surface_destroy(img);
+#else
       GdkBitmap *bitmap = NULL;
       gdk_pixbuf_render_pixmap_and_mask(gdk_pixbuf_new_from_file(icon, NULL), NULL, &bitmap, 128);
       gtk_widget_shape_combine_mask(gwin_message, bitmap, 0, 0);
+#endif
     }
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
   }
@@ -44,6 +70,7 @@ static void create_win_message(char *icon, char *text, int duration)
   get_win_size(gwin_message, &width, &height);
 
   int ox=-1, oy, szx, szy;
+#if !GTK_CHECK_VERSION(2,91,0)
   if (tray_da_win) {
     gdk_window_get_origin  (tray_da_win, &ox, &oy);
     gdk_drawable_get_size(tray_da_win, &szx, &szy);
@@ -63,6 +90,7 @@ static void create_win_message(char *icon, char *text, int duration)
     if (ox < 0)
       ox = 0;
   } else
+#endif
   if (icon_main) {
     GdkRectangle rect;
     GtkOrientation ori;

@@ -43,7 +43,7 @@ gboolean win_size_exceed(GtkWidget *win)
 
 void disp_pho_sel(char *s)
 {
-  gtk_label_set_text(GTK_LABEL(label_pho_sele), s);
+  gtk_label_set_markup(GTK_LABEL(label_pho_sele), s);
 
   if (win_size_exceed(gwin_pho)) {
     move_win_pho(current_in_win_x, current_in_win_y);
@@ -96,6 +96,7 @@ void create_win_pho()
     return;
 
   gwin_pho = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_pho), FALSE);
 #if WIN32
   set_no_focus(gwin_pho);
 #endif
@@ -172,11 +173,7 @@ void create_win_pho_gui_simple()
   hbox_row2 = gtk_hbox_new (FALSE, 0);
   /* This packs the button into the gwin_pho (a gtk container). */
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
-#if UNIX
-  label_full = gtk_label_new("全");
-#else
-  label_full = gtk_label_new("Fu");
-#endif
+  label_full = gtk_label_new(_(_L("全")));
   gtk_container_add (GTK_CONTAINER (hbox_row2), label_full);
 
 

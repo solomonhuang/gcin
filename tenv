@@ -12,6 +12,7 @@ export LC_CTYPE=zh_TW.UTF-8
 export XMODIFIERS=@im=gcin_test
 #export GCIN_OUTPUT_FILTER=./gcin_filter
 export GCIN_ERR_COREDUMP
+#export GCIN_PHO_KBM="pinyin-asdf asdfghjkl;"
 ./gcin.test &
 gcinpid=$!
 sleep 1
@@ -20,7 +21,7 @@ export LD_LIBRARY_PATH="./im-client"
 export GTK_IM_MODULE=gcin
 #export GTK_IM_MODULE=xim
 #sleep 5; gcin-message -text 'abcde' -duration 5000;
-#gedit a.txt
+#gedit a.txt &
 leafpad
 #pcmanx
 #firefox

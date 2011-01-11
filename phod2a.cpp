@@ -15,7 +15,7 @@ int main(int argc, char **argv)
   load_setttings();
 
   if (argc > 1) {
-    p_err("Currently only support ~/.gcin/pho.tab");
+    p_err("Currently only support ~/.gcin/pho.tab2");
   }
 
   pho_load();
@@ -28,13 +28,8 @@ int main(int argc, char **argv)
     int j;
     for(j=frm; j < to; j++) {
       prph(key);
-
-      int len = utf8_sz(ch_pho[j].ch);
-      int k;
-      dbg(" ");
-      for(k=0; k < len; k++)
-        dbg("%c", ch_pho[j].ch[k]);
-      dbg(" %d\n", ch_pho[j].count);
+      char *str = pho_idx_str(j);
+      dbg(" %s %d\n", str, ch_pho[j].count);
     }
   }
 

@@ -1,10 +1,12 @@
 #include "gcin.h"
 #include "pho.h"
 #include "config.h"
-#if UNIX
+#if GCIN_i18n_message
 #include <libintl.h>
 #endif
 #include "gst.h"
+#include "tsin.h"
+
 
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
@@ -12,6 +14,7 @@ PIN_JUYIN *pin_juyin;
 int pin_juyinN;
 PHOKBM phkbm;
 PHO_ST poo;
+TSIN_ST tss;
 int text_pho_N;
 
 gboolean b_pinyin;
@@ -139,18 +142,16 @@ void init_TableDir();
 
 int main(int argc, char **argv)
 {
-
-#if GCIN_i18n_message
-  gtk_set_locale();
-  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-  textdomain(GETTEXT_PACKAGE);
-#endif
-
 #if WIN32
   init_TableDir();
 #endif
 
   gtk_init (&argc, &argv);
+
+#if GCIN_i18n_message
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain(GETTEXT_PACKAGE);
+#endif
 
   char kbm_str[32];
   get_gcin_conf_fstr(PHONETIC_KEYBOARD, kbm_str, "zo-asdf");
@@ -166,6 +167,7 @@ int main(int argc, char **argv)
   pho_load();
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(mainwin), FALSE);
   gtk_window_set_default_size(GTK_WINDOW (mainwin), 640, 220);
   set_window_gcin_icon(mainwin);
 

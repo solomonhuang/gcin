@@ -10,9 +10,11 @@
 #include "tsin.h"
 #include "gtab.h"
 
+static char *bf;
+static int bfN_a = 0;
+
 int *phidx, *sidx, phcount;
 int bfsize, phidxsize;
-char *bf;
 u_char *sf;
 gboolean is_gtab, gtabkey64;
 int phsz, hash_shift;
@@ -66,19 +68,21 @@ int key_cmp64(char *a, char *b, char len)
 
 static int qcmp(const void *a, const void *b)
 {
-  int idxa=*((int *)a);
-  int idxb=*((int *)b);
+  int idxa=*((int *)a);  char *pa = (char *)&bf[idxa];
+  int idxb=*((int *)b);  char *pb = (char *)&bf[idxb];
   u_char lena,lenb, len;
-  int cha, chb;
   int i;
+  usecount_t usecounta, usecountb;
 
-  lena=bf[idxa]; idxa+=1 + sizeof(usecount_t);
-  lenb=bf[idxb]; idxb+=1 + sizeof(usecount_t);
-  cha=idxa + lena * phsz;
-  chb=idxb + lenb * phsz;
+  lena=*(pa++); memcpy(&usecounta, pa, sizeof(usecount_t)); pa+= sizeof(usecount_t);
+  char *ka = pa;
+  pa += lena * phsz;
+  lenb=*(pb++); memcpy(&usecountb, pb, sizeof(usecount_t)); pb+= sizeof(usecount_t);
+  char *kb = pb;
+  pb += lenb * phsz;
   len=Min(lena,lenb);
 
-  int d = (*key_cmp)(&bf[idxa], &bf[idxb], len);
+  int d = (*key_cmp)(ka, kb, len);
   if (d)
     return d;
 
@@ -87,17 +91,55 @@ static int qcmp(const void *a, const void *b)
   if (lena < lenb)
     return -1;
 
-  int tlena = utf8_tlen(&bf[cha], lena);
-  int tlenb = utf8_tlen(&bf[chb], lenb);
+  int tlena = utf8_tlen(pa, lena);
+  int tlenb = utf8_tlen(pb, lenb);
 
   if (tlena > tlenb)
     return 1;
   if (tlena < tlenb)
     return -1;
 
-  return memcmp(&bf[cha], &bf[chb], tlena);
+  if ((d=memcmp(pa, pb, tlena)))
+    return d;
+
+  // large first, so large one will be kept after delete
+  return usecountb - usecounta;
 }
 
+static int qcmp_eq(const void *a, const void *b)
+{
+  int idxa=*((int *)a);  char *pa = (char *)&bf[idxa];
+  int idxb=*((int *)b);  char *pb = (char *)&bf[idxb];
+  u_char lena,lenb, len;
+  int i;
+
+  lena=*(pa++);  pa+= sizeof(usecount_t);
+  char *ka = pa;
+  pa += lena * phsz;
+  lenb=*(pb++);  pb+= sizeof(usecount_t);
+  char *kb = pb;
+  pb += lenb * phsz;
+  len=Min(lena,lenb);
+
+  int d = (*key_cmp)(ka, kb, len);
+  if (d)
+    return d;
+
+  if (lena > lenb)
+    return 1;
+  if (lena < lenb)
+    return -1;
+
+  int tlena = utf8_tlen(pa, lena);
+  int tlenb = utf8_tlen(pb, lenb);
+
+  if (tlena > tlenb)
+    return 1;
+  if (tlena < tlenb)
+    return -1;
+
+  return memcmp(pa, pb, tlena);
+}
 
 static int qcmp_usecount(const void *a, const void *b)
 {
@@ -105,7 +147,6 @@ static int qcmp_usecount(const void *a, const void *b)
   int idxb=*((int *)b);  char *pb = (char *)&sf[idxb];
   u_char lena,lenb, len;
   int i;
-  u_short ka,kb;
   usecount_t usecounta, usecountb;
 
   lena=*(pa++); memcpy(&usecounta, pa, sizeof(usecount_t)); pa+= sizeof(usecount_t);
@@ -136,7 +177,7 @@ static int qcmp_usecount(const void *a, const void *b)
 }
 
 void send_gcin_message(Display *dpy, char *s);
-#if WIN32
+#if WIN32 && 1
  #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
@@ -155,6 +196,8 @@ int main(int argc, char **argv)
   u_char clen;
   int lineCnt=0;
   gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
+
+  dbg("enter %s\n", argv[0]);
 
   if (argc < 2)
     p_err("must specify input file");
@@ -203,11 +246,7 @@ int main(int argc, char **argv)
     fseek(fp, fofs, SEEK_SET);
   }
 
-  bfsize=10000000;
-  if (!(bf=(char *)malloc(bfsize))) {
-    puts("malloc err");
-    exit(1);
-  }
+
 
   INMD inmd, *cur_inmd = &inmd;
 
@@ -307,10 +346,7 @@ int main(int argc, char **argv)
     }
 
     if (phbufN!=charN) {
-      fprintf(stderr, "%s\n", s);
-      fprintf(stderr, "Line %d problem in phbufN!=chbufN %d != %d\n",
-        lineCnt, phbufN, chbufN);
-      exit(-1);
+      p_err("%s   Line %d problem in phbufN!=chbufN %d != %d\n", s, lineCnt, phbufN, chbufN);
     }
 
     clen=phbufN;
@@ -324,10 +360,23 @@ int main(int argc, char **argv)
       usecount = atoi((char *)&s[i]);
 
     /*      printf("len:%d\n", clen); */
-    phidx = trealloc(phidx, int, phcount);
+
+    if (phcount >= phidxsize) {
+      phidxsize+=1024;
+      if (!(phidx=(int *)realloc(phidx,phidxsize*4))) {
+        puts("realloc err");
+        exit(1);
+      }
+    }
+
     phidx[phcount++]=ofs;
 
-    bf = (char *)realloc(bf, ofs + 1 + sizeof(usecount_t)+ (CH_SZ+phsz) * clen);
+    int new_bfN = ofs + 1 + sizeof(usecount_t)+ phsz * clen + chbufN;
+
+    if (bfsize < new_bfN) {
+      bfsize = new_bfN + 1024*1024;
+      bf = (char *)realloc(bf, bfsize);
+    }
 
     memcpy(&bf[ofs++],&clen,1);
     memcpy(&bf[ofs],&usecount, sizeof(usecount_t)); ofs+=sizeof(usecount_t);
@@ -337,34 +386,21 @@ int main(int argc, char **argv)
 
     memcpy(&bf[ofs], chbuf, chbufN);
     ofs+=chbufN;
-    if (ofs+100 >= bfsize) {
-      bfsize+=65536;
-      if (!(bf=(char *)realloc(bf,bfsize))) {
-        puts("realloc err");
-        exit(1);
-      }
-    }
-    if (phcount+100 >= phidxsize) {
-      phidxsize+=1000;
-      if (!(phidx=(int *)realloc(phidx,phidxsize*4))) {
-        puts("realloc err");
-        exit(1);
-      }
-    }
   }
   fclose(fp);
 
   /* dumpbf(bf,phidx); */
 
   puts("Sorting ....");
-  qsort(phidx,phcount,4,qcmp);
+
+  qsort(phidx,phcount, sizeof(phidx[0]),qcmp);
 
   if (!(sf=(u_char *)malloc(bfsize))) {
     puts("malloc err");
     exit(1);
   }
 
-  if (!(sidx=(int *)malloc(phidxsize*4))) {
+  if (!(sidx=(int *)malloc(phidxsize*sizeof(int)))) {
     puts("malloc err");
     exit(1);
   }
@@ -380,7 +416,7 @@ int main(int argc, char **argv)
     int tlen = utf8_tlen(&bf[idx + 1 + sizeof(usecount_t) + phsz*len], len);
     clen= phsz*len + tlen + 1 + sizeof(usecount_t);
 
-    if (i && !qcmp(&phidx[i-1], &phidx[i]))
+    if (i && !qcmp_eq(&phidx[i-1], &phidx[i]))
       continue;
 
     memcpy(&sf[ofs], &bf[idx], clen);
@@ -398,7 +434,6 @@ int main(int argc, char **argv)
     hashidx[i]=-1;
 
   for(i=0;i<phcount;i++) {
-
     idx=sidx[i];
     idx+= 1 + sizeof(usecount_t);
     int v;
@@ -458,7 +493,7 @@ int main(int argc, char **argv)
   fwrite(sf,1,ofs,fw);
   fclose(fw);
 
-  char outfileidx[128];
+  char outfileidx[512];
   strcat(strcpy(outfileidx, outfile), ".idx");
 
   dbg("Writing data %s\n", outfileidx);
@@ -476,7 +511,11 @@ int main(int argc, char **argv)
   if (reload) {
     printf("reload....\n");
     gtk_init(&argc, &argv);
-    send_gcin_message(GDK_DISPLAY(), RELOAD_TSIN_DB);
+    send_gcin_message(
+#if UNIX
+		GDK_DISPLAY(),
+#endif
+		RELOAD_TSIN_DB);
   }
 
   exit(0);

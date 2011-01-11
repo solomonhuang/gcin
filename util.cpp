@@ -1,20 +1,22 @@
 #include "gcin.h"
 
 #if UNIX
-#if !defined CLIENT_LIB || defined DEBUG
+#if !CLIENT_LIB || DEBUG
 static FILE *out_fp;
 #endif
 
 void p_err(char *fmt,...)
 {
   va_list args;
+  FILE *out = stdout;
 
   va_start(args, fmt);
-  fprintf(stderr,"gcin:");
-  vfprintf(stderr, fmt, args);
+  fprintf(out,"gcin:");
+  vfprintf(out, fmt, args);
   va_end(args);
-  fprintf(stderr,"\n");
-#if DEBUG
+  fprintf(out,"\n");
+  fflush(out);
+#if DEBUG && 0
   abort();
 #else
   if (getenv("GCIN_ERR_COREDUMP"))
@@ -24,7 +26,7 @@ void p_err(char *fmt,...)
 #endif
 }
 
-#if !defined CLIENT_LIB || defined DEBUG
+#if !CLIENT_LIB || DEBUG
 static void init_out_fp()
 {
   if (!out_fp) {
@@ -80,6 +82,7 @@ void __gcin_dbg_(char *fmt,...)
 
 #if _DEBUG
 #define _DBG 1
+#define CONSOLE_OFF 0
 #endif
 
 

@@ -185,12 +185,10 @@ void add_to_tsin_buf_str(char *str);
 
 extern int c_len;
 extern short gbufN;
-static void cb_button_sym(GtkButton *button, char *str)
+static void cb_button_sym(GtkButton *button, GtkWidget *label)
 {
-  phokey_t pho[256];
-  bzero(pho, sizeof(pho));
-
 //  dbg("cb_button_sym\n");
+  char *str = (char *) gtk_label_get_text(GTK_LABEL(label));
 
 #if USE_TSIN
   if (current_method_type() == method_type_TSIN && current_CS->im_state == GCIN_STATE_CHINESE) {
@@ -198,9 +196,9 @@ static void cb_button_sym(GtkButton *button, char *str)
     if (tsin_cursor_end()) {
       flush_tsin_buffer();
       output_buffer_call_back();
-	} else {
+    } else {
       force_preedit_shift();
-	}
+    }
   }
   else
 #endif
@@ -341,6 +339,36 @@ static void destory_win()
   gwin_sym = NULL;
 }
 
+static void disp_win_sym()
+{
+  syms = pages[idx].syms;
+  symsN = pages[idx].symsN;
+  destory_win();
+//  win_sym_enabled = 0;
+  create_win_sym();
+}
+
+gboolean win_sym_page_up()
+{
+  if (!win_sym_enabled)
+	  return FALSE;
+  idx--;
+  if (idx < 0)
+  idx = pagesN - 1;
+  disp_win_sym();
+  return TRUE;
+}
+
+gboolean win_sym_page_down()
+{
+//  dbg("win_sym_page_down\n");
+  if (!win_sym_enabled)
+    return FALSE;
+  idx = (idx+1) % pagesN;
+  disp_win_sym();
+  return TRUE;
+}
+
 
 static gboolean button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
 {
@@ -349,24 +377,19 @@ static gboolean button_scroll_event(GtkWidget *widget,GdkEventScroll *event, gpo
 
   switch (event->direction) {
     case GDK_SCROLL_UP:
-      idx--;
-      if (idx < 0)
-        idx = pagesN - 1;
+	  win_sym_page_up();
       break;
     case GDK_SCROLL_DOWN:
-      idx = (idx+1) % pagesN;
+	  win_sym_page_down();
       break;
     default:
       break;
   }
 
-  syms = pages[idx].syms;
-  symsN = pages[idx].symsN;
-  destory_win();
-//  win_sym_enabled = 0;
-  create_win_sym();
   return TRUE;
 }
+
+
 
 static void mouse_button_callback_up_down( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
@@ -407,6 +430,7 @@ void create_win_sym()
   }
 
   gwin_sym = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_sym), FALSE);
 #if WIN32
   set_no_focus(gwin_sym);
 #endif
@@ -461,7 +485,7 @@ void create_win_sym()
         }
       }
 
-      g_signal_connect (G_OBJECT (button), "clicked",  G_CALLBACK (cb_button_sym), str);
+      g_signal_connect (G_OBJECT (button), "clicked",  G_CALLBACK (cb_button_sym), label);
     }
   }
 

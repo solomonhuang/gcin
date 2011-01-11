@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gtkintl.h"
+//#include "gtkintl.h"
 #include "gtk/gtklabel.h"
 #include "gtk/gtksignal.h"
 #include "gtk/gtkwindow.h"

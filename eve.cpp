@@ -272,7 +272,7 @@ void export_text_xim()
   Xutf8TextListToTextProperty(dpy, &text, 1, XCompoundTextStyle, &tp);
 #endif
 
-#if DEBUG
+#if DEBUG && 0
   dbg("sendkey_b5: %s\n", text);
 #endif
 
@@ -653,7 +653,7 @@ void init_state_chinese(ClientState *cs)
     init_in_method(default_input_method);
 #else
   if (!last_input_method)
-	last_input_method = default_input_method;
+    last_input_method = default_input_method;
   init_in_method(last_input_method);
 #endif
 }
@@ -841,6 +841,12 @@ int init_win_anthy();
 void show_win_kbm();
 void set_gtab_input_method_name(char *s);
 
+void update_win_kbm_inited()
+{
+  if (win_kbm_inited)
+    update_win_kbm();
+}
+
 gboolean init_in_method(int in_no)
 {
   gboolean init_im = !(cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM));
@@ -922,9 +928,7 @@ gboolean init_in_method(int in_no)
 #endif
 
   update_in_win_pos();
-
-  if (win_kbm_inited)
-    update_win_kbm();
+  update_win_kbm_inited();
 
   return TRUE;
 }
@@ -1041,7 +1045,11 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       }
 
       toggle_im_enabled();
+#if UNIX
       return TRUE;
+#else
+      return FALSE;
+#endif
     }
   }
 
@@ -1075,7 +1083,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     }
 
     if (keysym == ',') {
-
+#if 1
       if (current_CS->im_state == GCIN_STATE_CHINESE) {
         if (!win_is_visible())
           win_sym_enabled=1;
@@ -1083,6 +1091,9 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
           win_sym_enabled^=1;
       } else
         win_sym_enabled=0;
+#else
+      win_sym_enabled^=1;
+#endif
 
       create_win_sym();
       if (win_sym_enabled) {
@@ -1260,7 +1271,6 @@ int gcin_FocusIn(ClientState *cs)
   Window win = cs->client_win;
 
   gcin_reset();
-//  dbg("gcin_FocusIn\n");
 #if UNIX
   if (skip_window(win))
     return FALSE;
@@ -1292,6 +1302,7 @@ int gcin_FocusIn(ClientState *cs)
       hide_in_win(cs);
   }
 
+  update_win_kbm();
 #if TRAY_ENABLED
   disp_tray_icon();
 #endif
@@ -1319,7 +1330,7 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
       load_IC(ic);
     }
 
-#if DEBUG
+#if DEBUG && 0
     dbg("xim_gcin_FocusIn %d\n", call_data->icid);
 #endif
     return True;
@@ -1334,6 +1345,9 @@ static gint64 last_focus_out_time;
 int gcin_FocusOut(ClientState *cs)
 {
   gint64 t = current_time();
+
+  if (cs != current_CS)
+     return FALSE;
 
 #if UNIX
 //  dbg("gcin_FocusOut\n");

@@ -32,13 +32,17 @@ int qcmp_key(const void *aa, const void *bb)
 }
 
 
+
 void send_gcin_message(Display *dpy, char *s);
 
 int main(int argc, char **argv)
 {
-  char *fname = "pho.tab.src";
+  char *fname = "pho.tab2.src";
   FILE *fp;
   char s[64];
+  int phrase_area_N=0;
+  char *phrase_area = NULL;
+
   gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
   if (argc > 1)
@@ -50,7 +54,7 @@ int main(int argc, char **argv)
 
   while (!feof(fp)) {
     s[0]=0;
-    fgets(s,sizeof(s),fp);
+    myfgets(s,sizeof(s),fp);
     int len=strlen(s);
 
     if (s[len-1]=='\n')
@@ -75,9 +79,27 @@ int main(int argc, char **argv)
 
     p++;
 
-    int u8len = u8cpy((char *)items[itemsN].ch, p);
+    char *str = p;
+    while (*p && *p != ' ' && *p!=9)
+      p++;
 
-    p+= u8len + 1; // skip ch & space
+    *p = 0;
+    p++;
+
+    int slen = strlen(str);
+    if (slen==utf8_sz(str)) {
+      u8cpy((char *)items[itemsN].ch, str);
+    } else {
+      dbg("str %s\n", str);
+      int newN = phrase_area_N + slen + 1;
+      phrase_area = trealloc(phrase_area, char, newN);
+      strcpy(phrase_area + phrase_area_N, str);
+      items[itemsN].ch[0] = PHO_PHRASE_ESCAPE;
+      items[itemsN].ch[1] = phrase_area_N & 0xff;
+      items[itemsN].ch[2] = (phrase_area_N>>8) & 0xff;
+      items[itemsN].ch[3] = (phrase_area_N>>16) & 0xff;
+      phrase_area_N = newN;
+    }
 
     items[itemsN].count = atoi(p);
     items[itemsN].oseq = itemsN;
@@ -114,10 +136,11 @@ int main(int argc, char **argv)
     i = j;
   }
 
-  char *tp = strstr(fname, ".src");
+  char *tp = strstr(fname, ".tab2.src");
   if (!tp)
-    p_err("file name should be *.tab.src");
+    p_err("file name should be *.tab2.src");
 
+  tp = strstr(fname, ".src");
   *tp=0;
 
   char *fname_out = fname;
@@ -128,16 +151,24 @@ int main(int argc, char **argv)
   fwrite("PH",1,2,fp);
 //  dbg("pho_itemsN:%d  pho_idxN:%d\n", pho_itemsN, pho_idxN);
   fwrite(&pho_idxN, sizeof(u_short), 1, fp);
+  fwrite(&pho_itemsN, sizeof(pho_itemsN), 1, fp);
+  fwrite(&phrase_area_N, sizeof(phrase_area_N), 1, fp);
 #if 0
   fclose(fp); exit(0);
 #endif
   fwrite(pho_idx, sizeof(PHO_IDX), pho_idxN, fp);
   fwrite(pho_items, sizeof(PHO_ITEM), pho_itemsN, fp);
 
+  fwrite(phrase_area, 1, phrase_area_N, fp);
+
   fclose(fp);
 
   if (reload)
-    send_gcin_message(GDK_DISPLAY(), "reload");
+    send_gcin_message(
+#if UNIX
+	GDK_DISPLAY(),
+#endif
+	"reload");
 
   return 0;
 }

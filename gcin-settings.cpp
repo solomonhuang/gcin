@@ -58,6 +58,8 @@ int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y;
 #endif
 int gcin_bell_volume;
 int gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch;
+char *pho_kbm_name, *pho_selkey;
+int pho_candicate_col_N, pho_candicate_R2L;
 
 
 int get_gcin_conf_int(char *name, int default_value);
@@ -103,8 +105,12 @@ void load_setttings()
   gcin_win_sym_click_close = get_gcin_conf_int(GCIN_WIN_SYM_CLICK_CLOSE, 1);
 #if WIN32
   gcin_win32_icon = 1;
-#else
-  gcin_win32_icon = get_gcin_conf_int(GCIN_WIN32_ICON, 0);
+#endif
+#if UNIX && GTK_CHECK_VERSION(2,91,0)
+  gcin_win32_icon = get_gcin_conf_int(GCIN_STATUS_TRAY, 1);
+#endif
+#if UNIX && !GTK_CHECK_VERSION(2,91,0)
+  gcin_win32_icon = get_gcin_conf_int(GCIN_WIN32_ICON, 1);
 #endif
 
   gtab_dup_select_bell = get_gcin_conf_int(GTAB_DUP_SELECT_BELL, 0);
@@ -134,7 +140,7 @@ void load_setttings()
   tsin_buffer_size = get_gcin_conf_int(TSIN_BUFFER_SIZE, 40);
   tsin_tab_phrase_end = get_gcin_conf_int(TSIN_TAB_PHRASE_END, 1);
   tsin_tail_select_key = get_gcin_conf_int(TSIN_TAIL_SELECT_KEY, 0);
-  tsin_buffer_editing_mode = get_gcin_conf_int(TSIN_BUFFER_EDITING_MODE, 0);
+  tsin_buffer_editing_mode = get_gcin_conf_int(TSIN_BUFFER_EDITING_MODE, 1);
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);
@@ -174,4 +180,37 @@ void load_setttings()
   gcin_on_the_spot_key = get_gcin_conf_int(GCIN_ON_THE_SPOT_KEY, 0);
   if (gcin_on_the_spot_key)
     gcin_edit_display = GCIN_EDIT_DISPLAY_ON_THE_SPOT;
+
+
+  char phokbm[MAX_GCIN_STR];
+#define ASDF "asdfghjkl;"
+
+#if DEBUG
+  char *gcin_pho_kbm = getenv("GCIN_PHO_KBM");
+  if (gcin_pho_kbm)
+    strcpy(phokbm, gcin_pho_kbm);
+  else
+#endif
+    get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm, "zo "ASDF" 1 1");
+
+  char phokbm_name[32], selkey[32];
+  pho_candicate_col_N=0; pho_candicate_R2L=0;
+  sscanf(phokbm, "%s %s %d %d",phokbm_name, selkey, &pho_candicate_col_N, &pho_candicate_R2L);
+
+  if (pho_candicate_col_N <= 0)
+    pho_candicate_col_N = 1;
+  if (pho_candicate_col_N > strlen(selkey))
+    pho_candicate_col_N =strlen(selkey);
+
+  if (pho_candicate_R2L<0 || pho_candicate_R2L>1)
+    pho_candicate_R2L = 0;
+
+  if (pho_selkey)
+    free(pho_selkey);
+
+  pho_selkey = strdup(selkey);
+
+  if (pho_kbm_name)
+    free(pho_kbm_name);
+  pho_kbm_name = strdup(phokbm_name);
 }

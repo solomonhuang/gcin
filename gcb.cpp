@@ -76,6 +76,7 @@ void set_win_title(const gchar *text)
 {
 
    char titlestr[34];
+   bzero(titlestr, sizeof(titlestr));
    strncpy(titlestr, text, sizeof(titlestr)-1);
    titlestr[sizeof(titlestr)-1]=0;
 
@@ -400,6 +401,7 @@ void gcb_main()
   }
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(mainwin), FALSE);
   gtk_window_set_decorated(GTK_WINDOW(mainwin),FALSE);
   gtk_window_set_focus_on_map (GTK_WINDOW(mainwin), FALSE);
 
@@ -410,6 +412,7 @@ void gcb_main()
 #endif
 
   hist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(hist_window), FALSE);
 
   char icon_path[40];
   sys_icon_fname("gcb.png", icon_path);

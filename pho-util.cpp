@@ -10,13 +10,14 @@
 char phofname[128]="";
 extern char *TableDir;
 u_short idxnum_pho;
-// PHO_IDX idx_pho[1403];
 PHO_IDX *idx_pho;
 int ch_pho_ofs;
 PHO_ITEM *ch_pho;
 int ch_phoN;
-static char pho_normal_tab[]="pho.tab";
-static char pho_huge_tab[]="pho-huge.tab";
+char *pho_phrase_area;
+int pho_phrase_area_sz;
+static char pho_normal_tab[]="pho.tab2";
+static char pho_huge_tab[]="pho-huge.tab2";
 void update_table_file(char *name, int version);
 
 void pho_load()
@@ -54,10 +55,8 @@ void pho_load()
 
   fread(&idxnum_pho,sizeof(u_short),1,fr);
   fread(&idxnum_pho,sizeof(u_short),1,fr);
-
-  // bad design, should store ch_phoN
-  struct stat st;
-  fstat(fileno(fr), &st);
+  fread(&ch_phoN,sizeof(int),1,fr);
+  fread(&pho_phrase_area_sz, sizeof(pho_phrase_area_sz), 1,fr);
 
   if (idx_pho)
     free(idx_pho);
@@ -69,14 +68,27 @@ void pho_load()
   if (ch_pho)
     free(ch_pho);
 
-  int count = (st.st_size - ch_pho_ofs) / sizeof(PHO_ITEM);
-
-  if (!(ch_pho=tmalloc(PHO_ITEM, count))) {
+  if (!(ch_pho=tmalloc(PHO_ITEM, ch_phoN)))
     p_err("malloc error");
+
+  fread(ch_pho,sizeof(PHO_ITEM), ch_phoN, fr);
+//  dbg("ch_phoN:%d  %d\n", ch_phoN, idxnum_pho);
+  if (pho_phrase_area) {
+    free(pho_phrase_area);
+    pho_phrase_area = NULL;
+  }
+  if (pho_phrase_area_sz) {
+    pho_phrase_area = tmalloc(char, pho_phrase_area_sz);
+    fread(pho_phrase_area, 1,pho_phrase_area_sz, fr);
+#if 0
+    dbg("pho_phrase loaded %d\n", pho_phrase_area_sz);
+    int i;
+    for(i=0; i <pho_phrase_area_sz; i+=strlen(pho_phrase_area+i)+1) {
+      dbg("  %s\n", pho_phrase_area+i);
+    }
+#endif
   }
 
-  ch_phoN=fread(ch_pho,sizeof(PHO_ITEM), count, fr);
-//  dbg("ch_phoN:%d  %d\n", ch_phoN, idxnum_pho);
   fclose(fr);
 
   idx_pho[idxnum_pho].key=0xffff;
@@ -93,6 +105,32 @@ void pho_load()
 #endif
 }
 
+
+char *pho_idx_str2(int idx, int *is_phrase)
+{
+  static char tt[CH_SZ+1];
+
+  unsigned char *p = (u_char *)ch_pho[idx].ch;
+
+  if (*p==PHO_PHRASE_ESCAPE) {
+    p++;
+    int ofs = (*p) | *(p+1)<<8 | *(p+2)<<16;
+
+//    dbg("idx:%d ofs:%d %s\n", idx, ofs, pho_phrase_area+ofs);
+    *is_phrase = TRUE;
+    return pho_phrase_area+ofs;
+  } else {
+    *is_phrase = FALSE;
+    utf8cpy(tt, (char *)p);
+    return tt;
+  }
+}
+
+char *pho_idx_str(int idx)
+{
+  int is_phrase;
+  return pho_idx_str2(idx, &is_phrase);
+}
 
 void free_pho_mem()
 {
@@ -123,7 +161,7 @@ int utf8_pho_keys(char *utf8, phokey_t *phkeys)
 
   do {
     for(; ofs < ch_phoN; ofs++)
-      if (utf8_eq(utf8, ch_pho[ofs].ch))
+      if (utf8_eq(utf8, pho_idx_str(ofs)))
         break;
 
     if (ofs==ch_phoN)

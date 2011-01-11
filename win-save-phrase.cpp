@@ -130,6 +130,7 @@ void create_win_save_phrase(WSP_S *wsp, int wspN)
   SAVE_SESS *sess = tzmalloc(SAVE_SESS, 1);
 
   GtkWidget *main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), FALSE);
   sess->win = main_window;
 
   gtk_window_set_default_size(GTK_WINDOW (main_window), 200, 100);

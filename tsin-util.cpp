@@ -240,6 +240,8 @@ gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usec
   dbg("'\n");
 #endif
 
+  dbg("save_phrase_to_db '%s'  tlen:%d\n", utf8str, tlen);
+
   memcpy(&tbuf[1 + sizeof(usecount_t)], phkeys, ph_key_sz * len);
   memcpy(&tbuf[ph_key_sz*len + 1 + sizeof(usecount_t)], utf8str, tlen);
 
@@ -262,16 +264,15 @@ gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usec
     fread(sbuf,1,1,fph);
     fread(&sbuf[1], sizeof(usecount_t), 1, fph); // use count
     fread(&sbuf[1+sizeof(usecount_t)], 1, (ph_key_sz + CH_SZ) * sbuf[0], fph);
-    if ((ord=phseq(sbuf,tbuf)) >=0)
+    if ((ord=phseq(sbuf,tbuf)) > 0)
       break;
-  }
 
-//  dbg("tlen:%d  ord:%d  %s\n", tlen, ord, utf8str);
-  if (!ord && !memcmp(&sbuf[sbuf[0]*ph_key_sz+1+sizeof(usecount_t)], utf8str, tlen)) {
+	if (!ord && !memcmp(&sbuf[sbuf[0]*ph_key_sz+1+sizeof(usecount_t)], utf8str, tlen)) {
 //    bell();
-    dbg("Phrase already exists\n");
-    inc_dec_tsin_use_count(phkeys, utf8str, len);
-    return FALSE;
+	    dbg("Phrase already exists\n");
+		inc_dec_tsin_use_count(phkeys, utf8str, len);
+		return FALSE;
+	}
   }
 
   int wN = phcount - mid;
@@ -321,8 +322,7 @@ gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usec
 #include <sys/stat.h>
 
 
-void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho,
-                    u_char *ch)
+void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho, u_char *ch)
 {
   *usecount = 0;
 
@@ -349,20 +349,45 @@ void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho,
 
   fread(usecount, sizeof(usecount_t), 1, fph); // use count
   fread(pho, ph_key_sz, (int)(*len), fph);
-  if (ch)
+  if (ch) {
     fread(ch, CH_SZ, (int)(*len), fph);
+    int tlen = utf8_tlen((char *)ch, *len);
+    ch[tlen]=0;
+  }
+}
+
+// tone_mask : 1 -> pho has tone
+void mask_tone(phokey_t *pho, int plen, char *tone_mask)
+{
+  int i;
+//  dbg("mask_tone\n");
+  if (!tone_mask)
+    return;
+
+  for(i=0; i < plen; i++) {
+   if (!tone_mask[i])
+    pho[i] &= (~7);
+  }
 }
 
 
 // ***  r_sti<=  range  < r_edi
-gboolean tsin_seek(void *pho, int plen, int *r_sti, int *r_edi)
+gboolean tsin_seek(void *pho, int plen, int *r_sti, int *r_edi, char *tone_mask)
 {
   int mid, cmp;
   u_int64_t ss[MAX_PHRASE_LEN], stk[MAX_PHRASE_LEN];
-  u_char mlen, stch[MAX_PHRASE_LEN * CH_SZ];
   char len;
   usecount_t usecount;
   int hashi;
+
+#if 0
+  dbg("tsin_seek %d\n", plen);
+#endif
+
+#if 0
+  if (tone_mask)
+    mask_tone((phokey_t *)pho, plen, tone_mask);
+#endif
 
   if (ph_key_sz==2)
     hashi= *((phokey_t *)pho) >> TSIN_HASH_SHIFT;
@@ -371,23 +396,38 @@ gboolean tsin_seek(void *pho, int plen, int *r_sti, int *r_edi)
   else
     hashi= *((u_int64_t *)pho) >> TSIN_HASH_SHIFT_64;
 
-  if (hashi >= TSIN_HASH_N)
+  if (hashi >= TSIN_HASH_N) {
+//    dbg("hashi >= TSIN_HASH_N\n");
     return FALSE;
+  }
 
   int top=hashidx[hashi];
   int bot=hashidx[hashi+1];
 
-  if (top>=phcount)
+  if (top>=phcount) {
+//    dbg("top>=phcount\n");
     return FALSE;
+  }
 
   while (top <= bot) {
     mid=(top+bot)/ 2;
-    load_tsin_entry(mid, &len, &usecount, ss, stch);
+    load_tsin_entry(mid, &len, &usecount, ss, NULL);
 
+    u_char mlen;
     if (len > plen)
       mlen=plen;
     else
       mlen=len;
+
+//    prphs(ss, mlen);
+//    mask_tone((phokey_t *)ss, mlen, tone_mask);
+
+#if DBG || 0
+    int j;
+    dbg("> ");
+    prphs(ss, len);
+    dbg("\n");
+#endif
 
     cmp=phokey_t_seq(ss, pho, mlen);
 
@@ -403,49 +443,148 @@ gboolean tsin_seek(void *pho, int plen, int *r_sti, int *r_edi)
       break;
   }
 
-  if (cmp) {
+  if (cmp && !tone_mask) {
 //    dbg("no match %d\n", cmp);
     return FALSE;
   }
 
+//  dbg("<--\n");
   // seek to the first match because binary search is used
+  gboolean found=FALSE;
+
   int sti;
   for(sti = mid; sti>=0; sti--) {
-    load_tsin_entry(sti, &len, &usecount, stk, stch);
+    load_tsin_entry(sti, &len, &usecount, stk, NULL);
 
-    if (!phokey_t_seq(stk, pho, plen) && len >= plen)
+    u_char mlen;
+    if (len > plen)
+      mlen=plen;
+    else
+      mlen=len;
+#if 0
+    prphs(stk, len);
+#endif
+    mask_tone((phokey_t *)stk, mlen, tone_mask);
+
+    int v = phokey_t_seq(stk, pho, plen);
+    if (!v)
+      found = TRUE;
+
+#if 0
+    int j;
+    dbg("%d] %d*> ", sti, mlen);
+    prphs(stk, len);
+    dbg(" v:%d\n", v);
+#endif
+
+    if ((!tone_mask && !v && len>=plen) ||
+        (tone_mask && v>0 || !v && len >= plen))
       continue;
     break;
   }
   sti++;
 
   // seek to the tail
+
+  if (tone_mask) {
+    int top=hashidx[hashi];
+    int bot=hashidx[hashi+1];
+
+    if (top>=phcount) {
+  //    dbg("top>=phcount\n");
+      return FALSE;
+    }
+
+    phokey_t tpho[MAX_PHRASE_LEN];
+
+    int i;
+    for(i=0; i < plen; i++)
+      tpho[i]=((phokey_t*)pho)[i] | 7;
+
+    while (top <= bot) {
+      mid=(top+bot)/ 2;
+      load_tsin_entry(mid, &len, &usecount, ss, NULL);
+
+      u_char mlen;
+      if (len > plen)
+        mlen=plen;
+      else
+        mlen=len;
+
+  //    prphs(ss, mlen);
+
+#if DBG || 0
+      int j;
+      dbg("> ");
+      prphs(ss, len);
+      dbg("\n");
+#endif
+
+      cmp=phokey_t_seq(ss, tpho, mlen);
+
+      if (!cmp && len < plen)
+        cmp=-2;
+
+      if (cmp>0)
+        bot=mid-1;
+      else
+      if (cmp<0)
+        top=mid+1;
+      else
+        break;
+    }
+  }
+
   int edi;
   for(edi = mid; edi < phcount; edi++) {
-    load_tsin_entry(edi, &len, &usecount, stk, stch);
+    load_tsin_entry(edi, &len, &usecount, stk, NULL);
 
-    if (!phokey_t_seq(stk, pho, plen) && len >= plen)
+    u_char mlen;
+    if (len > plen)
+      mlen=plen;
+    else
+      mlen=len;
+#if 0
+    prphs(stk, len);
+#endif
+    mask_tone((phokey_t *)stk, mlen, tone_mask);
+
+    int v = phokey_t_seq(stk, pho, plen);
+    if (!v)
+      found = TRUE;
+#if 0
+    dbg("edi%d -> ", edi);
+    prphs(stk, len);
+    dbg(" v:%d\n", v);
+#endif
+
+    if ((!tone_mask && !v && len >= plen)
+      || (tone_mask && v<0 || !v && len >= plen))
       continue;
     break;
   }
 
-//  dbg("sti %d %d\n", sti, edi);
+#if 0
+  dbg("sti%d edi:%d found:%d\n", sti, edi, found);
+#endif
 
   *r_sti = sti;
   *r_edi = edi;
 
-  return TRUE;
+  return edi > sti;
 }
 
 void inc_dec_tsin_use_count(void *pho, char *ch, int N)
 {
   int sti, edi;
 
-  if (!tsin_seek(pho, N, &sti, &edi))
+//  dbg("inc_dec_tsin_use_count '%s'\n", ch);
+
+  if (!tsin_seek(pho, N, &sti, &edi, NULL))
     return;
 
   int idx;
-  int tlen = utf8_tlen(ch, N);
+  int tlen = strlen(ch);
 
 #if 0
   dbg("otlen %d  ", tlen);
@@ -459,7 +598,7 @@ void inc_dec_tsin_use_count(void *pho, char *ch, int N)
     char len;
     usecount_t usecount, n_usecount;
     u_int64_t phi[MAX_PHRASE_LEN];
-    char stch[MAX_PHRASE_LEN * CH_SZ];
+    char stch[MAX_PHRASE_LEN * CH_SZ * 2];
 
     load_tsin_entry(idx, &len, &usecount, phi, (u_char *)stch);
     n_usecount = usecount;
@@ -471,7 +610,9 @@ void inc_dec_tsin_use_count(void *pho, char *ch, int N)
       putchar(stch[i]);
     dbg(" ppp\n");
 #endif
-    if (!utf8_str_eq(stch, ch, N))
+
+//	dbg("stch %s\n", stch);
+    if (strcmp(stch, ch))
       continue;
 #if 0
     dbg("found match\n");

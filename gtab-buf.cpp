@@ -116,7 +116,7 @@ static char *gen_buf_str(int start, gboolean add_spc)
     char *t = gbuf[i].ch;
     int len = strlen(t);
 
-    if (add_spc && en_word_len(t)) {
+    if (add_spc && en_word_len(t) && !(gbuf[i].flag & FLAG_CHPHO_GTAB_BUF_EN_NO_SPC)) {
       if (last_en_word) {
         out = trealloc(out, char, outN+1);
         out[outN++]=' ';
@@ -156,6 +156,9 @@ static char *gen_buf_str_disp()
     char addspc[MAX_CIN_PHR * 2 + 2];
     char spec[MAX_CIN_PHR * 2 + 2];
     int len = en_word_len(gbuf[i].ch);
+//    dbg("i %d N:%d bufN:%d\n",i,N,ggg.gbufN);
+    if (gbuf[i].flag & FLAG_CHPHO_GTAB_BUF_EN_NO_SPC)
+      len = 0;
 //    dbg("%d %d is_en:%d\n",i, len, last_is_en_word);
 
     if (len) {
@@ -509,7 +512,7 @@ int qcmp_gitem(const void *aa, const void *bb)
 void hide_row2_if_necessary();
 
 unich_t auto_end_punch[]=_L(", . ? : ; ! [ ] 「 」 ， 。 ？ ； ： 、 ～ ！ （ ）");
-GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key)
+GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key, gboolean b_gtab_en_no_spc)
 {
   hide_row2_if_necessary();
 
@@ -517,7 +520,7 @@ GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key)
     return NULL;
 //  dbg("insert_gbuf_cursor %x\n", key);
 
-  gbuf=trealloc(gbuf, GEDIT, ggg.gbufN+1);
+  gbuf=trealloc(gbuf, GEDIT, ggg.gbufN+2);
 
   GEDIT *pbuf = &gbuf[ggg.gbuf_cursor];
 
@@ -528,6 +531,7 @@ GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key)
   ggg.gbufN++;
 
   bzero(pbuf, sizeof(GEDIT));
+  bzero(gbuf+ggg.gbufN, sizeof(GEDIT));
 
   GITEM *items = tmalloc(GITEM, selN);
 
@@ -548,6 +552,7 @@ GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key)
   pbuf->c_sel = 0;
   pbuf->keys[0] = key;
   pbuf->keysN=1;
+  pbuf->flag = b_gtab_en_no_spc ? FLAG_CHPHO_GTAB_BUF_EN_NO_SPC:0;
 
   if (ggg.gbufN==ggg.gbuf_cursor && selN==1 && strstr(_(auto_end_punch), sel[0])) {
     char_play(pbuf->ch);
@@ -578,7 +583,7 @@ void set_gbuf_c_sel(int v)
 //  dbg("zzzsel v:%d\n", pbuf->c_sel);
 }
 
-GEDIT *insert_gbuf_cursor1(char *s, u_int64_t key)
+GEDIT *insert_gbuf_cursor1(char *s, u_int64_t key, gboolean b_gtab_en_no_spc)
 {
    if (!gtab_phrase_on())
      return NULL;
@@ -586,7 +591,7 @@ GEDIT *insert_gbuf_cursor1(char *s, u_int64_t key)
 //   dbg("insert_gbuf_cursor1 %s %x\n", s, key);
    char **sel = tmalloc(char *, 1);
    sel[0] = strdup(s);
-   GEDIT *e = insert_gbuf_cursor(sel, 1, key);
+   GEDIT *e = insert_gbuf_cursor(sel, 1, key, b_gtab_en_no_spc);
    clear_after_put();
    return e;
 }
@@ -651,7 +656,7 @@ void insert_gbuf_nokey(char *s)
 
    qsort(keys, keysN, sizeof(u_int64_t), qcmp_key_N);
 
-   GEDIT *e = insert_gbuf_cursor1(s, keys[0]);
+   GEDIT *e = insert_gbuf_cursor1(s, keys[0], TRUE);
    if (keysN > 8)
      keysN = 8;
 
@@ -665,7 +670,7 @@ void insert_gbuf_cursor1_cond(char *s, u_int64_t key, gboolean valid_key)
     return;
 
   if (valid_key)
-    insert_gbuf_cursor1(s, key);
+    insert_gbuf_cursor1(s, key, FALSE);
   else
     insert_gbuf_nokey(s);
 }
@@ -678,7 +683,7 @@ void insert_gbuf_cursor_char(char ch)
   char t[2];
   t[0]=ch;
   t[1]=0;
-  insert_gbuf_cursor1(t, 0);
+  insert_gbuf_cursor1(t, 0, TRUE);
 }
 
 gboolean gtab_has_input();
@@ -821,7 +826,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
       char *s = gbuf[i].ch;
       char tt[MAX_CIN_PHR+2];
 
-      if (en_word_len(s)) {
+      if (en_word_len(s) && !(gbuf[i].flag & FLAG_CHPHO_GTAB_BUF_EN_NO_SPC)) {
         if (last_is_en_word) {
           strcpy(tt, " ");
           strcat(tt, s);
@@ -844,7 +849,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
         attrN++;
       }
 
-      if (ap_only && gcin_on_the_spot_key && i==ggg.gbuf_cursor)
+      if (gcin_on_the_spot_key && i==ggg.gbuf_cursor)
         strN += get_DispInArea_str(str+strN);
 
       memcpy(str+strN, s, len);

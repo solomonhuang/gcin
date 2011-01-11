@@ -13,12 +13,12 @@ GCIN_SO= gcin1.so gcin2.so
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o gtab-use-count.o \
-     win-save-phrase.o unix-exec.o
+     win-save-phrase.o unix-exec.o pho-kbm-name.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
-             table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o
+             table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
-                 gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o
+                 gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o pho-dbg.o
 OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o gcin-icon.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
@@ -30,10 +30,11 @@ OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
-	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o
+	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o pho-kbm-name.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_kbm_toggle = gcin-kbm-toggle.o gcin-conf.o util.o gcin-send.o
+OBJS_gcin_exit = gcin-exit.o gcin-conf.o util.o gcin-send.o
 OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
 OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 
@@ -45,7 +46,7 @@ CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -I./im-client 
         -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" \
         -DGCIN_OGG_DIR=\"$(GCIN_OGG_DIR)\" \
         -DDOC_DIR=\"$(DOC_DIR)\" \
-        -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" -DGCIN_VERSION=\"$(GCIN_VERSION)\" \
+        -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" \
         -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
         -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS) \
         -DG_DISABLE_SINGLE_INCLUDES -DG_DISABLE_DEPRECATED \
@@ -110,7 +111,7 @@ OBJ_IMSRV=im-addr.o im-dispatch.o im-srv.o gcin-crypt.o
 
 PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge \
-	gcin-kbm-toggle tsin2gtab-phrase
+	gcin-kbm-toggle tsin2gtab-phrase gcin-exit
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -124,46 +125,41 @@ endif
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im; fi
 
+#gcc_ld_run_path=-Wl,-rpath,$(gcin_ld_run_path)
+
 gcin:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
-	LD_RUN_PATH=$(gcin_ld_run_path) \
-	$(CCLD) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
+	$(CCLD) $(EXTRA_LDFLAGS) $(gcc_ld_run_path) -o $@ $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.* vgcore.*
 	ln -sf $@ $@.test
 
 gcin-nocur:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
-	LD_RUN_PATH=$(gcinlibdir) \
-	$(CCLD) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
+	$(CCLD) -Wl,-rpath,$(gcinlibdir) $(EXTRA_LDFLAGS) -o $@ $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV) -lXtst $(LDFLAGS) -L/usr/X11R6/lib
 	rm -f core.*
 
 tslearn:        $(OBJS_TSLEARN)
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_TSLEARN) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_TSLEARN) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 juyin-learn:        $(OBJS_JUYIN_LEARN)
 	$(CCLD) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)
 	rm -f core.*
 sim2trad:        $(OBJS_sim2trad)
-	LD_RUN_PATH=$(gcin_ld_run_path) \
-	$(CC) -o $@ $(OBJS_sim2trad) $(LDFLAGS)
+	$(CC) $(gcc_ld_run_path) -o $@ $(OBJS_sim2trad) $(LDFLAGS)
 	rm -f core.*
 trad2sim:	sim2trad
 	ln -sf sim2trad trad2sim
 
 gcin-setup:     $(OBJS_gcin_steup) im-client/libgcin-im-client.so
 	rm -f core.*
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_gcin_steup) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_steup) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 phoa2d: $(OBJS_phoa2d) im-client/libgcin-im-client.so
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_phoa2d) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_phoa2d) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 phod2a: $(OBJS_phod2a)
 	$(CCLD) -lX11 -o $@ $(OBJS_phod2a) $(LDFLAGS)
 
 tsa2d32:  $(OBJS_tsa2d32) im-client/libgcin-im-client.so
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_tsa2d32) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_tsa2d32) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 tsd2a:  $(OBJS_tsd2a)
 	$(CCLD) -o $@ $(OBJS_tsd2a) $(LDFLAGS)
@@ -182,16 +178,16 @@ kbmcv:  $(OBJS_kbmcv)
 	$(CCLD) -o $@ $(OBJS_kbmcv) $(LDFLAGS)
 
 gcin-gb-toggle:	$(OBJS_gcin_gb_toggle)
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_gcin_gb_toggle) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_gb_toggle) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 gcin-kbm-toggle:	$(OBJS_gcin_kbm_toggle)
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_gcin_kbm_toggle) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_kbm_toggle) -L./im-client -lgcin-im-client $(LDFLAGS)
+
+gcin-exit:	$(OBJS_gcin_exit)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_exit) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 gcin-message:	$(OBJS_gcin_message)
-	export LD_RUN_PATH=$(gcin_ld_run_path) ;\
-	$(CCLD) -o $@ $(OBJS_gcin_message) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_message) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 pin-juyin:	$(OBJS_pin_juyin)
 	$(CCLD) -o $@ $(OBJS_pin_juyin) $(LDFLAGS)
@@ -201,6 +197,9 @@ tsin2gtab-phrase:       $(OBJS_tsin2gtab_phrase)
 
 im-client/libgcin-im-client.so:
 	$(MAKE) -C im-client
+
+gcin-version.h:	VERSION.gcin
+	echo '#define GCIN_VERSION "'`cat VERSION.gcin`'"' > gcin-version.h
 
 gcin1_so += intcode.pico win-int.pico win-message.pico win-sym.pico \
 win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico

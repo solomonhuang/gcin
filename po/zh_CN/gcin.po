@@ -16,14 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../eggtrayicon.c:127 
-msgid "Orientation"
-msgstr "Orientation"
-
-#: ../eggtrayicon.c:128
-msgid "The orientation of the tray."
-msgstr "The orientation of the tray."
-
 #: ../gcin-setup-gtab.c:131
 msgid "空白鍵選項"
 msgstr "空格键选项"
@@ -146,31 +138,31 @@ msgstr "半角英文模态使用 Alt-Shift 片语"
 
 #: ../gcin-setup-pho.c:205 ../gcin-setup-pho.c:477
 msgid "詞音標示詞的底線顏色"
-msgstr "智能拼音标示词的底线颜色"
+msgstr "拼音标示词的底线颜色"
 
 #: ../gcin-setup-pho.c:244 ../gcin-setup-pho.c:490
 msgid "詞音游標的顏色"
-msgstr "智能拼音游标的颜色"
+msgstr "拼音游标的颜色"
 
 #: ../gcin-setup-pho.c:314 ../gcin-setup.c:622
 msgid "gcin 注音/詞音設定"
-msgstr "gcin 注音/智能拼音设置"
+msgstr "gcin 注音/拼音设置"
 
 #: ../gcin-setup-pho.c:320
-msgid "鍵盤排列方式"
-msgstr "键盘排列方式"
+msgid "鍵盤排列方式/選擇鍵/選單每列字數"
+msgstr "键盘排列方式/选择键/菜单每列字数"
 
 #: ../gcin-setup-pho.c:327
 msgid "詞音輸入[中/英]切換"
-msgstr "智能拼音输入[中/英]切换"
+msgstr "拼音输入[中/英]切换"
 
 #: ../gcin-setup-pho.c:354
 msgid "詞音輸入空白鍵選項"
-msgstr "智能拼音输入空格键选项"
+msgstr "拼音输入空格键选项"
 
 #: ../gcin-setup-pho.c:382
 msgid "詞音輸入預選詞視窗"
-msgstr "智能拼音输入预选词视窗"
+msgstr "拼音输入预选词视窗"
 
 #: ../gcin-setup-pho.c:392
 msgid "依使用頻率調整字的順序"
@@ -184,17 +176,13 @@ msgstr "注音隐藏第二列(按键显示)"
 msgid "注音輸入顯示移至第一列"
 msgstr "注音输入显示移至第一列"
 
-#: ../gcin-setup-pho.c:432
-msgid "使用巨大 UTF-8 字集"
-msgstr "使用巨大 UTF-8 字集"
-
 #: ../gcin-setup-pho.c:442
 msgid "詞音輸入注音聲調符號"
-msgstr "智能拼音输入注音声调符号"
+msgstr "拼音输入注音声调符号"
 
 #: ../gcin-setup-pho.c:452
 msgid "詞音/Escape Tab 斷詞"
-msgstr "智能拼音/Escape Tab 断词"
+msgstr "拼音/Escape Tab 断词"
 
 #: ../gcin-setup-pho.c:461
 msgid "同音字詞選擇按鍵在後"
@@ -214,7 +202,7 @@ msgstr "发音选择"
 
 #: ../gcin-setup-pho.c:468
 msgid "詞音編輯緩衝區大小"
-msgstr "智能拼音编辑缓冲区大小"
+msgstr "拼音编辑缓冲区大小"
 
 #: ../gcin-setup.c:98
 msgid "請輸入要匯出的檔案名稱"
@@ -238,15 +226,15 @@ msgstr "符号选择视窗字体大小"
 
 #: ../gcin-setup.c:394
 msgid "詞音預選詞視窗字型大小"
-msgstr "智能拼音预选词视窗字体大小"
+msgstr "拼音预选词视窗字体大小"
 
 #: ../gcin-setup.c:404
 msgid "詞音注音輸入區字型大小"
-msgstr "智能拼音、注音输入区字体大小"
+msgstr "拼音注音输入区字体大小"
 
 #: ../gcin-setup.c:414
 msgid "詞音近似音顯示字型大小"
-msgstr "智能拼音近似音显示字体大小"
+msgstr "拼音近似音显示字体大小"
 
 #: ../gcin-setup.c:424
 msgid "gtab(倉頡…)輸入區字型大小"
@@ -260,10 +248,6 @@ msgstr "弹出式输入视窗"
 msgid "固定 gcin 視窗位置"
 msgstr "固定 gcin 视窗位置"
 
-#: ../gcin-setup.c:455 ../gcin-setup.c:505
-msgid "使用"
-msgstr "使用"
-
 #: ../gcin-setup.c:479
 msgid "顯示內框"
 msgstr "显示内框"
@@ -275,10 +259,6 @@ msgstr "面板状态(tray)"
 #: ../gcin-setup.c:497
 msgid "顏色選擇"
 msgstr "颜色选择"
-
-#: ../gcin-setup.c:513
-msgid "測試目前狀態"
-msgstr "测试目前状态"
 
 #: ../gcin-setup.c:517
 msgid "前景顏色"
@@ -334,7 +314,7 @@ msgstr "词库编辑"
 
 #: ../gcin-setup.c:695
 msgid "讓詞音從文章學習詞"
-msgstr "让智能拼音从文章学习词"
+msgstr "让拼音从文章学习词"
 
 #: ../gcin-setup.c:700
 msgid "匯入系統的詞庫"
@@ -402,10 +382,6 @@ msgstr "符号视窗点击后自动关闭"
 msgid "選擇鍵的顏色"
 msgstr "选择键的颜色"
 
-#: ../gcin-setup-gtab.c:27 ../gcin-setup-tab.c:129
-msgid "由 .gtab 指定"
-msgstr "由 .gtab 指定"
-
 #: ../gcin-setup-gtab.c:28 ../gcin-setup-tab.c:130
 msgid "按空白立即送出第一字(嘸蝦米、大易)"
 msgstr "按空格立即送出第一字(呒虾米、大易)"
@@ -419,72 +395,16 @@ msgid "按滿按空白不送出第一字(倉頡, 行列)"
 msgstr "按满按空格不送出第一字(仓颉, 行列)"
 
 #: ../gcin-setup-pho.c:9 ../gcin-setup-tab.c:584
-msgid "標準 standard"
-msgstr "标准 standard"
-
-#: ../gcin-setup-pho.c:10 ../gcin-setup-tab.c:585
-msgid "標準 standard 使用 asdf 選擇"
-msgstr "标准 standard 使用 asdf 选择"
-
-#: ../gcin-setup-pho.c:11 ../gcin-setup-tab.c:586
-msgid "倚天 Eten"
-msgstr "倚天 Eten"
-
-#: ../gcin-setup-pho.c:12 ../gcin-setup-tab.c:587
-msgid "倚天 Eten 使用 asdf 選擇"
-msgstr "倚天 Eten 使用 asdf 选择"
+msgid "標準"
+msgstr "标准"
 
 #: ../gcin-setup-pho.c:13 ../gcin-setup-tab.c:588
 msgid "倚天 26 鍵"
 msgstr "倚天 26 键"
 
-#: ../gcin-setup-pho.c:14 ../gcin-setup-tab.c:589
-msgid "倚天 26 鍵,使用 asdf 選擇"
-msgstr "倚天 26 键,使用 asdf 选择"
-
 #: ../gcin-setup-pho.c:15 ../gcin-setup-tab.c:590
 msgid "許氏(國音,自然)"
 msgstr "许氏(国音,自然)"
-
-#: ../gcin-setup-pho.c:16 ../gcin-setup-tab.c:591
-msgid "聲調拼音"
-msgstr "声调拼音"
-
-#: ../gcin-setup-pho.c:17 ../gcin-setup-tab.c:592
-msgid "聲調拼音, 使用 asdf 選擇"
-msgstr "声调拼音, 使用 asdf 选择"
-
-#: ../gcin-setup-pho.c:18 ../gcin-setup-tab.c:593
-msgid "Dvorak"
-msgstr "Dvorak"
-
-#: ../gcin-setup-pho.c:19 ../gcin-setup-tab.c:594
-msgid "IBM"
-msgstr "IBM"
-
-#: ../gcin-setup-pho.c:20 ../gcin-setup-tab.c:595
-msgid "神通"
-msgstr "神通"
-
-#: ../gcin-setup-pho.c:44 ../gcin-setup-tab.c:541
-msgid "CapsLock"
-msgstr "CapsLock"
-
-#: ../gcin-setup-pho.c:45 ../gcin-setup-tab.c:542
-msgid "Tab"
-msgstr "Tab"
-
-#: ../gcin-setup-pho.c:46 ../gcin-setup-tab.c:543
-msgid "Shift(限非 XIM)"
-msgstr "Shift(限非 XIM)"
-
-#: ../gcin-setup-pho.c:47 ../gcin-setup-tab.c:544
-msgid "ShiftL(限非 XIM)"
-msgstr "ShiftL(限非 XIM)"
-
-#: ../gcin-setup-pho.c:48 ../gcin-setup-tab.c:545
-msgid "ShiftR(限非 XIM)"
-msgstr "ShiftR(限非 XIM)"
 
 #: ../gcin-setup-pho.c:57 ../gcin-setup-tab.c:101
 msgid "選擇同音字"
@@ -493,10 +413,6 @@ msgstr "选择同音字"
 #: ../gcin-setup-pho.c:58 ../gcin-setup-tab.c:102
 msgid "輸入空白"
 msgstr "输入空格"
-
-#: ../gcin-setup-pho.c:508 ../gcin-setup-tab.c:1725
-msgid "啟用詞音緩衝區編輯模式"
-msgstr "启用智能拼音缓冲区编辑模态"
 
 #: ../gcin-setup-tab.c:779 ../gcin-setup.c:63
 msgid "結果失敗"
@@ -515,12 +431,12 @@ msgid "念出發音"
 msgstr "念出发音"
 
 #: ../tray.c:179
-msgid "正->簡體"
-msgstr "正->简体"
+msgid "正→簡體"
+msgstr "正→简体"
 
 #: ../tray.c:180
-msgid "簡->正體"
-msgstr "简->正体"
+msgid "簡→正體"
+msgstr "简→正体"
 
 #: ../tray.c:181
 msgid "小鍵盤"
@@ -529,22 +445,6 @@ msgstr "小键盘"
 #: ../gcin-setup-list.c:570 ../gcin-setup-tab.c:1652
 msgid "剪貼區管理視窗位置&開關"
 msgstr "剪贴区管理视窗位置&开关"
-
-#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
-msgid "左下"
-msgstr "左下"
-
-#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
-msgid "左上"
-msgstr "左上"
-
-#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
-msgid "右下"
-msgstr "右下"
-
-#: ../gcin-setup-list.c:17 ../gcin-setup-tab.c:9
-msgid "右上"
-msgstr "右上"
 
 #: ../tray.c:197
 msgid "重新執行gcin"
@@ -585,10 +485,6 @@ msgstr "全部关闭"
 #: ../gtk-im/imgcin.c:27
 msgid "gcin Input Method"
 msgstr "gcin 输入法"
-
-#: ../tray.c:218
-msgid "简体输出"
-msgstr "简体输出"
 
 #: ../tray.cpp:255 ../tray.cpp:258
 msgid "左:中英切換 中:小鍵盤 右:選項"
@@ -633,3 +529,75 @@ msgstr "半角/正体输出"
 #: ../win-save-phrase.cpp:70
 msgid "加片語到詞庫"
 msgstr "加片语到词库"
+
+#: ../about.cpp:93
+msgid ""
+"<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
+"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
+"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</"
+"a>\n"
+msgstr ""
+"<a href='http://hyperrate.com?eid=67'>点击链接前往 gcin 讨论区</a>\n"
+"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
+"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin更新记录</"
+"a>\n"
+
+#: ../gcin-setup.cpp:593
+msgid ""
+"按鍵顯示於\n"
+"應用程式"
+msgstr ""
+"按键显示于\n"
+"应用程序"
+
+#: ../win-save-phrase.cpp:104
+msgid "%d 秒後自動加入"
+msgstr "%d 秒后自动加入"
+
+#: ../about.cpp:104
+msgid "gcin改變記錄"
+msgstr "gcin更新记录"
+
+#: ../gcin-setup.cpp:690
+msgid "小鍵盤字型大小"
+msgstr "小键盘字体大小"
+
+#: ../tslearn.cpp:368
+msgid "按 ctrl-V, 貼上你要 tslearn 學習的文章。"
+msgstr "按 ctrl-V, 贴上你要 tslearn 学习的文章。"
+
+#: ../gcin-setup.cpp:696
+msgid "英數"
+msgstr "英数"
+
+#: ../tray-win32.cpp:128
+msgid "送字到剪貼區"
+msgstr "送字到剪贴区"
+
+#: ../tray-win32.cpp:111 ../tray.cpp:272
+msgid "選擇輸入法"
+msgstr "选择输入法"
+
+#: ../gcin-setup-pho.cpp:598
+msgid "\\鍵切換jkx鍵編輯模式"
+msgstr "\\键切换jkx键编辑模态"
+
+#: ../gcin-setup.cpp:790
+msgid "取代主題顏色"
+msgstr "取代主题颜色"
+
+#: ../gcin-setup.cpp:820
+msgid "選擇鍵顏色"
+msgstr "选择键颜色"
+
+#: ../gcin-setup.cpp:491
+msgid ""
+"<span foreground=\"%s\" font=\"%d\">7</span><span font=\"%d\">測試</span>"
+msgstr ""
+"<span foreground=\"%s\" font=\"%d\">7</span><span font=\"%d\">测试</span>"
+
+#: ../gcin-setup.cpp:495
+msgid ""
+"<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">測試</span>"
+msgstr ""
+"<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">测试</span>"

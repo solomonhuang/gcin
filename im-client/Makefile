@@ -20,7 +20,7 @@ OBJS = gcin-im-client.o im-addr.o gcin-conf.o util.o gcin-crypt-fpic.o
 	$(CC) -x c -c $(CFLAGS) $<
 
 $(SOFILEVER):   $(OBJS)
-	$(CC) $(SO_FLAGS) -Wl,-soname,libgcin-im-client.so.1 $(OBJS) -lX11 -o $@
+	$(CC) $(SO_FLAGS) -Wl,-soname,libgcin-im-client.so.1 $(OBJS) -lX11 -o $@ -L/usr/X11R6/lib
 	ln -sf $(SOFILEVER) $(SOFILE)
 	ln -sf $(SOFILEVER) $(SOFILE).1
 	$(MAKE) -C ../gtk-im

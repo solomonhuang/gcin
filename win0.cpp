@@ -86,7 +86,6 @@ static void create_char(int index)
   gdk_color_parse(tsin_phrase_line_color, &color_bg);
 
   i = index;
-//  for(i=index; i<=index+1 && i < MAX_PH_BF_EXT; i++)
   {
     if (chars[i].vbox)
       return;
@@ -145,21 +144,17 @@ void set_label_space(GtkWidget *label);
 
 void disp_char(int index, char *ch)
 {
-  char tt[CH_SZ+1];
-
   if (gcin_edit_display_ap_only())
     return;
 
-//  dbg("disp_char %d %c%c%c\n", index, ch[0], ch[1], ch[2]);
+//  dbg("disp_char %d %s\n", index, ch);
   create_char(index);
   GtkWidget *label = chars[index].label;
 
-  utf8cpy(tt, ch);
-
   if (ch[0]==' ' && ch[1]==' ')
-      set_label_space(label);
+    set_label_space(label);
   else {
-    gtk_label_set_text(GTK_LABEL(label), tt);
+    gtk_label_set_text(GTK_LABEL(label), ch);
   }
 
   get_win0_geom();
@@ -235,10 +230,10 @@ void clr_tsin_cursor(int index)
 
   if (!label)
     return;
-
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   gtk_label_set_attributes(GTK_LABEL(label), attr_list_blank);
 }
 
@@ -248,9 +243,10 @@ void hide_win0();
 
 void disp_tsin_pho(int index, char *pho)
 {
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   if (gcin_on_the_spot_key) {
     if (gwin0 && GTK_WIDGET_VISIBLE(gwin0))
       hide_win0();
@@ -378,18 +374,12 @@ static void raw_move(int x, int y)
 
 void compact_win0_x()
 {
+#if WIN32
   if (test_mode)
     return;
-#if 0
-  int win_xl, win_yl;
-  gtk_window_get_size(GTK_WINDOW(gwin0), &win_xl, &win_yl);
-  if (max_yl < win_yl)
-    max_yl = win_yl;
-  gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, max_yl);
-#else
-  gtk_window_resize(GTK_WINDOW(gwin0), 16, 16);
 #endif
 
+  gtk_window_resize(GTK_WINDOW(gwin0), 16, 16);
   raw_move(best_win_x, best_win_y);
 }
 
@@ -455,10 +445,10 @@ void disp_tsin_eng_pho(int eng_pho)
 void clear_tsin_line()
 {
   int i;
-
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *line = chars[i].line;
     if (!line)
@@ -484,7 +474,6 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
       exec_gcin_setup();
       break;
   }
-
 }
 
 
@@ -508,6 +497,7 @@ void create_win0()
   dbg("create_win0\n");
 #endif
   gwin0 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin0), FALSE);
 #if WIN32
   set_no_focus(gwin0);
 #endif
@@ -618,8 +608,6 @@ static void create_win0_gui()
   gdk_flush();
   gtk_widget_hide (gwin0);
 
-//  compact_win0();
-
   create_win1();
   create_win1_gui();
 
@@ -634,20 +622,19 @@ void destroy_win0()
 {
   if (!gwin0)
     return;
-  bzero(chars, sizeof(chars));
   gtk_widget_destroy(gwin0);
   gwin0 = NULL;
   top_bin = NULL;
   label_pho = NULL;
   button_pho = NULL;
   button_eng_ph = NULL;
+  bzero(chars, sizeof(chars));
 }
 #endif
 
 void get_win0_geom()
 {
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
-
   get_win_size(gwin0, &win_xl, &win_yl);
 }
 
@@ -662,18 +649,21 @@ void show_win0()
     return;
 #endif
 
-#if _DEBUG && 0
+#if _DEBUG && 1
 	dbg("show_win0 pop:%d in:%d for:%d \n", gcin_pop_up_win, tsin_has_input(), force_show);
 #endif
   create_win0();
   create_win0_gui();
 
-  if (gcin_pop_up_win && !tsin_has_input() && !force_show)
+  if (gcin_pop_up_win && !tsin_has_input() && !force_show) {
+	dbg("show ret\n");
     return;
+  }
 #if UNIX
   if (!GTK_WIDGET_VISIBLE(gwin0))
 #endif
   {
+	dbg("gtk_widget_show %x\n", gwin0);
     gtk_widget_show(gwin0);
     move_win0(win_x, win_y);
   }
@@ -709,8 +699,6 @@ void bell();
 #if USE_TSIN
 void change_tsin_font_size()
 {
-  int i;
-
   if (!top_bin)
     return;
 
@@ -719,8 +707,11 @@ void change_tsin_font_size()
 
   set_label_font_size(label_pho, gcin_font_size_tsin_pho_in);
 
+  int i;
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *label = chars[i].label;
+	if (!label)
+		continue;
 
     set_label_font_size(label, gcin_font_size);
 
@@ -753,10 +744,11 @@ char *get_full_str();
 
 void win_tsin_disp_half_full()
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
   gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
-
   compact_win0();
 }
 

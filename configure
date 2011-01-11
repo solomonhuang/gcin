@@ -1,5 +1,6 @@
 ##!/bin/bash
 
+
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "** valid options:"
     echo "  --use_xim=N    : disable the support of XIM"
@@ -16,6 +17,7 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     exit
 fi
 
+
 MAKE=make
 which gmake > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
@@ -24,6 +26,11 @@ fi
 
 FREEBSD=0
 uname | grep FreeBSD > /dev/null 2> /dev/null
+if [ $? = 0 ]; then
+  FREEBSD=1
+fi
+
+uname | grep OpenBSD > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   FREEBSD=1
 fi
@@ -103,7 +110,7 @@ fi
 if [ ! -x /bin/bash ]; then
   for i in /usr/bin/bash /usr/local/bin/bash
   do
-    [ -x $i ] || next
+    [ -x $i ] || continue
     echo "/bin/bash -> $i"
     for i in scripts/*
     do
@@ -294,11 +301,14 @@ echo "USE_GCB=$use_gcb" >> config.mak
 
 if [ $prefix = /usr ]; then
   echo "gcin_ld_run_path=\$(gcinlibdir)" >> config.mak
-  echo "LDFLAGS+=-Wl,-rpath,\$(gcinlibdir)" >> config.mak
+# moved to Makefile
+#  echo "LDFLAGS+=-Wl,-rpath,\$(gcinlibdir)" >> config.mak
 else
   echo "gcin_ld_run_path=\$(PWD):\$(gcinlibdir)" >> config.mak
   echo "GCIN_DEBUG=1" >> config.mak
 fi
+
+echo "gcc_ld_run_path=-Wl,-rpath,\$(gcin_ld_run_path)" >> config.mak
 
 cd menu
 for i in *.in
@@ -311,3 +321,4 @@ do
     cp $i $outf
   fi
 done
+

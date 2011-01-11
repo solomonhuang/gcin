@@ -13,6 +13,7 @@
 #include "gcin.h"
 #include "gtab.h"
 #include "gcin-endian.h"
+#include "gcin-version.h"
 
 FILE *fr, *fw;
 int lineno;

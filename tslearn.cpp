@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 #include "config.h"
-#if UNIX
+#if GCIN_i18n_message
 #include <libintl.h>
 #endif
 
@@ -242,7 +242,7 @@ GtkWidget *create_pho_sel_area()
       char *phostr = phokey_to_str(bigpho[i].phokeys[j]);
 
 #if GTK_CHECK_VERSION(2,4,0)
-      gtk_combo_box_append_text (GTK_COMBO_BOX (bigpho[i].opt_menu), phostr);
+      gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (bigpho[i].opt_menu), phostr);
 #else
       GtkWidget *item = gtk_menu_item_new_with_label (phostr);
       gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
@@ -314,7 +314,11 @@ Display *dpy;
 
 void do_exit()
 {
-  send_gcin_message(dpy, RELOAD_TSIN_DB);
+  send_gcin_message(
+#if UNIX
+	  dpy,
+#endif
+	  RELOAD_TSIN_DB);
 
   exit(0);
 }
@@ -333,16 +337,18 @@ int main(int argc, char **argv)
   load_setttings();
 
 #if GCIN_i18n_message
-  gtk_set_locale();
   bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
   textdomain(GETTEXT_PACKAGE);
 #endif
 
   pho_load();
   load_tsin_db();
+#if UNIX
   dpy = GDK_DISPLAY();
+#endif
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(mainwin), FALSE);
   gtk_window_set_default_size(GTK_WINDOW (mainwin), 640, 520);
   set_window_gcin_icon(mainwin);
 
@@ -361,7 +367,11 @@ int main(int argc, char **argv)
 
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
+#if UNIX
   char *text = _(_L("按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"));
+#else
+  char *text = _(_L("按 ctrl-V, 貼上你要 tslearn 學習的文章。"));
+#endif
 
   gtk_text_buffer_set_text (buffer, text, -1);
 

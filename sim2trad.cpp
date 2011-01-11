@@ -1,7 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 #include "config.h"
-#if UNIX
+#if GCIN_i18n_message
 #include <libintl.h>
 #endif
 
@@ -72,16 +72,14 @@ void set_window_gcin_icon(GtkWidget *window);
 void init_TableDir();
 int main(int argc, char **argv)
 {
-
-#if GCIN_i18n_message
-  gtk_set_locale();
-  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-  textdomain(GETTEXT_PACKAGE);
-#endif
-
   init_TableDir();
 
   gtk_init (&argc, &argv);
+
+#if GCIN_i18n_message
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain(GETTEXT_PACKAGE);
+#endif
 
   if (strstr(argv[0],"trad2sim")) {
     b_trad2sim= TRUE;
@@ -90,6 +88,7 @@ int main(int argc, char **argv)
 
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(mainwin), FALSE);
   gtk_window_set_default_size(GTK_WINDOW (mainwin), 320, 100);
   set_window_gcin_icon(mainwin);
 

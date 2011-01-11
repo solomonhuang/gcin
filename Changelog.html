@@ -77,7 +77,68 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>Changlog</title><meta content="Edward Liu" name="author"></head><body>** UTF-8 encoding **<br>
+1.5.7:<br>
+
+- 詞音&amp;注音的單字注音現在可以定義詞了，目前定義有「ㄉㄧㄤ」「ㄉㄨㄞ」「ㄘㄟˋ」「ㄎㄧㄤ」了，只要直接輸入注音就可以，不用每個注音都按空白鍵。注音的檔案換成 pho.tab2 pho-huge.tab2，使用頻率從新開始計數排序。<br>
+
+- <a href="http://hyperrate.com/thread.php?tid=20847#20847">編輯區顯示設定成</a>「應用程式」則無法按 ` 查詢同音字的問題。<br>
+- 詞音keypad 的+-現在會加到編輯區了。<br>
+- 詞音的拼音改用一般可不輸入聲調且不用按空白的拼音。要輸入聲調也可以，1234鍵為對應的聲調，5為輕聲。<a href="http://hyperrate.com/thread.php?tid=3613">前導字元</a>輸入標點符號也可以用了。 <br>
+- <a href="http://hyperrate.com/thread.php?tid=21019">詞庫匯出/匯入會</a>出現錯誤訊息，其實是有完成。<br>
+- <a href="http://hyperrate.com/thread.php?tid=20986">在編輯區按↑鍵會</a>導致置gcin當掉<br>
+- 詞音 &amp; anthy日文 支援↑↓Enter 鍵選字了<br>
+- 可以在詞音&amp; gtab 的符號表使用 page-up page-down 切換上下頁。<br>
+- 合併詞庫時，會<a href="http://hyperrate.com/thread.php?tid=21187">保留最大的使用次數</a><br>
+- <a href="http://hyperrate.com/thread.php?tid=21246">小鍵盤的顯示不會隨著</a> focus window 而改變。<br>
+- <a href="http://hyperrate.com/thread.php?tid=21278">大易 gdayi3 *鍵的問題</a><br>
+- 新增 gcin-exit.exe，主要是給 win32 installer 結束 gcin.exe 否則無法寫入 .EXE .DLL 的問題。<br>
+- <a href="http://hyperrate.com/thread.php?tid=21483">[] 輸入括號</a>的功能在拼音鍵盤無法使用。<br>
+- <a href="http://hyperrate.com/thread.php?tid=21537">firefox 內 igoogle</a> 當首頁且有 youtube 時，輸入時會一直出現重覆字的問題。<br>
+- gtab 有使用自動選字，用 CapsLock 輸入英數時，會插入空白的問題。<br>
+- 注音/詞音的選擇鍵從鍵盤選擇中獨立出來了，新增 asdfzxcv、fdsavcxz、rewfdsvcx 的選擇。如果你的小指有受傷，用預選詞會常用到小指按a，可以試試改用 rewfdsvcx，這樣就可以改用食指按，食指比較強壯。<br>
+- win32 style 的 tray icon 全半形現在新增快速切換注音鍵盤的功能，像我是用倚天注音鍵盤，家裡的電腦初學者習慣用標準注音鍵盤，共用 pc 切換總覺得很麻煩，用這個就可以在兩個鍵盤間快速切換。<br>
+- 詞音新增「\鍵切換jkx鍵編輯模式」，用 ctrl-E 也可以，只是比較麻煩，必須在 gcin-setup 把這個功能開啟。<br>
+- 詞音的同音字現在可以設定多行顯示了，可以設定多少行(縱向)。<br>
+- 螢幕小鍵盤新增10秒鐘自動把 ctrl, alt 清除的功能，以免發生按了忘記，造成程式不正常的執行。<br>
+- 由於 gtk3 不支援目前單一的 tray icon，目前 win32 雙 icon方式的功能也比較多，內定改成 win32 雙 icon，未來單一 icon 的方式可能會被淘汰。<br>
+- gcin-setup → 外觀設定 → 前景、背景、選擇鍵的顏色設定，改成更簡單的方式。<br>
+- <a href="http://hyperrate.com/thread.php?tid=21883">caleb anthy 的 bug fix</a><br>
+- 來自 uim 的 romaji 定義<br>
+- ctrl-alt-3 的注音，選字的選擇鍵的顏色與詞音一致了。<br>
+<br>
 1.5.6:<br>
 - 小鍵盤現在英數模式會顯示！@#$ 等按鍵了。<br>
 
@@ -90,8 +151,7 @@
 - 現在可以用 mouse 直接點選詞音視窗的字來選同音字。編輯區顯示必須是gcin視窗或是同時顯示。主要給平版電腦用的。<br>
 - win32: 現在在登入時會自動執行 gcin.exe，這樣就不會覺得第一次輸入時很慢。<br>
 - win32: keypad 數字鍵無法輸入的問題<br>
-- keypad 數字鍵現在可用選字了。<br>
-<br>
+- keypad 數字鍵現在可用選字了。<br><br>
 1.5.5:<br>
 - <a href="http://hyperrate.com/thread.php?tid=19392#19392">gtab 開啟「按鍵顯示於應用程式」</a>不會自動送出第1字。<br>
 - .cin 檔案新增 %flag_disp_partial_match，使用此選項會強迫&nbsp; .gtab&nbsp; 開啟 預覽字 &amp;&nbsp; 預覽部分符合的字，主要是<a href="http://hyperrate.com/thread.php?tid=19382">給英文輸入的&nbsp; .cin </a>用的。 <br>

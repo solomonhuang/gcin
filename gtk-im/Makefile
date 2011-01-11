@@ -27,8 +27,7 @@ endif
 all:	im-gcin.so im-gcin-cur.so
 
 im-gcin.so:     $(OBJS) ../im-client/libgcin-im-client.so
-	export LD_RUN_PATH=$(gcinlibdir) ;\
-	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
+	$(CC) $(gcc_ld_run_path) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
 	rm -f core.*
 
 im-gcin-cur.so:     $(OBJS) ../im-client/libgcin-im-client.so
@@ -42,6 +41,7 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 		install -d $(IMMODULES_LOCAL); \
 		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
+		cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib; \
 	else \
 		install -d $(IMMODULES); \
 		install -m 755 im-gcin.so $(IMMODULES); \

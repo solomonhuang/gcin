@@ -262,13 +262,13 @@ void cb_inmd_menu(GtkCheckMenuItem *checkmenuitem, gpointer dat);
 
 static MITEM mitems[] = {
   {N_("設定"), GTK_STOCK_PREFERENCES, exec_gcin_setup_, NULL},
-  {N_("重新執行gcin"), NULL, restart_gcin, NULL},
+  {N_("重新執行gcin"), GTK_STOCK_QUIT, restart_gcin, NULL},
   {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
 #if USE_GCB
   {N_("gcb(剪貼區暫存)"), NULL, cb_tog_gcb, &gcb_enabled},
 #endif
-  {N_("正->簡體"), NULL, cb_trad2sim, NULL},
-  {N_("簡->正體"), NULL, cb_sim2trad, NULL},
+  {N_("正→簡體"), NULL, cb_trad2sim, NULL},
+  {N_("簡→正體"), NULL, cb_sim2trad, NULL},
   {N_("選擇輸入法"), NULL, cb_inmd_menu, NULL},
   {N_("小鍵盤"), NULL, kbm_toggle_, NULL},
   {N_("简体输出"), NULL, cb_trad_sim_toggle_, &gb_output},
@@ -337,7 +337,9 @@ gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
   return FALSE;
 }
 
+#if !GTK_CHECK_VERSION(2,90,7)
 GdkGC *gdk_gc_new (GdkDrawable *drawable);
+#endif
 
 gboolean create_tray(gpointer data)
 {

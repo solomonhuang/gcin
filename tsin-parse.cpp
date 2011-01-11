@@ -14,6 +14,7 @@ extern int ph_key_sz;
 void add_cache(int start, int usecount, TSIN_PARSE *out, short match_phr_N, short no_match_ch_N, int tc_len);
 void extract_gtab_key(int start, int len, void *out);
 gboolean check_gtab_fixed_mismatch(int idx, char *mtch, int plen);
+void mask_tone(phokey_t *pho, int plen, char *tone_mask);
 
 static int tsin_parse_len;
 
@@ -21,6 +22,8 @@ void set_tsin_parse_len(int len)
 {
   tsin_parse_len = len;
 }
+
+static char *c_pinyin_set;
 
 int tsin_parse_recur(int start, TSIN_PARSE *out,
                      short *r_match_phr_N, short *r_no_match_ch_N)
@@ -34,7 +37,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
   for(plen=1; start + plen <= tsin_parse_len && plen <= MAX_PHRASE_LEN; plen++) {
 #if DBG
-    dbg("---- aa st:%d hh plen:%d ", start, plen);utf8_putchar(chpho[start].ch); dbg("\n");
+    dbg("---- aa st:%d hh plen:%d ", start, plen);utf8_putchar(tss.chpho[start].ch); dbg("\n");
 #endif
     if (plen > 1) {
       if (tsin_is_gtab) {
@@ -82,10 +85,21 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
     if (tsin_is_gtab)
       extract_gtab_key(start, plen, ppp);
-    else
+    else {
       extract_pho(start, plen, (phokey_t *)ppp);
+      if (c_pinyin_set)
+        mask_tone(pp, plen, c_pinyin_set + start);
+    }
 
-    if (!tsin_seek(ppp, plen, &sti, &edi)) {
+#if DBG
+    for(i=0; i < plen; i++) {
+      prph(pp[i]); dbg("%d", c_pinyin_set[i+start]);
+    }
+    dbg("\n");
+#endif
+
+    char *pinyin_set = c_pinyin_set ? c_pinyin_set+start:NULL;
+    if (!tsin_seek(ppp, plen, &sti, &edi, pinyin_set)) {
 //      dbg("tsin_seek not found...\n");
       if (plen > 1)
         break;
@@ -126,6 +140,10 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
       int i;
       if (ph_key_sz==2) {
+        if (c_pinyin_set) {
+//          mask_tone(pp, plen, c_pinyin_set + start);
+          mask_tone(mtk, plen, c_pinyin_set + start);
+        }
         for(i=0;i < plen;i++)
           if (mtk[i]!=pp[i])
             break;
@@ -167,6 +185,7 @@ int tsin_parse_recur(int start, TSIN_PARSE *out,
 
 next:
 
+#if 0
     if (!match_phr_N) {
       if (tsin_is_gtab) {
         if (!(gbuf[start].ch[0] & 0x80))
@@ -175,6 +194,9 @@ next:
       if (!(tss.chpho[start].ch[0] & 0x80))
         no_match_ch_N = 0;
     }
+#else
+//	dbg("no_match_ch_N %d\n", no_match_ch_N);
+#endif
 
     remlen = tsin_parse_len - (start + plen);
 
@@ -221,7 +243,7 @@ next:
       dbg("    str:%d  ", start);
       int i;
       for(i=0;  i < tsin_parse_len - start; i++) {
-        utf8_putcharn(out[i].str, out[i].len);
+        utf8_putcharn((char *)out[i].str, out[i].len);
       }
       dbg("\n");
 #endif
@@ -257,8 +279,13 @@ void tsin_parse()
 
   init_cache(tss.c_len);
 
+  char pinyin_set[MAX_PH_BF_EXT];
+  c_pinyin_set = pin_juyin?pinyin_set:NULL;
+  get_chpho_pinyin_set(pinyin_set);
+
   short smatch_phr_N, sno_match_ch_N;
   tsin_parse_recur(0, out, &smatch_phr_N, &sno_match_ch_N);
+
 #if 0
   puts("vvvvvvvvvvvvvvvv");
   for(i=0;  i < tss.c_len; i++) {
@@ -279,7 +306,8 @@ void tsin_parse()
         tss.chpho[ofsi].flag |= FLAG_CHPHO_PHRASE_HEAD;
 
     for(ofsj=j=0; j < out[i].len; j++) {
-      ofsj += u8cpy(tss.chpho[ofsi].ch, (char *)&out[i].str[ofsj]);
+      ofsj += utf8cpy(tss.chpho[ofsi].cha, (char *)&out[i].str[ofsj]);
+//      tss.chpho[ofsi].ch = tss.chpho[ofsi].cha;
 
       tss.chpho[ofsi].flag |= FLAG_CHPHO_PHRASE_BODY;
       if (out[i].flag & FLAG_TSIN_PARSE_PHRASE)

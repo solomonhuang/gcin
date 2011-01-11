@@ -1,0 +1,4 @@
+export GCIN_NO_RELOAD=1
+cd
+/usr/local/bin/tsd2a32 -nousecount .gcin/tsin32 > tsin.src
+tsa2d32 tsin.src

@@ -93,6 +93,20 @@ static gboolean timeout_first_time(gpointer data)
   return FALSE;
 }
 
+static void clear_hold(KEY *k)
+{
+  KeySym keysym=k->keysym;
+  GtkWidget *laben = k->laben;
+  k->flag &= ~K_PRESS;
+  mod_fg_all(laben, NULL);
+  send_fake_key_eve2(keysym, FALSE);
+}
+
+static gboolean timeout_clear_hold(gpointer data)
+{
+  clear_hold((KEY *)data);
+  return FALSE;
+}
 
 static void cb_button_click(GtkWidget *wid, KEY *k)
 {
@@ -101,18 +115,16 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
 
   if (k->flag & K_HOLD) {
     if (k->flag & K_PRESS) {
-      k->flag &= ~K_PRESS;
-      mod_fg_all(laben, NULL);
-	  send_fake_key_eve2(keysym, FALSE);
-    }
-    else {
-	  send_fake_key_eve2(keysym, TRUE);
+      clear_hold(k);
+    } else {
+      send_fake_key_eve2(keysym, TRUE);
       k->flag |= K_PRESS;
       mod_fg_all(laben, &red);
+      g_timeout_add(10000, timeout_clear_hold, GINT_TO_POINTER(k));
     }
   } else {
     kbm_timeout_handle = g_timeout_add(500, timeout_first_time, GINT_TO_POINTER(keysym));
-	send_fake_key_eve2(keysym, TRUE);
+    send_fake_key_eve2(keysym, TRUE);
   }
 }
 
@@ -125,7 +137,7 @@ static void cb_button_release(GtkWidget *wid, KEY *k)
       kbm_timeout_handle = 0;
     }
 
-	send_fake_key_eve2(k->keysym, FALSE);
+    send_fake_key_eve2(k->keysym, FALSE);
 
     int i;
     for(i=0;i<keysN;i++) {
@@ -146,6 +158,7 @@ static void create_win_kbm()
   gdk_color_parse("red", &red);
 
   gwin_kbm = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_kbm), FALSE);
 #if WIN32
   set_no_focus(gwin_kbm);
 #endif
@@ -227,7 +240,7 @@ static void move_win_kbm()
   int ox, oy, szx, szy;
   GdkRectangle r;
   GtkOrientation ori;
-#if UNIX
+#if UNIX && !GTK_CHECK_VERSION(2,91,0)
   if (tray_da_win) {
     gdk_window_get_origin(tray_da_win, &ox, &oy);
     gdk_drawable_get_size(tray_da_win, &szx, &szy);
