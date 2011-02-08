@@ -1,4 +1,4 @@
-#if UNIX
+﻿#if UNIX
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
@@ -43,29 +43,87 @@ char *get_gcin_im_srv_sock_path();
 Atom get_gcin_addr_atom(Display *dpy);
 #endif
 
-#if WIN32
-bool init_winsock()
-{
-    WORD wVersionRequested;
-    WSADATA wsaData;
 
-/* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
-    wVersionRequested = MAKEWORD(2, 2);
-
-    int err = WSAStartup(wVersionRequested, &wsaData);
-    if (err != 0) {
-        dbg("WSAStartup failed with error: %d\n", err);
-		wVersionRequested = 0;
-        return FALSE;
-    }
-
-	return TRUE;
-}
-#endif
 
 #if WIN32
 bool sys_end_session;
+HWND serverWnd;
+
+HANDLE open_pipe_client()
+{
+  int retried=0;
+restart:
+  serverWnd = FindWindowA(GCIN_WIN_NAME, NULL);
+  if (!serverWnd) {
+    if (retried < 10) {
+	  if (!retried)
+        win32exec("gcin.exe");
+
+      Sleep(1000);
+	  retried++;
+      goto restart;
+	} else {
+      dbg("exec not found ?\n");
+	}
+
+	  MessageBoxA(NULL, "cannot find window", NULL, MB_OK);
+	  return NULL;
+  }
+
+  dbg("serverwnd %x\n", serverWnd);
+
+  int port = SendMessageA(serverWnd, GCIN_PORT_MESSAGE, 0, 0);
+
+  dbg("port %d\n", port);
+
+  char pipe_path[64];
+  sprintf(pipe_path, GCIN_PIPE_PATH, port);
+  dbg("pipe_path %s\n", pipe_path);
+
+  HANDLE hPipe;
+
+  int i;
+  for(i=0;i<20;i++) 
+   { 
+      hPipe = CreateFileA( 
+         pipe_path,   // pipe name 
+         GENERIC_READ |  // read and write access 
+         GENERIC_WRITE, 
+         0,              // no sharing 
+         NULL,           // default security attributes
+         OPEN_EXISTING,  // opens existing pipe 
+         0,              // default attributes 
+         NULL);          // no template file 
+ 
+   // Break if the pipe handle is valid. 
+ 
+      if (hPipe != INVALID_HANDLE_VALUE) {
+		 dbg("connection established %x\n", hPipe);
+         return hPipe; 
+	  }
+ 
+      // Exit if an error other than ERROR_PIPE_BUSY occurs. 
+ 
+      if (GetLastError() != ERROR_PIPE_BUSY) {
+         dbg("Could not open pipe. GLE=%d\n", GetLastError() ); 
+         return NULL;
+      }
+ 
+      // All pipe instances are busy, so wait for 20 seconds. 
+ 
+      if (!WaitNamedPipeA(pipe_path, 2000)) { 
+         printf("Could not open pipe: 20 second wait timed out."); 
+         return NULL;
+      } 
+   } 
+
+   MessageBoxA(NULL, "cannot connect to gcin.exe", NULL, MB_OK);
+
+  return NULL;
+}
 #endif
+
+
 
 
 static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Display *dpy)
@@ -81,13 +139,18 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 
 //  dbg("gcin_im_client_reopen\n");
   int dbg_msg = getenv("GCIN_CONNECT_MSG_ON") != NULL;
+#if UNIX
   int sockfd=0;
   int servlen;
   char *addr;
   Server_IP_port srv_ip_port;
+  u_char *pp;
+#else
+  HANDLE sockfd;
+#endif
+
   int tcp = FALSE;
   GCIN_client_handle *handle;
-  u_char *pp;
   int rstatus;
 
 //  dbg("gcin_im_client_reopen\n");
@@ -214,92 +277,38 @@ tcp:
 
 
 //  dbg("im server tcp port %d\n", ntohs(srv_ip_port.port));
-#endif // UNIX
 
   struct sockaddr_in in_serv_addr;
   bzero((char *) &in_serv_addr, sizeof(in_serv_addr));
 
   in_serv_addr.sin_family = AF_INET;
-#if WIN32
-  retried=0;
-restart:
-  HWND serverWnd = FindWindowA(GCIN_WIN_NAME, NULL);
-  if (!serverWnd) {
-    if (retried < 10) {
-	  if (!retried)
-        win32exec("gcin.exe");
-
-      Sleep(1000);
-	  retried++;
-      goto restart;
-	} else {
-      dbg("exec not found ?\n");
-	}
-
-	  MessageBoxA(NULL, "cannot find window", NULL, MB_OK);
-	  goto next;
-  }
-
-  dbg("serverwnd %x\n", serverWnd);
-
-  int port = SendMessageA(serverWnd, GCIN_PORT_MESSAGE, 0, 0);
-
-  dbg("port %d\n", port);
-
-  in_serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-  in_serv_addr.sin_port = htons(port);
-#else
   in_serv_addr.sin_addr.s_addr = srv_ip_port.ip;
   in_serv_addr.sin_port = srv_ip_port.port;
-#endif
   servlen = sizeof(in_serv_addr);
 
-#if WIN32
-  bool inited_winsock=false;
-retry_socket:
-#endif
+
   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-#if WIN32
-    if (inited_winsock)
-#endif
-	{
       perror("cannot open socket");
       goto next;
-	}
-#if WIN32
-	if (!init_winsock())
-	  goto next;
-    inited_winsock = true;
-	goto retry_socket;
-#endif
   }
 
   dbg("sock %d\n", sockfd);
 
   if (connect(sockfd, (struct sockaddr *)&in_serv_addr, servlen) < 0) {
-#if WIN32
-    dbg("err %d\n", WSAGetLastError());
-#endif
 	dbg("gcin_im_client_open cannot open: ") ;
     perror("");
-#if UNIX
     close(sockfd);
-#else
-	closesocket(sockfd);
-#endif
     sockfd = 0;
 	goto next;
   }
 
-#if WIN32
-  if (dbg_msg || 1)
-    dbg("gcin client connected to server\n");
-#else
   pp = (u_char *)&srv_ip_port.ip;
   if (dbg_msg)
     dbg("gcin client connected to server %d.%d.%d.%d:%d\n",
         pp[0], pp[1], pp[2], pp[3], ntohs(srv_ip_port.port));
-#endif
+#else
+	sockfd = open_pipe_client();
+#endif // UNIX
 
   tcp = TRUE;
 
@@ -316,7 +325,6 @@ next:
 
   if (sockfd > 0) {
     handle->fd = sockfd;
-
 #if UNIX
     if (tcp) {
       if (!handle->passwd)
@@ -327,6 +335,12 @@ next:
         free(handle->passwd); handle->passwd = NULL;
       }
     }
+#else
+	dbg("zzzzz %x\n", sockfd);
+	DWORD rn;
+	ReadFile(sockfd, &handle->server_idx, sizeof(int), &rn, NULL);
+	dbg("hhhhh\n");
+	dbg("server_idx %d\n", handle->server_idx);
 #endif
   }
 
@@ -364,7 +378,7 @@ void gcin_im_client_close(GCIN_client_handle *handle)
 	  return;
   if (handle->fd > 0)
 #if WIN32
-    closesocket(handle->fd);
+    CloseHandle((HANDLE)handle->fd);
 #else
     close(handle->fd);
 #endif
@@ -372,6 +386,14 @@ void gcin_im_client_close(GCIN_client_handle *handle)
   free(handle->passwd);
 #endif
   free(handle);
+}
+
+
+static void send_req_msg(GCIN_client_handle *handle)
+{
+#if WIN32
+	PostMessage(serverWnd, GCIN_CLIENT_MESSAGE_REQ, handle->server_idx, NULL);
+#endif
 }
 
 static int gen_req(GCIN_client_handle *handle, u_int req_no, GCIN_req *req)
@@ -416,7 +438,7 @@ static void error_proc(GCIN_client_handle *handle, char *msg)
 
   perror(msg);
 #if WIN32
-  closesocket(handle->fd);
+  CloseHandle(handle->fd);
 #else
   close(handle->fd);
 #endif
@@ -432,20 +454,23 @@ static void error_proc(GCIN_client_handle *handle, char *msg)
 #if WIN32
 static int handle_read(GCIN_client_handle *handle, void *ptr, int n)
 {
-  int r;
-  int fd = handle->fd;
+  BOOL r;
+  HANDLE fd = handle->fd;
 
   if (!fd)
     return 0;
+  DWORD rn;
+  r = ReadFile(fd, (char *)ptr, n, &rn, 0);
 
-  r = recv(fd, (char *)ptr, n, 0);
+  if (!r)
+	  return -1;
 
 #if (DBG || 0)
   if (r < 0)
     perror("handle_read");
 #endif
 
-  return r;
+  return rn;
 }
 #else
 typedef struct {
@@ -489,9 +514,9 @@ static int handle_read(GCIN_client_handle *handle, void *ptr, int n)
 #if WIN32
 static int handle_write(GCIN_client_handle *handle, void *ptr, int n)
 {
-  int r;
+  BOOL r;
   char *tmp;
-  int fd = handle->fd;
+  HANDLE fd = (HANDLE)handle->fd;
 
   if (!fd)
     return 0;
@@ -499,9 +524,12 @@ static int handle_write(GCIN_client_handle *handle, void *ptr, int n)
   tmp = (char *)malloc(n);
   memcpy(tmp, ptr, n);
 
-  r =  send(fd, tmp, n, 0);
+  DWORD wn;
+  r =  WriteFile(fd, tmp, n, &wn, NULL);
   free(tmp);
-  return r;
+  if (!r)
+	  return -1;
+  return wn;
 }
 #else
 static int handle_write(GCIN_client_handle *handle, void *ptr, int n)
@@ -547,6 +575,7 @@ void gcin_im_client_focus_in(GCIN_client_handle *handle)
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_focus_in error");
   }
+  send_req_msg(handle);
 
   gcin_im_client_set_cursor_location(handle, handle->spot_location.x,
      handle->spot_location.y);
@@ -568,6 +597,8 @@ void gcin_im_client_focus_out(GCIN_client_handle *handle)
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_focus_out error");
   }
+
+  send_req_msg(handle);
 }
 
 #if UNIX
@@ -639,6 +670,7 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
     error_proc(handle, "cannot write to gcin server");
     return FALSE;
   }
+  send_req_msg(handle);
 
   bzero(&reply, sizeof(reply));
   if (handle_read(handle, &reply, sizeof(reply)) <=0) {
@@ -724,6 +756,7 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_cursor_location error");
   }
+  send_req_msg(handle);
 }
 
 // in win32, if win is NULL, this means gcin_im_client_set_cursor_location(x,y) is screen position
@@ -756,6 +789,7 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_flags error");
   }
+  send_req_msg(handle);
 
   if (handle_read(handle, ret_flag, sizeof(int)) <= 0) {
     error_proc(handle, "cannot read reply str from gcin server");
@@ -780,6 +814,7 @@ void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_flags error");
   }
+  send_req_msg(handle);
 
   if (handle_read(handle, ret_flag, sizeof(int)) <= 0) {
     error_proc(handle, "cannot read reply str from gcin server");
@@ -817,6 +852,7 @@ err_ret:
     error_proc(handle,"gcin_im_client_get_preedit error");
     goto err_ret;
   }
+  send_req_msg(handle);
 
   str_len=-1; // str_len includes \0
   if (handle_read(handle, &str_len, sizeof(str_len))<=0)
@@ -883,6 +919,7 @@ void gcin_im_client_reset(GCIN_client_handle *handle)
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_reset error");
   }
+  send_req_msg(handle);
 }
 
 
@@ -899,6 +936,7 @@ void gcin_im_client_message(GCIN_client_handle *handle, char *message)
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_message error 1");
   }
+  send_req_msg(handle);
 
   len = strlen(message)+1;
   if (handle_write(handle, &len, sizeof(len)) <=0) {
@@ -931,6 +969,7 @@ bool gcin_im_client_key_eaten(GCIN_client_handle *handle, int press_release,
     error_proc(handle, "cannot write to gcin server");
     return FALSE;
   }
+  send_req_msg();
 
   bzero(&reply, sizeof(reply));
   if (handle_read(handle, &reply, sizeof(reply)) <=0) {

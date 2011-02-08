@@ -590,7 +590,7 @@ void create_kbm_window()
 
   GtkWidget *hbox_tsin_tail_select_key = gtk_hbox_new(FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_tail_select_key , TRUE, TRUE, 1);
-  GtkWidget *label_tsin_tail_select_key = gtk_label_new(_(_L("同音字詞選擇按鍵在後")));
+  GtkWidget *label_tsin_tail_select_key = gtk_label_new(_(_L("選擇鍵顯示於候選字(詞)後方")));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tail_select_key), label_tsin_tail_select_key , TRUE, TRUE, 0);
   check_button_tsin_tail_select_key = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_tsin_tail_select_key), check_button_tsin_tail_select_key, FALSE, FALSE, 0);

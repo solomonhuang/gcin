@@ -462,8 +462,13 @@ void sig_do_exit(int sig)
 
 char *get_gcin_xim_name();
 void load_phrase(), init_TableDir();
-void init_im_serv(), init_tray(), exec_setup_scripts();
-void init_gcin_im_serv(Window win), gcb_main(), init_tray_win32();
+void init_tray(), exec_setup_scripts();
+#if UNIX
+void init_gcin_im_serv(Window win);
+#else
+void init_gcin_im_serv();
+#endif
+void gcb_main(), init_tray_win32();
 
 #if WIN32
 void init_gcin_program_files();
@@ -533,8 +538,7 @@ int main(int argc, char **argv)
         }
 #endif
   init_gcin_program_files();
-
-  init_gcin_im_serv(NULL);
+  init_gcin_im_serv();
 #endif
 
 #if USE_XIM

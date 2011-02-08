@@ -28,6 +28,7 @@ gboolean test_mode;
 int last_input_method;
 #endif
 
+
 void init_gtab(int inmdno);
 
 char current_method_type()
@@ -134,16 +135,22 @@ static void append_str(char **buf, int *bufN, char *text, int len)
 }
 
 int trad2sim(char *str, int strN, char **out);
+void add_ch_time_str(char *s);
+
 void send_text(char *text)
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
 
   char *filter;
 
-  if (!text || test_mode)
+  if (!text)
     return;
   int len = strlen(text);
+
+  add_ch_time_str(text);
 
   append_str(&output_buffer_raw, &output_buffer_rawN, text, len);
 
@@ -204,8 +211,9 @@ direct:
   }
 #endif
 next:
-  if (len)
+  if (len) {
     append_str(&output_buffer, &output_bufferN, text, len);
+  }
 
   free(utf8_gbtext);
 }
@@ -1338,7 +1346,6 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
 #endif
 
 
-gint64 current_time();
 
 static gint64 last_focus_out_time;
 

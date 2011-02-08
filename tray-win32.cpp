@@ -84,6 +84,12 @@ void cb_trad_sim_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 //  dbg("checkmenuitem %x\n", checkmenuitem);
 }
 
+void cb_stat_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
+{
+  toggle_stat_win();
+}
+
+
 void exec_gcin_setup_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   exec_gcin_setup();
@@ -125,7 +131,8 @@ static void cb_set_output_buffer_bak_to_clipboard(GtkCheckMenuItem *checkmenuite
 void load_setttings(), load_tab_pho_file();;
 void update_win_kbm();
 void update_win_kbm_inited();
-extern gboolean win_kbm_inited;
+extern gboolean win_kbm_inited, stat_enabled;
+extern toggle_stat_win();
 static void cb_fast_phonetic_kbd_switch(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   char bak[128], cur[128];
@@ -144,6 +151,7 @@ static MITEM mitems_state[] = {
   {N_(_L("正→簡體")), NULL, cb_trad2sim},
   {N_(_L("簡→正體")), NULL, cb_sim2trad},
   {N_(_L("简体输出")), NULL, cb_trad_sim_toggle_, &gb_output},
+  {N_(_L("打字速度")), NULL, cb_stat_toggle_, &stat_enabled},
   {N_(_L("送字到剪貼區")), NULL, cb_set_output_buffer_bak_to_clipboard},
   {NULL}
 };

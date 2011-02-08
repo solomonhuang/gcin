@@ -15,18 +15,23 @@
 
 #define DBG 0
 
+#if UNIX
 static int myread(int fd, void *buf, int bufN)
+#else
+static int myread(HANDLE fd, void *buf, int bufN)
+#endif
 {
 #if UNIX
   return read(fd, buf, bufN);
 #else
   int ofs=0, toN = bufN;
   while (toN) {
-    int n = recv(fd, ((char *)buf) + ofs, toN, 0);
-    if (!n || n == SOCKET_ERROR)
+	DWORD rn;
+    BOOL r = ReadFile(fd, ((char *)buf) + ofs, toN, &rn, 0);
+    if (!r)
       return -1;
-    ofs+=n;
-	toN-=n;
+    ofs+=rn;
+	toN-=rn;
   };
   return bufN;
 #endif
@@ -35,6 +40,35 @@ static int myread(int fd, void *buf, int bufN)
 
 GCIN_ENT *gcin_clients;
 int gcin_clientsN;
+
+#if WIN32
+// need to use Enter/Leave CriticalSection in the future
+int find_im_client(HANDLE hand)
+{
+	int i;
+	for(i=0;i<gcin_clientsN;i++)
+		if (gcin_clients[i].fd == hand)
+			break;
+	if (i==gcin_clientsN)
+		return -1;
+	return i;
+}
+
+int add_im_client(HANDLE hand)
+{
+	int i = find_im_client(0);
+	if (i<0) {
+		gcin_clients=trealloc(gcin_clients, GCIN_ENT, gcin_clientsN);
+		i=gcin_clientsN++;
+	}
+
+	ZeroMemory(&gcin_clients[i], sizeof(GCIN_ENT));
+	gcin_clients[i].fd = hand;
+	return i;
+}
+
+#endif
+
 extern GCIN_PASSWD my_passwd;
 
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state);
@@ -55,13 +89,20 @@ void dbg_time(char *fmt,...);
 extern char *output_buffer;
 extern int output_bufferN;
 
+#if UNIX
 int write_enc(int fd, void *p, int n)
+#else
+int write_enc(HANDLE fd, void *p, int n)
+#endif
 {
 #if WIN32
-  int r = send(fd, (char *)p, n, 0);
-  if (r < 0)
+  DWORD wn;
+  BOOL r = WriteFile(fd, (char *)p, n, &wn, 0);
+  if (!r) {
     perror("write_enc");
-  return r;
+	return -1;
+  }
+  return wn;
 #else
   if (!fd)
     return 0;
@@ -94,19 +135,29 @@ typedef int socklen_t;
 #include <pwd.h>
 #endif
 
-
+#if UNIX
 static void shutdown_client(int fd)
+#else
+static void shutdown_client(HANDLE fd)
+#endif
 {
 //  dbg("client shutdown rn %d\n", rn);
+#if UNIX
   g_source_remove(gcin_clients[fd].tag);
+  int idx = fd;
+#else
+  int idx = find_im_client(fd);
+#endif
 
-  if (gcin_clients[fd].cs == current_CS) {
+  if (gcin_clients[idx].cs == current_CS) {
     hide_in_win(current_CS);
     current_CS = NULL;
   }
 
-  free(gcin_clients[fd].cs);
-  gcin_clients[fd].cs = NULL;
+  free(gcin_clients[idx].cs);
+  gcin_clients[idx].cs = NULL;
+  gcin_clients[idx].fd = NULL;
+
 #if UNIX
   int uid = getuid();
   struct passwd *pwd;
@@ -118,13 +169,18 @@ static void shutdown_client(int fd)
 #if UNIX
   close(fd);
 #else
-  closesocket(fd);
+  CloseHandle(fd);
+//  CloseHandle(handle);
 #endif
 }
 
 void message_cb(char *message);
 
+#if UNIX
 void process_client_req(int fd)
+#else
+void process_client_req(HANDLE fd)
+#endif
 {
   GCIN_req req;
 //  dbg("svr--> process_client_req %d\n", fd);
@@ -152,11 +208,17 @@ void process_client_req(int fd)
   if (current_CS && req.client_win == current_CS->client_win) {
     cs = current_CS;
   } else {
+#if UNIX
+	int idx = fd;
     cs = gcin_clients[fd].cs;
+#else
+	int idx = find_im_client(fd);
+	cs = gcin_clients[idx].cs;
+#endif
 
     int new_cli = 0;
     if (!cs) {
-      cs = gcin_clients[fd].cs = tzmalloc(ClientState, 1);
+      cs = gcin_clients[idx].cs = tzmalloc(ClientState, 1);
       new_cli = 1;
     }
 
@@ -396,7 +458,7 @@ cli_down:
       break;
     default:
       dbg_time("Invalid request %x from:", req.req_no);
-
+#if UNIX
       struct sockaddr_in addr;
       socklen_t len=sizeof(addr);
       bzero(&addr, sizeof(addr));
@@ -406,22 +468,9 @@ cli_down:
       } else {
         perror("getpeername\n");
       }
-
+#endif
       shutdown_client(fd);
       break;
   }
 }
 
-
-
-void close_all_clients()
-{
-  int i;
-  for(i=3; i <= gcin_clientsN; i++)
-    if (gcin_clients[i].tag)
-#if UNIX
-      close(i);
-#else
-      closesocket(i);
-#endif
-}

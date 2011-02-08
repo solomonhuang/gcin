@@ -656,14 +656,14 @@ void show_win0()
   create_win0_gui();
 
   if (gcin_pop_up_win && !tsin_has_input() && !force_show) {
-	dbg("show ret\n");
+//    dbg("show ret\n");
     return;
   }
 #if UNIX
   if (!GTK_WIDGET_VISIBLE(gwin0))
 #endif
   {
-	dbg("gtk_widget_show %x\n", gwin0);
+// dbg("gtk_widget_show %x\n", gwin0);
     gtk_widget_show(gwin0);
     move_win0(win_x, win_y);
   }

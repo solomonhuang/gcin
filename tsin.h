@@ -38,4 +38,12 @@ typedef struct {
   char keymap[128];
 } TSIN_GTAB_HEAD;
 
+typedef struct PRE_SEL {
+  u_int64_t phkey[MAX_PHRASE_LEN];  // gtab 4-byte is actually stored as u_int not u_int64_t
+//  int phidx;
+  char str[MAX_PHRASE_LEN*CH_SZ+1];
+  int len;
+  usecount_t usecount;
+} PRE_SEL;
+
 extern gboolean tsin_is_gtab;

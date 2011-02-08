@@ -84,7 +84,8 @@ void __gcin_enc_mem(u_char *p, int n, GCIN_PASSWD *passwd, u_int *seed);
 #endif
 
 #if WIN32
-#define TCP_PORT 29892
 #define GCIN_WIN_NAME "gcin0"
 #define GCIN_PORT_MESSAGE WM_USER+10
+#define GCIN_CLIENT_MESSAGE_REQ WM_USER+11
+#define GCIN_PIPE_PATH "\\\\.\\pipe\\gcin-svr%d"
 #endif

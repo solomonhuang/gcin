@@ -16,7 +16,8 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_vertical_select,
                  *check_button_gtab_unique_auto_send,
                  *check_button_gtab_que_wild_card,
-                 *check_button_gcin_capslock_lower;
+                 *check_button_gcin_capslock_lower,
+                 *check_button_gtab_phrase_pre_select;
 
 struct {
   unich_t *str;
@@ -91,6 +92,9 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 
   save_gcin_conf_int(GCIN_CAPSLOCK_LOWER,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower)));
+
+  save_gcin_conf_int(GTAB_PHRASE_PRE_SELECT,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_phrase_pre_select)));
 
 #if GTK_CHECK_VERSION(2,4,0)
   int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_spc_opts));
@@ -370,6 +374,12 @@ void create_gtab_conf_window()
   GtkWidget *label_gtab_auto_select = gtk_label_new(_(_L("由詞庫自動選擇字")));
   gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), label_gtab_auto_select,  FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), create_auto_select_by_phrase_opts(),  FALSE, FALSE, 0);
+  GtkWidget *label_gtab_phrase_pre_select = gtk_label_new(_(_L("使用預選詞")));
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), label_gtab_phrase_pre_select,  FALSE, FALSE, 0);
+  check_button_gtab_phrase_pre_select = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_auto_select_by_phrase), check_button_gtab_phrase_pre_select,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_phrase_pre_select), gtab_phrase_pre_select);
+
 
   GtkWidget *hbox_gtab_dup_select_bell = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_dup_select_bell, FALSE, FALSE, 0);

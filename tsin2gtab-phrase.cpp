@@ -11,9 +11,6 @@ ITEM64 it64[MAX_K];
 gboolean key64;
 int itN;
 
-int idx[50000];
-int idxN;
-
 int qcmp_ch(const void *aa, const void *bb)
 {
   return memcmp(((ITEM *)aa)->ch, ((ITEM *)bb)->ch, CH_SZ);

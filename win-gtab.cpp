@@ -10,7 +10,7 @@ static int current_gtab_vertical_select;
 
 GtkWidget *gwin_gtab;
 static GtkWidget *top_bin;
-static GtkWidget *label_full, *label_gtab_sele;
+static GtkWidget *label_full, *label_gtab_sele, *label_gtab_pre_sel;
 static GtkWidget *label_gtab = NULL;
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
@@ -149,6 +149,7 @@ void change_gtab_font_size()
     return;
 
   set_label_font_size(label_gtab_sele, gcin_font_size);
+  set_label_font_size(label_gtab_pre_sel, gcin_font_size);
   set_label_font_size(label_edit, gcin_font_size);
 
   set_label_font_size(label_gtab, gcin_font_size_gtab_in);
@@ -441,6 +442,9 @@ void create_win_gtab_gui_simple()
       gtk_box_pack_start (GTK_BOX (hbox_row1), align, FALSE, FALSE, 0);
   }
 
+  label_gtab_pre_sel = gtk_label_new(NULL);
+  gtk_box_pack_start (GTK_BOX (vbox_top), label_gtab_pre_sel, FALSE, FALSE, 0);
+
 
   hbox_row2 = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
@@ -510,6 +514,7 @@ void create_win_gtab_gui_simple()
   gtk_widget_show_all (gwin_gtab);
   gtk_widget_hide (gwin_gtab);
   gtk_widget_hide(label_gtab_sele);
+  gtk_widget_hide(label_gtab_pre_sel);
 
   show_hide_label_edit();
 
@@ -697,4 +702,17 @@ void win_gtab_disp_half_full()
     gtk_label_set_text(GTK_LABEL(label_gtab), get_full_str());
 
   minimize_win_gtab();
+}
+
+
+void disp_gtab_pre_sel(char *s)
+{
+  gtk_label_set_markup(GTK_LABEL(label_gtab_pre_sel), s);
+  gtk_widget_show(label_gtab_pre_sel);
+}
+
+void hide_gtab_pre_sel()
+{
+  tss.pre_selN = 0;
+  gtk_widget_hide(label_gtab_pre_sel);
 }

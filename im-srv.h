@@ -8,7 +8,11 @@ typedef struct {
   int tag;
   u_int seed;
   Connection_type type;
+#if	UNIX
   int fd;
+#else
+  HANDLE fd;
+#endif
 } GCIN_ENT;
 
 extern GCIN_ENT *gcin_clients;

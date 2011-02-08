@@ -210,6 +210,7 @@ void send_gcin_message(Display *dpy, char *s);
 void send_gcin_message(char *s);
 #endif
 void check_CS();
+gint64 current_time();
 void get_win_size(GtkWidget *win, int *width, int *height);
 void change_win_fg_bg(GtkWidget *win, GtkWidget *label);
 void set_no_focus(GtkWidget *win);

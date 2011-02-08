@@ -16,7 +16,7 @@ void p_err(char *fmt,...)
   va_end(args);
   fprintf(out,"\n");
   fflush(out);
-#if DEBUG && 0
+#if DEBUG && 1
   abort();
 #else
   if (getenv("GCIN_ERR_COREDUMP"))

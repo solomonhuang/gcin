@@ -587,8 +587,10 @@ int feedkey_pho(KeySym xkey, int kbstate)
         i++;
       }
 
-      char *tt = poo.cpg ? "&lt;" : " ";
-      int ttlen = strlen(tt);
+      char *tt;
+	  tt = poo.cpg ? "&lt;" : " ";
+      int ttlen;
+	  ttlen = strlen(tt);
       memcpy(out_buffer+out_bufferN, tt, ttlen);
       out_bufferN+=ttlen;
 

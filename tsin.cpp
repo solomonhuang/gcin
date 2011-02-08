@@ -13,6 +13,7 @@
 #include "gtab.h"
 #include "pho-status.h"
 
+extern int ph_key_sz;
 extern GtkWidget *gwin1;
 gint64 key_press_time;
 extern gboolean b_hsu_kbm;
@@ -30,14 +31,6 @@ extern PHOKBM phkbm;
 
 extern int hashidx[TSIN_HASH_N];
 // gboolean eng_ph=TRUE;  // english(FALSE) <-> pho(juyin, TRUE)
-
-typedef struct PRE_SEL {
-  phokey_t phokey[MAX_PHRASE_LEN];
-  int phidx;
-  char str[MAX_PHRASE_LEN*CH_SZ+1];
-  int len;
-  usecount_t usecount;
-} PRE_SEL;
 
 void clrin_pho(), hide_win0();
 void show_tsin_stat();
@@ -454,6 +447,12 @@ static void dump_tsidx_all()
 void load_tab_pho_file();
 void show_win0();
 
+void init_pre_sel()
+{
+  if (!tss.pre_sel)
+    tss.pre_sel=tzmalloc(PRE_SEL, 10);
+}
+
 void init_tab_pp(gboolean init)
 {
   if (!tss.chpho)
@@ -461,8 +460,7 @@ void init_tab_pp(gboolean init)
 
   tss.ph_sta_last = -1;
 
-  if (!tss.pre_sel)
-    tss.pre_sel=tzmalloc(PRE_SEL, 10);
+  init_pre_sel();
 
   if (!ch_pho)
     load_tab_pho_file();
@@ -871,6 +869,19 @@ static int qcmp_pre_sel_usecount(const void *aa, const void *bb)
   return b->usecount - a->usecount;
 }
 
+
+static int qcmp_pre_sel_str(const void *aa, const void *bb)
+{
+  PRE_SEL *a = (PRE_SEL *) aa;
+  PRE_SEL *b = (PRE_SEL *) bb;
+
+  int d = strcmp(a->str, b->str);
+  if (d)
+    return d;
+
+  return b->usecount - a->usecount;
+}
+
 gboolean check_fixed_mismatch(int chpho_idx, char *mtch, int plen)
 {
   int j;
@@ -890,8 +901,11 @@ gboolean check_fixed_mismatch(int chpho_idx, char *mtch, int plen)
   return FALSE;
 }
 
+void extract_gtab_key(int start, int len, void *out);
+gboolean check_gtab_fixed_mismatch(int idx, char *mtch, int plen);
+extern u_int64_t vmaskci;
 
-static u_char scanphr_e(int chpho_idx, int plen, gboolean pho_incr, int *rselN)
+u_char scanphr_e(int chpho_idx, int plen, gboolean pho_incr, int *rselN)
 {
   if (plen >= MAX_PHRASE_LEN)
     goto empty;
@@ -899,16 +913,28 @@ static u_char scanphr_e(int chpho_idx, int plen, gboolean pho_incr, int *rselN)
     goto empty;
 
   phokey_t tailpho;
+  u_int64_t tail64;
 
   if (pho_incr) {
-    tailpho = pho2key(poo.typ_pho);
-    if (!tailpho)
-      pho_incr = FALSE;
+    if (ph_key_sz==2) {
+      tailpho = pho2key(poo.typ_pho);
+      if (!tailpho)
+        pho_incr = FALSE;
+    } else {
+      tail64 = ggg.kval;
+    }
   }
 
-  phokey_t pp[MAX_PHRASE_LEN + 1];
-  extract_pho(chpho_idx, plen, pp);
-  int sti, edi;
+  u_int64_t pp64[MAX_PHRASE_LEN + 1];
+  phokey_t *pp = (phokey_t*)pp64;
+  u_int *pp32 = (u_int *)pp64;
+
+  if (ph_key_sz==2) {
+    extract_pho(chpho_idx, plen, pp);
+  } else {
+    extract_gtab_key(chpho_idx, plen, pp64);
+  }
+
 
 #if 0
   dbg("scanphr %d\n", plen);
@@ -921,13 +947,15 @@ static u_char scanphr_e(int chpho_idx, int plen, gboolean pho_incr, int *rselN)
 
   char pinyin_set[MAX_PH_BF_EXT];
   char *t_pinyin_set = NULL;
+  gboolean is_pin_juyin = ph_key_sz==2 && pin_juyin;
 
-  if (pin_juyin) {
+  if (is_pin_juyin) {
     get_chpho_pinyin_set(pinyin_set);
     t_pinyin_set = pinyin_set + chpho_idx;
     mask_tone(pp, plen, t_pinyin_set);
   }
 
+  int sti, edi;
   if (!tsin_seek(pp, plen, &sti, &edi, t_pinyin_set)) {
 empty:
     if (rselN)
@@ -938,12 +966,16 @@ empty:
   tss.pre_selN = 0;
   int maxlen=0;
 
-#define selNMax 200
+#define selNMax 300
   PRE_SEL sel[selNMax];
   int selN = 0;
 
+
+  u_int64_t mtk64[MAX_PHRASE_LEN+1];
+  phokey_t *mtk = (phokey_t*) mtk64;
+  u_int *mtk32 = (u_int *)mtk64;
+
   while (sti < edi && selN < selNMax) {
-    phokey_t mtk[MAX_PHRASE_LEN];
     u_char mtch[MAX_PHRASE_LEN*CH_SZ+1];
     char match_len;
     usecount_t usecount;
@@ -967,10 +999,16 @@ empty:
       continue;
 
     if (pho_incr) {
-      phokey_t last_m = mtk[plen];
-      mask_key_typ_pho(&last_m);
-      if (last_m != tailpho)
-        continue;
+      if (ph_key_sz==2) {
+        phokey_t last_m = mtk[plen];
+        mask_key_typ_pho(&last_m);
+        if (last_m != tailpho)
+          continue;
+      } else {
+        u_int64_t v = ph_key_sz==4?mtk32[plen]:mtk64[plen];
+        if (ggg.kval != (v&vmaskci))
+          continue;
+      }
     }
 
 
@@ -980,23 +1018,41 @@ empty:
     dbg("\n");
 #endif
 
-    if (check_fixed_mismatch(chpho_idx, (char *)mtch, plen))
-      continue;
+
+    if (ph_key_sz==2) {
+      if (check_fixed_mismatch(chpho_idx, (char *)mtch, plen))
+        continue;
+    } else {
+      if (check_gtab_fixed_mismatch(chpho_idx, (char *)mtch, plen))
+        continue;
+    }
 
     if (maxlen < match_len)
       maxlen = match_len;
 
     sel[selN].len = match_len;
-    sel[selN].phidx = sti - 1;
+//    sel[selN].phidx = sti - 1;
     sel[selN].usecount = usecount;
     utf8cpyN(sel[selN].str, (char *)mtch, match_len);
-    memcpy(sel[selN].phokey, mtk, match_len*sizeof(phokey_t));
+    memcpy(sel[selN].phkey, mtk, match_len*ph_key_sz);
     selN++;
+  }
+
+  if (selN > 1) {
+    qsort(sel, selN, sizeof(PRE_SEL), qcmp_pre_sel_str);
+    int nselN = 1;
+    int i;
+    for(i=1;i<selN;i++)
+      if (strcmp(sel[i].str, sel[i-1].str))
+        sel[nselN++]=sel[i];
+    selN = nselN;
   }
 
   qsort(sel, selN, sizeof(PRE_SEL), qcmp_pre_sel_usecount);
 
   tss.pre_selN = Min(selN, phkbm.selkeyN);
+
+//  dbg("tss.pre_selN %d\n", tss.pre_selN);
 
   memcpy(tss.pre_sel, sel, sizeof(PRE_SEL) * tss.pre_selN);
 
@@ -1008,7 +1064,7 @@ empty:
 
 static u_char scanphr(int chpho_idx, int plen, gboolean pho_incr)
 {
-	return scanphr_e(chpho_idx, plen, pho_incr, NULL);
+  return scanphr_e(chpho_idx, plen, pho_incr, NULL);
 }
 
 
@@ -1319,42 +1375,46 @@ int tsin_sele_by_idx(int c)
     return 0;
 
   tss.full_match = FALSE;
-  gboolean b_added = add_to_tsin_buf_phsta(tss.pre_sel[c].str, tss.pre_sel[c].phokey, len);
+  gboolean b_added = add_to_tsin_buf_phsta(tss.pre_sel[c].str, (phokey_t*)tss.pre_sel[c].phkey, len);
 
   return b_added;
 }
 
-
-static gboolean pre_sel_handler(KeySym xkey)
+static char shift_sele[]="!@#$%^&*()asdfghjkl:zxcvbnm<>?qwertyuiop";
+static char noshi_sele[]="1234567890asdfghjkl;zxcvbnm,./qwertyuiop";
+int shift_key_idx(char *s, KeySym xkey)
 {
   if (xkey >= 0x7f)
-    return 0;
-
-  static char shift_sele[]="!@#$%^&*()asdfghjkl:zxcvbnm<>?qwertyuiop";
-  static char noshi_sele[]="1234567890asdfghjkl;zxcvbnm,./qwertyuiop";
-  char *p;
-
-  if (!tss.pre_selN || !tsin_phrase_pre_select)
-    return 0;
+    return -1;
 
   if (isupper(xkey))
     xkey = xkey - 'A' + 'a';
 
 //  dbg("pre_sel_handler aa\n");
 
-  if (!(p=strchr(shift_sele, xkey))) {
-    close_selection_win();
-    return 0;
-  }
+  char *p;
+  if (!(p=strchr(shift_sele, xkey)))
+    return -1;
 
   int c = p - shift_sele;
   char noshi = noshi_sele[c];
 
-  if (!(p=strchr(pho_selkey, noshi)))
+  if (!(p=strchr(s, noshi)))
+    return -1;
+
+  c = p - s;
+  return c;
+}
+
+
+static gboolean pre_sel_handler(KeySym xkey)
+{
+  if (!tss.pre_selN || !tsin_phrase_pre_select)
     return 0;
 
-  c = p - pho_selkey;
-
+  int c = shift_key_idx(pho_selkey, xkey);
+  if (c < 0)
+    close_selection_win();
   return tsin_sele_by_idx(c);
 }
 
@@ -1787,7 +1847,7 @@ tab_phrase_end:
         poo.ityp3_pho=0;
         tss.pre_selN = 0;
         gboolean pho_cleared;
-		pho_cleared=FALSE;
+        pho_cleared=FALSE;
 
         if (pin_juyin) {
           for(j=sizeof(poo.inph)-1;j>=0;j--) {

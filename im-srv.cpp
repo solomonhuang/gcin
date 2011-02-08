@@ -1,4 +1,3 @@
-#if UNIX
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -8,24 +7,18 @@
 #include <X11/Xatom.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>
-#else
-#include <winsock.h>
-#endif
 
 #include "gcin.h"
 #include "gcin-protocol.h"
 #include "im-srv.h"
 #include <gdk/gdk.h>
 
-#if UNIX
 int im_sockfd, im_tcp_sockfd;
 Atom get_gcin_sockpath_atom(Display *dpy);
 Server_IP_port srv_ip_port;
 static Window prop_win;
 static Atom addr_atom;
-#else
-SOCKET im_tcp_sockfd;
-#endif
+
 
 #ifdef __cplusplus
 extern "C" gint gdk_input_add	  (gint		     source,
@@ -39,6 +32,7 @@ void gdk_input_remove	  (gint		     tag);
 void get_gcin_im_srv_sock_path(char *outstr, int outstrN);
 void process_client_req(int fd);
 
+#if UNIX
 static gboolean cb_read_gcin_client_data(GIOChannel *source, GIOCondition condition, gpointer data)
 {
   int fd=GPOINTER_TO_INT(data);
@@ -46,8 +40,8 @@ static gboolean cb_read_gcin_client_data(GIOChannel *source, GIOCondition condit
   process_client_req(fd);
   return TRUE;
 }
+#endif
 
-#if UNIX
 Atom get_gcin_addr_atom(Display *dpy);
 
 static void gen_passwd_idx()
@@ -62,11 +56,8 @@ static void gen_passwd_idx()
 
   XSync(GDK_DISPLAY(), FALSE);
 }
-#endif
 
-#if WIN32
-typedef int socklen_t;
-#endif
+
 
 static gboolean cb_new_gcin_client(GIOChannel *source, GIOCondition condition, gpointer data)
 {
@@ -77,7 +68,6 @@ static gboolean cb_new_gcin_client(GIOChannel *source, GIOCondition condition, g
   unsigned int newsockfd;
   socklen_t clilen;
 
-#if UNIX
   if (type==Connection_type_unix) {
     struct sockaddr_un cli_addr;
 
@@ -85,7 +75,6 @@ static gboolean cb_new_gcin_client(GIOChannel *source, GIOCondition condition, g
     clilen=0;
     newsockfd = accept(im_sockfd,(struct sockaddr *) & cli_addr, &clilen);
   } else
-#endif
   {
     struct sockaddr_in cli_addr;
 
@@ -108,24 +97,18 @@ static gboolean cb_new_gcin_client(GIOChannel *source, GIOCondition condition, g
 
   bzero(&gcin_clients[newsockfd], sizeof(gcin_clients[0]));
 
-#if WIN32
-  gcin_clients[newsockfd].tag = g_io_add_watch(g_io_channel_win32_new_socket(newsockfd), G_IO_IN, cb_read_gcin_client_data,
-              GINT_TO_POINTER(newsockfd));
-#else
   gcin_clients[newsockfd].tag = g_io_add_watch(g_io_channel_unix_new(newsockfd), G_IO_IN, cb_read_gcin_client_data,
               GINT_TO_POINTER(newsockfd));
-#endif
-#if UNIX
+
   if (type==Connection_type_tcp) {
     gcin_clients[newsockfd].seed = srv_ip_port.passwd.seed;
     gen_passwd_idx();
   }
-#endif
   gcin_clients[newsockfd].type = type;
   return TRUE;
 }
 
-#if UNIX
+
 static int get_ip_address(u_int *ip)
 {
   char hostname[64];
@@ -146,111 +129,16 @@ static int get_ip_address(u_int *ip)
   memcpy(ip, hent->h_addr_list[0], hent->h_length);
   return 0;
 }
-#endif
 
-#if WIN32
 
-static int my_port;
-static HWND hwndNextViewer;
-static UINT uFormat = (UINT)(-1);
-void get_selection();
-void disp_gcb_selection(const gchar *text);
 
-LRESULT wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-	switch (msg)
-	{
-#if 0
-// a very unreliable design in win32, cygwin/X sometimes flood WM_DRAWCLIPBOARD to gcin
-		case WM_CREATE:
-			hwndNextViewer = SetClipboardViewer(hwnd);
-			break;
-        case WM_CHANGECBCHAIN:
-#if 1
-//			dbg("WM_CHANGECBCHAIN\n");
-            if ((HWND) wp == hwndNextViewer)
-              hwndNextViewer = (HWND) lp;
-            else if (hwndNextViewer != NULL)
-              SendMessage(hwndNextViewer, msg, wp, lp);
-			break;
-#endif
-		case WM_DRAWCLIPBOARD:
-#if _DEBUG
-			dbg("WM_DRAWCLIPBOARD\n");
-#endif
-
-			{
-#if 1
-				get_selection();
-#else
-				static UINT auPriorityList[] = {
-					CF_UNICODETEXT
-                };
-                uFormat = GetPriorityClipboardFormat(auPriorityList, 1);
-				if (OpenClipboard(hwnd)) {
-                  HGLOBAL hglb = GetClipboardData(uFormat);
-                  LPWSTR lpstr = (LPWSTR) GlobalLock(hglb);
-				  char buf[4096];
-				  utf16_to_8(lpstr, buf, sizeof(buf));
-				  disp_gcb_selection(buf);
-                  GlobalUnlock(hglb);
-                  CloseClipboard();
-                }
-#endif
-			}
-
-			if (hwndNextViewer)
-				SendMessage(hwndNextViewer, msg, wp, lp);
-
-			break;
-#endif
-		case GCIN_PORT_MESSAGE:
-//			dbg("wndProc %d\n", my_port);
-			return my_port;
-		default:
-			return DefWindowProc(hwnd, msg, wp, lp);
-	}
-	return 0;
-}
-
-void ErrorExit(LPTSTR lpszFunction);
-extern HINSTANCE g_inst;
-void create_win32_svr_hwnd()
-{
-	WNDCLASSEX wc;
-	wc.cbSize         = sizeof(WNDCLASSEX);
-	wc.style          = 0;
-	wc.lpfnWndProc    = (WNDPROC)wndProc;
-	wc.cbClsExtra     = 0;
-	wc.cbWndExtra     = 0;
-	wc.hInstance      = (HINSTANCE)GetModuleHandleA(NULL);
-	wc.hCursor        = NULL;
-	wc.hIcon          = NULL;
-	wc.lpszMenuName   = (LPTSTR)NULL;
-	wc.lpszClassName  = GCIN_WIN_NAME;
-	wc.hbrBackground  = NULL;
-	wc.hIconSm        = NULL;
-
-	if( !RegisterClassEx( (LPWNDCLASSEX)&wc ) )
-		return;
-
-	HWND hwnd = CreateWindowExA(0, GCIN_WIN_NAME, NULL, 0,
-		0, 0, 0, 0, HWND_DESKTOP, NULL, wc.hInstance, NULL);
-
-	if (!hwnd)
-		ErrorExit("CreateWindowEx");
-
-//	dbg("svr_hwnd %x\n", hwnd);
-}
-#endif
+void start_pipe_svr();
 
 void init_gcin_im_serv(Window win)
 {
-  int servlen;
-
   dbg("init_gcin_im_serv\n");
 
-#if UNIX
+  int servlen;
   prop_win = win;
   struct sockadd_un;
   struct sockaddr_un serv_addr;
@@ -294,13 +182,8 @@ void init_gcin_im_serv(Window win)
 
   dbg("im_sockfd:%d\n", im_sockfd);
 
-#if 0
-  gdk_input_add(im_sockfd, GDK_INPUT_READ, cb_new_gcin_client,
-                GINT_TO_POINTER(Connection_type_unix));
-#else
   g_io_add_watch(g_io_channel_unix_new(im_sockfd), G_IO_IN, cb_new_gcin_client,
                 GINT_TO_POINTER(Connection_type_unix));
-#endif
 
   Display *dpy = GDK_DISPLAY();
 
@@ -317,28 +200,10 @@ void init_gcin_im_serv(Window win)
     dbg("connection via TCP is disabled\n");
     return;
   }
-#endif
 
   // tcp socket
-#if UNIX
   if (get_ip_address(&srv_ip_port.ip) < 0)
     return;
-#else
-    WORD wVersionRequested;
-    WSADATA wsaData;
-    int err;
-
-/* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
-    wVersionRequested = MAKEWORD(2, 2);
-
-    err = WSAStartup(wVersionRequested, &wsaData);
-    if (err != 0) {
-        /* Tell the user that we could not find a usable */
-        /* Winsock DLL.                                  */
-        dbg("WSAStartup failed with error: %d\n", err);
-        exit(1);
-    }
-#endif
 
   if ((im_tcp_sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("cannot open tcp socket");
@@ -355,35 +220,13 @@ void init_gcin_im_serv(Window win)
     // tcp socket
     bzero(&serv_addr_tcp, sizeof(serv_addr_tcp));
     serv_addr_tcp.sin_family = AF_INET;
-#if WIN32
-    serv_addr_tcp.sin_addr.s_addr = inet_addr("127.0.0.1");
-    serv_addr_tcp.sin_port = htons(port);
-	if (bind(im_tcp_sockfd, (struct sockaddr *) &serv_addr_tcp, sizeof(serv_addr_tcp))!=SOCKET_ERROR) {
-		break;
-	}
 
-	dbg("after bind\n");
-#else
     serv_addr_tcp.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr_tcp.sin_port = htons(port);
     if (bind(im_tcp_sockfd, (struct sockaddr *) &serv_addr_tcp, sizeof(serv_addr_tcp)) == 0)
       break;
-#endif
   }
 
-#if WIN32
-  if (port == 20000)
-	  p_err("Cannot bind port");
-  my_port = port;
-
-  dbg("----- my_port %d\n", port);
-#endif
-
-
-#if 0
-  u_char *myip = (char *)&srv_ip_port.ip;
-#endif
-#if UNIX
   srv_ip_port.port = serv_addr_tcp.sin_port;
   dbg("server port bind to %s:%d\n", inet_ntoa(serv_addr_tcp.sin_addr), port);
   time_t t;
@@ -393,7 +236,6 @@ void init_gcin_im_serv(Window win)
   for(i=0; i < __GCIN_PASSWD_N_; i++) {
     srv_ip_port.passwd.passwd[i] = (rand()>>2) & 0xff;
   }
-#endif
 
   if (listen(im_tcp_sockfd, 5) < 0) {
     perror("cannot listen: ");
@@ -403,20 +245,8 @@ void init_gcin_im_serv(Window win)
   dbg("after listen\n");
 
 
-#if UNIX
   gen_passwd_idx();
-#endif
 
-#if WIN32
-  g_io_add_watch(g_io_channel_win32_new_socket(im_tcp_sockfd), G_IO_IN, cb_new_gcin_client,
-                GINT_TO_POINTER(Connection_type_tcp));
-#else
   g_io_add_watch(g_io_channel_unix_new(im_tcp_sockfd), G_IO_IN, cb_new_gcin_client,
                 GINT_TO_POINTER(Connection_type_tcp));
-#endif
-
-//  printf("im_sockfd: %d\n",im_sockfd);
-#if WIN32
-	create_win32_svr_hwnd();
-#endif
 }
