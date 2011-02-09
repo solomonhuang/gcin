@@ -82,7 +82,7 @@ void __gcin_dbg_(char *fmt,...)
 
 #if _DEBUG
 #define _DBG 1
-#define CONSOLE_OFF 0
+#define CONSOLE_OFF 1
 #endif
 
 

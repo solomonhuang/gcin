@@ -21,6 +21,8 @@ GTAB_ST ggg;
 #endif
 
 extern GtkWidget *gwin_gtab;
+void hide_gtab_pre_sel();
+void gtab_scan_pre_select(gboolean);
 
 static GTAB_space_pressed_E _gtab_space_auto_first;
 extern char *TableDir;
@@ -1291,6 +1293,7 @@ static void proc_wild_disp()
 
 gboolean full_char_proc(KeySym keysym);
 void insert_gbuf_cursor_char(char ch);
+gboolean gtab_pre_select_shift(KeySym key, int kbstate);
 
 gboolean shift_char_proc(KeySym key, int kbstate)
 {
@@ -1669,6 +1672,9 @@ direct_select:
           return 0;
       }
     case '*':
+      if (tss.pre_selN)
+		  shift_char_proc(key, kbstate);
+
       inkey=cur_inmd->keymap[key];
       if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {
 //        dbg("%d %d\n", inkey, cur_inmd->WILD_STAR);

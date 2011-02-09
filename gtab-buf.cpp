@@ -23,6 +23,7 @@ int ch_pos_find(char *ch, int pos);
 void inc_gtab_usecount(char *str), ClrSelArea();
 void lookup_gtabn(char *ch, char *out);
 char *htmlspecialchars(char *s, char out[]);
+void hide_gtab_pre_sel();
 
 extern gboolean test_mode;
 
@@ -745,7 +746,7 @@ int gtab_buf_delete_ex(gboolean auto_hide)
 
 int gtab_buf_delete()
 {
-  gtab_buf_delete_ex(TRUE);
+  return gtab_buf_delete_ex(TRUE);
 }
 
 
@@ -774,7 +775,7 @@ int gtab_buf_backspace_ex(gboolean auto_hide)
 
 int gtab_buf_backspace()
 {
-  gtab_buf_backspace_ex(TRUE);
+  return gtab_buf_backspace_ex(TRUE);
 }
 
 
@@ -1033,8 +1034,7 @@ void init_pre_sel();
 
 static int gtab_pre_select_phrase_len;
 
-
-
+void disp_gtab_pre_sel(char *s);
 
 void gtab_scan_pre_select(gboolean b_incr)
 {

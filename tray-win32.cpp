@@ -84,6 +84,7 @@ void cb_trad_sim_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 //  dbg("checkmenuitem %x\n", checkmenuitem);
 }
 
+void toggle_stat_win();
 void cb_stat_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   toggle_stat_win();
@@ -132,7 +133,7 @@ void load_setttings(), load_tab_pho_file();;
 void update_win_kbm();
 void update_win_kbm_inited();
 extern gboolean win_kbm_inited, stat_enabled;
-extern toggle_stat_win();
+void toggle_stat_win();
 static void cb_fast_phonetic_kbd_switch(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   char bak[128], cur[128];

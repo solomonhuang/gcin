@@ -1,4 +1,4 @@
-﻿#if UNIX
+#if UNIX
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
@@ -83,39 +83,39 @@ restart:
   HANDLE hPipe;
 
   int i;
-  for(i=0;i<20;i++) 
-   { 
-      hPipe = CreateFileA( 
-         pipe_path,   // pipe name 
-         GENERIC_READ |  // read and write access 
-         GENERIC_WRITE, 
-         0,              // no sharing 
+  for(i=0;i<20;i++)
+   {
+      hPipe = CreateFileA(
+         pipe_path,   // pipe name
+         GENERIC_READ |  // read and write access
+         GENERIC_WRITE,
+         0,              // no sharing
          NULL,           // default security attributes
-         OPEN_EXISTING,  // opens existing pipe 
-         0,              // default attributes 
-         NULL);          // no template file 
- 
-   // Break if the pipe handle is valid. 
- 
+         OPEN_EXISTING,  // opens existing pipe
+         0,              // default attributes
+         NULL);          // no template file
+
+   // Break if the pipe handle is valid.
+
       if (hPipe != INVALID_HANDLE_VALUE) {
 		 dbg("connection established %x\n", hPipe);
-         return hPipe; 
+         return hPipe;
 	  }
- 
-      // Exit if an error other than ERROR_PIPE_BUSY occurs. 
- 
+
+      // Exit if an error other than ERROR_PIPE_BUSY occurs.
+
       if (GetLastError() != ERROR_PIPE_BUSY) {
-         dbg("Could not open pipe. GLE=%d\n", GetLastError() ); 
+         dbg("Could not open pipe. GLE=%d\n", GetLastError() );
          return NULL;
       }
- 
-      // All pipe instances are busy, so wait for 20 seconds. 
- 
-      if (!WaitNamedPipeA(pipe_path, 2000)) { 
-         printf("Could not open pipe: 20 second wait timed out."); 
+
+      // All pipe instances are busy, so wait for 20 seconds.
+
+      if (!WaitNamedPipeA(pipe_path, 2000)) {
+         printf("Could not open pipe: 20 second wait timed out.");
          return NULL;
-      } 
-   } 
+      }
+   }
 
    MessageBoxA(NULL, "cannot connect to gcin.exe", NULL, MB_OK);
 

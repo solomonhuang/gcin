@@ -4,7 +4,7 @@ QTIM=$(QT)/plugins/inputmethods
 IMMODULES=$(libdir)/$(QTIM)
 
 INCS=-I../im-client -I/usr/include/X11 `pkg-config QtCore QtGui --cflags`
-CXXFLAGS=$(OPTFLAGS) $(INCS) -Wall -D_REENTRANT -fPIC  -DQT4 -DQT_SHARED \
+CXXFLAGS=$(OPTFLAGS) $(INCS) -Wall -D_REENTRANT -DUNIX=1 -fPIC  -DQT4 -DQT_SHARED \
 -DQT_IMMODULE -DPIC
 OBJS= moc_gcin-qt.o gcin-qt.o im-gcin-qt.o gcin-imcontext-qt.o
 .SUFFIXES:	.c .cpp .a .so .E .h
