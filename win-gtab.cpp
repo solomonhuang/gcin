@@ -707,6 +707,7 @@ void win_gtab_disp_half_full()
 
 void disp_gtab_pre_sel(char *s)
 {
+//  dbg("disp_gtab_pre_sel %s\n", s);
   gtk_label_set_markup(GTK_LABEL(label_gtab_pre_sel), s);
   gtk_widget_show(label_gtab_pre_sel);
 }

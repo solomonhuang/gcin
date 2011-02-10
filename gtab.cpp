@@ -1421,6 +1421,8 @@ shift_proc:
   if (shift_m && !strchr(cur_inmd->selkey, key) && !ggg.more_pg &&
        key!='*' && (key!='?' || gtab_shift_phrase_key && !ggg.ci)) {
     if (gtab_shift_phrase_key) {
+      if (tss.pre_selN && shift_char_proc(key, kbstate))
+        return TRUE;
       if (feed_phrase(key, kbstate))
         return TRUE;
     } else {
@@ -1673,7 +1675,7 @@ direct_select:
       }
     case '*':
       if (tss.pre_selN)
-		  shift_char_proc(key, kbstate);
+        shift_char_proc(key, kbstate);
 
       inkey=cur_inmd->keymap[key];
       if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {

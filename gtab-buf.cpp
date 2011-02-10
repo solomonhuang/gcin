@@ -1073,6 +1073,7 @@ void gtab_scan_pre_select(gboolean b_incr)
 
   scanphr_e(ggg.gbufN - max_len, max_len, b_incr, &selN);
 
+//  dbg("selN:%d %d\n", selN, tss.pre_selN);
 
   if (selN==1 && tss.pre_sel[0].len==max_len) {
     char out[MAX_PHRASE_LEN * CH_SZ + 1];

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gtkintl.h"
+//#include "gtkintl.h"
 #include <gtk/gtk.h>
 #include "gtkimcontextgcin.h"
 // #include "gcin.h"  // for debug only

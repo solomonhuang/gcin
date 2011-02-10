@@ -13,7 +13,7 @@ EXTRA_INC=-I/sw/include
 endif
 
 .SUFFIXES:	.c .o .E
-CFLAGS = $(OPTFLAGS) $(EXTRA_INC) $(GTKINC) -I../im-client -I.. \
+CFLAGS = $(OPTFLAGS) $(EXTRA_INC) $(GTKINC) -I../im-client -I.. -DUNIX=1 \
 -I../IMdkit/include -DCLIENT_LIB=1 -DMAC_OS=$(MAC_OS) -DFREEBSD=$(FREEBSD)
 
 ifeq ($(NEW_GTK_IM),Y)
@@ -29,8 +29,7 @@ endif
 all:	im-gcin.so im-gcin-cur.so
 
 im-gcin.so:     $(OBJS) ../im-client/libgcin-im-client.so
-	export LD_RUN_PATH=$(gcinlibdir) ;\
-	$(CC) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
+	$(CC) $(gcc_ld_run_path) $(SO_FLAGS) $(OBJS) -L../im-client -lgcin-im-client -o $@ $(LDFLAGS)
 	rm -f core.*
 
 im-gcin-cur.so:     $(OBJS) ../im-client/libgcin-im-client.so

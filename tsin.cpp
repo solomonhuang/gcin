@@ -1050,10 +1050,12 @@ empty:
 
   qsort(sel, selN, sizeof(PRE_SEL), qcmp_pre_sel_usecount);
 
-  tss.pre_selN = Min(selN, phkbm.selkeyN);
+  if (ph_key_sz==2)
+    tss.pre_selN = Min(selN, phkbm.selkeyN);
+  else
+    tss.pre_selN = strlen(cur_inmd->selkey);
 
 //  dbg("tss.pre_selN %d\n", tss.pre_selN);
-
   memcpy(tss.pre_sel, sel, sizeof(PRE_SEL) * tss.pre_selN);
 
   if (rselN)
