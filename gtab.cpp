@@ -1674,8 +1674,8 @@ direct_select:
           return 0;
       }
     case '*':
-      if (tss.pre_selN)
-        shift_char_proc(key, kbstate);
+      if (tss.pre_selN && shift_char_proc(key, kbstate))
+        return TRUE;
 
       inkey=cur_inmd->keymap[key];
       if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {
