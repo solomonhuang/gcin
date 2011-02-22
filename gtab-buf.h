@@ -2,7 +2,8 @@ typedef struct {
   char *ch;
   char **sel;
   int selN;
-  u_char flag, c_sel;
+  u_short flag;
+  u_char c_sel;
   char plen, keysN;
   u_int64_t keys[8];
 } GEDIT;

@@ -1058,6 +1058,9 @@ void gtab_scan_pre_select(gboolean b_incr)
 
   int len, selN, pre_selN=0, max_len=-1, max_selN;
   for(len=1; len <= Maxlen; len++) {
+    int idx = ggg.gbufN - len;
+    if (gbuf[idx].flag & FLAG_CHPHO_PHRASE_TAIL)
+      break;
     int mlen = scanphr_e(ggg.gbufN - len, len, b_incr, &selN);
     if (mlen) {
       max_len = len;
@@ -1125,7 +1128,10 @@ gboolean gtab_pre_select_shift(KeySym key, int kbstate)
 #endif
 
   gtab_buf_backspaceN(gtab_pre_select_phrase_len);
-  insert_gbuf_cursor_phrase(tss.pre_sel[c].str, tss.pre_sel[c].phkey, tss.pre_sel[c].len);
+  int len = tss.pre_sel[c].len;
+  insert_gbuf_cursor_phrase(tss.pre_sel[c].str, tss.pre_sel[c].phkey, len);
+  gbuf[ggg.gbufN-1].flag |= FLAG_CHPHO_PHRASE_TAIL;
+
   hide_gtab_pre_sel();
   return TRUE;
 }

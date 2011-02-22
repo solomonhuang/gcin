@@ -1741,6 +1741,9 @@ direct_select:
     default:
 next:
 
+      if (shift_m && tss.pre_selN && shift_char_proc(key, kbstate))
+        return TRUE;
+
       clear_gtab_input_error_color();
 
       if (ggg.invalid_spc && gtab_invalid_key_in) {
@@ -1795,10 +1798,11 @@ keypad_proc:
       }
 #endif
 
-	  if (key < 0x7f)
-		inkey= cur_inmd->keymap[key];
-	  else
-		inkey = 0;
+
+      if (key < 0x7f)
+        inkey= cur_inmd->keymap[key];
+      else
+        inkey = 0;
 
 //	  dbg("ggg.spc_pressed %d %d %d is_keypad:%d\n", ggg.spc_pressed, ggg.last_full, cur_inmd->MaxPress, is_keypad);
 
