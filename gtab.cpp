@@ -20,6 +20,7 @@ GTAB_ST ggg = {.sel1st_i=MAX_SELKEY - 1};
 GTAB_ST ggg;
 #endif
 
+extern gint64 key_press_time_ctrl;
 extern GtkWidget *gwin_gtab;
 void hide_gtab_pre_sel();
 void gtab_scan_pre_select(gboolean);
@@ -1343,6 +1344,7 @@ void save_gtab_buf_phrase(KeySym key);
 gboolean save_gtab_buf_shift_enter();
 gboolean win_sym_page_up(), win_sym_page_down();
 u_int64_t vmaskci;
+gboolean gtab_pre_select_idx(int c);
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -1356,11 +1358,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   gboolean ctrl_m = (kbstate & ControlMask) > 0;
 
   bzero(seltab_phrase, sizeof(seltab_phrase));
-
-#if 0
-  if (key>= XK_KP_0 && key<= XK_KP_9)
-	dbg("uuuu");
-#endif
 
 //  dbg("uuuuu %x %x   shift,ctrl:%d,%d\n", key, kbstate, shift_m, ctrl_m);
 
@@ -1386,6 +1383,13 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (poo.same_pho_query_state == SAME_PHO_QUERY_none && gwin_pho &&
     GTK_WIDGET_VISIBLE(gwin_pho))
      hide_win_pho();
+
+   if ((key==XK_Control_L||key==XK_Control_R) && !key_press_time_ctrl && tss.pre_selN) {
+     key_press_time_ctrl = current_time();
+     return TRUE;
+   } else {
+     key_press_time_ctrl = 0;
+   }
 
 
   if (gtab_capslock_in_eng && (kbstate&LockMask) && !BITON(cur_inmd->flag, FLAG_KEEP_KEY_CASE)) {
@@ -1751,13 +1755,12 @@ next:
       }
       if (key>=XK_KP_0 && key<=XK_KP_9) {
         if (!ggg.ci) {
-		  if (ggg.gbufN) {
+          if (ggg.gbufN) {
             insert_gbuf_cursor_char(key - XK_KP_0 + '0');
-			return 1;
-		  }
-		  else
+            return 1;
+          } else
             return 0;
-		}
+        }
         if (!strncmp(cur_inmd->filename, "dayi", 4)) {
           key = key - XK_KP_0 + '0';
           is_keypad = TRUE;
@@ -1804,12 +1807,15 @@ keypad_proc:
       else
         inkey = 0;
 
-//	  dbg("ggg.spc_pressed %d %d %d is_keypad:%d\n", ggg.spc_pressed, ggg.last_full, cur_inmd->MaxPress, is_keypad);
+//        dbg("ggg.spc_pressed %d %d %d is_keypad:%d\n", ggg.spc_pressed, ggg.last_full, cur_inmd->MaxPress, is_keypad);
 
 #if 1 // for dayi, testcase :  6 space keypad6
+      int vv = pselkey - cur_inmd->selkey;
+      if (pselkey && tss.ctrl_pre_sel) {
+        if (gtab_pre_select_idx(vv))
+          return TRUE;
+      } else
       if (( (ggg.spc_pressed||ggg.last_full||is_keypad) ||(ggg.wild_mode && (!inkey ||pendkey)) || ggg.gtab_buf_select) && pselkey) {
-        int vv = pselkey - cur_inmd->selkey;
-
         if ((_gtab_space_auto_first & GTAB_space_auto_first_any) && !ggg.wild_mode)
           vv++;
 

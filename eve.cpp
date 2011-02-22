@@ -1206,8 +1206,6 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
   }
 #endif
 
-
-#if USE_TSIN
   switch(current_method_type()) {
     case method_type_TSIN:
       return feedkey_pp_release(keysym, kev_state);
@@ -1215,8 +1213,9 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
     case method_type_ANTHY:
       return feedkey_anthy_release(keysym, kev_state);
 #endif
+    default:
+      return feedkey_gtab_release(keysym, kev_state);
   }
-#endif
 
   return FALSE;
 }

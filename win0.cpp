@@ -122,6 +122,7 @@ static void create_char(int index)
 
 static void change_tsin_line_color()
 {
+#if 0
   int i;
 
   GdkColor fg;
@@ -137,6 +138,7 @@ static void change_tsin_line_color()
 #endif
     gtk_widget_modify_fg(chars[i].label, GTK_STATE_NORMAL, gcin_win_color_use ? &fg:NULL);
   }
+#endif
 }
 
 

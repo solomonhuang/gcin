@@ -723,6 +723,7 @@ void disp_gtab_pre_sel(char *s)
 void hide_gtab_pre_sel()
 {
   tss.pre_selN = 0;
+  tss.ctrl_pre_sel = FALSE;
   gtk_widget_hide(label_gtab_pre_sel);
 
   move_win_gtab(current_in_win_x, current_in_win_y);

@@ -204,12 +204,18 @@ static void cb_ok (GtkWidget *button, gpointer data)
 {
   save_gcin_conf_int(DEFAULT_INPUT_METHOD, default_input_method);
 
+  int idx;
+#if UNIX
 #if GTK_CHECK_VERSION(2,4,0)
-  int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_im_toggle_keys));
+  idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_im_toggle_keys));
 #else
-  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
+  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
 #endif
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, imkeys[idx].keynum);
+#else
+  save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, Control_Space);
+#endif
+
   save_gcin_conf_int(GCIN_FLAGS_IM_ENABLED, gcin_flags_im_enabled);
   save_gcin_conf_int(GCIN_REMOTE_CLIENT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
@@ -499,7 +505,7 @@ void set_selection_by_key(int key)
     gtk_tree_selection_select_iter(selection,&iter);
 }
 
-
+#if UNIX
 static GtkWidget *create_im_toggle_keys()
 {
 
@@ -541,6 +547,7 @@ static GtkWidget *create_im_toggle_keys()
 
   return hbox;
 }
+#endif
 
 int get_current_speaker_idx();
 
@@ -677,7 +684,9 @@ void create_gtablist_window (void)
 
   gtk_container_add (GTK_CONTAINER (sw), treeview);
 
+#if UNIX
   gtk_box_pack_start (GTK_BOX (vbox), create_im_toggle_keys(), FALSE, FALSE, 0);
+#endif
 
 #if UNIX
   GtkWidget *hbox_gcin_remote_client = gtk_hbox_new (FALSE, 10);

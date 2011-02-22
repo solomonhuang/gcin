@@ -25,6 +25,8 @@ void lookup_gtabn(char *ch, char *out);
 char *htmlspecialchars(char *s, char out[]);
 void hide_gtab_pre_sel();
 
+extern gint64 key_press_time_ctrl;
+
 extern gboolean test_mode;
 
 GEDIT *gbuf;
@@ -1109,14 +1111,8 @@ void gtab_scan_pre_select(gboolean b_incr)
 
 int shift_key_idx(char *s, KeySym xkey);
 
-
-gboolean gtab_pre_select_shift(KeySym key, int kbstate)
+gboolean gtab_pre_select_idx(int c)
 {
-//  dbg("gtab_pre_select_shift %c\n", key);
-  if (!gtab_phrase_pre_select || !tss.pre_selN)
-    return FALSE;
-
-  int c = shift_key_idx(cur_inmd->selkey, key);
   if (c < 0)
     return FALSE;
   if (c >= tss.pre_selN)
@@ -1135,3 +1131,37 @@ gboolean gtab_pre_select_shift(KeySym key, int kbstate)
   hide_gtab_pre_sel();
   return TRUE;
 }
+
+
+gboolean gtab_pre_select_shift(KeySym key, int kbstate)
+{
+//  dbg("gtab_pre_select_shift %c\n", key);
+  if (!gtab_phrase_pre_select || !tss.pre_selN)
+    return FALSE;
+
+  int c = shift_key_idx(cur_inmd->selkey, key);
+  return gtab_pre_select_idx(c);
+}
+
+
+int feedkey_gtab_release(KeySym xkey, int kbstate)
+{
+  gint64 kpt;
+
+  switch (xkey) {
+     case XK_Control_L:
+     case XK_Control_R:
+       kpt = key_press_time_ctrl;
+       key_press_time_ctrl = 0;
+        if (current_time() - kpt < 300000 && tss.pre_selN) {
+          if (!test_mode) {
+            tss.ctrl_pre_sel = TRUE;
+          }
+          return 1;
+        } else
+          return 0;
+     default:
+        return 0;
+  }
+}
+

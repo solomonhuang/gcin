@@ -15,7 +15,7 @@
 
 extern int ph_key_sz;
 extern GtkWidget *gwin1;
-gint64 key_press_time;
+gint64 key_press_time, key_press_time_ctrl;
 extern gboolean b_hsu_kbm;
 extern gboolean test_mode;
 
@@ -915,7 +915,7 @@ void disp_pre_sel_page()
 static void close_selection_win()
 {
   hide_selections_win();
-  tss.current_page=tss.sel_pho=0;
+  tss.current_page=tss.sel_pho=tss.ctrl_pre_sel = 0;
   tss.pre_selN = 0;
 }
 
@@ -1239,7 +1239,6 @@ static gboolean pre_sel_handler(KeySym xkey)
 }
 
 
-
 static gboolean pre_punctuation(KeySym xkey)
 {
   char *p;
@@ -1371,17 +1370,6 @@ static int cursor_delete()
   clrcursor();
   int k;
 
-#if 0
-  int pst=k=tss.chpho[tss.c_idx].psta;
-
-  for(k=tss.c_idx;k<tss.c_len;k++) {
-    tss.chpho[k] = tss.chpho[k+1];
-	if (tss.chpho[k+1].ch == tss.chpho[k+1].cha)
-		tss.chpho[k].ch = tss.chpho[k].cha;
-//    tss.chpho[k].psta=tss.chpho[k+1].psta-1;
-  }
-#endif
-
   tss.c_len--;
 //  hide_char(tss.c_len);
   init_chpho_i(tss.c_len);
@@ -1393,27 +1381,6 @@ static int cursor_delete()
 
   if (!tss.c_idx)
     clear_match();
-  else {
-#if 0
-    k=tss.c_idx-1;
-    pst=tss.chpho[k].psta;
-
-    while (k>0 && tss.chpho[k].psta==pst)
-      k--;
-
-    if (tss.chpho[k].psta!=pst)
-      k++;
-
-    int match_len= tss.c_idx - k;
-    if (!(match_len=scanphr(k, match_len, FALSE)))
-      tss.ph_sta=-1;
-    else
-      tss.ph_sta=k;
-
-    if (tss.ph_sta < 0 || tss.c_idx - tss.ph_sta < 2)
-      tss.pre_selN = 0;
-#endif
-  }
 
   if (!tss.c_len && gcin_pop_up_win)
     hide_win0();
@@ -1541,8 +1508,18 @@ int feedkey_pp(KeySym xkey, int kbstate)
    if ((xkey==XK_Shift_L||xkey==XK_Shift_R) && !key_press_time) {
 //	  dbg("feedkey_pp\n");
      key_press_time = current_time();
+	 key_press_time_ctrl = 0;
    } else
+   if ((xkey==XK_Control_L||xkey==XK_Control_R)
+	   && !key_press_time_ctrl && tss.pre_selN) {
+//	  dbg("feedkey_pp\n");
+     key_press_time_ctrl = current_time();
+	 key_press_time = 0;
+	 return TRUE;
+   } else {
      key_press_time = 0;
+	 key_press_time_ctrl = 0;
+   }
 
    if (!tsin_pho_mode() && !tss.c_len && gcin_pop_up_win && xkey!=XK_Caps_Lock) {
      hide_win0();
@@ -1732,24 +1709,6 @@ tab_phrase_end:
         if (!tss.c_idx) {
           clear_match();
         } else {
-#if 0
-          k=tss.c_idx-1;
-          pst=tss.chpho[k].psta;
-
-          while (k>0 && tss.chpho[k].psta==pst)
-            k--;
-
-          if (tss.chpho[k].psta!=pst)
-            k++;
-
-          match_len= tss.c_idx - k;
-          if (!(match_len=scanphr(k, match_len, FALSE)))
-            tss.ph_sta=-1;
-          else
-            tss.ph_sta=k;
-
-            tss.pre_selN = 0;
-#endif
           tsin_scan_pre_select(TRUE);
         }
 
@@ -1963,11 +1922,21 @@ other_keys:
          xkey_lcase = xkey - XK_KP_0 + '0';
 
        char *pp;
-       if ((pp=strchr(pho_selkey,xkey_lcase)) && tss.sel_pho) {
+       if ((pp=strchr(pho_selkey,xkey_lcase)) && (tss.sel_pho || tss.ctrl_pre_sel)) {
          int c=pp-pho_selkey;
 
-         if (tsin_pho_sel(c))
-           return 1;
+		 if (tss.sel_pho) {
+           if (tsin_pho_sel(c))
+             return 1;
+		 } else
+		 if (tss.ctrl_pre_sel) {
+  		     tss.ctrl_pre_sel = FALSE;
+			 if (tsin_sele_by_idx(c))
+				 return TRUE;
+			 else {
+				 close_selection_win();
+			 }
+		 }
 
          goto scan_it;
        }
@@ -2091,12 +2060,6 @@ llll2:
 
      disp_in_area_pho_tsin();
 
-#if 0
-     if (tss.pre_selN)
-       scanphr(tss.ph_sta, tss.c_idx - tss.ph_sta, TRUE);
-     disp_pre_sel_page();
-#endif
-
      key = pho2key(poo.typ_pho);
 
      pho_play(key);
@@ -2173,11 +2136,6 @@ llll2:
    if (status & PHO_STATUS_PINYIN_LEFT) {
      poo.ityp3_pho=0;
      disp_in_area_pho_tsin();
-#if 0
-     if (tss.pre_selN)
-       scanphr(tss.ph_sta, tss.c_idx - tss.ph_sta, TRUE);
-     disp_pre_sel_page();
-#endif
    } else {
      clrin_pho_tsin();
      clr_in_area_pho_tsin();
@@ -2194,12 +2152,14 @@ scan_it:
 
 int feedkey_pp_release(KeySym xkey, int kbstate)
 {
-  gint64 kpt = key_press_time;
-  key_press_time = 0;
+  gint64 kpt;
 
   switch (xkey) {
      case XK_Shift_L:
      case XK_Shift_R:
+		kpt = key_press_time;
+		key_press_time = 0;
+
 // dbg("release xkey %x\n", xkey);
         if (
 (  (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) ||
@@ -2209,9 +2169,19 @@ int feedkey_pp_release(KeySym xkey, int kbstate)
      && xkey == XK_Shift_R))
           &&  current_time() - kpt < 300000) {
           if (!test_mode) {
-            key_press_time = 0;
             close_selection_win();
             tsin_toggle_eng_ch();
+          }
+          return 1;
+		} else
+          return 0;
+     case XK_Control_L:
+     case XK_Control_R:
+		kpt = key_press_time_ctrl;
+		key_press_time_ctrl = 0;
+        if (current_time() - kpt < 300000 && tss.pre_selN) {
+          if (!test_mode) {
+			tss.ctrl_pre_sel = TRUE;
           }
           return 1;
 		} else
