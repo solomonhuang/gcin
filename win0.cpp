@@ -22,7 +22,7 @@ gboolean gcin_edit_display_ap_only();
 static struct {
   GtkWidget *vbox;
   GtkWidget *label;
-  GtkWidget *line;
+//  GtkWidget *line;
   int x;
 } chars[MAX_PH_BF_EXT];
 
@@ -104,17 +104,19 @@ static void create_char(int index)
     set_label_font_size(label, gcin_font_size);
 
     chars[i].label = label;
+#if 0
     GtkWidget *separator =  gtk_drawing_area_new();
     gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
     gtk_widget_set_size_request(separator, 8, 2);
     gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
     chars[i].line = separator;
+#endif
 
     if (gcin_win_color_use)
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
 
     gtk_widget_show_all(event_box);
-    gtk_widget_hide(separator);
+//    gtk_widget_hide(separator);
   }
 }
 
@@ -128,9 +130,11 @@ static void change_tsin_line_color()
   gdk_color_parse(tsin_phrase_line_color, &color_bg);
 
   for(i=0; i < MAX_PH_BF_EXT; i++) {
+#if 0
     if (!chars[i].line)
       continue;
     gtk_widget_modify_bg(chars[i].line, GTK_STATE_NORMAL, &color_bg);
+#endif
     gtk_widget_modify_fg(chars[i].label, GTK_STATE_NORMAL, gcin_win_color_use ? &fg:NULL);
   }
 }
@@ -162,7 +166,7 @@ void disp_char(int index, char *ch)
     move_win0(dpy_xl - win_xl, win_y);
 
   gtk_widget_show_all(chars[index].vbox);
-  gtk_widget_hide(chars[index].line);
+//  gtk_widget_hide(chars[index].line);
 }
 
 void hide_char(int index)
@@ -195,20 +199,24 @@ void clear_chars_all()
 
 void draw_underline(int index)
 {
+#if 0
   if (gcin_edit_display_ap_only())
     return;
 
   create_char(index);
 
   gtk_widget_show(chars[index].line);
+#endif
 }
 
 void clear_underline(int index)
 {
+#if 0
   if (gcin_edit_display_ap_only())
     return;
 
   gtk_widget_hide(chars[index].line);
+#endif
 }
 
 void set_cursor_tsin(int index)
@@ -311,10 +319,13 @@ void disp_selections(int x, int y);
 void disp_tsin_select(int index)
 {
   int x,y;
-
+#if WIN32
   if (test_mode)
     return;
+#endif
 
+  if (index < 0)
+	  return;
 #if 0
   GtkWidget *widget =chars[index].line;
 
@@ -444,6 +455,7 @@ void disp_tsin_eng_pho(int eng_pho)
 
 void clear_tsin_line()
 {
+#if 0
   int i;
 #if WIN32
   if (test_mode)
@@ -455,6 +467,7 @@ void clear_tsin_line()
       continue;
     gtk_widget_hide(line);
   }
+#endif
 }
 
 void exec_gcin_setup();

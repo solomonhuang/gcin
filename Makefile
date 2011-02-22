@@ -13,7 +13,7 @@ GCIN_SO= gcin1.so gcin2.so
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o gtab-use-count.o \
-     win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o
+     win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o

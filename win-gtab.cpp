@@ -149,7 +149,9 @@ void change_gtab_font_size()
     return;
 
   set_label_font_size(label_gtab_sele, gcin_font_size);
-  set_label_font_size(label_gtab_pre_sel, gcin_font_size);
+  if (label_gtab_pre_sel)
+    set_label_font_size(label_gtab_pre_sel, gcin_font_size);
+
   set_label_font_size(label_edit, gcin_font_size);
 
   set_label_font_size(label_gtab, gcin_font_size_gtab_in);
@@ -519,7 +521,8 @@ void create_win_gtab_gui_simple()
   gtk_widget_show_all (gwin_gtab);
   gtk_widget_hide (gwin_gtab);
   gtk_widget_hide(label_gtab_sele);
-  gtk_widget_hide(label_gtab_pre_sel);
+  if (label_gtab_pre_sel)
+    gtk_widget_hide(label_gtab_pre_sel);
 
   show_hide_label_edit();
 

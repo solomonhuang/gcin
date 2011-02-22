@@ -64,6 +64,9 @@
 
 #if !GTK_CHECK_VERSION(2,91,1)
 #define gtk_window_set_has_resize_grip(x,y);
+#endif
+
+#ifndef GTK_COMBO_BOX_TEXT
 #define GTK_COMBO_BOX_TEXT GTK_COMBO_BOX
 #endif
 

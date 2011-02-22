@@ -1,7 +1,7 @@
 typedef struct {
   struct CHPHO *chpho;
   int c_idx, c_len;
-  int ph_sta, ph_sta_last;  // phrase start
+  int ph_sta;  // phrase start
   int sel_pho;
   int save_frm, save_to;
   int current_page;

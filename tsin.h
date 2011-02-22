@@ -48,3 +48,4 @@ typedef struct PRE_SEL {
 } PRE_SEL;
 
 extern gboolean tsin_is_gtab;
+extern int ph_key_sz;

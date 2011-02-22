@@ -6,6 +6,7 @@
 #include "pho.h"
 #include "tsin.h"
 #include "gtab.h"
+#include "gst.h"
 
 int hashidx[TSIN_HASH_N];
 //static int *phidx;

@@ -21,7 +21,7 @@ int main()
     sscanf(line, "%s %s %d", aa, bb, &usecount);
 
     if (utf8_str_N(aa)==1)
-      dbg(line);
+      printf(line);
   }
 
   return 0;
