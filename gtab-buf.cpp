@@ -1049,6 +1049,7 @@ void gtab_scan_pre_select(gboolean b_incr)
   if (!gtab_cursor_end() || !ggg.gbufN)
     return;
 
+  init_tsin_table();
   init_pre_sel();
 
   int Maxlen = ggg.gbufN;

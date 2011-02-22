@@ -1412,11 +1412,13 @@ int shift_key_idx(char *s, KeySym xkey)
 static gboolean pre_sel_handler(KeySym xkey)
 {
   if (!tss.pre_selN || !tsin_phrase_pre_select)
-    return 0;
+    return FALSE;
 
   int c = shift_key_idx(pho_selkey, xkey);
-  if (c < 0)
+  if (c < 0) {
     close_selection_win();
+	return FALSE;
+  }
   return tsin_sele_by_idx(c);
 }
 
