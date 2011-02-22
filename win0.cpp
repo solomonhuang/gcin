@@ -325,7 +325,7 @@ void disp_tsin_select(int index)
 #endif
 
   if (index < 0)
-	  return;
+    return;
 #if 0
   GtkWidget *widget =chars[index].line;
 

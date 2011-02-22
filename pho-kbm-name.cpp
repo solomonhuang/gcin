@@ -11,5 +11,6 @@ struct PHO_KBM_NAME kbm_sel[]= {
  {N_(_L("Dvorak")), "dvorak"},
  {N_(_L("IBM")), "ibm"},
  {N_(_L("神通")), "mitac"},
+ {N_(_L("Colemak")), "colemak"},
  {NULL, NULL}
 };

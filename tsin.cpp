@@ -895,16 +895,12 @@ void disp_pre_sel_page()
     return;
   }
 
-#if 0
-  if (tss.pre_selN==0 || (tss.pre_selN==1 && tss.pre_sel[0].len<=2) || tss.ph_sta < 0)   {
-    hide_selections_win();
+  if (!tss.pre_selN)
     return;
-  }
-#endif
 
   clear_sele();
 
-  for(i=0; i < Min(phkbm.selkeyN, tss.pre_selN); i++) {
+  for(i=0; i < tss.pre_selN; i++) {
     int tlen = utf8_tlen(tss.pre_sel[i].str, tss.pre_sel[i].len);
 
     set_sele_text(tss.pre_selN, i, tss.pre_sel[i].str, tlen);
@@ -2098,8 +2094,8 @@ llll2:
 #if 0
      if (tss.pre_selN)
        scanphr(tss.ph_sta, tss.c_idx - tss.ph_sta, TRUE);
-#endif
      disp_pre_sel_page();
+#endif
 
      key = pho2key(poo.typ_pho);
 
