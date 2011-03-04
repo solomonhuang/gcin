@@ -1181,6 +1181,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 
 int feedkey_pp_release(KeySym xkey, int kbstate);
 int feedkey_anthy_release(KeySym xkey, int kbstate);
+int feedkey_gtab_release(KeySym xkey, int kbstate);
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)

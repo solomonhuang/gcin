@@ -1373,6 +1373,13 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (ggg.gbufN && key==XK_Tab)
     return 1;
 
+  if ((key==XK_Control_L||key==XK_Control_R) && !key_press_time_ctrl && tss.pre_selN) {
+    key_press_time_ctrl = current_time();
+    return TRUE;
+  } else {
+    key_press_time_ctrl = 0;
+  }
+
   if (kbstate & (Mod1Mask|Mod4Mask|Mod5Mask|ControlMask)) {
     return 0;
   }
@@ -1383,14 +1390,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (poo.same_pho_query_state == SAME_PHO_QUERY_none && gwin_pho &&
     GTK_WIDGET_VISIBLE(gwin_pho))
      hide_win_pho();
-
-   if ((key==XK_Control_L||key==XK_Control_R) && !key_press_time_ctrl && tss.pre_selN) {
-     key_press_time_ctrl = current_time();
-     return TRUE;
-   } else {
-     key_press_time_ctrl = 0;
-   }
-
 
   if (gtab_capslock_in_eng && (kbstate&LockMask) && !BITON(cur_inmd->flag, FLAG_KEEP_KEY_CASE)) {
     if (key < 0x20 || key>=0x7f)

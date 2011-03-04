@@ -6,7 +6,7 @@
 
 extern void key_typ_pho(phokey_t phokey, u_char rtyp_pho[]);
 
-gboolean pin2juyin()
+gboolean pin2juyin(gboolean full_match)
 {
   int i;
 
@@ -26,6 +26,9 @@ gboolean pin2juyin()
     int pinN = strlen(pin);
     if (pinN < inphN)
       continue;
+
+	if (full_match && pinN != inphN)
+		continue;
 
     if (!memcmp(pin, poo.inph, inphN)) {
 //      dbg("pin %s %s\n", pin, poo.inph);
@@ -62,7 +65,7 @@ gboolean inph_typ_pho_pinyin(int newkey)
 //    dbg("cccc num %d typ:%d\n", num, typ);
 
     if (typ==3) {
-      pin2juyin();
+      pin2juyin(TRUE);
       poo.typ_pho[typ] = num;
 //      tss.chpho[tss.c_idx].flag |=FLAG_CHPHO_PINYIN_TONE;
 //      dbg("set %d\n",tss.c_idx);
@@ -81,7 +84,7 @@ gboolean inph_typ_pho_pinyin(int newkey)
     poo.inph[i] = newkey;
   }
 
-  if (pin2juyin()) {
+  if (pin2juyin(newkey==' ')) {
 //    dbg("zzzz\n");
     if (newkey==' ')
       return PHO_STATUS_OK_NEW;
@@ -103,7 +106,7 @@ gboolean inph_typ_pho_pinyin(int newkey)
     if (pin_juyin[j].pinyin[0]==newkey)
       break;
 
-  int r = pin2juyin();
+  int r = pin2juyin(FALSE);
   if (j==pin_juyinN)
     return PHO_STATUS_REJECT;
 

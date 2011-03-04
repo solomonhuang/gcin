@@ -62,6 +62,8 @@ extern int ph_key_sz;
 static gboolean cb_ok(GtkWidget *widget, gpointer data)
 {
   SAVE_SESS *sess = (SAVE_SESS *)data;
+  g_source_remove(sess->countdown_handle);
+
   int i;
   phokey_t pho[MAX_PHRASE_LEN];
   u_int pho32[MAX_PHRASE_LEN];

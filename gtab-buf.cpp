@@ -1093,10 +1093,11 @@ void gtab_scan_pre_select(gboolean b_incr)
   char tt[4096];
   tt[0]=0;
   int i;
-  char *br=gtab_vertical_select?"\n":"";
 
   for(i=0;i<tss.pre_selN; i++) {
     char ts[(MAX_PHRASE_LEN+3) * CH_SZ + 1];
+    char *br= (i < tss.pre_selN-1 && gtab_vertical_select)?"\n":"";
+
     sprintf(ts, "<span foreground=\"%s\">%c</span>%s%s", gcin_sel_key_color,
       cur_inmd->selkey[i], tss.pre_sel[i].str, br);
     strcat(tt, ts);
