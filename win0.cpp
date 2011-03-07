@@ -273,10 +273,10 @@ void disp_tsin_pho(int index, char *pho);
 void clr_in_area_pho_tsin()
 {
   int i;
-
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   for(i=0; i < text_pho_N; i++)
    disp_tsin_pho(i, " ");
 }
@@ -328,36 +328,21 @@ void disp_tsin_select(int index)
 
   if (index < 0)
     return;
-#if 0
-  GtkWidget *widget =chars[index].line;
-
-  if (!GTK_WIDGET_VISIBLE(widget)) {
-    widget = chars[index].vbox;
-  }
-#endif
-#if 0
-  GtkWidget *widget = chars[index].label;
-#else
-  GtkWidget *widget = chars[index].vbox;
-#endif
 
   if (gcin_edit_display_ap_only()) {
     getRootXY(current_CS->client_win, current_CS->spot_location.x, current_CS->spot_location.y, &x, &y);
   } else {
     int i;
-	// bug in GTK, widget position is wrong, repeat util find one
+    // bug in GTK, widget position is wrong, repeat util find one
     for(i=index;i>=0; i--) {
-#if _DEBUG
-      if (!chars[i].vbox || !chars[index].label)
-        p_err("err found");
-#endif
       gtk_widget_show_now(chars[i].label);
       gtk_widget_show(chars[i].vbox);
+      gtk_main_iteration_do(FALSE);
+
       int tx = get_widget_xy(gwin0, chars[i].vbox, &x, &y);
 
       if (tx>=0)
         break;
-//	  dbg("%d] %d\n", i, tx);
     }
   }
   disp_selections(x, y);
