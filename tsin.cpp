@@ -221,7 +221,7 @@ static void putbuf(int len)
 #endif
 
   for(idx=i=0;i<len;i++) {
-    int len = strlen(tss.chpho[i].ch);
+    int len = utf8_sz(tss.chpho[i].ch);
 
     if (tss.chpho[i].pho && len > 1) {
       int pho_idx = ch_key_to_ch_pho_idx(tss.chpho[i].pho, tss.chpho[i].ch);
@@ -1010,7 +1010,7 @@ void ch_pho_cpy(CHPHO *pchpho, char *utf8, phokey_t *phos, int len)
   int i;
 
   for(i=0; i < len; i++) {
-    int len = u8cpy(pchpho[i].cha, utf8);
+    int len = utf8cpy(pchpho[i].cha, utf8);
     utf8+=len;
     pchpho[i].pho = phos[i];
 	pchpho[i].flag &= ~FLAG_CHPHO_PHO_PHRASE;
@@ -1150,7 +1150,6 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
 }
 
 
-#if USE_TSIN
 void add_to_tsin_buf_str(char *str)
 {
   char *pp = str;
@@ -1167,12 +1166,12 @@ void add_to_tsin_buf_str(char *str)
       break;
   }
 
+  dbg("add_to_tsin_buf_str %s %d\n",str, N);
 
   phokey_t pho[MAX_PHRASE_LEN];
   bzero(pho, sizeof(pho));
   add_to_tsin_buf(str, pho, N);
 }
-#endif
 
 int tsin_pho_sel(int c);
 

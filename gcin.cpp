@@ -508,6 +508,15 @@ gboolean delayed_start_cb(gpointer data)
   return FALSE;
 }
 
+void get_dpy_xyl()
+{
+	dpy_xl = gdk_screen_width(), dpy_yl = gdk_screen_height();
+}
+
+void screen_size_changed(GdkScreen *screen, gpointer user_data)
+{
+	get_dpy_xyl();
+}
 
 int main(int argc, char **argv)
 {
@@ -601,7 +610,8 @@ int main(int argc, char **argv)
   dpy = GDK_DISPLAY();
   root=DefaultRootWindow(dpy);
 #endif
-  dpy_xl = gdk_screen_width(), dpy_yl = gdk_screen_height();
+  get_dpy_xyl();
+  g_signal_connect(gdk_screen_get_default(),"size-changed", G_CALLBACK(screen_size_changed), NULL);
 
   dbg("display width:%d height:%d\n", dpy_xl, dpy_yl);
 

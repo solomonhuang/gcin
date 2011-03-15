@@ -828,6 +828,7 @@ int show_buf_select()
   ggg.pg_idx = 0;
 
   gtab_disp_sel();
+  hide_gtab_pre_sel();
 
   return 1;
 }
@@ -1072,8 +1073,10 @@ void gtab_scan_pre_select(gboolean b_incr)
 
 //  dbg("max_len:%d  max_selN:%d\n", max_len, max_selN);
 
-  if (max_len < 0 || max_selN >= strlen(cur_inmd->selkey) * 2)
+  if (max_len < 0 || max_selN >= strlen(cur_inmd->selkey) * 2) {
+    tss.pre_selN = 0;
     return;
+  }
 
   gtab_pre_select_phrase_len = max_len;
 
@@ -1130,6 +1133,9 @@ gboolean gtab_pre_select_idx(int c)
   gbuf[ggg.gbufN-1].flag |= FLAG_CHPHO_PHRASE_TAIL;
 
   hide_gtab_pre_sel();
+  if (gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+    hide_win_gtab();
+
   return TRUE;
 }
 

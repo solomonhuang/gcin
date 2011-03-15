@@ -13,7 +13,9 @@ static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_inner_frame,
 #if TRAY_ENABLED
                  *check_button_gcin_status_tray,
+#if !GTK_CHECK_VERSION(2,91,0)
                  *check_button_gcin_win32_icon,
+#endif
 #endif
                  *check_button_gcin_win_color_use,
                  *check_button_gcin_on_the_spot_key;
@@ -654,7 +656,7 @@ void create_appearance_conf_window()
 
   GtkWidget *hbox_gcin_font_size_tsin_presel = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_gcin_font_size_tsin_presel, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_font_size_tsin_presel = gtk_label_new(_(_L("詞音預選詞視窗字型大小")));
+  GtkWidget *label_gcin_font_size_tsin_presel = gtk_label_new(_(_L("詞音&gtab預選詞視窗字型大小")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_font_size_tsin_presel), label_gcin_font_size_tsin_presel, FALSE, FALSE, 0);
   GtkAdjustment *adj_gcin_font_size_tsin_presel =
    (GtkAdjustment *) gtk_adjustment_new (gcin_font_size_tsin_presel, 8.0, 32.0, 1.0, 1.0, 0.0);
@@ -942,7 +944,7 @@ static void create_main_win()
   GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (main_window), vbox);
 
-  GtkWidget *button_kbm = gtk_button_new_with_label(_(_L("gcin 注音/詞音設定")));
+  GtkWidget *button_kbm = gtk_button_new_with_label(_(_L("gcin 注音/詞音/拼音 設定")));
   gtk_box_pack_start (GTK_BOX (vbox), button_kbm, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_kbm), "clicked",
                     G_CALLBACK (cb_kbm), NULL);

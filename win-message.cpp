@@ -69,8 +69,9 @@ static void create_win_message(char *icon, char *text, int duration)
   int width, height;
   get_win_size(gwin_message, &width, &height);
 
-  int ox=-1, oy, szx, szy;
+  int ox=-1, oy;
 #if !GTK_CHECK_VERSION(2,91,0)
+  int szx, szy;
   if (tray_da_win) {
     gdk_window_get_origin  (tray_da_win, &ox, &oy);
     gdk_drawable_get_size(tray_da_win, &szx, &szy);

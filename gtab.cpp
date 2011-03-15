@@ -341,7 +341,7 @@ void ClrIn()
   clear_gtab_in_area();
   ggg.last_idx = 0;
 
-  if (gcin_pop_up_win && !gtab_has_input())
+  if (gcin_pop_up_win && !gtab_has_input() && !tss.pre_selN)
     hide_win_gtab();
 
   clear_gtab_input_error_color();
@@ -1810,7 +1810,8 @@ keypad_proc:
 
 #if 1 // for dayi, testcase :  6 space keypad6
       int vv = pselkey - cur_inmd->selkey;
-      if (pselkey && tss.ctrl_pre_sel) {
+      if (pselkey && tss.pre_selN && !ggg.gtab_buf_select && (tss.ctrl_pre_sel||
+          ((!inkey||ggg.spc_pressed||is_keypad)&&!gtab_disp_partial_match&&!gtab_pre_select))) {
         if (gtab_pre_select_idx(vv))
           return TRUE;
       } else

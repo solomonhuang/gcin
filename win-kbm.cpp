@@ -237,10 +237,11 @@ static void move_win_kbm()
   int width, height;
   get_win_size(gwin_kbm, &width, &height);
 
-  int ox, oy, szx, szy;
+  int ox, oy;
   GdkRectangle r;
   GtkOrientation ori;
 #if UNIX && !GTK_CHECK_VERSION(2,91,0)
+  int szx, szy;
   if (tray_da_win) {
     gdk_window_get_origin(tray_da_win, &ox, &oy);
     gdk_drawable_get_size(tray_da_win, &szx, &szy);

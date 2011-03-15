@@ -149,10 +149,13 @@ static gboolean cb_ok( GtkWidget *widget,
   tsin_buffer_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_buffer_size));
   save_gcin_conf_int(TSIN_BUFFER_SIZE, tsin_buffer_size);
 
-  gchar *cstr = gtk_color_selection_palette_to_string(&tsin_phrase_line_gcolor, 1);
+  gchar *cstr;
+#if 0
+  cstr = gtk_color_selection_palette_to_string(&tsin_phrase_line_gcolor, 1);
   dbg("color %s\n", cstr);
   save_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, cstr);
   g_free(cstr);
+#endif
 
 
   cstr = gtk_color_selection_palette_to_string(&tsin_cursor_gcolor, 1);
@@ -615,7 +618,7 @@ void create_kbm_window()
   spinner_tsin_buffer_size = gtk_spin_button_new (adj_gtab_in, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_tsin_buffer_size), spinner_tsin_buffer_size);
 
-
+#if 0
   GtkWidget *frame_tsin_phrase_line_color = gtk_frame_new(_(_L("詞音標示詞的底線顏色")));
   gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_phrase_line_color, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_phrase_line_color), 1);
@@ -628,6 +631,7 @@ void create_kbm_window()
   gtk_widget_modify_bg(da_phrase_line, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
   gtk_widget_set_size_request(da_phrase_line, 16, 2);
   gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
+#endif
 
   GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_(_L("詞音游標的顏色")));
   gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_cursor_color, FALSE, FALSE, 0);
