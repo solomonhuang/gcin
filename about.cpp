@@ -25,6 +25,7 @@ void align_with_ui_window(GtkWidget *win)
 void align_with_ui_window(GtkWidget *win);
 int html_browser(char *fname);
 
+
 static void callback_forum( GtkWidget *widget, gpointer   data)
 {
 #if WIN32
@@ -36,10 +37,10 @@ static void callback_forum( GtkWidget *widget, gpointer   data)
 #endif
 }
 
+#define LOG_URL "http://www.csie.nctu.edu.tw/~cp76/gcin/download/Changelog.html"
 
 static void callback_changelog( GtkWidget *widget, gpointer   data)
 {
-#define LOG_URL "http://cle.linux.org.tw/gcin/download/Changelog.html"
 #if WIN32
 	ShellExecuteA(NULL, "open", LOG_URL, NULL, NULL, SW_SHOWNORMAL);
 #else
@@ -92,7 +93,7 @@ void create_about_window()
 #if GTK_CHECK_VERSION(2,18,9)
    GtkWidget *label = gtk_label_new(_(_L("<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
 _L("<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n")
-_L("<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</a>\n")
+_L("<a href='"LOG_URL"'>gcin改變記錄</a>\n")
 )));
    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);

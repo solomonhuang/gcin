@@ -728,6 +728,7 @@ void disp_gtab_pre_sel(char *s)
   gtk_label_set_markup(GTK_LABEL(label_gtab_pre_sel), s);
   minimize_win_gtab();
   show_win_gtab();
+  adj_gtab_win_pos();
 }
 
 void hide_gtab_pre_sel()
@@ -736,6 +737,8 @@ void hide_gtab_pre_sel()
   tss.pre_selN = 0;
   tss.ctrl_pre_sel = FALSE;
   gtk_widget_hide(label_gtab_pre_sel);
+  minimize_win_gtab();
 
   move_win_gtab(current_in_win_x, current_in_win_y);
+  adj_gtab_win_pos();
 }

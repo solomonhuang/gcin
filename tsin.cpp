@@ -1889,15 +1889,18 @@ other_keys:
        if (xkey >= XK_KP_0 && xkey<=XK_KP_9)
          xkey_lcase = xkey - XK_KP_0 + '0';
 
+	   gboolean use_pre_sel;
+	   use_pre_sel = tss.pre_selN && !tss.sel_pho && xkey < 127 && !phkbm.phokbm[xkey][0].num;
+
        char *pp;
-       if ((pp=strchr(pho_selkey,xkey_lcase)) && (tss.sel_pho || tss.ctrl_pre_sel)) {
+	   if ((pp=strchr(pho_selkey,xkey_lcase)) && (tss.sel_pho || tss.ctrl_pre_sel || use_pre_sel)) {
          int c=pp-pho_selkey;
 
 		 if (tss.sel_pho) {
            if (tsin_pho_sel(c))
              return 1;
 		 } else
-		 if (tss.ctrl_pre_sel) {
+		 if (tss.ctrl_pre_sel || use_pre_sel) {
   		     tss.ctrl_pre_sel = FALSE;
 			 if (tsin_sele_by_idx(c))
 				 return TRUE;

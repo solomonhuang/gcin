@@ -241,8 +241,10 @@ void tsin_scan_pre_select(gboolean b_incr)
 
 //  dbg("max_len:%d  max_selN:%d\n", max_len, max_selN);
 
-  if (max_len < 0 || max_selN >= strlen(pho_selkey) * 2)
+  if (max_len < 0 || max_selN >= strlen(pho_selkey) * 2) {
+    tss.pre_selN=0;
     return;
+  }
 
   scanphr_e(tss.c_len - max_len, max_len, b_incr, &selN);
 
