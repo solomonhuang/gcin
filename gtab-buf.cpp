@@ -868,6 +868,10 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
 
 #if WIN32
   *sub_comp_len = ggg.ci > 0;
+#if 1
+  if (ggg.gbufN && !gcin_edit_display_ap_only())
+	*sub_comp_len|=4;
+#endif
 #endif
   gboolean ap_only = gcin_edit_display_ap_only();
 

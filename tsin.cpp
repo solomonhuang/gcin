@@ -1237,13 +1237,9 @@ static gboolean pre_sel_handler(KeySym xkey)
   return tsin_sele_by_idx(c);
 }
 
-
-static gboolean pre_punctuation(KeySym xkey)
+static gboolean pre_punctuation_sub(KeySym xkey, char shift_punc[], unich_t *chars[])
 {
   char *p;
-  static char shift_punc[]="<>?:\"{}!";
-  static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("："),_L("；"),_L("『"),_L("』"),_L("！")};
-
   if ((p=strchr(shift_punc, xkey))) {
     int c = p - shift_punc;
     phokey_t key=0;
@@ -1258,28 +1254,18 @@ static gboolean pre_punctuation(KeySym xkey)
 }
 
 
-static char hsu_punc[]=",./;";
+static gboolean pre_punctuation(KeySym xkey)
+{
+  static char shift_punc[]="<>?:\"{}!";
+  static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("："),_L("；"),_L("『"),_L("』"),_L("！")};
+  return pre_punctuation_sub(xkey, shift_punc, chars);
+}
+
+static char hsu_punc[]=",./;'";
 static gboolean pre_punctuation_hsu(KeySym xkey)
 {
-
-  static char *chars[]={
-#if UNIX
-	  "，","。","？","；"
-#else
-"\xef\xbc\x8c",
-"\xe3\x80\x82","\xef\xbc\x9f","\xef\xbc\x9b"
-#endif
-  };
-  char *p;
-
-  if ((p=strchr(hsu_punc, xkey))) {
-    int c = p - hsu_punc;
-    phokey_t key=0;
-
-    return add_to_tsin_buf(chars[c], &key, 1);
-  }
-
-  return 0;
+  static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("；"),_L("、")};
+  return pre_punctuation_sub(xkey, hsu_punc, chars);
 }
 
 
@@ -1799,15 +1785,10 @@ change_char:
 		 return win_sym_page_down();
 	   }
      case '\'':  // single quote
-       if (phkbm.phokbm[xkey][0].num)
+       if (phkbm.phokbm[xkey][0].num && !pin_juyin)
          goto other_keys;
        else {
-         phokey_t key = 0;
-#if UNIX
-         return add_to_tsin_buf("、", &key, 1);
-#else
-		 return add_to_tsin_buf("\xe3\x80\x81", &key, 1);
-#endif
+	 return pre_punctuation_hsu(xkey);
        }
      case 'q':
      case 'Q':
@@ -2235,6 +2216,10 @@ fin:
   *sub_comp_len = !typ_pho_empty();
   if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
     *sub_comp_len|=2;
+#if 1
+  if (tss.c_len && !gcin_edit_display_ap_only())
+	*sub_comp_len|=4;
+#endif
 #endif
 
   return attrN;
