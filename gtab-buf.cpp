@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 #include "gtab.h"
 #include "gcin-conf.h"
 #include "gcin-endian.h"
@@ -25,7 +25,7 @@ void lookup_gtabn(char *ch, char *out);
 char *htmlspecialchars(char *s, char out[]);
 void hide_gtab_pre_sel();
 
-extern gint64 key_press_time_ctrl;
+extern gint64 key_press_time, key_press_time_ctrl;
 
 extern gboolean test_mode;
 
@@ -866,7 +866,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
   str[0]=0;
   *pcursor=0;
 
-#if WIN32
+#if WIN32 || 1
   *sub_comp_len = ggg.ci > 0;
 #if 1
   if (ggg.gbufN && !gcin_edit_display_ap_only())
@@ -1154,6 +1154,7 @@ gboolean gtab_pre_select_shift(KeySym key, int kbstate)
   return gtab_pre_select_idx(c);
 }
 
+void tsin_toggle_eng_ch();
 
 int feedkey_gtab_release(KeySym xkey, int kbstate)
 {
@@ -1171,6 +1172,27 @@ int feedkey_gtab_release(KeySym xkey, int kbstate)
           return 1;
         } else
           return 0;
+#if 1
+     case XK_Shift_L:
+     case XK_Shift_R:
+		kpt = key_press_time;
+		key_press_time = 0;
+
+// dbg("release xkey %x\n", xkey);
+        if (
+(  (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) ||
+   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL
+     && xkey == XK_Shift_L) ||
+   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
+     && xkey == XK_Shift_R))
+          &&  current_time() - kpt < 300000) {
+          if (!test_mode) {
+			  tsin_toggle_eng_ch();
+          }
+          return 1;
+		} else
+          return 0;
+#endif
      default:
         return 0;
   }

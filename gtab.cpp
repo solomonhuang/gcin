@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Copyright (C) 2004-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
@@ -20,7 +20,8 @@ GTAB_ST ggg = {.sel1st_i=MAX_SELKEY - 1};
 GTAB_ST ggg;
 #endif
 
-extern gint64 key_press_time_ctrl;
+extern gint64 key_press_time, key_press_time_ctrl;
+
 extern GtkWidget *gwin_gtab;
 void hide_gtab_pre_sel();
 void gtab_scan_pre_select(gboolean);
@@ -1356,6 +1357,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   gboolean is_keypad = FALSE;
   gboolean shift_m = (kbstate & ShiftMask) > 0;
   gboolean ctrl_m = (kbstate & ControlMask) > 0;
+  int caps_eng_tog = tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock;
+  gboolean capslock_on = (kbstate&LockMask);
 
   bzero(seltab_phrase, sizeof(seltab_phrase));
 
@@ -1363,6 +1366,13 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (!cur_inmd)
     return 0;
+
+  if (caps_eng_tog) {
+	gboolean new_tsin_pho_mode =!capslock_on;
+	if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
+      current_CS->tsin_pho_mode = new_tsin_pho_mode;
+	}
+  }
 
   if ((kbstate & (Mod1Mask|Mod4Mask|Mod5Mask|ControlMask))==ControlMask
      && key>='1' && key<='9' && ggg.gbufN) {
@@ -1373,6 +1383,10 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   if (ggg.gbufN && key==XK_Tab)
     return 1;
 
+   if ((key==XK_Shift_L||key==XK_Shift_R) && !key_press_time) {
+     key_press_time = current_time();
+	 key_press_time_ctrl = 0;
+   } else
   if ((key==XK_Control_L||key==XK_Control_R) && !key_press_time_ctrl && tss.pre_selN) {
     key_press_time_ctrl = current_time();
     return TRUE;
@@ -1391,11 +1405,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     GTK_WIDGET_VISIBLE(gwin_pho))
      hide_win_pho();
 
-  if (gtab_capslock_in_eng && (kbstate&LockMask) && !BITON(cur_inmd->flag, FLAG_KEEP_KEY_CASE)) {
+  if (!tsin_pho_mode() && !BITON(cur_inmd->flag, FLAG_KEEP_KEY_CASE)) {
     if (key < 0x20 || key>=0x7f)
       goto shift_proc;
 
-    if (gcin_capslock_lower)
+    if (capslock_on && gcin_capslock_lower)
       case_inverse((KeySym *)&key, shift_m);
 
     if (ggg.gbufN)

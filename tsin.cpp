@@ -40,19 +40,16 @@ gboolean tsin_pho_mode()
   return current_CS && current_CS->tsin_pho_mode;
 }
 
-
 void set_tsin_pho_mode0(ClientState *cs)
 {
   cs->tsin_pho_mode = 1;
 }
 
-
-void set_tsin_pho_mode(ClientState *cs)
+void set_tsin_pho_mode()
 {
   set_tsin_pho_mode0(current_CS);
   show_tsin_stat();
 }
-
 
 gboolean tsin_cursor_end()
 {
@@ -923,9 +920,11 @@ void show_button_pho(gboolean bshow);
 
 void tsin_set_eng_ch(int nmod)
 {
+  dbg("tsin_set_eng_ch %d\n", nmod);
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   if (current_CS)
     current_CS->tsin_pho_mode = nmod;
 
@@ -1516,12 +1515,19 @@ int feedkey_pp(KeySym xkey, int kbstate)
   int caps_eng_tog = tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock;
   int status=0;
 
+
 //  dbg("feedkey_pp %x %x\n", xkey, kbstate);
 //  if (xkey=='1')
 //    dbg("aaa\n");
 
-  if (caps_eng_tog)
-    current_CS->tsin_pho_mode = !(kbstate&LockMask);
+  if (caps_eng_tog) {
+	gboolean new_tsin_pho_mode =!(kbstate&LockMask);
+	if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
+	  close_selection_win();
+      current_CS->tsin_pho_mode = new_tsin_pho_mode;
+	  tsin_set_eng_ch(new_tsin_pho_mode);
+	}
+  }
 
 //  key_press_time = 0;
 
@@ -1552,7 +1558,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
      gboolean is_ascii = (xkey>=' ' && xkey<0x7f) && !ctrl_m;
 
      if (caps_eng_tog && is_ascii) {
-       case_inverse(&xkey, shift_m);
+	   if (gcin_capslock_lower)
+         case_inverse(&xkey, shift_m);
        send_ascii(xkey);
        return 1;
      }
@@ -1638,8 +1645,14 @@ int feedkey_pp(KeySym xkey, int kbstate)
         return cursor_right();
      case XK_Caps_Lock:
         if (caps_eng_tog) {
+#if 0
           close_selection_win();
+#if UNIX
           tsin_toggle_eng_ch();
+#else
+		  tsin_set_eng_ch(!(kbstate&LockMask));
+#endif
+#endif
           return 1;
         } else
           return 0;
@@ -2212,7 +2225,7 @@ fin:
   }
 
   *cursor = tss.c_idx;
-#if WIN32
+#if WIN32 || 1
   *sub_comp_len = !typ_pho_empty();
   if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
     *sub_comp_len|=2;

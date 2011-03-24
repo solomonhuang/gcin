@@ -1090,7 +1090,14 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       return TRUE;
     }
 
-    if (keysym == ',') {
+    if (!gcin_enable_ctrl_alt_switch)
+      return FALSE;
+
+    int kidx = gcin_switch_keys_lookup(keysym);
+    if (kidx <= 0)
+      return FALSE;
+
+    if (inmd[kidx].method_type == method_type_SYMBOL_TABLE) {
 #if 1
       if (current_CS->im_state == GCIN_STATE_CHINESE) {
         if (!win_is_visible())
@@ -1112,13 +1119,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       }
       return TRUE;
     }
-
-    if (!gcin_enable_ctrl_alt_switch)
-      return FALSE;
-
-    int kidx = gcin_switch_keys_lookup(keysym);
-    if (kidx <= 0)
-      return FALSE;
 
     if (!inmd[kidx].cname)
       return FALSE;

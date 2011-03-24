@@ -12,6 +12,7 @@ GTAB_LIST_S method_codes[] = {
  {"!TSIN", method_type_TSIN},
  {"!INT_CODE", method_type_INT_CODE},
  {"!ANTHY", method_type_ANTHY},
+ {"!SYMBOL_TABLE", method_type_SYMBOL_TABLE},
  {NULL}
 };
 

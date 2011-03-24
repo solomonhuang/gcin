@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 #include "pho.h"
 #include "pho-kbm-name.h"
 
@@ -32,10 +32,10 @@ static struct {
   int key;
 } tsin_eng_ch_sw[]={
   {N_(_L("CapsLock")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock},
-  {N_(_L("Tab")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
-  {N_(_L("Shift(限非 XIM)")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
-  {N_(_L("ShiftL(限非 XIM)")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL},
-  {N_(_L("ShiftR(限非 XIM)")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR},
+//  {N_(_L("Tab")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab},
+  {N_(_L("Shift")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift},
+  {N_(_L("左Shift")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL},
+  {N_(_L("右Shift")), TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR},
 };
 int tsin_eng_ch_swN = sizeof(tsin_eng_ch_sw) / sizeof(tsin_eng_ch_sw[0]);
 
@@ -61,6 +61,21 @@ int get_current_speaker_idx()
       return i;
 
   return 0;
+}
+
+void save_tsin_eng_pho_key()
+{
+  int idx;
+#if GTK_CHECK_VERSION(2,4,0)
+  idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_eng_ch_opts));
+#else
+  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_eng_ch_opts));
+#endif
+  save_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
+                     tsin_eng_ch_sw[idx].key);
+
+  save_gcin_conf_int(GCIN_CAPSLOCK_LOWER,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower)));
 }
 
 
@@ -104,13 +119,7 @@ static gboolean cb_ok( GtkWidget *widget,
   }
   save_gcin_conf_str(PHONETIC_KEYBOARD, tt);
 
-#if GTK_CHECK_VERSION(2,4,0)
-  idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_eng_ch_opts));
-#else
-  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_eng_ch_opts));
-#endif
-  save_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
-                     tsin_eng_ch_sw[idx].key);
+  save_tsin_eng_pho_key();
 
   save_gcin_conf_int(TSIN_SPACE_OPT,
                      tsin_space_options[new_select_idx_tsin_space_opt].key);
@@ -142,9 +151,6 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(TSIN_BUFFER_EDITING_MODE,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_buffer_editing_mode)));
-
-  save_gcin_conf_int(GCIN_CAPSLOCK_LOWER,
-       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower)));
 
   tsin_buffer_size = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_tsin_buffer_size));
   save_gcin_conf_int(TSIN_BUFFER_SIZE, tsin_buffer_size);
@@ -434,6 +440,24 @@ static GtkWidget *create_eng_ch_opts()
   return hbox;
 }
 
+GtkWidget *create_en_pho_key_sel(char *s)
+{
+GtkWidget *frame_tsin_sw = gtk_frame_new(s);
+  GtkWidget *vbox_tsin_sw = gtk_vbox_new(FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (frame_tsin_sw), vbox_tsin_sw);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_sw), 1);
+  gtk_container_add (GTK_CONTAINER (vbox_tsin_sw), create_eng_ch_opts());
+  GtkWidget *hbox_gcin_capslock_lower = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_tsin_sw), hbox_gcin_capslock_lower, TRUE, TRUE, 0);
+  GtkWidget *label_gcin_capslock_lower = gtk_label_new(_(_L("Capslock英數用小寫")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), label_gcin_capslock_lower , TRUE, TRUE, 0);
+  check_button_gcin_capslock_lower = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), check_button_gcin_capslock_lower, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower), gcin_capslock_lower);
+
+  return frame_tsin_sw;
+}
+
 
 void load_setttings();
 
@@ -477,24 +501,7 @@ void create_kbm_window()
   gtk_container_set_border_width (GTK_CONTAINER (frame_kbm), 1);
   gtk_container_add (GTK_CONTAINER (frame_kbm), create_kbm_opts());
 
-
-  GtkWidget *frame_tsin_sw = gtk_frame_new(_(_L("詞音輸入[中/英]切換")));
-  gtk_box_pack_start (GTK_BOX (vbox_l), frame_tsin_sw, TRUE, TRUE, 0);
-  GtkWidget *vbox_tsin_sw = gtk_vbox_new(FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame_tsin_sw), vbox_tsin_sw);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_sw), 1);
-  gtk_container_add (GTK_CONTAINER (vbox_tsin_sw), create_eng_ch_opts());
-
-  GtkWidget *hbox_gcin_capslock_lower = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_tsin_sw), hbox_gcin_capslock_lower, TRUE, TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_gcin_capslock_lower , TRUE, TRUE, 1);
-  GtkWidget *label_gcin_capslock_lower = gtk_label_new(_(_L("Capslock英數用小寫")));
-  gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), label_gcin_capslock_lower , TRUE, TRUE, 0);
-  check_button_gcin_capslock_lower = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), check_button_gcin_capslock_lower, FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower), gcin_capslock_lower);
-
-
+  gtk_box_pack_start (GTK_BOX (vbox_l), create_en_pho_key_sel(_(_L("詞音輸入[中/英]切換"))), TRUE, TRUE, 0);
 
   GtkWidget *frame_tsin_space_opt = gtk_frame_new(_(_L("詞音輸入空白鍵選項")));
   gtk_box_pack_start (GTK_BOX (vbox_l), frame_tsin_space_opt, TRUE, TRUE, 0);

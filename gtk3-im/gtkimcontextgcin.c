@@ -403,7 +403,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   gboolean context_has_str = context_xim->pe_str && context_xim->pe_str[0];
   char *tstr = NULL;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-  int cursor_pos;
+  int cursor_pos, sub_comp_len;
 
   if (event->type == GDK_KEY_PRESS) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
@@ -414,7 +414,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     printf("result %d\n", result);
 #endif
 
-    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos);
+    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos, &sub_comp_len);
     gboolean has_str = tstr && tstr[0];
 
     if (!context_has_str && has_str) {
@@ -484,7 +484,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   }
   else {
     result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
-      keysym, xevent.state, &rstr);
+      keysym, xevent.state, &rstr, &sub_comp_len);
     preedit_changed = result;
 //    printf("release rstr %x %s\n", rstr, rstr?rstr:"");
 

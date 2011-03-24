@@ -42,12 +42,17 @@ int pho_play(phokey_t key)
   return 0;
 }
 #else
+extern "C" {
+	HANDLE play_ogg_file(wchar_t *file_name);
+};
+
 void ErrorExit(LPTSTR lpszFunction);
 void pho_play(phokey_t key)
 {
   if (!phonetic_speak)
     return;
 
+#if 0
   static PROCESS_INFORMATION procinfo;
   static time_t last_time;
   time_t t = time(NULL);
@@ -76,7 +81,7 @@ void pho_play(phokey_t key)
   wchar_t pro16[64];
   strcpy(pro, gcin_program_files_path);
   strcat(pro, "\\oggdec.exe");
-  utf8_to_16(pro, pro16, sizeof(tt16));
+  utf8_to_16(pro, pro16, ARRAYSIZE(tt16));
 #endif
   STARTUPINFOW si;
 //  PROCESS_INFORMATION pi;
@@ -91,6 +96,14 @@ void pho_play(phokey_t key)
     dbg("cannot exec %s\n", tt);
 #endif
   }
+#else
+  char *ph = phokey_to_str2(key, 1);
+  char tt[512];
+  sprintf(tt, "%s\\ogg\\%s\\%s", gcin_program_files_path, ph, phonetic_speak_sel);
+  wchar_t tt16[MAX_PATH];
+  utf8_to_16(tt, tt16, ARRAYSIZE(tt16));
+  play_ogg_file(tt16);
+#endif
 }
 #endif
 

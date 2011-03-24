@@ -823,10 +823,10 @@ void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_
 
 
 int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor
-#if WIN32
-				,int *sub_comp_len
+#if WIN32 || 1
+    ,int *sub_comp_len
 #endif
-			   )
+    )
 {
   *str=NULL;
   if (!handle)
@@ -886,7 +886,7 @@ err_ret:
     *cursor = tcursor;
 
 
-#if WIN32
+#if WIN32 || 1
   int tsub_comp_len;
   tsub_comp_len=0;
   if (handle_read(handle, &tsub_comp_len, sizeof(tsub_comp_len))<=0) {

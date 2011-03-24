@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 
 #if UNIX
 #if !CLIENT_LIB || DEBUG
@@ -150,6 +150,9 @@ void __gcin_dbg_(char *format, ...) {
 
 	fprintf(dbgfp, "%s", bufb5);
 	printf("%s", bufb5);
+	wchar_t wchstr[1024];
+	utf8_to_16(buf, wchstr, ARRAYSIZE(wchstr));
+	OutputDebugStringW(wchstr);
 
 	fflush(dbgfp);
 	va_end(ap);

@@ -76,9 +76,10 @@ void GCINIMContext::update_preedit()
   QList<QAttribute> preedit_attributes;
 //  QString preedit_string;
   int preedit_cursor_position=0;
+  int sub_comp_len;
   char *str=NULL;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-  int attN = gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position);
+  int attN = gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position, &sub_comp_len);
 
   if (gcin_ch) {
     int ret;
@@ -240,8 +241,8 @@ bool GCINIMContext::isComposing() const
 {
   char *str;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-  int preedit_cursor_position;
-  gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position);
+  int preedit_cursor_position, sub_comp_len;
+  gcin_im_client_get_preedit(gcin_ch, &str, att, &preedit_cursor_position, &sub_comp_len);
   bool is_compose = str[0]>0;
   free(str);
 

@@ -63,7 +63,7 @@ struct TableHead {
 #define KeyBits (cur_inmd->keybits)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
-#define MAX_GTAB_NUM_KEY (16)
+#define MAX_GTAB_NUM_KEY (17)
 #define MAX_SELKEY 16
 
 #define MAX_TAB_KEY_NUM (32/KeyBits)
@@ -112,6 +112,7 @@ enum {
   method_type_TSIN=6,
   method_type_INT_CODE=10,
   method_type_ANTHY=12,
+  method_type_SYMBOL_TABLE=13,
 };
 
 extern INMD inmd[MAX_GTAB_NUM_KEY+1];

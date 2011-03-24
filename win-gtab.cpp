@@ -394,7 +394,7 @@ void create_win_gtab_gui_simple()
   if (top_bin)
     return;
 
-  dbg("create_win_gtab_gui_simple\n");
+//  dbg("create_win_gtab_gui_simple\n");
 
   last_cursor_off = FALSE;
 

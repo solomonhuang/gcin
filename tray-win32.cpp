@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 #include "pho.h"
 #include "gtab.h"
 #include "win-sym.h"
@@ -369,11 +369,18 @@ void load_tray_icon_win32()
     iconame=inmd[current_CS->in_method].icon;
   }
 
+//  dbg("tsin_pho_mode() %d\n", tsin_pho_mode());
+
   char tt[32];
-  if (current_CS && (current_method_type()==method_type_TSIN || current_method_type()==method_type_ANTHY) &&current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
-    strcpy(tt, "en-");
-    strcat(tt, iconame);
-    iconame = tt;
+  if (current_CS && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
+	 if ((current_method_type()==method_type_TSIN || current_method_type()==method_type_ANTHY)) {
+		strcpy(tt, "en-");
+		strcat(tt, iconame);
+     } else {
+		strcpy(tt, "en-tsin.png");
+     }
+
+	 iconame = tt;
   }
 
 //  dbg("iconame %s\n", iconame);

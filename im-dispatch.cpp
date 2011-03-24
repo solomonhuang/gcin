@@ -426,8 +426,8 @@ void process_client_req(HANDLE fd)
       if (attrN > 0)
         write_enc(fd, attr, sizeof(GCIN_PREEDIT_ATTR)*attrN);
       write_enc(fd, &cursor, sizeof(cursor));
-#if WIN32
-	  write_enc(fd, &sub_comp_len, sizeof(sub_comp_len));
+#if WIN32 || 1
+      write_enc(fd, &sub_comp_len, sizeof(sub_comp_len));
 #endif
 //      dbg("uuuuuuuuuuuuuuuuu len:%d %d cursor:%d\n", len, attrN, cursor);
       }

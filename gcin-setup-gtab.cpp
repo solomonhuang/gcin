@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 #include "gtab.h"
 
 
@@ -41,12 +41,14 @@ struct {
   { NULL, 0},
 };
 
+void save_tsin_eng_pho_key();
 static GtkWidget *gcin_gtab_conf_window;
 static GtkWidget *opt_spc_opts, *opt_auto_select_by_phrase;
 static gboolean cb_gtab_conf_ok( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
+  save_tsin_eng_pho_key();
   save_gcin_conf_int(GTAB_DUP_SELECT_BELL,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_dup_select_bell)));
 
@@ -246,6 +248,9 @@ static GtkWidget *create_auto_select_by_phrase_opts()
   return hbox;
 }
 
+
+GtkWidget *create_en_pho_key_sel(char *s);
+
 void create_gtab_conf_window()
 {
   if (gcin_gtab_conf_window) {
@@ -412,7 +417,7 @@ void create_gtab_conf_window()
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_shift_phrase_key),
      gtab_shift_phrase_key);
 
-
+#if 0
   GtkWidget *hbox_gtab_capslock_in_eng = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_capslock_in_eng, FALSE, FALSE, 0);
   GtkWidget *label_gtab_capslock_in_eng = gtk_label_new(_(_L("CapsLock 打開輸入英數")));
@@ -421,6 +426,9 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (hbox_gtab_capslock_in_eng), check_button_gtab_capslock_in_eng,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_capslock_in_eng),
      gtab_capslock_in_eng);
+#else
+  gtk_box_pack_start (GTK_BOX (vbox_gtab_r), create_en_pho_key_sel(_(_L("[中/英]切換"))), FALSE, FALSE, 0);
+#endif
 
   GtkWidget *hbox_gcin_capslock_lower = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gcin_capslock_lower, FALSE, FALSE, 0);
