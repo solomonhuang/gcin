@@ -881,9 +881,11 @@ gboolean init_in_method(int in_no)
       hide_win_kbm();
   }
 
+
   reset_current_in_win_xy();
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
+  set_tsin_pho_mode0(current_CS);
 
   switch (inmd[in_no].method_type) {
     case method_type_PHO:
@@ -893,7 +895,6 @@ gboolean init_in_method(int in_no)
 #if USE_TSIN
     case method_type_TSIN:
       current_CS->in_method = in_no;
-      set_tsin_pho_mode0(current_CS);
       init_tab_pp(init_im);
       break;
 #endif

@@ -44,6 +44,8 @@ struct _GtkIMContextGCIN
   int timeout_handle;
   gboolean is_mozilla, dirty_fix_off, preedit;
   char *pe_str;
+  int old_sub_comp_len;
+  gboolean pe_started;
   GCIN_PREEDIT_ATTR *pe_att;
   int pe_attN;
   int pe_cursor;
@@ -152,6 +154,7 @@ get_im (GtkIMContextGCIN *context_xim)
     context_xim->pe_att = NULL;
     context_xim->pe_str = NULL;
     context_xim->pe_cursor = 0;
+    context_xim->pe_started = FALSE;
 #endif
 
 #if 0
@@ -400,28 +403,43 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 #endif
 
   gboolean preedit_changed = FALSE;
+  gboolean context_pe_started = context_xim->pe_started;
   gboolean context_has_str = context_xim->pe_str && context_xim->pe_str[0];
   char *tstr = NULL;
+  int sub_comp_len = 0;
   GCIN_PREEDIT_ATTR att[GCIN_PREEDIT_ATTR_MAX_N];
-  int cursor_pos, sub_comp_len;
+  int cursor_pos;
+  gboolean has_str = FALSE;
 
   if (event->type == GDK_KEY_PRESS) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
     preedit_changed = result;
 
+    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos, &sub_comp_len);
+    has_str = tstr && tstr[0];
+
+    gboolean open_cand = !(context_xim->old_sub_comp_len & 1) && (sub_comp_len & 1)
+        || !(context_xim->old_sub_comp_len & 2) && (sub_comp_len & 2)
+        ||  !(context_xim->old_sub_comp_len & 4) && (sub_comp_len & 4);
+
 #if DBG
-    printf("result %d\n", result);
+    printf("result %x %d %x  open:%d  tstr:%x\n", keysym, result, sub_comp_len, open_cand);
 #endif
 
-    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos, &sub_comp_len);
-    gboolean has_str = tstr && tstr[0];
+    if (open_cand) {
+      has_str = TRUE;
+      preedit_changed = TRUE;
+    }
 
-    if (!context_has_str && has_str) {
+    context_xim->old_sub_comp_len = sub_comp_len;
+
+    if (!context_pe_started && has_str) {
 #if DBG
       printf("emit preedit-start\n");
 #endif
       g_signal_emit_by_name (context, "preedit-start");
+      context_xim->pe_started = TRUE;
     }
 
     if (context_has_str != has_str || (tstr && context_xim->pe_str && strcmp(tstr, context_xim->pe_str))) {
@@ -484,18 +502,20 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   }
   else {
     result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
-      keysym, xevent.state, &rstr, &sub_comp_len);
+      keysym, xevent.state, &rstr);
     preedit_changed = result;
 //    printf("release rstr %x %s\n", rstr, rstr?rstr:"");
 
-    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos);
-    gboolean has_str = tstr && tstr[0];
+    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos, &sub_comp_len);
+    context_xim->old_sub_comp_len = sub_comp_len;
+    has_str = tstr && tstr[0];
 
-    if (!context_has_str && has_str) {
+    if (!context_pe_started && has_str) {
 #if DBG
       printf("emit preedit-start\n");
 #endif
       g_signal_emit_by_name (context, "preedit-start");
+      context_xim->pe_started = TRUE;
     }
 
     if (context_has_str != has_str || (tstr && context_xim->pe_str && strcmp(tstr, context_xim->pe_str))) {
@@ -516,8 +536,9 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 #endif
 
 
-  if (rstr && context_has_str) {
+  if (!has_str && context_pe_started) {
     clear_preedit(context_xim);
+    context_xim->pe_started = FALSE;
 #if DBG
     printf("preedit-end\n");
 #endif

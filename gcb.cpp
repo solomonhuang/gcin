@@ -6,7 +6,7 @@
 #include "gcin-conf.h"
 
 static GtkWidget *mainwin;
-static GtkClipboard *pclipboard;
+static GtkClipboard *pclipboard, *pclipboard_prim;
 static GtkWidget **buttonArr;
 static gchar **buttonStr;
 static int buttonArrN=3;
@@ -21,9 +21,6 @@ static GtkWidget *hist_window;
 static gchar **hist_strArr;
 static int hist_strArrN=10;
 static GtkWidget **hist_buttonArr;
-#if WIN32
-static int fetch_start_tick=0;
-#endif
 static void del_nl(char *tmpstr)
 {
    int i;
@@ -45,8 +42,8 @@ static void update_hist_button()
       continue;
 
 //    snprintf(tstr,sizeof(tstr),"%s",hist_strArr[i]);
-	strncpy(tstr, hist_strArr[i], sizeof(tstr)-1);
-	tstr[sizeof(tstr)-1]=0;
+        strncpy(tstr, hist_strArr[i], sizeof(tstr)-1);
+        tstr[sizeof(tstr)-1]=0;
 
     del_nl(tstr);
     gtk_button_set_label(GTK_BUTTON(hist_buttonArr[i]),tstr);
@@ -83,27 +80,6 @@ void set_win_title(const gchar *text)
    gtk_window_set_title (GTK_WINDOW (mainwin),titlestr);
 }
 
-#if WIN32
-static void place_gcb_win()
-{
-  int w, h;
-
-  get_win_size(mainwin, &w, &h);
-
-  int x,y;
-
-  x = dpy_xl - w - gcb_position_x;
-
-
-  if (gcb_position==4)
-    y = gcb_position_y;
-  else
-	y = dpy_yl - gcb_position_y -h;
-
-  gtk_window_move(GTK_WINDOW(mainwin), x, y);
-}
-#endif
-
 /* Signal handler called when the selections owner returns the data */
 void disp_gcb_selection(const gchar *text)
 {
@@ -117,7 +93,7 @@ void disp_gcb_selection(const gchar *text)
      return;
 
   if (!buttonArr)
-	 return;
+         return;
 
    for(i=0;i<buttonArrN;i++) {
      if (buttonStr[i] && !strcmp(buttonStr[i],text))
@@ -147,10 +123,6 @@ void disp_gcb_selection(const gchar *text)
    }
 
    gtk_button_set_label(GTK_BUTTON(button),tmpstr);
-#if WIN32
-   if (gcb_position==3 || gcb_position==4)
-     place_gcb_win();
-#endif
 
    set_win_title(text);
 
@@ -187,31 +159,18 @@ void disp_gcb_selection(const gchar *text)
    hist_strArr[0]=g_strdup(text);
 
    update_hist_button();
-
-#if WIN32
-   // dirty trick to avoid the block caused by cygwin/X, make the clipboard mine
-   int d = GetTickCount() - fetch_start_tick;
-   dbg("tick %d\n", d);
-
-   if (d > 50) {
-	  gtk_clipboard_set_text(pclipboard, text, -1);
-   }
-#endif
 }
 
 
 void cb_selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
 {
-	disp_gcb_selection(text);
+        disp_gcb_selection(text);
 }
 
 
-void get_selection()
+void get_selection(GtkClipboard *pcli)
 {
-#if WIN32
-  fetch_start_tick = GetTickCount();
-#endif
-  gtk_clipboard_request_text(pclipboard, cb_selection_received,snoop_button);
+  gtk_clipboard_request_text(pcli, cb_selection_received,snoop_button);
 }
 
 
@@ -248,6 +207,7 @@ static void get_mouse_button( GtkWidget *widget,GdkEventButton *event, gpointer 
         continue;
       if (buttonStr[i]) {
         gtk_clipboard_set_text(pclipboard, buttonStr[i], -1);
+        gtk_clipboard_set_text(pclipboard_prim, buttonStr[i], -1);
         set_win_title(buttonStr[i]);
       }
       break;
@@ -307,7 +267,7 @@ gboolean  key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_d
    if ((event->string && event->string[0]=='q') || event->keyval==GDK_Escape)
      do_exit();
 #endif
-	return TRUE;
+        return TRUE;
 }
 
 
@@ -336,16 +296,18 @@ gboolean hist_focus_out_callback(GtkWidget *widget, GdkEventFocus *event,
    return TRUE;
 }
 
+#if 0
 gboolean timeout_periodic_clipboard_fetch(void *data)
 {
 //  dbg("timeout_periodic_clipboard_fetch\n");
-  get_selection();
+  get_selection(data);
   return TRUE;
 }
+#endif
 
 static void cb_owner_change(GtkClipboard *clipboard, GdkEvent *event, gpointer ser_data)
 {
-  get_selection();
+  get_selection(clipboard);
 }
 
 
@@ -404,12 +366,6 @@ void gcb_main()
   gtk_window_set_has_resize_grip(GTK_WINDOW(mainwin), FALSE);
   gtk_window_set_decorated(GTK_WINDOW(mainwin),FALSE);
   gtk_window_set_focus_on_map (GTK_WINDOW(mainwin), FALSE);
-
-#if WIN32
-  gtk_window_set_accept_focus(GTK_WINDOW(mainwin), FALSE);
-  gtk_window_set_skip_taskbar_hint(GTK_WINDOW(mainwin), TRUE);
-  gtk_window_set_accept_focus(GTK_WINDOW(mainwin), FALSE);
-#endif
 
   hist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(hist_window), FALSE);
@@ -496,14 +452,12 @@ void gcb_main()
   gdk_input_set_extension_events(gtk_widget_get_window(mainwin), GDK_EXTENSION_EVENTS_ALL,
                                  GDK_EXTENSION_EVENTS_ALL);
 #endif
-#if UNIX
-  pclipboard = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
-#else
+  pclipboard_prim = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
   pclipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
-#endif
 
   set_snoop_button(buttonArr[0]);
-  get_selection();
+  get_selection(pclipboard);
+  get_selection(pclipboard_prim);
 #if 0
   gdk_window_set_events (GDK_ROOT_PARENT (), GDK_PROPERTY_CHANGE_MASK);
   gdk_window_add_filter (GDK_ROOT_PARENT (), property_change_event, NULL);
@@ -513,9 +467,8 @@ void gcb_main()
 
 
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
-#if GTK_CHECK_VERSION(2,6,0) && UNIX
+#if GTK_CHECK_VERSION(2,6,0)
   g_signal_connect(pclipboard, "owner-change", G_CALLBACK (cb_owner_change), NULL);
-#elif WIN32 && 1
-  g_timeout_add(3000, timeout_periodic_clipboard_fetch, NULL);
+  g_signal_connect(pclipboard_prim, "owner-change", G_CALLBACK (cb_owner_change), NULL);
 #endif
 }

@@ -42,6 +42,8 @@ gboolean tsin_pho_mode()
 
 void set_tsin_pho_mode0(ClientState *cs)
 {
+  if (!cs)
+    return;
   cs->tsin_pho_mode = 1;
 }
 
@@ -920,7 +922,7 @@ void show_button_pho(gboolean bshow);
 
 void tsin_set_eng_ch(int nmod)
 {
-  dbg("tsin_set_eng_ch %d\n", nmod);
+//  dbg("tsin_set_eng_ch %d\n", nmod);
 #if WIN32
   if (test_mode)
     return;
@@ -1365,6 +1367,9 @@ static int cursor_backspace()
         }
 
         if (pho_cleared) {
+		  if (typ_pho_empty())
+			  bzero(poo.inph, sizeof(poo.inph));
+
           disp_in_area_pho_tsin();
           tsin_scan_pre_select(TRUE);
 
