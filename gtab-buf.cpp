@@ -1,4 +1,4 @@
-﻿#include "gcin.h"
+#include "gcin.h"
 #include "gtab.h"
 #include "gcin-conf.h"
 #include "gcin-endian.h"
@@ -903,7 +903,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
       ch_N+=N;
       if (i < ggg.gbuf_cursor)
         *pcursor+=N;
-      if (i==ggg.gbuf_cursor) {
+      if (ap_only && i==ggg.gbuf_cursor) {
         attr[1].ofs0=*pcursor;
         attr[1].ofs1=*pcursor+N;
         attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;

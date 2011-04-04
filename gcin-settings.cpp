@@ -10,7 +10,7 @@ int left_right_button_tips;
 int gcin_im_toggle_keys, gcin_bell_off;
 int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
 int gcin_win_sym_click_close, gcin_edit_display, gcin_win32_icon;
-int gcin_on_the_spot_key;
+int gcin_on_the_spot_key, gcin_tray_hf_win_kbm;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -85,6 +85,7 @@ void load_setttings()
   gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 1);
   gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 0);
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
+  gcin_tray_hf_win_kbm = get_gcin_conf_int(GCIN_TRAY_HF_WIN_KBM, 0);
 #if UNIX
   gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 0);
 #else
@@ -106,10 +107,7 @@ void load_setttings()
 #if WIN32
   gcin_win32_icon = 1;
 #endif
-#if UNIX && GTK_CHECK_VERSION(2,91,0)
-  gcin_win32_icon = get_gcin_conf_int(GCIN_STATUS_TRAY, 1);
-#endif
-#if UNIX && !GTK_CHECK_VERSION(2,91,0)
+#if UNIX
   gcin_win32_icon = get_gcin_conf_int(GCIN_WIN32_ICON, 1);
 #endif
 

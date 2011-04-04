@@ -1,6 +1,7 @@
 #include "gcin.h"
 #include "pho.h"
 #include "gst.h"
+#include "gcin-module.h"
 #include <anthy/anthy.h>
 extern gboolean test_mode;
 static anthy_context_t ac;
@@ -10,7 +11,7 @@ void (*f_anthy_get_segment)(anthy_context_t ac, int,int,char *, int);
 void (*f_anthy_get_segment_stat)(anthy_context_t ac, int, struct anthy_segment_stat *);
 void (*f_anthy_commit_segment)(anthy_context_t ac, int, int);
 void (*f_anthy_set_string)(anthy_context_t ac, char *);
-extern gint64 key_press_time;
+static gint64 key_press_time;
 static GtkWidget *event_box_anthy;
 gint64 current_time();
 
@@ -1235,8 +1236,7 @@ int init_win_anthy()
 
   gtk_widget_show_all(win_anthy);
 
-  create_win1();
-  create_win1_gui();
+  init_tsin_selection_win();
   change_anthy_font_size();
 
   if (!phkbm.selkeyN)
@@ -1331,7 +1331,10 @@ int feedkey_anthy_release(KeySym xkey, int kbstate)
    (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
      && xkey == XK_Shift_R))
           &&  current_time() - key_press_time < 300000) {
-          if (!test_mode) {
+#if WIN32
+          if (!test_mode)
+#endif
+          {
             flush_anthy_input();
             key_press_time = 0;
             hide_selections_win();
@@ -1370,7 +1373,7 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
       ch_N+=N;
       if (i < cursor)
         *pcursor+=N;
-      if (i==cursor) {
+      if (gcin_edit_display_ap_only() && i==cursor) {
         attr[1].ofs0=*pcursor;
         attr[1].ofs1=*pcursor+N;
         attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
@@ -1391,7 +1394,7 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
       char *s=idx_hira_kata(jp[i], FALSE);
       int N = utf8_str_N(s);
 //      dbg("%d]%s N:%d\n", i, s, N);
-      if (i==cursor) {
+      if (gcin_edit_display_ap_only() && i==cursor) {
         strcat(str, keys);
         ch_N+=keysN;
         *pcursor = ch_N;

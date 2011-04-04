@@ -16,7 +16,6 @@ tsin:
 	鹹豬  select 鹹豬肉、鹹豬手
 	試試新的 開始用 是為什麼
 	有試過XXXXXX嗎？
-	由於雨水是集中一個角落流出來
 	排便時流血
 	實驗中只有
 	賣一種
@@ -25,7 +24,7 @@ tsin:
 	自己所用
 	中文自行  → should popup 自行、字型、
 	斷線16分鐘
-	
+        有人受到影響	
 
 簡易:
        aa space -> should be able to skip to next page

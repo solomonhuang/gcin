@@ -1,4 +1,4 @@
-﻿#include "gcin.h"
+#include "gcin.h"
 #include "pho.h"
 #include "gtab.h"
 #include "win-sym.h"
@@ -276,7 +276,10 @@ void toggle_half_full_char();
 static void cb_activate_state(GtkStatusIcon *status_icon, gpointer user_data)
 {
 //  dbg("cb_activate\n");
-  toggle_half_full_char();
+  if (gcin_tray_hf_win_kbm)
+    kbm_toggle();
+  else
+    toggle_half_full_char();
 }
 
 

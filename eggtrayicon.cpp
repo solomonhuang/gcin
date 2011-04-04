@@ -385,14 +385,34 @@ transparent_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer use
 	                      event->area.width, event->area.height);
 	return FALSE;
 }
+#else
+static gboolean
+transparent_expose_event (GtkWidget *widget, cairo_t *event, gpointer user_data)
+{
+	guint width, height;
+	GdkRGBA color;
+	width = gtk_widget_get_allocated_width (widget);
+	height = gtk_widget_get_allocated_height (widget);
+	cairo_arc (event, width / 2.0, height / 2.0,
+	           MIN (width, height) / 2.0, 0, 2 * G_PI);
+	gtk_style_context_get_color (gtk_widget_get_style_context (widget),
+	                             0, &color);
+	gdk_cairo_set_source_rgba (event, &color);
+	cairo_fill (event);
+	return FALSE;
+}
+#endif
 
 static void
 make_transparent_again (GtkWidget *widget, GtkStyle *previous_style,
                        gpointer user_data)
 {
+#if !GTK_CHECK_VERSION(2,91,0)
 	gdk_window_set_back_pixmap(gtk_widget_get_window(widget), NULL, TRUE);
-}
+#else
+	gdk_window_set_background_pattern(gtk_widget_get_window(widget), NULL);
 #endif
+}
 
 static void
 make_transparent (GtkWidget *widget, gpointer user_data)
@@ -410,9 +430,13 @@ make_transparent (GtkWidget *widget, gpointer user_data)
 	gdk_window_set_back_pixmap (gtk_widget_get_window(widget), NULL, TRUE);
 	g_signal_connect (widget, "expose_event",
 	                 G_CALLBACK (transparent_expose_event), NULL);
+#else
+	gdk_window_set_background_pattern (gtk_widget_get_window(widget), NULL);
+	g_signal_connect (widget, "draw",
+	                 G_CALLBACK (transparent_expose_event), NULL);
+#endif
 	g_signal_connect_after (widget, "style_set",
 	                       G_CALLBACK (make_transparent_again), NULL);
-#endif
 }
 
 static void

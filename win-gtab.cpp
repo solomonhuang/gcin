@@ -409,6 +409,7 @@ void create_win_gtab_gui_simple()
     gtk_container_add (GTK_CONTAINER(gwin_gtab), frame);
     gtk_container_set_border_width (GTK_CONTAINER (gwin_gtab), 0);
     gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   } else {
     gtk_container_add (GTK_CONTAINER(gwin_gtab), vbox_top);
     top_bin = vbox_top;
@@ -471,6 +472,7 @@ void create_win_gtab_gui_simple()
   gtk_container_set_border_width (GTK_CONTAINER (event_box_input_method_name), 0);
 
   GtkWidget *frame_input_method_name = gtk_frame_new(NULL);
+  gtk_frame_set_shadow_type(GTK_FRAME(frame_input_method_name), GTK_SHADOW_OUT);
   gtk_container_add (GTK_CONTAINER (event_box_input_method_name), frame_input_method_name);
   gtk_container_set_border_width (GTK_CONTAINER (frame_input_method_name), 0);
 
@@ -489,6 +491,7 @@ void create_win_gtab_gui_simple()
 
   if (!gcin_on_the_spot_key) {
     GtkWidget *frame_gtab = gtk_frame_new(NULL);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame_gtab), GTK_SHADOW_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame_gtab), 0);
     gtk_container_add (GTK_CONTAINER (event_box_gtab), frame_gtab);
     g_signal_connect(G_OBJECT(event_box_gtab),"button-press-event",

@@ -179,6 +179,12 @@ void create_win1_gui()
   change_win1_font();
 }
 
+void init_tsin_selection_win()
+{
+  create_win1();
+  create_win1_gui();
+}
+
 void clear_sele()
 {
   int i;

@@ -32,7 +32,6 @@
 #define DBG 0
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
-//gboolean is_gdm;
 
 struct _GtkIMContextGCIN
 {
@@ -51,19 +50,6 @@ struct _GtkIMContextGCIN
   int pe_cursor;
 };
 
-
-#if NEW_GTK_IM
-static void cancel_timeout(GtkIMContextGCIN *context)
-{
-#if DBG && 0
-  printf("cancel_timeout %d\n", context->timeout_handle);
-#endif
-  if (!context->timeout_handle)
-    return;
-  g_source_remove(context->timeout_handle);
-  context->timeout_handle = 0;
-}
-#endif
 
 static void     gtk_im_context_gcin_class_init         (GtkIMContextGCINClass  *class);
 static void     gtk_im_context_gcin_init               (GtkIMContextGCIN       *im_context_gcin);
@@ -191,6 +177,7 @@ gtk_im_context_gcin_class_init (GtkIMContextGCINClass *class)
   gobject_class->finalize = gtk_im_context_gcin_finalize;
 }
 
+
 static void
 gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
 {
@@ -200,33 +187,10 @@ gtk_im_context_gcin_init (GtkIMContextGCIN *im_context_gcin)
   im_context_gcin->pe_str = NULL;
   im_context_gcin->pe_cursor = 0;
   im_context_gcin->gcin_ch = NULL;
+//  test_gdm();
 
 #if DBG
   printf("gtk_im_context_gcin_init %x\n", im_context_gcin);
-#endif
-#if NEW_GTK_IM
-  int pid = getpid();
-// probably only works for linux
-  static char *moz[]={"mozilla", "firefox", "thunderbird", "nvu", "sunbird",
-        "seamonkey", "gnuzilla", "iceweasel", "icedove", "iceape", "swiftfox",
-        "iceowl", "kompozer", "swiftdove", "swiftweasel", "navigator", "xulrunner"};
-  char tstr0[64];
-  char exec[256];
-  sprintf(tstr0, "/proc/%d/exe", pid);
-  int n;
-  if ((n=readlink(tstr0, exec, sizeof(exec))) > 0) {
-    exec[n]=0;
-    int i;
-    for(i=0; i < sizeof(moz)/sizeof(moz[0]); i++) {
-      if (!strstr(exec, moz[i]))
-        continue;
-      im_context_gcin->is_mozilla = TRUE;
-      break;
-    }
-
-//    if (strstr(exec, "/gdm"))
-//      is_gdm = TRUE;
-  }
 #endif
 // dirty hack for mozilla...
 }
@@ -260,10 +224,6 @@ gtk_im_context_gcin_finalize (GObject *obj)
 #endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (obj);
   clear_preedit(context_xim);
-
-#if NEW_GTK_IM
-  cancel_timeout(context_xim);
-#endif
 
   if (context_xim->gcin_ch) {
     gcin_im_client_close(context_xim->gcin_ch);
@@ -348,6 +308,16 @@ gtk_im_context_gcin_new (void)
 
 #include <gdk/gdkkeysyms.h>
 
+#if 0
+static gboolean open_gcin_win(int sub_comp_len, GtkIMContextGCIN *context_xim)
+{
+    return !(context_xim->old_sub_comp_len & 1) && (sub_comp_len & 1)
+        || !(context_xim->old_sub_comp_len & 2) && (sub_comp_len & 2)
+        ||  !(context_xim->old_sub_comp_len & 4) && (sub_comp_len & 4);
+}
+#endif
+
+
 ///
 static gboolean
 gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
@@ -366,7 +336,6 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   GdkWindow *root_window = gdk_screen_get_root_window (gdk_window_get_screen (event->window));
 
   XKeyPressedEvent xevent;
-
   xevent.type = (event->type == GDK_KEY_PRESS) ? KeyPress : KeyRelease;
   xevent.serial = 0;            /* hope it doesn't matter */
   xevent.send_event = event->send_event;
@@ -414,22 +383,25 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   if (event->type == GDK_KEY_PRESS) {
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
+  } else {
+//    printf("release\n");
+    result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
+     keysym, xevent.state, &rstr);
+  }
+
     preedit_changed = result;
 
     int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos, &sub_comp_len);
     has_str = tstr && tstr[0];
 
-    gboolean open_cand = !(context_xim->old_sub_comp_len & 1) && (sub_comp_len & 1)
-        || !(context_xim->old_sub_comp_len & 2) && (sub_comp_len & 2)
-        ||  !(context_xim->old_sub_comp_len & 4) && (sub_comp_len & 4);
 
 #if DBG
-    printf("result %x %d %x  open:%d  tstr:%x\n", keysym, result, sub_comp_len, open_cand);
+    printf("result keysym:%x %d sub_comp_len:%x tstr:%x\n", keysym, result, sub_comp_len, tstr);
 #endif
 
-    if (open_cand) {
+    if (sub_comp_len) {
       has_str = TRUE;
-      preedit_changed = TRUE;
+//      preedit_changed = TRUE;
     }
 
     context_xim->old_sub_comp_len = sub_comp_len;
@@ -439,7 +411,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
       printf("emit preedit-start\n");
 #endif
       g_signal_emit_by_name (context, "preedit-start");
-      context_xim->pe_started = TRUE;
+      context_pe_started = context_xim->pe_started = TRUE;
     }
 
     if (context_has_str != has_str || (tstr && context_xim->pe_str && strcmp(tstr, context_xim->pe_str))) {
@@ -477,7 +449,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
 #if DBG
     printf("seq:%d rstr:%s result:%x num_bytes:%d %x\n", context_xim->gcin_ch->seq, rstr, result, num_bytes, (unsigned int)buffer[0]);
 #endif
-    if (!rstr && !result && num_bytes &&
+    if (event->type == GDK_KEY_PRESS && !rstr && !result && num_bytes &&
 #if 1
    buffer[0]>=0x20 && buffer[0]!=0x7f
 #else
@@ -489,42 +461,6 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
       rstr[num_bytes] = 0;
       result = TRUE;
     }
-
-#if NEW_GTK_IM
-    // this one is for mozilla, I know it is very dirty
-    if (context_xim->is_mozilla && !context_xim->dirty_fix_off) {
-        if (rstr || !result)
-          add_cursor_timeout(context_xim);
-    } else {
-//      printf("predit_changed\n");
-    }
-#endif
-  }
-  else {
-    result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
-      keysym, xevent.state, &rstr);
-    preedit_changed = result;
-//    printf("release rstr %x %s\n", rstr, rstr?rstr:"");
-
-    int attN = gcin_im_client_get_preedit(context_xim->gcin_ch, &tstr, att, &cursor_pos, &sub_comp_len);
-    context_xim->old_sub_comp_len = sub_comp_len;
-    has_str = tstr && tstr[0];
-
-    if (!context_pe_started && has_str) {
-#if DBG
-      printf("emit preedit-start\n");
-#endif
-      g_signal_emit_by_name (context, "preedit-start");
-      context_xim->pe_started = TRUE;
-    }
-
-    if (context_has_str != has_str || (tstr && context_xim->pe_str && strcmp(tstr, context_xim->pe_str))) {
-      if (context_xim->pe_str)
-        free(context_xim->pe_str);
-      context_xim->pe_str = tstr;
-    }
-  }
-
 
 #if 1
   if (preedit_changed) {
@@ -540,7 +476,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     clear_preedit(context_xim);
     context_xim->pe_started = FALSE;
 #if DBG
-    printf("preedit-end\n");
+    printf("preedit-end %x\n", has_str);
 #endif
     g_signal_emit_by_name (context, "preedit-end");
   }
@@ -571,10 +507,6 @@ gtk_im_context_gcin_focus_in (GtkIMContext *context)
   printf("gtk_im_context_gcin_focus_in\n");
 #endif
   if (context_xim->gcin_ch) {
-#if NEW_GTK_IM && 0
-    if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
-      add_cursor_timeout(context_xim);
-#endif
     gcin_im_client_focus_in(context_xim->gcin_ch);
   }
 
@@ -586,13 +518,11 @@ gtk_im_context_gcin_focus_out (GtkIMContext *context)
 {
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 //  printf("gtk_im_context_gcin_focus_out\n");
-#if NEW_GTK_IM
-  cancel_timeout(context_xim);
-#endif
 
   if (context_xim->gcin_ch) {
     char *rstr;
     gcin_im_client_focus_out2(context_xim->gcin_ch , &rstr);
+    context_xim->pe_started = FALSE;
 
     if (rstr) {
       g_signal_emit_by_name (context, "commit", rstr);
@@ -653,7 +583,7 @@ gtk_im_context_gcin_reset (GtkIMContext *context)
   printf("gtk_im_context_gcin_reset %x\n", context_gcin);
 #endif
 
-
+  context_gcin->pe_started = FALSE;
 #if 1
   if (context_gcin->gcin_ch) {
     gcin_im_client_reset(context_gcin->gcin_ch);

@@ -740,7 +740,7 @@ proc_state:
       out_buffer[out_bufferN++] = ' ';
 
       ii++;
-      i=i++;
+      i++;
     }
 
     char *tt = poo.cpg ? "&lt;" : " ";

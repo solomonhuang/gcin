@@ -326,7 +326,11 @@ void update_item_active_unix()
 }
 
 
+#if !GTK_CHECK_VERSION(2,91,0)
 gboolean cb_expose(GtkWidget *da, GdkEventExpose *event, gpointer data)
+#else
+gboolean cb_expose(GtkWidget *da, cairo_t *event, gpointer data)
+#endif
 {
   if (!da)
     create_tray(NULL);
@@ -376,7 +380,11 @@ gboolean create_tray(gpointer data)
   da =  gtk_drawing_area_new();
   g_signal_connect (G_OBJECT (event_box), "destroy",
                     G_CALLBACK (gtk_widget_destroyed), &da);
+#if !GTK_CHECK_VERSION(2,91,0)
   g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(cb_expose), NULL);
+#else
+  g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(cb_expose), NULL);
+#endif
 
   gtk_container_add (GTK_CONTAINER (event_box), da);
   gtk_widget_set_size_request(GTK_WIDGET(egg_tray_icon), pwidth, pheight);

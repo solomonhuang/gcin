@@ -1,4 +1,4 @@
-﻿#include "gcin.h"
+#include "gcin.h"
 
 #if UNIX
 #if !CLIENT_LIB || DEBUG

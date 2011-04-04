@@ -67,10 +67,6 @@ CFLAGS += -DTRAY_ENABLED=1
 OBJS += tray.o eggtrayicon.o tray-win32.o
 endif
 
-ifeq ($(USE_TRAY),N)
-GCIN_SO += tray-win32.o
-endif
-
 ifeq ($(USE_I18N),Y)
 CFLAGS += -DGCIN_i18n_message=1
 endif
@@ -115,7 +111,7 @@ PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
-all:	$(PROGS) trad2sim $(DATA) $(PROGS_CV) gcin.spec
+all:	$(PROGS) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C gtk-im
 ifeq ($(USE_I18N),Y)

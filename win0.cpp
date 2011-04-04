@@ -540,7 +540,8 @@ static void create_cursor_attr()
   pango_attr_list_insert (attr_list, white_fg);
 }
 
-void create_win1_gui();
+void init_tsin_selection_win();
+
 static void set_win0_bg()
 {
 #if 1
@@ -608,8 +609,7 @@ static void create_win0_gui()
   gdk_flush();
   gtk_widget_hide (gwin0);
 
-  create_win1();
-  create_win1_gui();
+  init_tsin_selection_win();
 
   set_win0_bg();
 

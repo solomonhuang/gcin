@@ -1,4 +1,5 @@
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
+sh gen-gtk3
 rm -f tags core.*
 cd ..
 rm -fr $GCIN_VERSION

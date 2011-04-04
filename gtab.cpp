@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (C) 2004-2008	Edward Der-Hua Liu, Hsin-Chu, Taiwan
 */
 
@@ -1359,6 +1359,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   gboolean ctrl_m = (kbstate & ControlMask) > 0;
   int caps_eng_tog = tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock;
   gboolean capslock_on = (kbstate&LockMask);
+  gboolean is_dayi = !strncmp(cur_inmd->filename, "dayi", 4);
 
   bzero(seltab_phrase, sizeof(seltab_phrase));
 
@@ -1779,7 +1780,7 @@ next:
           } else
             return 0;
         }
-        if (!strncmp(cur_inmd->filename, "dayi", 4)) {
+        if (is_dayi) {
           key = key - XK_KP_0 + '0';
           is_keypad = TRUE;
         }

@@ -13,9 +13,8 @@ static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_inner_frame,
 #if TRAY_ENABLED
                  *check_button_gcin_status_tray,
-#if !GTK_CHECK_VERSION(2,91,0)
                  *check_button_gcin_win32_icon,
-#endif
+		     *check_button_gcin_tray_hf_win_kbm,
 #endif
                  *check_button_gcin_win_color_use,
                  *check_button_gcin_on_the_spot_key;
@@ -389,11 +388,7 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GCIN_INNER_FRAME, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_inner_frame)));
 #if TRAY_ENABLED
   save_gcin_conf_int(GCIN_STATUS_TRAY, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray)));
-#if UNIX && GTK_CHECK_VERSION(2,91,0)
-  save_gcin_conf_int(GCIN_WIN32_ICON, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray)));
-#else
   save_gcin_conf_int(GCIN_WIN32_ICON, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win32_icon)));
-#endif
 #endif
 
   gchar *cstr = gtk_color_selection_palette_to_string(&gcin_win_gcolor_fg, 1);
@@ -408,6 +403,7 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
 
   save_gcin_conf_int(GCIN_WIN_COLOR_USE, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_color_use)));
   save_gcin_conf_int(GCIN_ON_THE_SPOT_KEY, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_on_the_spot_key)));
+  save_gcin_conf_int(GCIN_TRAY_HF_WIN_KBM, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_tray_hf_win_kbm)));
 
   cstr = gtk_color_selection_palette_to_string(&gcin_sel_key_gcolor, 1);
   dbg("selkey color %s\n", cstr);
@@ -775,14 +771,20 @@ void create_appearance_conf_window()
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_status_tray),
        gcin_status_tray);
   gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_status_tray, FALSE, FALSE, 0);
-#if UNIX && !GTK_CHECK_VERSION(2,91,0)
-  GtkWidget *label_gcin_status_tray_windows_style = gtk_label_new(_(_L("Windows style")));
+#if UNIX
+  GtkWidget *label_gcin_status_tray_windows_style = gtk_label_new(_(_L("雙圖示")));
   gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), label_gcin_status_tray_windows_style, FALSE, FALSE, 0);
   check_button_gcin_win32_icon = gtk_check_button_new ();
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_win32_icon),
        gcin_win32_icon);
   gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_win32_icon, FALSE, FALSE, 0);
 #endif
+  GtkWidget *label_gcin_tray_hf_win_kbm = gtk_label_new(_(_L("全半形左鍵\n切換小鍵盤")));
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), label_gcin_tray_hf_win_kbm, FALSE, FALSE, 0);
+  check_button_gcin_tray_hf_win_kbm = gtk_check_button_new ();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_tray_hf_win_kbm),
+       gcin_tray_hf_win_kbm);
+  gtk_box_pack_start (GTK_BOX(hbox_gcin_status_tray), check_button_gcin_tray_hf_win_kbm, FALSE, FALSE, 0);
 #endif
 
   GtkWidget *frame_win_color = gtk_frame_new(_(_L("顏色選擇")));

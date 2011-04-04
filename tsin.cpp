@@ -975,6 +975,12 @@ void hide_pre_sel()
 }
 
 
+static void call_tsin_parse()
+{
+  prbuf();
+  tsin_parse();
+  prbuf();
+}
 
 void draw_underline(int index);
 
@@ -1133,6 +1139,7 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     ch_pho_cpy(&tss.chpho[idx], str, pho, len);
     set_chpho_ch(&tss.chpho[idx], str, len, FALSE);
     set_fixed(idx, len);
+    tss.chpho[idx].flag |= FLAG_CHPHO_PHRASE_USER_HEAD;
     tss.c_idx=idx + len;
     tss.chpho[tss.c_idx - 1].flag |= FLAG_CHPHO_PHRASE_TAIL;
 
@@ -1147,6 +1154,8 @@ gboolean add_to_tsin_buf_phsta(char *str, phokey_t *pho, int len)
     disp_ph_sta();
     hide_pre_sel();
     tss.ph_sta=-1;
+    call_tsin_parse();
+
     return 1;
 }
 
@@ -1233,7 +1242,7 @@ static gboolean pre_sel_handler(KeySym xkey)
   int c = shift_key_idx(pho_selkey, xkey);
   if (c < 0) {
     close_selection_win();
-	return FALSE;
+    return FALSE;
   }
   return tsin_sele_by_idx(c);
 }
@@ -1273,12 +1282,6 @@ static gboolean pre_punctuation_hsu(KeySym xkey)
 int inph_typ_pho(KeySym newkey);
 gint64 current_time();
 
-static void call_tsin_parse()
-{
-  prbuf();
-  tsin_parse();
-  prbuf();
-}
 
 KeySym keypad_proc(KeySym xkey)
 {
@@ -2221,7 +2224,9 @@ fin:
     attr[0].ofs1=tss.c_len;
     attrN++;
 
-    if (tss.c_idx < tss.c_len) {
+
+    // for firefox 4
+    if (gcin_edit_display_ap_only() && tss.c_idx < tss.c_len) {
       attr[1].ofs0=tss.c_idx;
       attr[1].ofs1=tss.c_idx+1;
       attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;

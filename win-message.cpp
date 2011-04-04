@@ -70,11 +70,15 @@ static void create_win_message(char *icon, char *text, int duration)
   get_win_size(gwin_message, &width, &height);
 
   int ox=-1, oy;
-#if !GTK_CHECK_VERSION(2,91,0)
   int szx, szy;
   if (tray_da_win) {
     gdk_window_get_origin  (tray_da_win, &ox, &oy);
+#if !GTK_CHECK_VERSION(2,91,0)
     gdk_drawable_get_size(tray_da_win, &szx, &szy);
+#else
+    szx = gdk_window_get_width(tray_da_win);
+    szy = gdk_window_get_height(tray_da_win);
+#endif
 
     if (oy<height) {
       oy = szy;
@@ -91,7 +95,6 @@ static void create_win_message(char *icon, char *text, int duration)
     if (ox < 0)
       ox = 0;
   } else
-#endif
   if (icon_main) {
     GdkRectangle rect;
     GtkOrientation ori;

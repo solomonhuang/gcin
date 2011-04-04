@@ -1,4 +1,4 @@
-﻿#include "gcin.h"
+#include "gcin.h"
 #include "pho.h"
 #include "pho-kbm-name.h"
 
