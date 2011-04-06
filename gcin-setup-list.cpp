@@ -206,11 +206,7 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   int idx;
 #if UNIX
-#if GTK_CHECK_VERSION(2,4,0)
   idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_im_toggle_keys));
-#else
-  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_im_toggle_keys));
-#endif
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, imkeys[idx].keynum);
 #else
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, Control_Space);
@@ -235,22 +231,14 @@ static void cb_ok (GtkWidget *button, gpointer data)
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off)));
 
   if (opt_speaker_opts) {
-#if GTK_CHECK_VERSION(2,4,0)
     idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_speaker_opts));
-#else
-    idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_speaker_opts));
-#endif
     save_gcin_conf_str(PHONETIC_SPEAK_SEL, pho_speaker[idx]);
   }
 
 
 #if USE_GCB
   save_gcin_conf_int(GCB_ENABLED, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcb_enabled)));
-#if GTK_CHECK_VERSION(2,4,0)
   idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_gcb_pos));
-#else
-  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcb_pos));
-#endif
   save_gcin_conf_int(GCB_POSITION, idx+1); // for backward compatbility
   int pos_x = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_x));
   save_gcin_conf_int(GCB_POSITION_X, pos_x);
@@ -513,10 +501,8 @@ static GtkWidget *create_im_toggle_keys()
   GtkWidget *label = gtk_label_new(_(_L("輸入視窗(開啟/關閉)切換")));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
-#if GTK_CHECK_VERSION(2,4,0)
   opt_im_toggle_keys = gtk_combo_box_new_text ();
-#else
-  opt_im_toggle_keys = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
   GtkWidget *menu_im_toggle_keys = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_im_toggle_keys, FALSE, FALSE, 0);
@@ -538,12 +524,10 @@ static GtkWidget *create_im_toggle_keys()
 #endif
   }
 
-#if GTK_CHECK_VERSION(2,4,0)
-  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_im_toggle_keys), current_idx);
-#else
+#if !GTK_CHECK_VERSION(2,4,0)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_im_toggle_keys), menu_im_toggle_keys);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_im_toggle_keys), current_idx);
 #endif
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_im_toggle_keys), current_idx);
 
   return hbox;
 }
@@ -555,10 +539,8 @@ static GtkWidget *create_speaker_opts()
 {
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
 
-#if GTK_CHECK_VERSION(2,4,0)
   opt_speaker_opts = gtk_combo_box_new_text ();
-#else
-  opt_speaker_opts = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
   GtkWidget *menu_speaker_opts = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_speaker_opts, FALSE, FALSE, 0);
@@ -581,12 +563,10 @@ static GtkWidget *create_speaker_opts()
 #endif
   }
 
-#if GTK_CHECK_VERSION(2,4,0)
-  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_speaker_opts), current_idx);
-#else
+#if !GTK_CHECK_VERSION(2,4,0)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_speaker_opts), menu_speaker_opts);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_speaker_opts), current_idx);
 #endif
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_speaker_opts), current_idx);
 
   return hbox;
 }
@@ -597,10 +577,8 @@ static GtkWidget *create_gcb_pos_opts()
 {
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
 
-#if GTK_CHECK_VERSION(2,4,0)
   opt_gcb_pos = gtk_combo_box_new_text ();
-#else
-  opt_gcb_pos = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
   GtkWidget *menu_gcb_pos = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_gcb_pos, FALSE, FALSE, 0);
@@ -612,17 +590,14 @@ static GtkWidget *create_gcb_pos_opts()
     gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (opt_gcb_pos), _(gcb_pos[i]));
 #else
     GtkWidget *item = gtk_menu_item_new_with_label (_(gcb_pos[i]));
-
     gtk_menu_shell_append (GTK_MENU_SHELL (menu_gcb_pos), item);
 #endif
   }
 
-#if GTK_CHECK_VERSION(2,4,0)
-  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcb_pos), gcb_position-1); // for backward compatibily
-#else
+#if !GTK_CHECK_VERSION(2,4,0)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcb_pos), menu_gcb_pos);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcb_pos), gcb_position-1); // for backward compatibily
 #endif
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcb_pos), gcb_position-1); // for backward compatibily
 
   return hbox;
 }

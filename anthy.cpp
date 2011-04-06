@@ -1,23 +1,21 @@
 #include "gcin.h"
 #include "pho.h"
 #include "gst.h"
+#include "im-client/gcin-im-client-attr.h"
 #include "gcin-module.h"
 #include <anthy/anthy.h>
+#if WIN32
 extern gboolean test_mode;
+#endif
 static anthy_context_t ac;
-void (*f_anthy_resize_segment)(anthy_context_t ac, int, int);
-void (*f_anthy_get_stat)(anthy_context_t ac, struct anthy_conv_stat *acs);
-void (*f_anthy_get_segment)(anthy_context_t ac, int,int,char *, int);
-void (*f_anthy_get_segment_stat)(anthy_context_t ac, int, struct anthy_segment_stat *);
-void (*f_anthy_commit_segment)(anthy_context_t ac, int, int);
-void (*f_anthy_set_string)(anthy_context_t ac, char *);
 static gint64 key_press_time;
 static GtkWidget *event_box_anthy;
-gint64 current_time();
 
-void show_win_anthy();
-void hide_win_anthy();
-void change_anthy_font_size();
+static GCIN_module_main_functions gmf;
+
+void module_show_win();
+void module_hide_win();
+void module_change_font_size();
 
 enum {
   STATE_hira=0,
@@ -501,9 +499,9 @@ static gboolean is_empty()
 static void auto_hide()
 {
 //  puts("auto hide");
-  if (is_empty() && gcin_pop_up_win) {
+  if (is_empty() && *gmf.mf_gcin_pop_up_win) {
 //    puts("empty");
-    hide_win_anthy();
+    module_hide_win();
   }
 }
 
@@ -593,7 +591,7 @@ static void cursor_markup(int idx, char *s)
 {
   char cur[256];
   GtkWidget *lab = seg[idx].label;
-  sprintf(cur, "<span background=\"%s\">%s</span>", tsin_cursor_color, s);
+  sprintf(cur, "<span background=\"%s\">%s</span>", *gmf.mf_tsin_cursor_color, s);
   gtk_label_set_markup(GTK_LABEL(lab), cur);
 }
 
@@ -677,7 +675,7 @@ static void clear_all()
   keysN = 0;
   segN = 0;
   cursor=0;
-  tss.sel_pho = FALSE;
+  gmf.mf_tss->sel_pho = FALSE;
   state_hira_kata = STATE_hira;
   auto_hide();
 }
@@ -689,12 +687,12 @@ static void send_seg()
   int i;
   for(i=0, out[0]=0; i < segN; i++) {
     strcat(out, gtk_label_get_text(GTK_LABEL(seg[i].label)));
-    (*f_anthy_commit_segment)(ac, i, seg[i].selidx);
+    anthy_commit_segment(ac, i, seg[i].selidx);
     seg[i].selidx = 0;
   }
 
 //  printf("sent convert '%s'\n", out);
-  send_text(out);
+  gmf.mf_send_text(out);
   clear_all();
 }
 
@@ -719,7 +717,7 @@ static gboolean send_jp()
   keysN = 0;
 
 //  printf("sent romanji '%s'\n", out);
-  send_text(out);
+  gmf.mf_send_text(out);
   segN = 0;
   return TRUE;
 }
@@ -734,47 +732,48 @@ static void disp_select()
 {
 //  puts("disp_select");
   clear_sele();
-  int endn = pageidx + phkbm.selkeyN;
+  int endn = pageidx + gmf.mf_phkbm->selkeyN;
   if (endn >  seg[cursor].selN)
     endn = seg[cursor].selN;
   int i;
   for(i=pageidx; i<endn; i++) {
     char buf[256];
-    (*f_anthy_get_segment)(ac, cursor, i, buf, sizeof(buf));
+    anthy_get_segment(ac, cursor, i, buf, sizeof(buf));
 //    printf("%d %s\n", i, buf);
-    set_sele_text(seg[cursor].selN, i - pageidx, buf, strlen(buf));
+    gmf.mf_set_sele_text(seg[cursor].selN, i - pageidx, buf, strlen(buf));
   }
 
   if (pageidx)
-    disp_arrow_up();
+    gmf.mf_disp_arrow_up();
   if (i < seg[cursor].selN)
-    disp_arrow_down();
+    gmf.mf_disp_arrow_down();
 
   int x,y;
-  get_widget_xy(win_anthy, seg[cursor].label, &x, &y);
+  gmf.mf_get_widget_xy(win_anthy, seg[cursor].label, &x, &y);
 //  printf("%x cusor %d %d\n", win_anthy, cursor, x);
-  y = gcin_edit_display_ap_only()?win_y:win_y+win_yl;
-  disp_selections(x, y);
+  y = gmf.mf_gcin_edit_display_ap_only()?
+    *gmf.mf_win_y:*gmf.mf_win_y+*gmf.mf_win_yl;
+  gmf.mf_disp_selections(x, y);
 }
 
 static void load_seg()
 {
       clear_seg_label();
       struct anthy_conv_stat acs;
-      (*f_anthy_get_stat)(ac, &acs);
+      anthy_get_stat(ac, &acs);
       segN = 0;
       if (acs.nr_segment > 0) {
         char buf[256];
         int i;
 
         for(i=0; i < acs.nr_segment; i++) {
-          (*f_anthy_get_segment)(ac, i, 0, buf, sizeof(buf));
+          anthy_get_segment(ac, i, 0, buf, sizeof(buf));
 
           seg[i].selidx = 0;
           gtk_label_set_text(GTK_LABEL(seg[i].label), buf);
 
           struct anthy_segment_stat ss;
-          (*f_anthy_get_segment_stat)(ac, i, &ss);
+          anthy_get_segment_stat(ac, i, &ss);
 
           seg[i].selN = ss.nr_candidate;
           segN++;
@@ -791,7 +790,7 @@ static void load_seg()
 
 static void next_page()
 {
-  pageidx += phkbm.selkeyN;
+  pageidx += gmf.mf_phkbm->selkeyN;
   if (pageidx >= seg[cursor].selN)
     pageidx = 0;
   disp_select();
@@ -799,7 +798,7 @@ static void next_page()
 
 void hide_selections_win();
 
-int flush_anthy_input()
+int module_flush_input()
 {
   hide_selections_win();
 
@@ -819,8 +818,8 @@ int flush_anthy_input()
 static int page_N()
 {
   int N = seg[cursor].selN - pageidx;
-  if (N > phkbm.selkeyN)
-    N = phkbm.selkeyN;
+  if (N > gmf.mf_phkbm->selkeyN)
+    N = gmf.mf_phkbm->selkeyN;
   return N;
 }
 
@@ -830,12 +829,12 @@ static gboolean select_idx(int c)
 
   if (idx < seg[cursor].selN) {
     char buf[256];
-    (*f_anthy_get_segment)(ac, cursor, idx, buf, sizeof(buf));
+    anthy_get_segment(ac, cursor, idx, buf, sizeof(buf));
     gtk_label_set_text(GTK_LABEL(seg[cursor].label), buf);
     seg[cursor].selidx = idx;
 
     state = STATE_CONVERT;
-    hide_selections_win();
+    gmf.mf_hide_selections_win();
     return (segN==1);
   }
 
@@ -843,7 +842,7 @@ static gboolean select_idx(int c)
 }
 
 
-gboolean feedkey_anthy(int kv, int kvstate)
+gboolean module_feedkey(int kv, int kvstate)
 {
   int lkv = tolower(kv);
   int shift_m=(kvstate&ShiftMask) > 0;
@@ -858,7 +857,7 @@ gboolean feedkey_anthy(int kv, int kvstate)
     key_press_time = current_time();
   }
 
-  if (!tsin_pho_mode())
+  if (!gmf.mf_tsin_pho_mode())
     return 0;
 
   gboolean b_is_empty = is_empty();
@@ -895,9 +894,9 @@ gboolean feedkey_anthy(int kv, int kvstate)
         return FALSE;
       if (state==STATE_SELECT) {
         int N = page_N();
-        tss.pho_menu_idx--;
-        if (tss.pho_menu_idx < 0)
-          tss.pho_menu_idx = N - 1;
+        gmf.mf_tss->pho_menu_idx--;
+        if (gmf.mf_tss->pho_menu_idx < 0)
+          gmf.mf_tss->pho_menu_idx = N - 1;
         disp_select();
       }
       return TRUE;
@@ -906,13 +905,13 @@ gboolean feedkey_anthy(int kv, int kvstate)
         return FALSE;
       if (state==STATE_CONVERT) {
         state = STATE_SELECT;
-        tss.sel_pho = TRUE;
+        gmf.mf_tss->sel_pho = TRUE;
   //      puts("STATE_SELECT");
         disp_select();
       } else
       if (state==STATE_SELECT) {
         int N = page_N();
-        tss.pho_menu_idx=(tss.pho_menu_idx+1)% N;
+        gmf.mf_tss->pho_menu_idx=(gmf.mf_tss->pho_menu_idx+1)% N;
         disp_select();
       }
       return TRUE;
@@ -920,16 +919,16 @@ gboolean feedkey_anthy(int kv, int kvstate)
       if (b_is_empty)
         return FALSE;
       if (state==STATE_SELECT) {
-        if (select_idx(tss.pho_menu_idx))
+        if (select_idx(gmf.mf_tss->pho_menu_idx))
           goto send;
         return TRUE;
       }
 send:
-      return flush_anthy_input();
+      return module_flush_input();
     case XK_Escape:
         if (state==STATE_SELECT) {
           state = STATE_CONVERT;
-          tss.sel_pho = FALSE;
+          gmf.mf_tss->sel_pho = FALSE;
           clear_sele();
         }
         else
@@ -942,7 +941,7 @@ send:
         return FALSE;
       }
 
-      hide_selections_win();
+      gmf.mf_hide_selections_win();
 
       if (state&(STATE_CONVERT|STATE_SELECT)) {
 rom:
@@ -993,7 +992,7 @@ rom:
       } else
       if (state&STATE_CONVERT) {
         if (shift_m) {
-          (*f_anthy_resize_segment)(ac, cursor, -1);
+          anthy_resize_segment(ac, cursor, -1);
           load_seg();
         } else {
           if (cursor)
@@ -1012,7 +1011,7 @@ rom:
       } else
       if (state&STATE_CONVERT) {
         if (shift_m) {
-          (*f_anthy_resize_segment)(ac, cursor, 1);
+          anthy_resize_segment(ac, cursor, 1);
           load_seg();
         } else {
           if (cursor < segN-1)
@@ -1047,7 +1046,7 @@ rom:
     case XK_Prior:
       if (state!=STATE_SELECT)
         return FALSE;
-      pageidx -= phkbm.selkeyN;
+      pageidx -= gmf.mf_phkbm->selkeyN;
       if (pageidx < 0)
         pageidx = 0;
       disp_select();
@@ -1064,8 +1063,8 @@ rom:
     default:
       if (state==STATE_SELECT) {
         char *pp;
-        if ((pp=strchr(pho_selkey, lkv))) {
-          int c=pp-pho_selkey;
+        if ((pp=strchr(*gmf.mf_pho_selkey, lkv))) {
+          int c=pp-*gmf.mf_pho_selkey;
           if (select_idx(c))
             goto send;
         }
@@ -1094,7 +1093,7 @@ lab1:
     disp_input();
   }
 
-  show_win_anthy();
+  module_show_win();
 
   if (kv==' ') {
     if (state==STATE_ROMANJI) {
@@ -1102,12 +1101,12 @@ lab1:
       clear_seg_label();
       merge_jp(tt, TRUE);
 //      dbg("tt %s %d\n", tt, strlen(tt));
-      (*f_anthy_set_string)(ac, tt);
+      anthy_set_string(ac, tt);
       load_seg();
     } else
     if (state==STATE_CONVERT) {
       state = STATE_SELECT;
-      tss.sel_pho = TRUE;
+      gmf.mf_tss->sel_pho = TRUE;
 //      puts("STATE_SELECT");
       disp_select();
     } else
@@ -1119,20 +1118,18 @@ lab1:
   return TRUE;
 }
 
-void toggle_win_sym(), exec_gcin_setup();
-
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
 //  dbg("mouse_button_callback %d\n", event->button);
   switch (event->button) {
     case 1:
-      toggle_win_sym();
+      gmf.mf_toggle_win_sym();
       break;
     case 2:
-      inmd_switch_popup_handler(widget, (GdkEvent *)event);
+      gmf.mf_inmd_switch_popup_handler(widget, (GdkEvent *)event);
       break;
     case 3:
-      exec_gcin_setup();
+      gmf.mf_exec_gcin_setup();
       break;
   }
 }
@@ -1142,42 +1139,18 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 void create_win1(), create_win1_gui(), load_tab_pho_file(), show_win_sym();
 void hide_win_sym();
-int init_win_anthy()
+int module_init_win(GCIN_module_main_functions *funcs)
 {
-  char* so[] = {"libanthy.so", "libanthy.so.0", NULL};
-  void *handle;
-  char *error;
+  gmf = *funcs;
 
-  set_tsin_pho_mode();
+  dbg("module_init_win\n");
+
+  gmf.mf_set_tsin_pho_mode();
 
   if (win_anthy)
     return TRUE;
 
-  int i;
-  for (i=0; so[i]; i++)
-    if (handle = dlopen(so[i], RTLD_LAZY))
-      break;
-
-  if (!handle) {
-    GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                     GTK_MESSAGE_ERROR,
-                                     GTK_BUTTONS_CLOSE,
-                                     "Error loading %s %s. Please install anthy", so[0], dlerror());
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-    return FALSE;
-  }
-  dlerror();    /* Clear any existing error */
-
-  int (*f_anthy_init)();
-  *(void **) (&f_anthy_init) = dlsym(handle, "anthy_init");
-
-  if ((error = dlerror()) != NULL)  {
-    fprintf(stderr, "%s\n", error);
-    return FALSE;
-  }
-
-  if ((*f_anthy_init)() == -1) {
+  if (anthy_init() == -1) {
     GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
                                      GTK_MESSAGE_ERROR,
                                      GTK_BUTTONS_CLOSE,
@@ -1187,25 +1160,13 @@ int init_win_anthy()
     return FALSE;
   }
 
-  anthy_context_t (*f_anthy_create_context)();
-  *(void **) (&f_anthy_create_context) = dlsym(handle, "anthy_create_context");
-  ac = (*f_anthy_create_context)();
+  ac = anthy_create_context();
   if (!ac) {
     printf("anthy_create_context err\n");
     return FALSE;
   }
 
-  int (*f_anthy_context_set_encoding)(anthy_context_t, int);
-  *(void **) (&f_anthy_context_set_encoding) = dlsym(handle, "anthy_context_set_encoding");
-  (*f_anthy_context_set_encoding)(ac, ANTHY_UTF8_ENCODING);
-
-  *(void **) (&f_anthy_resize_segment) = dlsym(handle, "anthy_resize_segment");
-  *(void **) (&f_anthy_get_stat) = dlsym(handle, "anthy_get_stat");
-  *(void **) (&f_anthy_get_segment) = dlsym(handle, "anthy_get_segment");
-  *(void **) (&f_anthy_get_segment_stat) = dlsym(handle, "anthy_get_segment_stat");
-  *(void **) (&f_anthy_commit_segment) = dlsym(handle, "anthy_commit_segment");
-  *(void **) (&f_anthy_set_string) = dlsym(handle, "anthy_set_string");
-
+  anthy_context_set_encoding(ac, ANTHY_UTF8_ENCODING);
 
   win_anthy = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(win_anthy), FALSE);
@@ -1213,7 +1174,7 @@ int init_win_anthy()
 
 
   gtk_widget_realize (win_anthy);
-  set_no_focus(win_anthy);
+  gmf.mf_set_no_focus(win_anthy);
 
   event_box_anthy = gtk_event_box_new();
 
@@ -1225,9 +1186,13 @@ int init_win_anthy()
   g_signal_connect(G_OBJECT(event_box_anthy),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
 
-  if (!seg)
-    seg=tzmalloc(SEG,MAX_SEG_N);
+  if (!seg) {
+    int n=sizeof(SEG)*MAX_SEG_N;
+    seg=malloc(n);
+    bzero(seg, n);
+  }
 
+  int i;
   for(i=0; i < MAX_SEG_N; i++) {
     seg[i].label = gtk_label_new(NULL);
     gtk_widget_show(seg[i].label);
@@ -1236,109 +1201,107 @@ int init_win_anthy()
 
   gtk_widget_show_all(win_anthy);
 
-  init_tsin_selection_win();
-  change_anthy_font_size();
+  gmf.mf_init_tsin_selection_win();
 
-  if (!phkbm.selkeyN)
-    load_tab_pho_file();
+  module_change_font_size();
 
-  hide_win_anthy();
+  if (!gmf.mf_phkbm->selkeyN)
+    gmf.mf_load_tab_pho_file();
+
+  module_hide_win();
 
   return TRUE;
 }
 
-int anthy_visible()
+int module_win_visible()
 {
   return GTK_WIDGET_VISIBLE(win_anthy);
 }
 
-extern gboolean force_show;
-void show_win_anthy()
+void module_show_win()
 {
-  if (gcin_edit_display_ap_only())
+  if (gmf.mf_gcin_edit_display_ap_only())
     return;
-  if (!gcin_pop_up_win || !is_empty() || force_show ) {
-    if (!anthy_visible())
+  if (!*gmf.mf_gcin_pop_up_win || !is_empty() || *gmf.mf_force_show ) {
+    if (!module_win_visible())
       gtk_widget_show(win_anthy);
-    show_win_sym();
+    gmf.mf_show_win_sym();
   }
 }
 
-void hide_win_anthy()
+void module_hide_win()
 {
   if (state == STATE_SELECT) {
     state = STATE_CONVERT;
-    hide_selections_win();
+    gmf.mf_hide_selections_win();
   }
   gtk_widget_hide(win_anthy);
-  hide_win_sym();
+  gmf.mf_hide_win_sym();
 }
 
-void change_anthy_font_size()
+void module_change_font_size()
 {
+  dbg("change_anthy_font_size\n");
   GdkColor fg;
-  gdk_color_parse(gcin_win_color_fg, &fg);
-  change_win_bg(win_anthy);
-  change_win_bg(event_box_anthy);
+  gdk_color_parse(*gmf.mf_gcin_win_color_fg, &fg);
+  gmf.mf_change_win_bg(win_anthy);
+  gmf.mf_change_win_bg(event_box_anthy);
 
   int i;
   for(i=0; i < MAX_SEG_N; i++) {
     GtkWidget *label = seg[i].label;
-    set_label_font_size(label, gcin_font_size);
-    if (gcin_win_color_use) {
+    set_label_font_size(label, *gmf.mf_gcin_font_size);
+    if (*gmf.mf_gcin_win_color_use) {
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
     }
   }
 }
 
-void move_win_sym();
-void move_win_anthy(int x, int y)
+void module_move_win(int x, int y)
 {
 #if 0
   best_win_x = x;
   best_win_y = y;
 #endif
-  gtk_window_get_size(GTK_WINDOW(win_anthy), &win_xl, &win_yl);
+  gtk_window_get_size(GTK_WINDOW(win_anthy), gmf.mf_win_xl, gmf.mf_win_yl);
 
-  if (x + win_xl > dpy_xl)
-    x = dpy_xl - win_xl;
+  if (x + *gmf.mf_win_xl > *gmf.mf_dpy_xl)
+    x = *gmf.mf_dpy_xl - *gmf.mf_win_xl;
   if (x < 0)
     x = 0;
 
-  if (y + win_yl > dpy_yl)
-    y = dpy_yl - win_yl;
+  if (y + *gmf.mf_win_yl > *gmf.mf_dpy_yl)
+    y = *gmf.mf_dpy_yl - *gmf.mf_win_yl;
   if (y < 0)
     y = 0;
 
   gtk_window_move(GTK_WINDOW(win_anthy), x, y);
-  win_x = x;
-  win_y = y;
+  *gmf.mf_win_x = x;
+  *gmf.mf_win_y = y;
 
-  move_win_sym();
+  gmf.mf_move_win_sym();
 }
 
-void tsin_set_eng_ch(int nmod);
-
-int feedkey_anthy_release(KeySym xkey, int kbstate)
+int module_feedkey_release(KeySym xkey, int kbstate)
 {
   switch (xkey) {
      case XK_Shift_L:
      case XK_Shift_R:
         if (
-(  (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) ||
-   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL
+(  (*gmf.mf_tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift) ||
+   (*gmf.mf_tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftL
      && xkey == XK_Shift_L) ||
-   (tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
+   (*gmf.mf_tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
      && xkey == XK_Shift_R))
           &&  current_time() - key_press_time < 300000) {
 #if WIN32
           if (!test_mode)
 #endif
           {
-            flush_anthy_input();
+            module_flush_input();
             key_press_time = 0;
-            hide_selections_win();
-            tsin_set_eng_ch(!tsin_pho_mode());
+            gmf.mf_hide_selections_win();
+            gmf.mf_tsin_set_eng_ch(!!gmf.mf_tsin_pho_mode());
           }
           return 1;
         } else
@@ -1348,9 +1311,8 @@ int feedkey_anthy_release(KeySym xkey, int kbstate)
   }
 }
 
-#include "im-client/gcin-im-client-attr.h"
 
-int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
+int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
 {
   int i;
 
@@ -1369,11 +1331,11 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
 
     for(i=0; i < segN; i++) {
       char *s = (char *)gtk_label_get_text(GTK_LABEL(seg[i].label));
-      int N = utf8_str_N(s);
+      int N = gmf.mf_utf8_str_N(s);
       ch_N+=N;
       if (i < cursor)
         *pcursor+=N;
-      if (gcin_edit_display_ap_only() && i==cursor) {
+      if (gmf.mf_gcin_edit_display_ap_only() && i==cursor) {
         attr[1].ofs0=*pcursor;
         attr[1].ofs1=*pcursor+N;
         attr[1].flag=GCIN_PREEDIT_ATTR_FLAG_REVERSE;
@@ -1392,9 +1354,9 @@ int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
     int idx;
     for(i=0;i < jpN; i++) {
       char *s=idx_hira_kata(jp[i], FALSE);
-      int N = utf8_str_N(s);
+      int N = gmf.mf_utf8_str_N(s);
 //      dbg("%d]%s N:%d\n", i, s, N);
-      if (gcin_edit_display_ap_only() && i==cursor) {
+      if (gmf.mf_gcin_edit_display_ap_only() && i==cursor) {
         strcat(str, keys);
         ch_N+=keysN;
         *pcursor = ch_N;
@@ -1422,7 +1384,7 @@ ret:
 }
 
 
-int gcin_anthy_reset()
+int module_reset()
 {
   if (!win_anthy)
     return 0;
@@ -1432,11 +1394,11 @@ int gcin_anthy_reset()
   return v;
 }
 
-void get_win_anthy_geom()
+void module_win_geom()
 {
   if (!win_anthy)
     return;
-  gtk_window_get_position(GTK_WINDOW(win_anthy), &win_x, &win_y);
+  gtk_window_get_position(GTK_WINDOW(win_anthy), gmf.mf_win_x, gmf.mf_win_y);
 
-  get_win_size(win_anthy, &win_xl, &win_yl);
+  gmf.mf_get_win_size(win_anthy, gmf.mf_win_xl, gmf.mf_win_yl);
 }

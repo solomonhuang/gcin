@@ -11,7 +11,6 @@ GTAB_LIST_S method_codes[] = {
  {"!PHO", method_type_PHO},
  {"!TSIN", method_type_TSIN},
  {"!INT_CODE", method_type_INT_CODE},
- {"!ANTHY", method_type_ANTHY},
  {"!SYMBOL_TABLE", method_type_SYMBOL_TABLE},
  {NULL}
 };
@@ -24,7 +23,7 @@ void load_gtab_list(gboolean skip_disabled)
   inmd[3].method_type = method_type_PHO;
   inmd[6].method_type = method_type_TSIN;
   inmd[10].method_type = method_type_INT_CODE;
-  inmd[12].method_type = method_type_ANTHY;
+  inmd[12].method_type = method_type_MODULE;
 
   get_gcin_user_fname(gtab_list, ttt);
 
@@ -78,13 +77,27 @@ void load_gtab_list(gboolean skip_disabled)
     if (keyidx < 0)
       p_err("bad key value %s in %s\n", key, ttt);
 
+    if (!strcmp(file, "!ANTHY")) {
+#if UNIX
+       strcpy(file, "anthy-module.so");
+#else
+       strcpy(file, "anthy-module.dll");
+#endif
+    }
+
     inmd[keyidx].filename = strdup(file);
-    int i;
-    for(i=0; method_codes[i].id; i++)
-      if (!strcmp(file, method_codes[i].id))
-        break;
-    if (method_codes[i].id)
-      inmd[keyidx].method_type = method_codes[i].method_type;
+
+    if (strstr(file, ".so") || strstr(file, ".dll")) {
+      inmd[keyidx].method_type = method_type_MODULE;
+      dbg("%s is module file\n", file);
+    } else {
+      int i;
+      for(i=0; method_codes[i].id; i++)
+        if (!strcmp(file, method_codes[i].id))
+          break;
+      if (method_codes[i].id)
+        inmd[keyidx].method_type = method_codes[i].method_type;
+    }
 
     if (name[0]=='!') {
       name++;

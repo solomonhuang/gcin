@@ -188,11 +188,6 @@ msgstr "Enable tone symbols in Tsin"
 msgid "詞音/Escape Tab 斷詞"
 msgstr "Break sentence with Escape/Tab key"
 
-#: ../gcin-setup-pho.c:461
-msgid "同音字詞選擇按鍵在後"
-msgstr "Show selection key behind choices"
-
-#: ../gcin-setup-pho.c:475
 msgid "Capslock英數用小寫"
 msgstr "Alphabet-numeric mode uses lower case letters"
 
@@ -228,11 +223,6 @@ msgstr "Font size"
 msgid "符號選擇視窗字型大小"
 msgstr "Font size of symbols window"
 
-#: ../gcin-setup.c:394
-msgid "詞音預選詞視窗字型大小"
-msgstr "Font size of Tsin's preselection window"
-
-#: ../gcin-setup.c:404
 msgid "詞音注音輸入區字型大小"
 msgstr "Font size of keycodes for Bopomofo and Tsin"
 
@@ -430,19 +420,6 @@ msgstr "Pinyin"
 msgid "神通"
 msgstr "Mitac"
 
-#: ../gcin-setup-pho.c:46 ../gcin-setup-tab.c:543
-msgid "Shift(限非 XIM)"
-msgstr "Shift key(Not available under XIM mode)"
-
-#: ../gcin-setup-pho.c:47 ../gcin-setup-tab.c:544
-msgid "ShiftL(限非 XIM)"
-msgstr "Left Shift key(Not available under XIM mode)"
-
-#: ../gcin-setup-pho.c:48 ../gcin-setup-tab.c:545
-msgid "ShiftR(限非 XIM)"
-msgstr "Right Shift key(Not available under XIM mode)"
-
-#: ../gcin-setup-pho.c:57 ../gcin-setup-tab.c:101
 msgid "選擇同音字"
 msgstr "Select other same phonetic characters"
 
@@ -582,19 +559,6 @@ msgstr "Half-width / Traditional Chinese output"
 msgid "加片語到詞庫"
 msgstr "Add phrase to Tsin's database"
 
-#: ../about.cpp:93
-msgid ""
-"<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
-"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
-"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</"
-"a>\n"
-msgstr ""
-"<a href='http://hyperrate.com?eid=67'>Click to forum of gcin</a>\n"
-"<a href='http://hyperrate.com?eid=215'>Windows version of gcin</a>\n"
-"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>Changelog of gcin</"
-"a>\n"
-
-#: ../gcin-setup.cpp:593
 msgid ""
 "按鍵顯示於\n"
 "應用程式"
@@ -653,3 +617,50 @@ msgid ""
 "<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">測試</span>"
 msgstr ""
 "<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">test</span>"
+
+msgid "[中/英]切換"
+msgstr "Toggle alphabet-numeric mode"
+
+msgid "詞音&gtab預選詞視窗字型大小"
+msgstr "Font size of Tsin's and gtab's preselection window"
+
+msgid "gcin 注音/詞音/拼音 設定"
+msgstr "Settings for Bopomofo, Tsin, and Pinyin"
+
+msgid "選擇鍵顯示於候選字(詞)後方"
+msgstr "Show selection key behind choices"
+
+msgid "<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
+msgstr "<a href='http://hyperrate.com?eid=67'>Click to forum of gcin</a>\n"
+
+msgid "<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
+msgstr "<a href='http://hyperrate.com?eid=215'>Windows version of gcin</a>\n"
+
+msgid "使用預選詞"
+msgstr "Enable preselection"
+
+msgid "雙圖示"
+msgstr "Dual icons"
+
+msgid ""
+"1,3,5分鐘\n"
+"%d,%d,%d/分"
+msgstr ""
+"1,3,5 min\n"
+"%d,%d,%d/min"
+
+msgid ""
+"全半形左鍵\n"
+"切換小鍵盤"
+msgstr ""
+"Left-click half-/double-width icon\n"
+"to toggle virtual keyboard"
+
+msgid "左Shift"
+msgstr "Left Shift"
+
+msgid "右Shift"
+msgstr "Right Shift"
+
+msgid "打字速度"
+msgstr "Typing Speed"

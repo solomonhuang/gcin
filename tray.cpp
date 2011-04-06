@@ -116,7 +116,7 @@ static void draw_icon()
 #endif
     }
 #if USE_TSIN
-    if ((current_method_type()==method_type_TSIN||current_method_type()==method_type_ANTHY) && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
+    if ((current_method_type()==method_type_TSIN||current_method_type()==method_type_MODULE) && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
       static char efull[] = "ABC";
       gdk_color_parse("blue", &color_fg);
 #if !GTK_CHECK_VERSION(2,90,6)

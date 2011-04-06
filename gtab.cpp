@@ -461,6 +461,24 @@ void init_seltab(char ***p)
   }
 }
 
+time_t find_tab_file(char *fname, char *out_file)
+{
+  get_gcin_user_fname(fname, out_file);
+  time_t mtime = file_mtime(out_file);
+
+  if (!mtime) {
+    strcat(strcpy(out_file,TableDir),"/");
+    strcat(out_file, fname);
+    if (!(mtime = file_mtime(out_file))) {
+      dbg("init_tab:1 err open %s\n", out_file);
+      return 0;
+    }
+  }
+
+  return mtime;
+}
+
+
 void init_gtab(int inmdno)
 {
   FILE *fp;
@@ -478,17 +496,11 @@ void init_gtab(int inmdno)
     return;
   }
 
-  get_gcin_user_fname(inmd[inmdno].filename, ttt);
-  time_t mtime = file_mtime(ttt);
+  time_t mtime;
 
-  if (!mtime) {
-    strcat(strcpy(ttt,TableDir),"/");
-    strcat(ttt, inmd[inmdno].filename);
-    if (!(mtime = file_mtime(ttt))) {
-      dbg("init_tab:1 err open %s\n", ttt);
-      return;
-    }
-  }
+  if (!(mtime = find_tab_file(inmd[inmdno].filename, ttt)))
+    return;
+
 
   char append[64], append_user[128];
   strcat(strcpy(append, inmd[inmdno].filename), ".append");

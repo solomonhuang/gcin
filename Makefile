@@ -13,7 +13,7 @@ GCIN_SO= gcin1.so gcin2.so
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o gtab-use-count.o \
-     win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o
+     win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o gcin-module.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o
@@ -111,7 +111,11 @@ PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
-all:	$(PROGS) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
+ifeq ($(USE_ANTHY),Y)
+GCIN_MODULE+=anthy-module.so
+endif
+
+all:	$(PROGS) $(GCIN_MODULE) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C gtk-im
 ifeq ($(USE_I18N),Y)
@@ -201,7 +205,7 @@ gcin1_so += intcode.pico win-int.pico win-message.pico win-sym.pico \
 win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico
 
 ifeq ($(USE_ANTHY),Y)
-gcin1_so += anthy.pico
+gcin1_so += gcin-module.pico
 endif
 
 gcin1.so: $(gcin1_so) pho.o tsin.o eve.o gtab.o win-sym.o
@@ -211,21 +215,13 @@ gcin2_so= t2s-lookup.pico
 gcin2.so: $(gcin2_so) gcin-conf.o
 	$(CCLD) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
 
+anthy_module_so = anthy.pico
+anthy-module.so: $(anthy_module_so)
+	$(CCLD) $(SO_FLAGS) -o $@ $(anthy_module_so) $(LDFLAGS) -lanthy
+	ln -sf $(PWD)/$@ data
+
 #gtk_bug_fix.so: gtk_bug_fix.pico
 #	$(CC) $(SO_FLAGS) -o $@ gtk_bug_fix.pico
-
-### making the following as .so actuall makes the RSS larger
-gcin_gtab_so = gtab.pico win-gtab.pico gtab-util.pico
-gcin-gtab.so: $(gcin_gtab_so)
-	$(CC) $(SO_FLAGS) -o $@  $(gcin_gtab_so) $(LDFLAGS)
-
-gcin_tsin_so = tsin.pico tsin-util.pico win0.pico win1.pico win-pho-near.pico tsin-parse.pico
-gcin-tsin.so: $(gcin_tsin_so)
-	$(CCLD) -shared -o $@  $(gcin_tsin_so) $(LDFLAGS)
-
-gcin_pho_so=win-pho.pico pho.pico pho-util.pico pho-sym.pico table-update.pico pho-dbg.pico
-gcin-pho.so: $(gcin_pho_so)
-	$(CC) -shared -fPIC -o $@ $(gcin_pho_so) $(LDFLAGS)
 
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib

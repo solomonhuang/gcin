@@ -409,11 +409,7 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   dbg("selkey color %s\n", cstr);
   save_gcin_conf_str(GCIN_SEL_KEY_COLOR, cstr);
 
-#if GTK_CHECK_VERSION(2,4,0)
   int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_gcin_edit_display));
-#else
-  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_gcin_edit_display));
-#endif
   save_gcin_conf_int(GCIN_EDIT_DISPLAY, edit_disp[idx].keynum);
 
   g_free(cstr);
@@ -534,13 +530,7 @@ void cb_button_gcin_on_the_spot_key(GtkToggleButton *togglebutton, gpointer user
   int i;
   for (i=0; edit_disp[i].keystr; i++)
    if (edit_disp[i].keynum == GCIN_EDIT_DISPLAY_ON_THE_SPOT)
-   {
-#if GTK_CHECK_VERSION(2,4,0)
      gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcin_edit_display), i);
-#else
-     gtk_option_menu_set_history(GTK_OPTION_MENU(opt_gcin_edit_display), i);
-#endif
-   }
 }
 
 static GtkWidget *create_gcin_edit_display()
@@ -550,10 +540,8 @@ static GtkWidget *create_gcin_edit_display()
   GtkWidget *label = gtk_label_new(_(_L("編輯區顯示")));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
-#if GTK_CHECK_VERSION(2,4,0)
   opt_gcin_edit_display = gtk_combo_box_new_text ();
-#else
-  opt_gcin_edit_display = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
   GtkWidget *menu = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_gcin_edit_display, FALSE, FALSE, 0);
@@ -575,12 +563,10 @@ static GtkWidget *create_gcin_edit_display()
 #endif
   }
 
-#if GTK_CHECK_VERSION(2,4,0)
-  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcin_edit_display), current_idx);
-#else
+#if !GTK_CHECK_VERSION(2,4,0)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_gcin_edit_display), menu);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_gcin_edit_display), current_idx);
 #endif
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcin_edit_display), current_idx);
 
   label = gtk_label_new(_(_L("按鍵顯示於\n應用程式")));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
@@ -850,11 +836,7 @@ void create_appearance_conf_window()
                             G_CALLBACK (cb_appearance_conf_ok),
                             G_OBJECT (gcin_kbm_window));
 
-#if GTK_CHECK_VERSION(2,17,5)
-  gtk_widget_set_can_default (button_close, TRUE);
-#else
   GTK_WIDGET_SET_FLAGS (button_close, GTK_CAN_DEFAULT);
-#endif
   gtk_widget_grab_default (button_close);
 
   gtk_widget_show_all (gcin_appearance_conf_window);

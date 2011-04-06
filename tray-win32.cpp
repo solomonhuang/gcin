@@ -376,7 +376,7 @@ void load_tray_icon_win32()
 
   char tt[32];
   if (current_CS && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
-	 if ((current_method_type()==method_type_TSIN || current_method_type()==method_type_ANTHY)) {
+	 if ((current_method_type()==method_type_TSIN || current_method_type()==method_type_MODULE)) {
 		strcpy(tt, "en-");
 		strcat(tt, iconame);
      } else {

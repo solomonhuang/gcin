@@ -149,6 +149,7 @@ void create_win_pho_gui_simple()
     gtk_container_set_border_width (GTK_CONTAINER (frame), 0);
     gtk_container_add (GTK_CONTAINER(gwin_pho), frame);
     gtk_container_add (GTK_CONTAINER (frame), vbox_top);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   } else {
     gtk_container_add (GTK_CONTAINER(gwin_pho), vbox_top);
     top_bin = vbox_top;
@@ -185,6 +186,7 @@ void create_win_pho_gui_simple()
                    G_CALLBACK(mouse_button_callback), NULL);
 
   GtkWidget *frame_pho = gtk_frame_new(NULL);
+  gtk_frame_set_shadow_type(GTK_FRAME(frame_pho), GTK_SHADOW_OUT);
   gtk_container_add (GTK_CONTAINER (event_box_pho), frame_pho);
   gtk_container_set_border_width (GTK_CONTAINER (frame_pho), 0);
 

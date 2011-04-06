@@ -1,7 +1,6 @@
 #!/bin/sh
-rm -fr gtk3-im
-mkdir gtk3-im
-cp gtk-im/Makefile gtk-im/config.h gtk-im/gtkimcontextgcin.c gtk-im/gtkimcontextgcin.h gtk-im/gtkintl.h gtk-im/imgcin.c gtk3-im/
+mkdir -p gtk3-im
+cp -a gtk-im/Makefile gtk-im/config.h gtk-im/gtkimcontextgcin.c gtk-im/gtkimcontextgcin.h gtk-im/gtkintl.h gtk-im/imgcin.c gtk3-im/
 exec patch -p1 < $0
 --- a/gtk3-im/Makefile
 +++ b/gtk3-im/Makefile
@@ -25,7 +24,7 @@ exec patch -p1 < $0
  		install -d $(IMMODULES_LOCAL); \
  		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
 -		cd /etc/gtk-2.0; gtk-query-immodules-2.0 > gtk.immodules.lib; \
-+		cd /usr/local/lib/gtk-3.0/3.0.0; gtk-query-immodules-3.0 > immodules.cache; \
++		gtk-query-immodules-3.0 --update-cache; \
  	else \
  		install -d $(IMMODULES); \
  		install -m 755 im-gcin.so $(IMMODULES); \

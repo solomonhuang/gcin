@@ -43,7 +43,7 @@ install:
 	if [ $(prefix) = /usr/local ]; then \
 		install -d $(IMMODULES_LOCAL); \
 		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
-		cd /usr/local/lib/gtk-3.0/3.0.0; gtk-query-immodules-3.0 > immodules.cache; \
+		gtk-query-immodules-3.0 --update-cache; \
 	else \
 		install -d $(IMMODULES); \
 		install -m 755 im-gcin.so $(IMMODULES); \

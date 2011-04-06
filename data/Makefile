@@ -10,6 +10,12 @@ DATA=pho.tab2 tsin32.idx \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab2 simplex.gtab symbols.gtab russian.gtab \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
      t2s.dat s2t.dat cj543.gtab
+
+ifeq ($(USE_ANTHY),Y)
+DATA+=../anthy-module.so
+endif
+
+
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 
 all:	$(DATA)

@@ -228,7 +228,7 @@ static void hist_get_mouse_button( GtkWidget *widget,GdkEventButton *event, gpoi
         continue;
       if (hist_strArr[i]) {
         gtk_clipboard_set_text(pclipboard, hist_strArr[i], -1);
-
+        gtk_clipboard_set_text(pclipboard_prim, hist_strArr[i], -1);
       }
       break;
     }

@@ -69,7 +69,7 @@ struct TableHead {
 #define MAX_TAB_KEY_NUM (32/KeyBits)
 #define MAX_TAB_KEY_NUM64 (64/KeyBits)
 
-
+struct _GCIN_module_callback_functions;
 typedef u_int gtab_idx1_t;
 
 typedef struct {
@@ -104,6 +104,7 @@ typedef struct {
   char *icon;
   u_char kmask, keybits, last_k_bitn, method_type;
   char WILD_QUES, WILD_STAR;
+  struct _GCIN_module_callback_functions *mod_cb_funcs;
 } INMD;
 
 enum {
@@ -111,7 +112,7 @@ enum {
   method_type_PHO=3,
   method_type_TSIN=6,
   method_type_INT_CODE=10,
-  method_type_ANTHY=12,
+  method_type_MODULE=12,
   method_type_SYMBOL_TABLE=13,
 };
 

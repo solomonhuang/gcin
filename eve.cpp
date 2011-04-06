@@ -5,7 +5,9 @@
 #include <X11/extensions/XTest.h>
 #endif
 #include "gst.h"
+#include "pho.h"
 #include "im-client/gcin-im-client-attr.h"
+#include "gcin-module.h"
 
 #define STRBUFLEN 64
 
@@ -313,7 +315,17 @@ void reset_current_in_win_xy()
   current_in_win_x = current_in_win_y = -1;
 }
 
-void hide_win_anthy();
+GCIN_module_callback_functions *module_cb1(ClientState *cs)
+{
+  return inmd[cs->in_method].mod_cb_funcs;
+}
+
+GCIN_module_callback_functions *module_cb()
+{
+  if (!current_CS)
+    return NULL;
+  return module_cb1(current_CS);
+}
 
 void hide_in_win(ClientState *cs)
 {
@@ -346,8 +358,8 @@ void hide_in_win(ClientState *cs)
       hide_win_int();
       break;
 #if USE_ANTHY
-    case method_type_ANTHY:
-      hide_win_anthy();
+    case method_type_MODULE:
+      module_cb1(cs)->module_hide_win();
       break;
 #endif
     default:
@@ -360,7 +372,7 @@ void hide_in_win(ClientState *cs)
 void show_win_pho();
 void show_win0();
 void show_win_int();
-void show_win_gtab(), show_win_anthy();
+void show_win_gtab();
 
 void check_CS()
 {
@@ -397,8 +409,8 @@ void show_in_win(ClientState *cs)
       show_win_int();
       break;
 #if USE_ANTHY
-    case method_type_ANTHY:
-      show_win_anthy();
+    case method_type_MODULE:
+      module_cb1(cs)->module_show_win();
       break;
 #endif
     default:
@@ -414,7 +426,6 @@ void move_win_gtab(int x, int y);
 void move_win_int(int x, int y);
 void move_win0(int x, int y);
 void move_win_pho(int x, int y);
-void move_win_anthy(int x, int y);
 
 void move_in_win(ClientState *cs, int x, int y)
 {
@@ -451,8 +462,8 @@ void move_in_win(ClientState *cs, int x, int y)
       move_win_int(x, y);
       break;
 #if USE_ANTHY
-    case method_type_ANTHY:
-      move_win_anthy(x, y);
+    case method_type_MODULE:
+      module_cb1(cs)->module_move_win(x, y);
       break;
 #endif
     default:
@@ -647,7 +658,6 @@ void disp_im_half_full()
 
 void flush_tsin_buffer();
 void reset_gtab_all();
-void set_tsin_pho_mode();
 void set_tsin_pho_mode0(ClientState *cs);
 
 //static u_int orig_caps_state;
@@ -732,7 +742,6 @@ void toggle_im_enabled()
 void get_win_gtab_geom();
 void get_win0_geom();
 void get_win_pho_geom();
-void get_win_anthy_geom();
 void get_win_int_geom();
 
 void update_active_in_win_geom()
@@ -751,8 +760,8 @@ void update_active_in_win_geom()
 	  get_win_int_geom();
       break;
 #if USE_ANTHY
-    case method_type_ANTHY:
-      get_win_anthy_geom();
+    case method_type_MODULE:
+      module_cb()->module_get_win_geom();
       break;
 #endif
     default:
@@ -762,7 +771,6 @@ void update_active_in_win_geom()
 }
 
 extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab, *gwin_int;
-int anthy_visible();
 
 gboolean win_is_visible()
 {
@@ -778,8 +786,8 @@ gboolean win_is_visible()
     case method_type_INT_CODE:
 	  return gwin_int && GTK_WIDGET_VISIBLE(gwin_int);
 #if USE_ANTHY
-    case method_type_ANTHY:
-      return anthy_visible();
+    case method_type_MODULE:
+      return module_cb()->module_win_visible();
 #endif
     default:
       if (!gwin_gtab)
@@ -845,9 +853,11 @@ extern int b_show_win_kbm;
 
 void hide_win_kbm();
 extern gboolean win_sym_enabled;
-int init_win_anthy();
 void show_win_kbm();
+extern char *TableDir;
 void set_gtab_input_method_name(char *s);
+GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile);
+time_t find_tab_file(char *fname, char *out_file);
 
 void update_win_kbm_inited()
 {
@@ -903,14 +913,31 @@ gboolean init_in_method(int in_no)
       init_inter_code();
       break;
 #if USE_ANTHY
-    case method_type_ANTHY:
-      if (init_win_anthy()) {
+    case method_type_MODULE:
+    {
+      GCIN_module_main_functions gmf;
+      init_GCIN_module_main_functions(&gmf);
+      if (!module_cb()) {
+        char ttt[256];
+        if (!find_tab_file(inmd[in_no].filename, ttt))
+          return FALSE;
+
+        dbg("module %s\n", ttt);
+        if (!(inmd[in_no].mod_cb_funcs = init_GCIN_module_callback_functions(ttt))) {
+          dbg("module not found\n");
+          return FALSE;
+        }
+      }
+
+      if (inmd[in_no].mod_cb_funcs->module_init_win(&gmf)) {
         current_CS->in_method = in_no;
-        show_win_anthy();
+        module_cb()->module_show_win();
       } else {
         return FALSE;
       }
+
       break;
+    }
 #endif
     default:
       init_gtab(in_no);
@@ -1000,7 +1027,6 @@ int feedkey_pp(KeySym xkey, int state);
 int feedkey_gtab(KeySym key, int kbstate);
 int feed_phrase(KeySym ksym, int state);
 int feedkey_intcode(KeySym key);
-gboolean feedkey_anthy(int kv, int kvstate);
 void tsin_set_eng_ch(int nmod);
 static KeySym last_keysym;
 
@@ -1170,8 +1196,8 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     case method_type_INT_CODE:
       return feedkey_intcode(keysym);
 #if USE_ANTHY
-    case method_type_ANTHY:
-      return feedkey_anthy(keysym, kev_state);
+    case method_type_MODULE:
+      return module_cb()->module_feedkey(keysym, kev_state);
 #endif
     default:
       return feedkey_gtab(keysym, kev_state);
@@ -1181,7 +1207,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 }
 
 int feedkey_pp_release(KeySym xkey, int kbstate);
-int feedkey_anthy_release(KeySym xkey, int kbstate);
 int feedkey_gtab_release(KeySym xkey, int kbstate);
 
 // return TRUE if the key press is processed
@@ -1212,8 +1237,8 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
     case method_type_TSIN:
       return feedkey_pp_release(keysym, kev_state);
 #if USE_ANTHY
-    case method_type_ANTHY:
-      return feedkey_anthy_release(keysym, kev_state);
+    case method_type_MODULE:
+      return module_cb()->module_feedkey_release(keysym, kev_state);
 #endif
     default:
       return feedkey_gtab_release(keysym, kev_state);
@@ -1386,7 +1411,6 @@ int gcin_FocusOut(ClientState *cs)
 }
 
 int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
-int anthy_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor);
 int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub_comp_len);
 int int_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
 int pho_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
@@ -1417,8 +1441,8 @@ empty:
       return tsin_get_preedit(str, attr, cursor, sub_comp_len);
 #endif
 #if USE_ANTHY
-    case method_type_ANTHY:
-      return anthy_get_preedit(str, attr, cursor);
+    case method_type_MODULE:
+      return module_cb()->module_get_preedit(str, attr, cursor);
 #endif
     default:
       return gtab_get_preedit(str, attr, cursor, sub_comp_len);
@@ -1429,7 +1453,7 @@ empty:
 }
 
 void pho_reset();
-int tsin_reset(),gcin_anthy_reset();
+int tsin_reset();
 void gtab_reset();
 
 void gcin_reset()
@@ -1451,8 +1475,8 @@ void gcin_reset()
       return;
 #endif
 #if USE_ANTHY
-    case method_type_ANTHY:
-      gcin_anthy_reset();
+    case method_type_MODULE:
+      module_cb()->module_reset();
       return;
 #endif
     default:
@@ -1486,7 +1510,6 @@ gboolean gcin_edit_display_ap_only()
   return current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
 }
 
-void flush_anthy_input();
 
 void flush_edit_buffer()
 {
@@ -1501,8 +1524,8 @@ void flush_edit_buffer()
       break;
 #endif
 #if USE_ANTHY
-    case method_type_ANTHY:
-      flush_anthy_input();
+    case method_type_MODULE:
+      module_cb()->module_flush_input();
       break;
 #endif
     default:

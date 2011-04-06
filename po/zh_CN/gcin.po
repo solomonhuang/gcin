@@ -184,11 +184,6 @@ msgstr "拼音输入注音声调符号"
 msgid "詞音/Escape Tab 斷詞"
 msgstr "拼音/Escape Tab 断词"
 
-#: ../gcin-setup-pho.c:461
-msgid "同音字詞選擇按鍵在後"
-msgstr "同音字词选择按键在后"
-
-#: ../gcin-setup-pho.c:475
 msgid "Capslock英數用小寫"
 msgstr "Capslock英数用小写"
 
@@ -224,11 +219,6 @@ msgstr "字体大小"
 msgid "符號選擇視窗字型大小"
 msgstr "符号选择视窗字体大小"
 
-#: ../gcin-setup.c:394
-msgid "詞音預選詞視窗字型大小"
-msgstr "拼音预选词视窗字体大小"
-
-#: ../gcin-setup.c:404
 msgid "詞音注音輸入區字型大小"
 msgstr "拼音注音输入区字体大小"
 
@@ -530,19 +520,6 @@ msgstr "半角/正体输出"
 msgid "加片語到詞庫"
 msgstr "加片语到词库"
 
-#: ../about.cpp:93
-msgid ""
-"<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
-"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
-"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin改變記錄</"
-"a>\n"
-msgstr ""
-"<a href='http://hyperrate.com?eid=67'>点击链接前往 gcin 讨论区</a>\n"
-"<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
-"<a href='http://cle.linux.org.tw/gcin/download/Changelog.html'>gcin更新记录</"
-"a>\n"
-
-#: ../gcin-setup.cpp:593
 msgid ""
 "按鍵顯示於\n"
 "應用程式"
@@ -601,3 +578,38 @@ msgid ""
 "<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">測試</span>"
 msgstr ""
 "<span foreground=\"%S\" font=\"%d\">7</span><span font=\"%d\">测试</span>"
+
+msgid "[中/英]切換"
+msgstr "[中/英]切换"
+
+msgid "詞音&gtab預選詞視窗字型大小"
+msgstr "拼音&gtab预选词视窗字体大小"
+
+msgid "gcin 注音/詞音/拼音 設定"
+msgstr "gcin 注音/词音/拼音 设置"
+
+msgid "選擇鍵顯示於候選字(詞)後方"
+msgstr "选择键显示于候选字(词)后方"
+
+msgid "<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
+msgstr "<a href='http://hyperrate.com?eid=67'>点击链接前往 gcin 讨论区</a>\n"
+
+msgid "使用預選詞"
+msgstr "使用预选词"
+
+msgid "雙圖示"
+msgstr "双图标"
+
+msgid ""
+"1,3,5分鐘\n"
+"%d,%d,%d/分"
+msgstr ""
+"1,3,5分钟\n"
+"%d,%d,%d/分"
+
+msgid ""
+"全半形左鍵\n"
+"切換小鍵盤"
+msgstr ""
+"全半角左键\n"
+"切换小键盘"

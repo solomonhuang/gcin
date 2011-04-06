@@ -197,11 +197,7 @@ static void cb_button_ok(GtkButton *button, gpointer user_data)
   int i;
 
   for(i=0; i < bigphoN; i++) {
-#if GTK_CHECK_VERSION(2,4,0)
     int idx = gtk_combo_box_get_active(GTK_COMBO_BOX(bigpho[i].opt_menu));
-#else
-    int idx = gtk_option_menu_get_history(GTK_OPTION_MENU(bigpho[i].opt_menu));
-#endif
     pharr[i] = bigpho[i].phokeys[idx];
   }
 
@@ -229,10 +225,8 @@ GtkWidget *create_pho_sel_area()
   int i;
 
   for(i=0; i < bigphoN; i++) {
-#if GTK_CHECK_VERSION(2,4,0)
     bigpho[i].opt_menu = gtk_combo_box_new_text ();
-#else
-    bigpho[i].opt_menu = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
     GtkWidget *menu = gtk_menu_new ();
 #endif
     gtk_box_pack_start (GTK_BOX (hbox_pho_sel), bigpho[i].opt_menu, FALSE, FALSE, 0);

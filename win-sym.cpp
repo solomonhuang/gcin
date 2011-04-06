@@ -223,7 +223,7 @@ static void cb_button_sym(GtkButton *button, GtkWidget *label)
        break;
 #endif
 #if USE_ANTHY
-    case method_type_ANTHY:
+    case method_type_MODULE:
        break;
 #endif
     default:
@@ -409,7 +409,7 @@ void create_win_sym()
     p_err("bad current_CS %d\n", current_CS->in_method);
   }
 
-  if (current_method_type() != method_type_PHO && current_method_type() != method_type_TSIN && current_method_type() != method_type_ANTHY && !cur_inmd)
+  if (current_method_type() != method_type_PHO && current_method_type() != method_type_TSIN && current_method_type() != method_type_MODULE && !cur_inmd)
     return;
 
   if (read_syms() || cur_in_method != current_CS->in_method) {

@@ -98,19 +98,11 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_PHRASE_PRE_SELECT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_phrase_pre_select)));
 
-#if GTK_CHECK_VERSION(2,4,0)
   int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_spc_opts));
-#else
-  int idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_spc_opts));
-#endif
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
 
-#if GTK_CHECK_VERSION(2,4,0)
   idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_auto_select_by_phrase));
-#else
-  idx = gtk_option_menu_get_history (GTK_OPTION_MENU (opt_auto_select_by_phrase));
-#endif
   save_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, auto_select_by_phrase_opts[idx].num);
 
   send_gcin_message(
@@ -174,10 +166,8 @@ static GtkWidget *create_spc_opts()
   GtkWidget *label = gtk_label_new(_(_L("空白鍵選項")));
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
-#if GTK_CHECK_VERSION(2,4,0)
   opt_spc_opts = gtk_combo_box_new_text ();
-#else
-  opt_spc_opts = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
   GtkWidget *menu_spc_opts = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_spc_opts, FALSE, FALSE, 0);
@@ -199,12 +189,10 @@ static GtkWidget *create_spc_opts()
 #endif
   }
 
-#if GTK_CHECK_VERSION(2,4,0)
-  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_spc_opts), current_idx);
-#else
+#if !GTK_CHECK_VERSION(2,4,0)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_spc_opts), menu_spc_opts);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_spc_opts), current_idx);
 #endif
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_spc_opts), current_idx);
 
   return hbox;
 }
@@ -213,10 +201,8 @@ static GtkWidget *create_auto_select_by_phrase_opts()
 {
   GtkWidget *hbox = gtk_hbox_new (FALSE, 1);
 
-#if GTK_CHECK_VERSION(2,4,0)
   opt_auto_select_by_phrase = gtk_combo_box_new_text ();
-#else
-  opt_auto_select_by_phrase = gtk_option_menu_new ();
+#if !GTK_CHECK_VERSION(2,4,0)
   GtkWidget *menu_auto_select_by_phrase = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_auto_select_by_phrase, FALSE, FALSE, 0);
@@ -238,12 +224,10 @@ static GtkWidget *create_auto_select_by_phrase_opts()
 #endif
   }
 
-#if GTK_CHECK_VERSION(2,4,0)
-  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_auto_select_by_phrase), current_idx);
-#else
+#if !GTK_CHECK_VERSION(2,4,0)
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_auto_select_by_phrase), menu_auto_select_by_phrase);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt_auto_select_by_phrase), current_idx);
 #endif
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt_auto_select_by_phrase), current_idx);
 
   return hbox;
 }

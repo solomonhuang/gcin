@@ -419,7 +419,7 @@ void update_win_kbm()
       break;
     case method_type_INT_CODE:
 #if USE_ANTHY
-    case method_type_ANTHY:
+    case method_type_MODULE:
 #endif
       break;
     default:

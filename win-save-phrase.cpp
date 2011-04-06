@@ -190,11 +190,7 @@ void create_win_save_phrase(WSP_S *wsp, int wspN)
 
 //  dbg("mmmmmmmmmmmmm\n");
 
-#if GTK_CHECK_VERSION(2,17,5)
-  gtk_widget_set_can_default (button_ok, TRUE);
-#else
   GTK_WIDGET_SET_FLAGS (button_ok, GTK_CAN_DEFAULT);
-#endif
   gtk_widget_grab_default (button_ok);
 
 
