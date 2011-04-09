@@ -90,9 +90,7 @@ void disp_pho_sub(GtkWidget *label, int index, char *pho)
 
 void exec_gcin_setup()
 {
-#if DEBUG
   dbg("exec gcin\n");
-#endif
 #if UNIX
   if (geteuid() < 100 || getegid() < 100)
     return;
@@ -101,6 +99,7 @@ void exec_gcin_setup()
     return;
 #endif
 
+#if 0
   char pidstr[32];
   sprintf(pidstr, "GCIN_PID=%d",
 #if UNIX
@@ -110,6 +109,8 @@ void exec_gcin_setup()
 #endif
   );
   putenv(pidstr);
+#endif
+
 #if UNIX
   system(GCIN_BIN_DIR"/gcin-setup &");
 #else

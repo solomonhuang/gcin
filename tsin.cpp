@@ -299,12 +299,11 @@ static int get_in_area_pho_tsin_str(char *out)
   return outN;
 }
 
-void clear_chars_all(),clear_tsin_line();
+void clear_chars_all();
 
 static void clear_match()
 {
   tss.ph_sta=-1;
-  clear_tsin_line();
 }
 
 static void clr_ch_buf()
@@ -325,7 +324,6 @@ static void clear_ch_buf_sel_area()
   tss.full_match = FALSE;
   clr_ch_buf();
   drawcursor();
-  clear_tsin_line();
 }
 
 static void close_selection_win();
@@ -982,29 +980,8 @@ static void call_tsin_parse()
   prbuf();
 }
 
-void draw_underline(int index);
-
-static void draw_ul(int start, int stop)
-{
-  if (test_mode)
-    return;
-
-  int i;
-  for(i=start; i < stop; i++)
-    draw_underline(i);
-}
-
 void disp_ph_sta_idx(int idx)
 {
-#if 0
-//  dbg("tss.ph_sta:%d\n", tss.ph_sta);
-  clear_tsin_line();
-
-  if (tss.ph_sta < 0)
-    return;
-
-  draw_ul(idx, tss.c_idx);
-#endif
 }
 
 void disp_ph_sta()
@@ -1344,7 +1321,6 @@ void tsin_scan_pre_select(gboolean b_incr);
 static int cursor_backspace()
 {
         close_selection_win();
-        clear_tsin_line();
         poo.ityp3_pho=0;
         tss.pre_selN = 0;
         gboolean pho_cleared;

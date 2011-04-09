@@ -13,7 +13,7 @@ export XMODIFIERS=@im=gcin_test
 #export GCIN_OUTPUT_FILTER=./gcin_filter
 export GCIN_ERR_COREDUMP
 #export GCIN_PHO_KBM="pinyin-asdf asdfghjkl;"
-./gcin.test &
+./gcin.test --g-fatal-warnings &
 gcinpid=$!
 sleep 1
 export LD_PRELOAD="./gtk-im/im-gcin-cur.so"

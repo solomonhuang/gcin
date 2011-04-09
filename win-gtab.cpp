@@ -14,10 +14,8 @@ static GtkWidget *label_full, *label_gtab_sele, *label_gtab_pre_sel;
 static GtkWidget *label_gtab = NULL;
 static GtkWidget *label_input_method_name;
 static GtkWidget *label_key_codes;
-#if WIN32
 char str_key_codes[128];
 gboolean better_key_codes;
-#endif
 static GtkWidget *box_gtab_im_name;
 static GtkWidget *hbox_row2;
 static GtkWidget *label_page;
@@ -25,7 +23,6 @@ static GtkWidget *label_edit;
 static GdkColor better_color;
 gboolean last_cursor_off;
 
-Window xwin_gtab;
 void set_label_space(GtkWidget *label);
 void minimize_win_gtab();
 gboolean win_size_exceed(GtkWidget *win), gtab_phrase_on(), gcin_edit_display_ap_only();
@@ -38,6 +35,8 @@ unich_t cht_halt_str[]=_L("半");
 
 static void adj_gtab_win_pos()
 {
+  if (!gwin_gtab)
+    return;
   if (win_size_exceed(gwin_gtab))
     move_win_gtab(current_in_win_x, current_in_win_y);
 }
@@ -48,13 +47,12 @@ void disp_gtab(char *str)
   if (test_mode)
     return;
 #endif
-   if (!label_gtab)
+  if (!label_gtab)
      return;
   if (str) {
     gtk_widget_show(label_gtab);
     gtk_label_set_text(GTK_LABEL(label_gtab), str);
-  }
-  else
+  } else
     gtk_widget_hide(label_gtab);
 
   adj_gtab_win_pos();
@@ -75,8 +73,10 @@ void set_gtab_input_error_color()
 
 void clear_gtab_input_error_color()
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
   set_gtab_input_color(NULL);
 }
 
@@ -96,16 +96,12 @@ void gtab_disp_empty(char *tt, int N)
 
 void clear_gtab_in_area()
 {
-#if 0
-  disp_gtab(NULL);
-#else
   if (!cur_inmd)
     return;
   char tt[64];
   tt[0]=0;
   gtab_disp_empty(tt, win_gtab_max_key_press);
   disp_gtab(tt);
-#endif
 }
 
 
@@ -189,16 +185,16 @@ void set_key_codes_label(char *s, int better)
 {
   if (!label_key_codes)
     return;
-
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   if (s && strlen(s)) {
     if (hbox_row2 && (!gtab_hide_row2 || ggg.wild_mode
-#if WIN32
-		|| str_key_codes[0]
+#if WIN32 || 1
+        || str_key_codes[0]
 #endif
-		)) {
+      )) {
       gtk_widget_show(hbox_row2);
     }
   } else {
@@ -213,7 +209,7 @@ void set_key_codes_label(char *s, int better)
     gtk_widget_modify_fg(label_key_codes, GTK_STATE_NORMAL, NULL);
 
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
-#if WIN32
+#if WIN32 || 1
   better_key_codes = better;
   if (s && s != str_key_codes)
     strcpy(str_key_codes, s);
@@ -234,6 +230,8 @@ void show_win_sym();
 
 void move_win_gtab(int x, int y)
 {
+  if (!gwin_gtab)
+    return;
 //  dbg("move_win_gtab %d %d\n", x, y);
   get_win_size(gwin_gtab, &win_xl, &win_yl);
 
@@ -282,7 +280,6 @@ void create_win_gtab()
 #if UNIX
   GdkWindow *gdkwin = gtk_widget_get_window(gwin_gtab);
   set_no_focus(gwin_gtab);
-  xwin_gtab = GDK_WINDOW_XWINDOW(gdkwin);
 #else
   win32_init_win(gwin_gtab);
 #endif
@@ -324,7 +321,6 @@ void show_hide_label_edit()
 
   if (gcin_edit_display_ap_only() || !gtab_phrase_on()) {
     gtk_widget_hide(label_edit);
-    return;
   } else
     gtk_widget_show(label_edit);
 }
@@ -332,9 +328,10 @@ void show_hide_label_edit()
 
 void disp_label_edit(char *str)
 {
+#if WIN32
   if (test_mode)
     return;
-
+#endif
   if (!label_edit)
     return;
 
@@ -592,18 +589,21 @@ void show_win_gtab()
     return;
 
 //  dbg("show_win_gtab()\n");
-#if UNIX
-  if (!GTK_WIDGET_VISIBLE(gwin_gtab))
-#endif
+#if WIN32
     gtk_widget_show(gwin_gtab);
+#endif
 
-#if UNIX
+#if UNIX && 0
   if (current_CS->b_raise_window)
 #endif
     gtk_window_present(GTK_WINDOW(gwin_gtab));
 
-#if WIN32
-	move_win_gtab(current_in_win_x, current_in_win_y);
+#if WIN32 || 1
+    move_win_gtab(current_in_win_x, current_in_win_y);
+#endif
+
+#if UNIX
+    gtk_widget_show(gwin_gtab);
 #endif
 
   show_win_sym();
@@ -630,6 +630,7 @@ void destroy_win_gtab()
   box_gtab_im_name = NULL;
   label_page = NULL;
   label_edit = NULL;
+  label_gtab_pre_sel = NULL;
 }
 
 void hide_win_gtab()
@@ -645,10 +646,10 @@ void hide_win_gtab()
 
 //  dbg("hide_win_gtab\n");
   if (gwin_gtab) {
-#if UNIX
+#if UNIX && 0
     gtk_widget_hide(gwin_gtab);
 #else
-	  destroy_win_gtab();
+    destroy_win_gtab();
 #endif
   }
 
@@ -662,11 +663,9 @@ void minimize_win_gtab()
   if (test_mode)
     return;
 #endif
-//  if (!GTK_WIDGET_VISIBLE(gwin_gtab))
-//    return;
+  if (!gwin_gtab)
+    return;
 
-//  dbg("minimize_win_gtab\n");
-  // bug in GTK, in key disp is incomplete
   gtk_window_resize(GTK_WINDOW(gwin_gtab), 20, 20);
 }
 
@@ -707,8 +706,10 @@ char *get_full_str()
 
 void win_gtab_disp_half_full()
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
 
   if (label_full) {
     if (current_CS->im_state == GCIN_STATE_CHINESE && (!current_CS->b_half_full_char))
@@ -736,6 +737,8 @@ void disp_gtab_pre_sel(char *s)
 
 void hide_gtab_pre_sel()
 {
+  if (!label_gtab_pre_sel)
+    return;
 //  dbg("hide_gtab_pre_sel %d\n", tss.ctrl_pre_sel);
   tss.pre_selN = 0;
   tss.ctrl_pre_sel = FALSE;

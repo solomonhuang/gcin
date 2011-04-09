@@ -7,11 +7,11 @@
 #include "gcin-module.h"
 
 void show_win_sym(),hide_win_sym(),move_win_sym(),toggle_win_sym();
-void init_tsin_selection_win(),disp_selections(),hide_selections_win();
+void init_tsin_selection_win(),disp_selections(int x, int y),hide_selections_win();
 void disp_arrow_up(),disp_arrow_down(), set_tsin_pho_mode();
 void set_sele_text(int tN, int i, char *text, int len);
 void tsin_set_eng_ch(int nmod);
-void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry);
+int get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry);
 void get_win_size(GtkWidget *win, int *width, int *height);
 void exec_gcin_setup();
 void load_tab_pho_file();
@@ -90,8 +90,7 @@ GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile
     return NULL;
   }
 #else
-  HINSTANCE *handle;
-  LoadLibrary(sofile);
+  HMODULE handle = LoadLibrary(sofile);
 #define dlsym GetProcAddress
 #endif
 

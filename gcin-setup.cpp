@@ -891,17 +891,17 @@ static void cb_juying_learn()
   exit(0);
 }
 
-
+#if 0
 int gcin_pid;
-
 static void cb_gcin_exit()
 {
 #if UNIX
   kill(gcin_pid, 9);
 #else
+  TerminateProcess(
 #endif
 }
-
+#endif
 
 void create_gtablist_window();
 static void cb_default_input_method()
@@ -1024,14 +1024,15 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_help), "clicked",
                     G_CALLBACK (cb_help), NULL);
 
+#if 0
   char *pid = getenv("GCIN_PID");
-
   if (pid && (gcin_pid = atoi(pid))) {
     GtkWidget *button_gcin_exit = gtk_button_new_with_label (_(_L("結束 gcin")));
     gtk_box_pack_start (GTK_BOX (vbox), button_gcin_exit, TRUE, TRUE, 0);
     g_signal_connect (G_OBJECT (button_gcin_exit), "clicked",
                       G_CALLBACK (cb_gcin_exit), NULL);
   }
+#endif
 
 
   GtkWidget *button_quit = gtk_button_new_from_stock (GTK_STOCK_QUIT);

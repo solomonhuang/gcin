@@ -6,7 +6,6 @@ static int current_pho_in_row1;
 
 GtkWidget *gwin_pho;
 static GtkWidget *top_bin, *hbox_row2;
-Window xwin_pho;
 static GtkWidget *label_pho_sele;
 static GtkWidget *label_pho;
 static GtkWidget *label_full;
@@ -105,7 +104,6 @@ void create_win_pho()
   gtk_widget_realize (gwin_pho);
 #if UNIX
   GdkWindow *gdkwin = gtk_widget_get_window(gwin_pho);
-  xwin_pho = GDK_WINDOW_XWINDOW(gdkwin);
   set_no_focus(gwin_pho);
 #else
   win32_init_win(gwin_pho);

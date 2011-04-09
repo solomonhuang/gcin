@@ -42,25 +42,13 @@ void create_win1(), create_win_gtab(),create_win_pho();
 extern Window xwin0, xwin1, xwin_gtab, xwin_pho;
 
 
-void start_inmd_window()
+static void start_inmd_window()
 {
-
-  switch (default_input_method) {
-    case 3:
-      create_win_pho();
-      xim_arr[0].xim_xwin = xwin_pho;
-      break;
-#if USE_TSIN
-    case 6:
-      create_win0();
-      xim_arr[0].xim_xwin = xwin0;
-      break;
-#endif
-    default:
-      create_win_gtab();
-      xim_arr[0].xim_xwin = xwin_gtab;
-      break;
-  }
+  GtkWidget *win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_widget_realize (win);
+  GdkWindow *gdkwin0 = gtk_widget_get_window(win);
+  xim_arr[0].xim_xwin = GDK_WINDOW_XWINDOW(gdkwin0);
+  dbg("xim_xwin %x\n", xim_arr[0].xim_xwin);
 }
 
 

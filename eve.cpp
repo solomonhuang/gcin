@@ -357,11 +357,9 @@ void hide_in_win(ClientState *cs)
     case method_type_INT_CODE:
       hide_win_int();
       break;
-#if USE_ANTHY
     case method_type_MODULE:
       module_cb1(cs)->module_hide_win();
       break;
-#endif
     default:
       hide_win_gtab();
   }
@@ -408,11 +406,9 @@ void show_in_win(ClientState *cs)
     case method_type_INT_CODE:
       show_win_int();
       break;
-#if USE_ANTHY
     case method_type_MODULE:
       module_cb1(cs)->module_show_win();
       break;
-#endif
     default:
       show_win_gtab();
   }
@@ -461,11 +457,9 @@ void move_in_win(ClientState *cs, int x, int y)
     case method_type_INT_CODE:
       move_win_int(x, y);
       break;
-#if USE_ANTHY
     case method_type_MODULE:
       module_cb1(cs)->module_move_win(x, y);
       break;
-#endif
     default:
       if (!cs->in_method)
         return;
@@ -757,13 +751,11 @@ void update_active_in_win_geom()
       break;
 #endif
     case method_type_INT_CODE:
-	  get_win_int_geom();
+      get_win_int_geom();
       break;
-#if USE_ANTHY
     case method_type_MODULE:
       module_cb()->module_get_win_geom();
       break;
-#endif
     default:
       get_win_gtab_geom();
       break;
@@ -785,10 +777,8 @@ gboolean win_is_visible()
 #endif
     case method_type_INT_CODE:
 	  return gwin_int && GTK_WIDGET_VISIBLE(gwin_int);
-#if USE_ANTHY
     case method_type_MODULE:
       return module_cb()->module_win_visible();
-#endif
     default:
       if (!gwin_gtab)
         return FALSE;
@@ -912,7 +902,6 @@ gboolean init_in_method(int in_no)
       current_CS->in_method = in_no;
       init_inter_code();
       break;
-#if USE_ANTHY
     case method_type_MODULE:
     {
       GCIN_module_main_functions gmf;
@@ -938,7 +927,6 @@ gboolean init_in_method(int in_no)
 
       break;
     }
-#endif
     default:
       init_gtab(in_no);
       if (!inmd[in_no].DefChars)
@@ -1195,10 +1183,8 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 #endif
     case method_type_INT_CODE:
       return feedkey_intcode(keysym);
-#if USE_ANTHY
     case method_type_MODULE:
       return module_cb()->module_feedkey(keysym, kev_state);
-#endif
     default:
       return feedkey_gtab(keysym, kev_state);
   }
@@ -1236,10 +1222,8 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
   switch(current_method_type()) {
     case method_type_TSIN:
       return feedkey_pp_release(keysym, kev_state);
-#if USE_ANTHY
     case method_type_MODULE:
       return module_cb()->module_feedkey_release(keysym, kev_state);
-#endif
     default:
       return feedkey_gtab_release(keysym, kev_state);
   }
@@ -1440,10 +1424,8 @@ empty:
     case method_type_TSIN:
       return tsin_get_preedit(str, attr, cursor, sub_comp_len);
 #endif
-#if USE_ANTHY
     case method_type_MODULE:
       return module_cb()->module_get_preedit(str, attr, cursor);
-#endif
     default:
       return gtab_get_preedit(str, attr, cursor, sub_comp_len);
 //      dbg("metho %d\n", current_CS->in_method);
@@ -1474,11 +1456,9 @@ void gcin_reset()
       tsin_reset();
       return;
 #endif
-#if USE_ANTHY
     case method_type_MODULE:
       module_cb()->module_reset();
       return;
-#endif
     default:
       gtab_reset();
 //      dbg("metho %d\n", current_CS->in_method);
@@ -1523,11 +1503,9 @@ void flush_edit_buffer()
       flush_tsin_buffer();
       break;
 #endif
-#if USE_ANTHY
     case method_type_MODULE:
       module_cb()->module_flush_input();
       break;
-#endif
     default:
       output_gbuf();
 //      dbg("metho %d\n", current_CS->in_method);

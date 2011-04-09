@@ -5,7 +5,6 @@
 
 GtkWidget *gwin0 = NULL;
 extern GtkWidget *gwin1;
-Window xwin0;
 extern Display *dpy;
 static GtkWidget *top_bin;
 int current_gcin_inner_frame;
@@ -80,10 +79,14 @@ static void create_char(int index)
 {
   int i;
 
+  if (!hbox_edit)
+    return;
+
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
   GdkColor color_bg;
   gdk_color_parse(tsin_phrase_line_color, &color_bg);
+
 
   i = index;
   {
@@ -102,45 +105,18 @@ static void create_char(int index)
     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
 
     set_label_font_size(label, gcin_font_size);
-
     chars[i].label = label;
-#if 0
-    GtkWidget *separator =  gtk_drawing_area_new();
-    gtk_widget_modify_bg(separator, GTK_STATE_NORMAL, &color_bg);
-    gtk_widget_set_size_request(separator, 8, 2);
-    gtk_box_pack_start (GTK_BOX (vbox), separator, FALSE, FALSE, 0);
-    chars[i].line = separator;
-#endif
 
     if (gcin_win_color_use)
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
 
     gtk_widget_show_all(event_box);
-//    gtk_widget_hide(separator);
   }
 }
 
 static void change_tsin_line_color()
 {
-#if 0
-  int i;
-
-  GdkColor fg;
-  gdk_color_parse(gcin_win_color_fg, &fg);
-  GdkColor color_bg;
-  gdk_color_parse(tsin_phrase_line_color, &color_bg);
-
-  for(i=0; i < MAX_PH_BF_EXT; i++) {
-#if 0
-    if (!chars[i].line)
-      continue;
-    gtk_widget_modify_bg(chars[i].line, GTK_STATE_NORMAL, &color_bg);
-#endif
-    gtk_widget_modify_fg(chars[i].label, GTK_STATE_NORMAL, gcin_win_color_use ? &fg:NULL);
-  }
-#endif
 }
-
 
 
 extern gboolean b_use_full_space;
@@ -152,15 +128,19 @@ void disp_char(int index, char *ch)
 {
   if (gcin_edit_display_ap_only())
     return;
+  if (!gwin0)
+    return;
 
 //  dbg("disp_char %d %s\n", index, ch);
   create_char(index);
   GtkWidget *label = chars[index].label;
 
-  if (ch[0]==' ' && ch[1]==' ')
-    set_label_space(label);
-  else {
-    gtk_label_set_text(GTK_LABEL(label), ch);
+  if (label) {
+    if (ch[0]==' ' && ch[1]==' ')
+      set_label_space(label);
+    else {
+      gtk_label_set_text(GTK_LABEL(label), ch);
+    }
   }
 
   get_win0_geom();
@@ -168,7 +148,6 @@ void disp_char(int index, char *ch)
     move_win0(dpy_xl - win_xl, win_y);
 
   gtk_widget_show_all(chars[index].vbox);
-//  gtk_widget_hide(chars[index].line);
 }
 
 void hide_char(int index)
@@ -196,29 +175,6 @@ void clear_chars_all()
   }
 
   compact_win0();
-}
-
-
-void draw_underline(int index)
-{
-#if 0
-  if (gcin_edit_display_ap_only())
-    return;
-
-  create_char(index);
-
-  gtk_widget_show(chars[index].line);
-#endif
-}
-
-void clear_underline(int index)
-{
-#if 0
-  if (gcin_edit_display_ap_only())
-    return;
-
-  gtk_widget_hide(chars[index].line);
-#endif
 }
 
 void set_cursor_tsin(int index)
@@ -376,6 +332,8 @@ void compact_win0_x()
   if (test_mode)
     return;
 #endif
+  if (!gwin0)
+    return;
 
   gtk_window_resize(GTK_WINDOW(gwin0), 16, 16);
   raw_move(best_win_x, best_win_y);
@@ -383,7 +341,9 @@ void compact_win0_x()
 
 static void compact_win0()
 {
-  if (! gwin0) return;
+  if (!gwin0)
+    return;
+
   max_yl = 0;
   gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
   raw_move(best_win_x, best_win_y);
@@ -440,23 +400,6 @@ void disp_tsin_eng_pho(int eng_pho)
   gtk_button_set_label(GTK_BUTTON(button_eng_ph), _(eng_pho_strs[eng_pho]));
 }
 
-void clear_tsin_line()
-{
-#if 0
-  int i;
-#if WIN32
-  if (test_mode)
-    return;
-#endif
-  for(i=0; i < MAX_PH_BF_EXT; i++) {
-    GtkWidget *line = chars[i].line;
-    if (!line)
-      continue;
-    gtk_widget_hide(line);
-  }
-#endif
-}
-
 void exec_gcin_setup();
 void toggle_win_sym();
 
@@ -505,7 +448,6 @@ void create_win0()
   gtk_widget_realize (gwin0);
 #if UNIX
   GdkWindow *gdkwin0 = gtk_widget_get_window(gwin0);
-  xwin0 = GDK_WINDOW_XWINDOW(gdkwin0);
   set_no_focus(gwin0);
 #else
   win32_init_win(gwin0);
@@ -616,8 +558,6 @@ static void create_win0_gui()
   change_win1_font();
 }
 
-
-#if USE_TSIN
 void destroy_win0()
 {
   if (!gwin0)
@@ -628,12 +568,14 @@ void destroy_win0()
   label_pho = NULL;
   button_pho = NULL;
   button_eng_ph = NULL;
+  hbox_edit = NULL;
   bzero(chars, sizeof(chars));
 }
-#endif
 
 void get_win0_geom()
 {
+  if (!gwin0)
+    return;
   gtk_window_get_position(GTK_WINDOW(gwin0), &win_x, &win_y);
   get_win_size(gwin0, &win_xl, &win_yl);
 }
@@ -659,13 +601,19 @@ void show_win0()
 //    dbg("show ret\n");
     return;
   }
-#if UNIX
+
+#if UNIX && 0
   if (!GTK_WIDGET_VISIBLE(gwin0))
 #endif
   {
 // dbg("gtk_widget_show %x\n", gwin0);
+#if UNIX
+    move_win0(win_x, win_y);
+    gtk_widget_show(gwin0);
+#else
     gtk_widget_show(gwin0);
     move_win0(win_x, win_y);
+#endif
   }
 
   show_win_sym();
@@ -684,7 +632,7 @@ void hide_win0()
     return;
   if (!gwin0)
     return;
-#if UNIX
+#if UNIX && 0
   gtk_widget_hide(gwin0);
 #else
   destroy_win0();
@@ -724,7 +672,7 @@ void change_tsin_font_size()
   change_win1_font();
 
   set_win0_bg();
-  change_tsin_line_color();
+//  change_tsin_line_color();
 }
 #endif
 
