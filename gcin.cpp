@@ -41,7 +41,7 @@ void create_win0();
 void create_win1(), create_win_gtab(),create_win_pho();
 extern Window xwin0, xwin1, xwin_gtab, xwin_pho;
 
-
+#if UNIX
 static void start_inmd_window()
 {
   GtkWidget *win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -50,6 +50,7 @@ static void start_inmd_window()
   xim_arr[0].xim_xwin = GDK_WINDOW_XWINDOW(gdkwin0);
   dbg("xim_xwin %x\n", xim_arr[0].xim_xwin);
 }
+#endif
 
 
 #if USE_XIM
@@ -337,13 +338,16 @@ void cb_trad_sim_toggle()
 }
 void execute_message(char *message), show_win_kbm(), hide_win_kbm();
 int b_show_win_kbm=0;
+void disp_win_kbm_capslock_init();
+
 void kbm_toggle()
 {
   win_kbm_inited = 1;
   b_show_win_kbm^=1;
-  if (b_show_win_kbm)
+  if (b_show_win_kbm) {
     show_win_kbm();
-  else
+    disp_win_kbm_capslock_init();
+  } else
     hide_win_kbm();
 }
 
@@ -635,6 +639,9 @@ int main(int argc, char **argv)
 #endif
 
   dbg("before gtk_main\n");
+
+  disp_win_kbm_capslock_init();
+
   gtk_main();
 
   return 0;

@@ -30,6 +30,8 @@ gboolean test_mode;
 int last_input_method;
 #endif
 
+gboolean old_capslock_on;
+
 
 void init_gtab(int inmdno);
 
@@ -1027,8 +1029,33 @@ gboolean timeout_raise_window(gpointer data)
 }
 
 extern Window xwin_pho, xwin0, xwin_gtab;
-void create_win_sym();
+void create_win_sym(), win_kbm_disp_caplock();
 int gcin_switch_keys_lookup(int key);
+
+void disp_win_kbm_capslock()
+{
+  if (!b_show_win_kbm)
+    return;
+
+  gboolean o_state = old_capslock_on;
+  old_capslock_on = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
+
+//  dbg("%x %x\n", old_capslock_on, o_state);
+
+  if (o_state != old_capslock_on) {
+    win_kbm_disp_caplock();
+  }
+}
+
+
+void disp_win_kbm_capslock_init()
+{
+  old_capslock_on = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
+//  dbg("disp_win_kbm_capslock_init %d\n",old_capslock_on);
+
+  if (b_show_win_kbm)
+    win_kbm_disp_caplock();
+}
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
@@ -1036,6 +1063,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 #if 0
   dbg("key press %x %x\n", keysym, kev_state);
 #endif
+  disp_win_kbm_capslock();
   check_CS();
 
   if (current_CS->client_win)
@@ -1198,6 +1226,8 @@ int feedkey_gtab_release(KeySym xkey, int kbstate);
 // return TRUE if the key press is processed
 gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
 {
+  disp_win_kbm_capslock();
+
   check_CS();
 #if 0
   dbg_time("key release %x %x\n", keysym, kev_state);
@@ -1544,10 +1574,8 @@ gboolean ProcessTestKeyPress(KeySym keysym, u_int kev_state)
       v = ProcessKeyPress(keysym, kev_state);
       tsin_restore_gst();
       break;
-#if USE_ANTHY
-    case method_type_ANTHY:
+    case method_type_MODULE:
       break;
-#endif
     default:
       gtab_save_gst();
       v = ProcessKeyPress(keysym, kev_state);

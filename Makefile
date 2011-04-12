@@ -76,14 +76,6 @@ CFLAGS += -DUSE_TSIN=1
 OBJS += $(gcin_tsin_o)
 endif
 
-ifeq ($(USE_ANTHY),Y)
-CFLAGS += -DUSE_ANTHY=1
-LDFLAGS += -ldl
-ifeq ($(USE_TSIN),N)
-OBJS += $(gcin_tsin_o)
-endif
-endif
-
 ifeq ($(USE_GCB),Y)
 CFLAGS += -DUSE_GCB=1
 OBJS += gcb.o

@@ -386,7 +386,7 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
     result = gcin_im_client_forward_key_press(context_xim->gcin_ch,
       keysym, xevent.state, &rstr);
   } else {
-//    printf("release\n");
+//    printf("release %x %x\n", xevent.state, event->state);
     result = gcin_im_client_forward_key_release(context_xim->gcin_ch,
      keysym, xevent.state, &rstr);
   }

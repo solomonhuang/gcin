@@ -32,7 +32,7 @@ void create_inmd_switch()
 #if UNIX
     sprintf(tt, "%s ctrl-alt-%c", inmd[i].cname, gcin_switch_keys[i]);
 #else
-	strcpy(tt, inmd[i].cname);
+    strcpy(tt, inmd[i].cname);
 #endif
 
     GtkWidget *item = gtk_menu_item_new_with_label (tt);

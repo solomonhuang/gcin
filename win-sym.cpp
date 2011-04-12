@@ -222,10 +222,8 @@ static void cb_button_sym(GtkButton *button, GtkWidget *label)
        tsin_reset_in_pho();
        break;
 #endif
-#if USE_ANTHY
     case method_type_MODULE:
        break;
-#endif
     default:
        reset_gtab_all();
        break;

@@ -680,6 +680,9 @@ void change_tsin_font_size()
 
 void show_button_pho(gboolean bshow)
 {
+  if (!button_pho)
+    return;
+
   if (bshow)
     gtk_widget_show(button_pho);
   else {

@@ -229,11 +229,21 @@ int main(int argc, char **argv)
   cmd_arg(&cmd, &arg);
   if (!sequ(cmd,"%selkey") || !(*arg) )
     p_err("%d:  %%selkey select_key_list expected", lineno);
-  strcpy(th.selkey,arg);
+
+
+  if (strlen(arg) >= sizeof(th.selkey)) {
+    memcpy(th.selkey, arg, sizeof(th.selkey));
+    strcpy(th.selkey2, arg+sizeof(th.selkey));
+    dbg("th.selkey2 %s\n", th.selkey2);
+  } else
+    strcpy(th.selkey,arg);
 
   cmd_arg(&cmd, &arg);
   if (!sequ(cmd,"%dupsel") || !(*arg) ) {
-    th.M_DUP_SEL = strlen(th.selkey);
+    if (th.selkey[sizeof(th.selkey)-1])
+      th.M_DUP_SEL = sizeof(th.selkey) + strlen(th.selkey2);
+    else
+      th.M_DUP_SEL = strlen(th.selkey);
   }
   else {
     th.M_DUP_SEL=atoi(arg);

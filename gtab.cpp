@@ -662,7 +662,18 @@ void init_gtab(int inmdno)
   inp->MaxPress=th.MaxPress;
   inp->DefChars=th.DefC;
   free(inp->selkey);
-  inp->selkey = strdup(th.selkey);
+
+  if (th.selkey[sizeof(th.selkey)-1]) {
+    char tt[32];
+    bzero(tt, sizeof(tt));
+    memcpy(tt,th.selkey, sizeof(th.selkey));
+    strcat(tt, th.selkey2);
+    inp->selkey = strdup(tt);
+  } else
+    inp->selkey = strdup(th.selkey);
+
+  dbg("selkey %s\n", inp->selkey);
+
   inp->M_DUP_SEL=th.M_DUP_SEL;
   inp->space_style=th.space_style;
   inp->flag=th.flag;

@@ -37,6 +37,9 @@ enum {
   GTAB_AUTO_SELECT_BY_PHRASE_NO=2,
 };
 
+
+#define MAX_SELKEY 16
+
 struct TableHead {
   int version;
   u_int flag;
@@ -53,6 +56,7 @@ struct TableHead {
     struct {
       char endkey[99];
       char keybits;
+      char selkey2[10];
     };
 
     char dummy[128];  // for future use
@@ -64,8 +68,6 @@ struct TableHead {
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
 #define MAX_GTAB_NUM_KEY (17)
-#define MAX_SELKEY 16
-
 #define MAX_TAB_KEY_NUM (32/KeyBits)
 #define MAX_TAB_KEY_NUM64 (64/KeyBits)
 
