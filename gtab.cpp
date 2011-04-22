@@ -41,6 +41,14 @@ static char keyrow[]=
 	      "asdfghjkl;"
 	      "zxcvbnm,./";
 
+gboolean use_tsin_sel_win()
+{
+  return
+//  !gtab_pre_select && !gtab_disp_partial_match &&
+  gtab_vertical_select && gtab_phrase_pre_select;
+}
+
+
 int key_col(char cha)
 {
   char *p = strchr(keyrow, cha);

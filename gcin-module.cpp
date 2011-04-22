@@ -4,6 +4,7 @@
 #include "tsin.h"
 #include "gst.h"
 #include "im-client/gcin-im-client-attr.h"
+#include "win1.h"
 #include "gcin-module.h"
 
 void show_win_sym(),hide_win_sym(),move_win_sym(),toggle_win_sym();
@@ -32,6 +33,7 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_disp_arrow_up = disp_arrow_up;
   func->mf_disp_arrow_down = disp_arrow_down;
   func->mf_set_sele_text = set_sele_text;
+  func->mf_set_win1_cb = set_win1_cb;
 
   func->mf_tsin_set_eng_ch = tsin_set_eng_ch;
   func->mf_tsin_pho_mode = tsin_pho_mode;

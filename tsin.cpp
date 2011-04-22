@@ -811,7 +811,7 @@ static void disp_current_sel_page()
     if (idx < phrase_count + pho_count) {
       int v = idx - phrase_count + tss.startf;
       char *tstr = pho_idx_str(v);
-      set_sele_text(phrase_count + pho_count, i, tstr, strlen(tstr));
+      set_sele_text(phrase_count + pho_count, i, tstr, -1);
     } else
       break;
   }
@@ -1243,8 +1243,8 @@ static gboolean pre_punctuation_sub(KeySym xkey, char shift_punc[], unich_t *cha
 
 static gboolean pre_punctuation(KeySym xkey)
 {
-  static char shift_punc[]="<>?:\"{}!";
-  static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("："),_L("；"),_L("『"),_L("』"),_L("！")};
+  static char shift_punc[]="<>?:\"{}!_";
+  static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("："),_L("；"),_L("『"),_L("』"),_L("！"),_L("——")};
   return pre_punctuation_sub(xkey, shift_punc, chars);
 }
 

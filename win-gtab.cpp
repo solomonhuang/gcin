@@ -263,6 +263,8 @@ void set_gtab_input_method_name(char *s)
   gtk_label_set_text(GTK_LABEL(label_input_method_name), s);
 }
 
+gboolean use_tsin_sel_win();
+void init_tsin_selection_win();
 
 void create_win_gtab()
 {
@@ -283,6 +285,9 @@ void create_win_gtab()
 #else
   win32_init_win(gwin_gtab);
 #endif
+
+  if (use_tsin_sel_win())
+    init_tsin_selection_win();
 }
 
 void create_win_sym();
@@ -449,7 +454,7 @@ void create_win_gtab_gui_simple()
       gtk_box_pack_start (GTK_BOX (hbox_row1), align, FALSE, FALSE, 0);
   }
 
-  if (gtab_phrase_pre_select) {
+  if (gtab_phrase_pre_select && !use_tsin_sel_win()) {
     label_gtab_pre_sel = gtk_label_new(NULL);
     set_label_font_size(label_gtab_pre_sel, gcin_font_size_tsin_presel);
     gtk_box_pack_start (GTK_BOX (vbox_top), label_gtab_pre_sel, FALSE, FALSE, 0);
@@ -735,14 +740,19 @@ void disp_gtab_pre_sel(char *s)
   adj_gtab_win_pos();
 }
 
+void hide_selections_win();
+
 void hide_gtab_pre_sel()
 {
-  if (!label_gtab_pre_sel)
-    return;
+  if (use_tsin_sel_win())
+    hide_selections_win();
+
 //  dbg("hide_gtab_pre_sel %d\n", tss.ctrl_pre_sel);
   tss.pre_selN = 0;
   tss.ctrl_pre_sel = FALSE;
-  gtk_widget_hide(label_gtab_pre_sel);
+  if (label_gtab_pre_sel)
+    gtk_widget_hide(label_gtab_pre_sel);
+
   minimize_win_gtab();
 
   move_win_gtab(current_in_win_x, current_in_win_y);

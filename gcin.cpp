@@ -37,10 +37,6 @@ char *half_char_to_full_char(KeySym xkey)
 }
 
 
-void create_win0();
-void create_win1(), create_win_gtab(),create_win_pho();
-extern Window xwin0, xwin1, xwin_gtab, xwin_pho;
-
 #if UNIX
 static void start_inmd_window()
 {

@@ -5,7 +5,6 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "** valid options:"
     echo "  --use_xim=N    : disable the support of XIM"
     echo "  --prefix=dir_name : install prefix(e.g. /usr)"
-    echo "  --new_gtk_im=N : disable new gtk immodule for firefox over-the-spot"
     echo "  --use_tray=N   : disable system tray"
     echo "  --use_i18n=Y   : enable i18n"
     echo "  --use_tsin=N   : disable Tsin input method"
@@ -46,8 +45,6 @@ fi
 
 prefix="/usr/local"
 use_xim='Y'
-new_gtk_im='N'
-#new_gtk_im='Y'
 use_tray='Y'
 use_i18n='N'
 use_tsin='Y'
@@ -66,8 +63,6 @@ for opt do
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_xim=*) use_xim=`echo $opt | cut -d '=' -f 2`
-  ;;
-  --new_gtk_im=*) new_gtk_im=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_tray=*) use_tray=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -289,7 +284,6 @@ echo "GTK3_IM=$GTK3_IM" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
 echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
 echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak
-echo "NEW_GTK_IM=$new_gtk_im" >> config.mak
 echo "LIB=$LIB" >> config.mak
 echo "MAC_OS=$MAC_OS" >> config.mak
 echo "SO_FLAGS=$SO_FLAGS" >> config.mak

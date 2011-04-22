@@ -1038,6 +1038,12 @@ void init_tsin_table()
 
 extern u_char scanphr_e(int chpho_idx, int plen, gboolean pho_incr, int *rselN);
 void init_pre_sel();
+void clear_sele();
+void set_sele_text(int tN, int i, char *text, int len);
+void get_win_gtab_geom();
+void disp_selections(int x, int y);
+
+gboolean use_tsin_sel_win();
 
 static int gtab_pre_select_phrase_len;
 
@@ -1097,6 +1103,16 @@ void gtab_scan_pre_select(gboolean b_incr)
 
 //  dbg("selN %d %d\n",selN, tss.pre_selN);
 
+  if (use_tsin_sel_win()) {
+    clear_sele();
+    int i;
+    for(i=0;i<tss.pre_selN; i++)
+       set_sele_text(tss.pre_selN,i,tss.pre_sel[i].str, -1);
+    get_win_gtab_geom();
+    disp_selections(-1, -1);
+    return;
+  }
+
   char tt[4096];
   tt[0]=0;
   int i;
@@ -1142,7 +1158,6 @@ gboolean gtab_pre_select_idx(int c)
 
   return TRUE;
 }
-
 
 gboolean gtab_pre_select_shift(KeySym key, int kbstate)
 {
@@ -1198,3 +1213,9 @@ int feedkey_gtab_release(KeySym xkey, int kbstate)
   }
 }
 
+#include "win1.h"
+
+void gtab_set_win1_cb()
+{
+  set_win1_cb((cb_selec_by_idx_t)gtab_pre_select_idx, NULL, NULL);
+}

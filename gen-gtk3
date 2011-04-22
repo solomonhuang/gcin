@@ -19,7 +19,7 @@ exec patch -p1 < $0
  
  
  ifeq ($(MAC_OS),1)
-@@ -41,7 +43,7 @@
+@@ -37,7 +39,7 @@
  	if [ $(prefix) = /usr/local ]; then \
  		install -d $(IMMODULES_LOCAL); \
  		install -m 755 im-gcin.so $(IMMODULES_LOCAL); \
@@ -41,7 +41,7 @@ exec patch -p1 < $0
  #include "gtkimcontextgcin.h"
  // #include "gcin.h"  // for debug only
  #include "gcin-im-client.h"
-@@ -131,10 +129,10 @@
+@@ -128,10 +126,10 @@
  get_im (GtkIMContextGCIN *context_xim)
  {
    GdkWindow *client_window = context_xim->client_window;
@@ -54,7 +54,7 @@ exec patch -p1 < $0
        perror("cannot open gcin_ch");
  #if 1
      context_xim->timeout_handle = 0;
-@@ -249,7 +247,7 @@
+@@ -239,7 +237,7 @@
    if (context_xim->client_window) {
      get_im (context_xim);
      if (context_xim->gcin_ch) {
@@ -63,7 +63,7 @@ exec patch -p1 < $0
      }
    }
  }
-@@ -335,15 +333,15 @@
+@@ -298,15 +296,15 @@
    KeySym keysym = 0;
    Status status;
    gboolean result = FALSE;

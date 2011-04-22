@@ -288,6 +288,7 @@ void disp_tsin_select(int index)
   if (gcin_edit_display_ap_only()) {
     getRootXY(current_CS->client_win, current_CS->spot_location.x, current_CS->spot_location.y, &x, &y);
   } else {
+#if 1
     int i;
     // bug in GTK, widget position is wrong, repeat util find one
     for(i=index;i>=0; i--) {
@@ -300,6 +301,10 @@ void disp_tsin_select(int index)
       if (tx>=0)
         break;
     }
+#else
+	get_widget_xy(gwin0, chars[index].vbox, &x, &y);
+#endif
+	get_win0_geom();
   }
   disp_selections(x, y);
 }
@@ -618,7 +623,9 @@ void show_win0()
 
   show_win_sym();
 
+#if UNIX
   if (current_CS->b_raise_window)
+#endif
   {
     gtk_window_present(GTK_WINDOW(gwin0));
     raise_tsin_selection_win();

@@ -7,6 +7,7 @@
 #include "gst.h"
 #include "pho.h"
 #include "im-client/gcin-im-client-attr.h"
+#include "win1.h"
 #include "gcin-module.h"
 
 #define STRBUFLEN 64
@@ -29,6 +30,8 @@ gboolean test_mode;
 #if WIN32
 int last_input_method;
 #endif
+void set_wselkey(char *s);
+void gtab_set_win1_cb();
 
 gboolean old_capslock_on;
 
@@ -850,6 +853,13 @@ extern char *TableDir;
 void set_gtab_input_method_name(char *s);
 GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile);
 time_t find_tab_file(char *fname, char *out_file);
+gboolean tsin_page_up(), tsin_page_down();
+int tsin_sele_by_idx(int);
+
+static void tsin_set_win1_cb()
+{
+  set_win1_cb((cb_selec_by_idx_t)tsin_sele_by_idx, (cb_page_ud_t)tsin_page_up, (cb_page_ud_t)tsin_page_down);
+}
 
 void update_win_kbm_inited()
 {
@@ -870,9 +880,7 @@ gboolean init_in_method(int in_no)
   if (current_CS->in_method != in_no) {
     if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM)) {
       if (current_method_type() == method_type_TSIN) {
-#if USE_TSIN
-      flush_tsin_buffer();
-#endif
+        flush_tsin_buffer();
       } else
         output_gbuf();
 
@@ -888,18 +896,18 @@ gboolean init_in_method(int in_no)
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
   set_tsin_pho_mode0(current_CS);
+  set_wselkey(pho_selkey);
+  tsin_set_win1_cb();
 
   switch (inmd[in_no].method_type) {
     case method_type_PHO:
       current_CS->in_method = in_no;
       init_tab_pho();
       break;
-#if USE_TSIN
     case method_type_TSIN:
       current_CS->in_method = in_no;
       init_tab_pp(init_im);
       break;
-#endif
     case method_type_INT_CODE:
       current_CS->in_method = in_no;
       init_inter_code();
@@ -946,12 +954,18 @@ gboolean init_in_method(int in_no)
   }
 #if WIN32
   if (current_CS && current_CS->in_method != last_input_method)
-	  last_input_method = current_CS->in_method;
+    last_input_method = current_CS->in_method;
 #endif
 
 #if TRAY_ENABLED
   disp_tray_icon();
 #endif
+
+  if (inmd[current_CS->in_method].selkey) {
+    set_wselkey(inmd[current_CS->in_method].selkey);
+    gtab_set_win1_cb();
+    dbg("selkey %s\n", inmd[current_CS->in_method].selkey);
+  }
 
   update_in_win_pos();
   update_win_kbm_inited();
@@ -1343,11 +1357,16 @@ int gcin_FocusIn(ClientState *cs)
     if (cs->im_state != GCIN_STATE_DISABLED) {
       show_in_win(cs);
       move_IC_in_win(cs);
-#if 0
-      set_win_status_inmd(inmd[cs->in_method].cname);
-#endif
     } else
       hide_in_win(cs);
+  }
+
+  if (inmd[cs->in_method].selkey)
+    set_wselkey(inmd[cs->in_method].selkey);
+  else {
+    set_wselkey(pho_selkey);
+    gtab_set_win1_cb();
+    tsin_set_win1_cb();
   }
 
   update_win_kbm();

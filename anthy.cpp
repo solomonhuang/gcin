@@ -2,6 +2,7 @@
 #include "pho.h"
 #include "gst.h"
 #include "im-client/gcin-im-client-attr.h"
+#include "win1.h"
 #include "gcin-module.h"
 #include <anthy/anthy.h>
 #if WIN32
@@ -722,16 +723,10 @@ static gboolean send_jp()
   return TRUE;
 }
 
-void clear_sele();
-void set_sele_text(int tN, int i, char *text, int len);
-void disp_arrow_up(),disp_arrow_down();
-void get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry);
-void disp_selections(int x, int y);
-
 static void disp_select()
 {
 //  puts("disp_select");
-  clear_sele();
+  gmf.mf_clear_sele();
   int endn = pageidx + gmf.mf_phkbm->selkeyN;
   if (endn >  seg[cursor].selN)
     endn = seg[cursor].selN;
@@ -740,7 +735,7 @@ static void disp_select()
     char buf[256];
     anthy_get_segment(ac, cursor, i, buf, sizeof(buf));
 //    printf("%d %s\n", i, buf);
-    gmf.mf_set_sele_text(seg[cursor].selN, i - pageidx, buf, strlen(buf));
+    gmf.mf_set_sele_text(seg[cursor].selN, i - pageidx, buf, -1);
   }
 
   if (pageidx)
@@ -792,6 +787,14 @@ static void next_page()
 {
   pageidx += gmf.mf_phkbm->selkeyN;
   if (pageidx >= seg[cursor].selN)
+    pageidx = 0;
+  disp_select();
+}
+
+static void prev_page()
+{
+  pageidx -= gmf.mf_phkbm->selkeyN;
+  if (pageidx < 0)
     pageidx = 0;
   disp_select();
 }
@@ -929,7 +932,7 @@ send:
         if (state==STATE_SELECT) {
           state = STATE_CONVERT;
           gmf.mf_tss->sel_pho = FALSE;
-          clear_sele();
+          gmf.mf_clear_sele();
         }
         else
         if (state==STATE_CONVERT)
@@ -1046,10 +1049,7 @@ rom:
     case XK_Prior:
       if (state!=STATE_SELECT)
         return FALSE;
-      pageidx -= gmf.mf_phkbm->selkeyN;
-      if (pageidx < 0)
-        pageidx = 0;
-      disp_select();
+      prev_page();
       return TRUE;
     case XK_Next:
       if (state!=STATE_SELECT)
@@ -1146,6 +1146,7 @@ int module_init_win(GCIN_module_main_functions *funcs)
   dbg("module_init_win\n");
 
   gmf.mf_set_tsin_pho_mode();
+  gmf.mf_set_win1_cb((cb_selec_by_idx_t)select_idx, prev_page, next_page);
 
   if (win_anthy)
     return TRUE;

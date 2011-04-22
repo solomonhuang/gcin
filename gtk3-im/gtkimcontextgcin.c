@@ -28,7 +28,6 @@
 #include "gcin-im-client.h"
 #include <X11/keysym.h>
 
-//#define NEW_GTK_IM 0
 #define DBG 0
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
@@ -38,10 +37,11 @@ struct _GtkIMContextGCIN
   GtkIMContext object;
 
   GdkWindow *client_window;
+#if 0
   GtkWidget *client_widget;
+#endif
   GCIN_client_handle *gcin_ch;
   int timeout_handle;
-  gboolean is_mozilla, dirty_fix_off, preedit;
   char *pe_str;
   int old_sub_comp_len;
   gboolean pe_started;
@@ -113,9 +113,6 @@ static void gcin_display_closed (GdkDisplay *display,
 #if DBG
   puts("gcin_display_closed");
 #endif
-#if NEW_GTK_IM
-  cancel_timeout(context_xim);
-#endif
   if (!context_xim->gcin_ch)
     return;
 
@@ -148,13 +145,6 @@ get_im (GtkIMContextGCIN *context_xim)
     g_signal_connect (display, "closed",
                       G_CALLBACK (gcin_display_closed), context_xim);
 #endif
-    if (context_xim->is_mozilla) {
-      int rflag;
-      gcin_im_client_set_flags(context_xim->gcin_ch,
-        FLAG_GCIN_client_handle_raise_window, &rflag);
-
-      context_xim->dirty_fix_off = (rflag & FLAG_GCIN_srv_ret_status_use_pop_up) > 0;
-    }
   }
 }
 
@@ -252,29 +242,6 @@ set_ic_client_window (GtkIMContextGCIN *context_xim,
   }
 }
 
-#if NEW_GTK_IM
-static gboolean update_cursor_position(gpointer data)
-{
-  GtkIMContextGCIN *context = (GtkIMContextGCIN *)data;
-
-  if (!context)
-    return;
-
-  g_signal_emit_by_name(context, "preedit_changed");
-  cancel_timeout(context);
-  return FALSE;
-}
-#endif
-
-
-#if NEW_GTK_IM
-void add_cursor_timeout(GtkIMContextGCIN *context_xim)
-{
-  if (context_xim->timeout_handle)
-    return;
-  context_xim->timeout_handle = g_timeout_add(200, update_cursor_position, (gpointer)context_xim);
-}
-#endif
 
 ///
 static void
@@ -285,10 +252,6 @@ gtk_im_context_gcin_set_client_window (GtkIMContext          *context,
   printf("gtk_im_context_gcin_set_client_window\n");
 #endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
-#if NEW_GTK_IM
-  if (context_xim->is_mozilla && !context_xim->dirty_fix_off)
-    add_cursor_timeout(context_xim);
-#endif
   set_ic_client_window (context_xim, client_window);
 }
 
@@ -569,8 +532,6 @@ gtk_im_context_gcin_set_use_preedit (GtkIMContext *context,
     gcin_im_client_set_flags(context_gcin->gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
   else
     gcin_im_client_clear_flags(context_gcin->gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
-
-  context_gcin->preedit = use_preedit;
 }
 
 
@@ -647,7 +608,6 @@ gtk_im_context_gcin_get_preedit_string (GtkIMContext   *context,
   if (context_gcin->gcin_ch && cursor_pos) {
     int ret;
     gcin_im_client_set_flags(context_gcin->gcin_ch, FLAG_GCIN_client_handle_use_preedit, &ret);
-    context_gcin->preedit = TRUE;
   }
 
   if (cursor_pos)

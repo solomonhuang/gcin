@@ -1,8 +1,11 @@
 #include "gcin.h"
 #include "pho.h"
 #include "gst.h"
+#include "win1.h"
 
 static GtkWidget *gwin1, *frame;
+static char *wselkey;
+static int wselkeyN;
 //Window xwin1;
 
 #define SELEN (12)
@@ -12,12 +15,12 @@ static GtkWidget *eve_sele[SELEN], *eve_seleR[SELEN];
 static GtkWidget *arrow_up, *arrow_down;
 
 void hide_selections_win();
-gboolean tsin_page_up(), tsin_page_down();
+static cb_page_ud_t cb_page_up, cb_page_down;
 static int c_config;
 
 static int current_config()
 {
-  return (tsin_tail_select_key<<9) | (pho_candicate_col_N<<5) | phkbm.selkeyN << 1|
+  return (tsin_tail_select_key<<9) | (pho_candicate_col_N<<5) | wselkeyN << 1|
     pho_candicate_R2L;
 }
 
@@ -36,10 +39,12 @@ static gboolean button_scroll_event_tsin(GtkWidget *widget,GdkEventScroll *event
 {
   switch (event->direction) {
     case GDK_SCROLL_UP:
-      tsin_page_up();
+      if (cb_page_up)
+        cb_page_up();
       break;
     case GDK_SCROLL_DOWN:
-      tsin_page_down();
+      if (cb_page_down)
+        cb_page_down();
       break;
     default:
       break;
@@ -74,7 +79,9 @@ void create_win1()
 }
 
 void change_win1_font(), force_preedit_shift();
-int tsin_sele_by_idx(int c);
+
+
+static cb_selec_by_idx_t cb_sele_by_idx;
 
 static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
@@ -82,7 +89,8 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
   switch (event->button) {
     case 1:
       v = GPOINTER_TO_INT(data);
-      tsin_sele_by_idx(v);
+      if (cb_sele_by_idx)
+        cb_sele_by_idx(v);
       force_preedit_shift();
       break;
   }
@@ -91,11 +99,20 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 static void cb_arrow_up (GtkWidget *button, gpointer user_data)
 {
-  tsin_page_up();
+  if (cb_page_up)
+    cb_page_up();
 }
 static void cb_arrow_down (GtkWidget *button, gpointer user_data)
 {
-  tsin_page_down();
+  if (cb_page_down)
+   cb_page_down();
+}
+
+void set_win1_cb(cb_selec_by_idx_t sele_by_idx, cb_page_ud_t page_up, cb_page_ud_t page_down)
+{
+  cb_sele_by_idx = sele_by_idx;
+  cb_page_up = page_up;
+  cb_page_down = page_down;
 }
 
 void create_win1_gui()
@@ -116,7 +133,7 @@ void create_win1_gui()
   g_signal_connect (G_OBJECT (eve_box_up), "button-press-event",
                       G_CALLBACK (cb_arrow_up), NULL);
 
-  int c_rowN = (phkbm.selkeyN + pho_candicate_col_N - 1) / pho_candicate_col_N * pho_candicate_col_N;
+  int c_rowN = (wselkeyN + pho_candicate_col_N - 1) / pho_candicate_col_N * pho_candicate_col_N;
   int tablecolN = pho_candicate_col_N;
 
   if (!tsin_tail_select_key)
@@ -128,7 +145,7 @@ void create_win1_gui()
   gtk_box_pack_start (GTK_BOX (vbox_top), table, FALSE, FALSE, 0);
 
   int i;
-  for(i=0; i < phkbm.selkeyN; i++)
+  for(i=0; i < wselkeyN; i++)
   {
     int y = i/pho_candicate_col_N;
     int x = idx_to_x(SELEN+1, i);
@@ -192,7 +209,7 @@ void clear_sele()
   if (!gwin1)
     create_win1();
 
-  for(i=0; i < phkbm.selkeyN; i++) {
+  for(i=0; i < wselkeyN; i++) {
     gtk_widget_hide(labels_sele[i]);
     if (labels_seleR[i])
       gtk_widget_hide(labels_seleR[i]);
@@ -211,6 +228,9 @@ char *htmlspecialchars(char *s, char out[]);
 
 void set_sele_text(int tN, int i, char *text, int len)
 {
+  if (len < 0)
+    len=strlen(text);
+
   char tt[128];
   char utf8[128];
 
@@ -219,7 +239,7 @@ void set_sele_text(int tN, int i, char *text, int len)
   char uu[32], selma[128];
 
   char cc[2];
-  cc[0]=pho_selkey[i];
+  cc[0]=wselkey[i];
   cc[1]=0;
   char ul[128];
   ul[0]=0;
@@ -259,7 +279,14 @@ gboolean timeout_minimize_win1(gpointer data)
 }
 #endif
 
+void raise_tsin_selection_win()
+{
+  if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
+    gtk_window_present(GTK_WINDOW(gwin1));
+}
 
+
+void getRootXY(Window win, int wx, int wy, int *tx, int *ty);
 void disp_selections(int x, int y)
 {
   if (!gwin1)
@@ -270,11 +297,27 @@ void disp_selections(int x, int y)
   }
 #endif
 
+  if (y < 0) {
+	 int tx;
+	 if (gcin_edit_display_ap_only())
+		getRootXY(current_CS->client_win, current_CS->spot_location.x, current_CS->spot_location.y, &tx, &y);
+	 else
+		 y = win_y + win_yl;
+  }
+
+
   int win1_xl, win1_yl;
   get_win_size(gwin1, &win1_xl, &win1_yl);
 
+  if (x < 0) {
+    x = win_x + win_xl - win1_xl;
+	if (x < win_x)
+		x = win_x;
+  }
+
   if (x + win1_xl > dpy_xl)
     x = dpy_xl - win1_xl;
+
   if (y + win1_yl > dpy_yl)
     y = win_y - win1_yl;
 
@@ -288,14 +331,10 @@ void disp_selections(int x, int y)
     gtk_widget_show(gwin1);
   }
 #endif
+#if WIN32
+  raise_tsin_selection_win();
+#endif
 }
-
-void raise_tsin_selection_win()
-{
-  if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
-    gtk_window_present(GTK_WINDOW(gwin1));
-}
-
 
 void hide_selections_win()
 {
@@ -340,7 +379,7 @@ void change_win1_font()
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
 
-  for(i=0; i < phkbm.selkeyN; i++) {
+  for(i=0; i < wselkeyN; i++) {
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
     set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
     if (labels_sele[i])
@@ -365,4 +404,11 @@ void recreate_win1_if_nessary()
     gtk_widget_destroy(frame); frame = NULL;
     create_win1_gui();
   }
+}
+
+
+void set_wselkey(char *s)
+{
+  wselkey = s;
+  wselkeyN = strlen(s);
 }
