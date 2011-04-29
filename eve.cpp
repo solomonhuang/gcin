@@ -26,8 +26,8 @@ char *output_buffer;
 int output_bufferN;
 static char *output_buffer_raw, *output_buffer_raw_bak;
 static int output_buffer_rawN;
-gboolean test_mode;
 #if WIN32
+gboolean test_mode;
 int last_input_method;
 #endif
 void set_wselkey(char *s);
@@ -1083,7 +1083,11 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   if (current_CS->client_win)
     focus_win = current_CS->client_win;
 
-  if (!test_mode && callback_str_buffer && strlen(callback_str_buffer)) {
+  if (
+#if WIN32
+  !test_mode &&
+#endif
+  callback_str_buffer && strlen(callback_str_buffer)) {
     send_text(callback_str_buffer);
     callback_str_buffer[0]=0;
     return TRUE;

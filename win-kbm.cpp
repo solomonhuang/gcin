@@ -59,6 +59,7 @@ void mod_fg_all(GtkWidget *lab, GdkColor *col)
   gtk_widget_modify_fg(lab, GTK_STATE_PRELIGHT, col);
 }
 
+
 void send_fake_key_eve(KeySym key);
 #if WIN32
 void win32_FakeKey(UINT vk, bool key_press);

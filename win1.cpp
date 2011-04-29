@@ -190,7 +190,7 @@ void create_win1_gui()
                       G_CALLBACK (cb_arrow_down), NULL);
 
   gtk_widget_show_all(gwin1);
-  gdk_flush();
+//  gdk_flush();
   gtk_widget_hide(gwin1);
 
   change_win1_font();

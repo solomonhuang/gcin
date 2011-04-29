@@ -942,16 +942,8 @@ void gtab_reset()
   return;
 }
 
-
-void save_gtab_buf_phrase(KeySym key)
+void save_gtab_buf_phrase_idx(int idx0, int len)
 {
-  int len = key - '0';
-  int idx0 = ggg.gbuf_cursor - len;
-  int idx1 = ggg.gbuf_cursor - 1;
-
-  if (idx0 < 0 || idx0 > idx1)
-    return;
-
   WSP_S wsp[MAX_PHRASE_LEN];
 
   bzero(wsp, sizeof(wsp));
@@ -964,18 +956,25 @@ void save_gtab_buf_phrase(KeySym key)
   create_win_save_phrase(wsp, len);
 }
 
+void save_gtab_buf_phrase(KeySym key)
+{
+  int len = key - '0';
+  int idx0 = ggg.gbuf_cursor - len;
+  int idx1 = ggg.gbuf_cursor - 1;
+
+  if (idx0 < 0 || idx0 > idx1)
+    return;
+
+  save_gtab_buf_phrase_idx(idx0, len);
+}
+
 gboolean save_gtab_buf_shift_enter()
 {
-	if (ggg.gbuf_cursor== ggg.gbufN)
+	int N = ggg.gbufN - ggg.gbuf_cursor;
+	if (!N)
 		return 0;
 
-	int keys[512];
-	int N = ggg.gbufN - ggg.gbuf_cursor;
-	extract_gtab_key(ggg.gbuf_cursor, N, keys);
-	char *str = gen_buf_str(ggg.gbuf_cursor, FALSE);
-	save_phrase_to_db(keys, str, N, 1);
-
-	free(str);
+	save_gtab_buf_phrase_idx(ggg.gbuf_cursor, N);
 	gbuf_cursor_end();
 	return 1;
 }

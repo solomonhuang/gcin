@@ -135,7 +135,7 @@ void create_win_save_phrase(WSP_S *wsp, int wspN)
   gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), FALSE);
   sess->win = main_window;
 
-  gtk_window_set_default_size(GTK_WINDOW (main_window), 200, 100);
+  gtk_window_set_default_size(GTK_WINDOW (main_window), 20, 10);
 
   gtk_window_set_title(GTK_WINDOW(main_window), _(_L("加片語到詞庫")));
 
@@ -159,7 +159,9 @@ void create_win_save_phrase(WSP_S *wsp, int wspN)
       strcat(tt, phokey_to_str(wsp[i].key));
     strcat(tt, " ");
   }
-  gtk_box_pack_start (GTK_BOX (vbox), gtk_label_new(tt), FALSE, FALSE, 0);
+
+  if (tt[0])
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_label_new(tt), FALSE, FALSE, 0);
 
   sess->mywsp = tmemdup(wsp, WSP_S, wspN);
   sess->mywspN = wspN;

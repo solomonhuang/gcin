@@ -3,10 +3,13 @@
 #include "win-sym.h"
 #include "gst.h"
 
+#if WIN32
 extern gboolean test_mode;
+#endif
 static int current_gcin_inner_frame;
 static int current_gtab_in_row1;
 static int current_gtab_vertical_select;
+extern int destroy_window;
 
 GtkWidget *gwin_gtab;
 static GtkWidget *top_bin;
@@ -183,6 +186,7 @@ void disp_gtab_sel(char *s)
 
 void set_key_codes_label(char *s, int better)
 {
+//  dbg("set_key_codes_label %s %x\n", s, label_key_codes);
   if (!label_key_codes)
     return;
 #if WIN32
@@ -192,7 +196,7 @@ void set_key_codes_label(char *s, int better)
   if (s && strlen(s)) {
     if (hbox_row2 && (!gtab_hide_row2 || ggg.wild_mode
 #if WIN32 || 1
-        || str_key_codes[0]
+        || (str_key_codes[0])
 #endif
       )) {
       gtk_widget_show(hbox_row2);
@@ -209,6 +213,9 @@ void set_key_codes_label(char *s, int better)
     gtk_widget_modify_fg(label_key_codes, GTK_STATE_NORMAL, NULL);
 
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
+  if (s && s[0])
+    gtk_widget_show(label_key_codes);
+
 #if WIN32 || 1
   better_key_codes = better;
   if (s && s != str_key_codes)
@@ -386,6 +393,7 @@ static void destroy_if_necessary()
   hbox_row2 = NULL;
 }
 
+void mod_bg_all(GtkWidget *lab, GdkColor *col);
 
 void create_win_gtab_gui_simple()
 {
@@ -516,7 +524,10 @@ void create_win_gtab_gui_simple()
   }
 
   label_key_codes  = gtk_label_new(NULL);
+#if 0
   gtk_label_set_selectable(GTK_LABEL(label_key_codes), TRUE);
+  mod_bg_all(label_key_codes, NULL);
+#endif
   gtk_box_pack_start (GTK_BOX (hbox_row2), label_key_codes, FALSE, FALSE, 2);
 
   label_page  = gtk_label_new(NULL);
@@ -543,6 +554,8 @@ void create_win_gtab_gui_simple()
 
   if (gtab_hide_row2)
     gtk_widget_hide(hbox_row2);
+
+  minimize_win_gtab();
 }
 
 
@@ -576,7 +589,7 @@ void show_win_gtab()
 
   create_win_gtab();
   create_win_gtab_gui();
-#if WIN32
+#if WIN32 || 1
   // window was destroyed
   if (gcin_pop_up_win)
     set_key_codes_label(str_key_codes, better_key_codes);
@@ -604,11 +617,11 @@ void show_win_gtab()
     gtk_window_present(GTK_WINDOW(gwin_gtab));
 
 #if WIN32 || 1
-    move_win_gtab(current_in_win_x, current_in_win_y);
+  move_win_gtab(current_in_win_x, current_in_win_y);
 #endif
 
 #if UNIX
-    gtk_widget_show(gwin_gtab);
+  gtk_widget_show(gwin_gtab);
 #endif
 
   show_win_sym();
@@ -618,13 +631,11 @@ void show_win_gtab()
 void hide_win_sym();
 void close_gtab_pho_win();
 
-void destroy_win_gtab()
+static void destroy_top_bin()
 {
-  if (!gwin_gtab)
+  if (!top_bin)
     return;
-
-  gtk_widget_destroy(gwin_gtab);
-  gwin_gtab = NULL;
+  gtk_widget_destroy(top_bin);
   top_bin = NULL;
   hbox_row2 = NULL;
   label_full=NULL;
@@ -636,6 +647,15 @@ void destroy_win_gtab()
   label_page = NULL;
   label_edit = NULL;
   label_gtab_pre_sel = NULL;
+}
+
+void destroy_win_gtab()
+{
+  if (!gwin_gtab)
+    return;
+  destroy_top_bin();
+  gtk_widget_destroy(gwin_gtab);
+  gwin_gtab = NULL;
 }
 
 void hide_win_gtab()
@@ -651,11 +671,12 @@ void hide_win_gtab()
 
 //  dbg("hide_win_gtab\n");
   if (gwin_gtab) {
-#if UNIX && 0
-    gtk_widget_hide(gwin_gtab);
-#else
-    destroy_win_gtab();
-#endif
+    if (destroy_window)
+      destroy_win_gtab();
+    else {
+      gtk_widget_hide(gwin_gtab);
+      destroy_top_bin();
+    }
   }
 
   close_gtab_pho_win();
@@ -671,7 +692,7 @@ void minimize_win_gtab()
   if (!gwin_gtab)
     return;
 
-  gtk_window_resize(GTK_WINDOW(gwin_gtab), 20, 20);
+  gtk_window_resize(GTK_WINDOW(gwin_gtab), 10, 10);
 }
 
 

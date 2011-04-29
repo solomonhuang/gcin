@@ -3,6 +3,12 @@
 #include "win-sym.h"
 #include "gst.h"
 
+#if GTK_CHECK_VERSION(2,91,0)
+int destroy_window = TRUE;
+#else
+int destroy_window = FALSE;
+#endif
+
 GtkWidget *gwin0 = NULL;
 extern GtkWidget *gwin1;
 extern Display *dpy;
@@ -128,7 +134,7 @@ void disp_char(int index, char *ch)
 {
   if (gcin_edit_display_ap_only())
     return;
-  if (!gwin0)
+  if (!top_bin)
     return;
 
 //  dbg("disp_char %d %s\n", index, ch);
@@ -426,14 +432,6 @@ static void mouse_button_callback( GtkWidget *widget,GdkEventButton *event, gpoi
 
 
 void tsin_toggle_eng_ch();
-
-#if 0
-static void cb_clicked_eng_ph()
-{
-  tsin_toggle_eng_ch();
-}
-#endif
-
 void set_no_focus();
 
 
@@ -553,8 +551,8 @@ static void create_win0_gui()
   clr_in_area_pho_tsin();
 
   gtk_widget_show_all (gwin0);
-  gdk_flush();
-  gtk_widget_hide (gwin0);
+//  gdk_flush();
+  gtk_widget_hide(gwin0);
 
   init_tsin_selection_win();
 
@@ -563,18 +561,26 @@ static void create_win0_gui()
   change_win1_font();
 }
 
-void destroy_win0()
+static void destroy_top_bin()
 {
-  if (!gwin0)
+  if (!top_bin)
     return;
-  gtk_widget_destroy(gwin0);
-  gwin0 = NULL;
+  gtk_widget_destroy(top_bin);
   top_bin = NULL;
   label_pho = NULL;
   button_pho = NULL;
   button_eng_ph = NULL;
   hbox_edit = NULL;
   bzero(chars, sizeof(chars));
+}
+
+void destroy_win0()
+{
+  if (!gwin0)
+    return;
+  destroy_top_bin();
+  gtk_widget_destroy(gwin0);
+  gwin0 = NULL;
 }
 
 void get_win0_geom()
@@ -635,15 +641,18 @@ void show_win0()
 void hide_selections_win();
 void hide_win0()
 {
+#if WIN32
   if (test_mode)
     return;
+#endif
   if (!gwin0)
     return;
-#if UNIX && 0
   gtk_widget_hide(gwin0);
-#else
-  destroy_win0();
-#endif
+  if (destroy_window)
+    destroy_win0();
+  else
+    destroy_top_bin();
+
   hide_selections_win();
   hide_win_sym();
 }
@@ -665,8 +674,8 @@ void change_tsin_font_size()
   int i;
   for(i=0; i < MAX_PH_BF_EXT; i++) {
     GtkWidget *label = chars[i].label;
-	if (!label)
-		continue;
+    if (!label)
+      continue;
 
     set_label_font_size(label, gcin_font_size);
 

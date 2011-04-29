@@ -969,7 +969,7 @@ bool gcin_im_client_key_eaten(GCIN_client_handle *handle, int press_release,
     error_proc(handle, "cannot write to gcin server");
     return FALSE;
   }
-  send_req_msg();
+  send_req_msg(handle);
 
   bzero(&reply, sizeof(reply));
   if (handle_read(handle, &reply, sizeof(reply)) <=0) {
