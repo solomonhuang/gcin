@@ -16,8 +16,9 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_vertical_select,
                  *check_button_gtab_unique_auto_send,
                  *check_button_gtab_que_wild_card,
-                 *check_button_gcin_capslock_lower,
                  *check_button_gtab_phrase_pre_select;
+
+extern GtkWidget *check_button_gcin_capslock_lower;
 
 struct {
   unich_t *str;
@@ -401,19 +402,9 @@ void create_gtab_conf_window()
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_shift_phrase_key),
      gtab_shift_phrase_key);
 
-#if 0
-  GtkWidget *hbox_gtab_capslock_in_eng = gtk_hbox_new (FALSE, SPC);
-  gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_capslock_in_eng, FALSE, FALSE, 0);
-  GtkWidget *label_gtab_capslock_in_eng = gtk_label_new(_(_L("CapsLock 打開輸入英數")));
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_capslock_in_eng), label_gtab_capslock_in_eng,  FALSE, FALSE, 0);
-  check_button_gtab_capslock_in_eng = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_capslock_in_eng), check_button_gtab_capslock_in_eng,  FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_capslock_in_eng),
-     gtab_capslock_in_eng);
-#else
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), create_en_pho_key_sel(_(_L("[中/英]切換"))), FALSE, FALSE, 0);
-#endif
 
+#if 0
   GtkWidget *hbox_gcin_capslock_lower = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gcin_capslock_lower, FALSE, FALSE, 0);
   GtkWidget *label_gcin_capslock_lower = gtk_label_new(_(_L("\t用小寫字母")));
@@ -422,7 +413,7 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (hbox_gcin_capslock_lower), check_button_gcin_capslock_lower,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_capslock_lower),
      gcin_capslock_lower);
-
+#endif
 
   GtkWidget *hbox_gtab_unique_auto_send = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_unique_auto_send, FALSE, FALSE, 0);

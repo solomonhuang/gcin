@@ -20,9 +20,10 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_tsin_tab_phrase_end,
                  *check_button_tsin_tail_select_key,
                  *check_button_tsin_buffer_editing_mode,
-                 *check_button_gcin_capslock_lower,
                  *spinner_tsin_buffer_size,
                  *spinner_pho_candicate_col_N;
+
+GtkWidget *check_button_gcin_capslock_lower;
 
 static GtkWidget *opt_kbm_opts, *opt_selkeys, *opt_eng_ch_opts;
 
