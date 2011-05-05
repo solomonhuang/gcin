@@ -520,7 +520,7 @@ static void insert_jp(u_short rom_idx)
 
 #define SEND_PRE_INI 65535
 
-void parse_key()
+static void parse_key()
 {
   int i;
   int preN=0, eqN=0, sendpreN=0;
@@ -596,7 +596,7 @@ static void cursor_markup(int idx, char *s)
   gtk_label_set_markup(GTK_LABEL(lab), cur);
 }
 
-void minimize_win_anthy()
+static void minimize_win_anthy()
 {
   if (!win_anthy)
     return;
@@ -660,7 +660,7 @@ static void disp_convert()
   }
 }
 
-void delete_jpstr(int idx)
+static void delete_jpstr(int idx)
 {
   if (idx==jpN)
     return;
@@ -1302,7 +1302,7 @@ int module_feedkey_release(KeySym xkey, int kbstate)
             module_flush_input();
             key_press_time = 0;
             gmf.mf_hide_selections_win();
-            gmf.mf_tsin_set_eng_ch(!!gmf.mf_tsin_pho_mode());
+            gmf.mf_tsin_set_eng_ch(!gmf.mf_tsin_pho_mode());
           }
           return 1;
         } else
@@ -1313,7 +1313,7 @@ int module_feedkey_release(KeySym xkey, int kbstate)
 }
 
 
-int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
+int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *comp_flag)
 {
   int i;
 
@@ -1379,6 +1379,12 @@ int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor)
     attr[0].ofs1 = ch_N;
 //    dbg("cursor %d  ch_N:%d  '%s'\n", *pcursor, ch_N, str);
   }
+
+  *comp_flag = keysN>0;
+  if (win_anthy && GTK_WIDGET_VISIBLE(win_anthy))
+    *comp_flag|=2;
+  if (segN || jpN)
+    *comp_flag|=4;
 
 ret:
   return attrN;

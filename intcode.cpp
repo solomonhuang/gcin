@@ -140,7 +140,7 @@ extern GtkWidget *gwin_int;
 
 int int_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len)
 {
-#if WIN32
+#if WIN32 || 1
   *sub_comp_len = intcode_cin>0;
 #if 0
   if (gwin_int && GTK_WIDGET_VISIBLE(gwin_int))

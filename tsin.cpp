@@ -2165,7 +2165,7 @@ gboolean save_phrase_to_db2(CHPHO *chph, int len)
 #include "im-client/gcin-im-client-attr.h"
 
 
-int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len)
+int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *comp_flag)
 {
   int i;
   int tn=0;
@@ -2212,12 +2212,12 @@ fin:
 
   *cursor = tss.c_idx;
 #if WIN32 || 1
-  *sub_comp_len = !typ_pho_empty();
+  *comp_flag = !typ_pho_empty();
   if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
-    *sub_comp_len|=2;
+    *comp_flag|=2;
 #if 1
   if (tss.c_len && !gcin_edit_display_ap_only())
-	*sub_comp_len|=4;
+	*comp_flag|=4;
 #endif
 #endif
 

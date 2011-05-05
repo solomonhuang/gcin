@@ -336,15 +336,20 @@ void execute_message(char *message), show_win_kbm(), hide_win_kbm();
 int b_show_win_kbm=0;
 void disp_win_kbm_capslock_init();
 
-void kbm_toggle()
+void kbm_open_close(gboolean b_show)
 {
-  win_kbm_inited = 1;
-  b_show_win_kbm^=1;
-  if (b_show_win_kbm) {
+  b_show_win_kbm=b_show;
+  if (b_show) {
     show_win_kbm();
     disp_win_kbm_capslock_init();
   } else
     hide_win_kbm();
+}
+
+void kbm_toggle()
+{
+  win_kbm_inited = 1;
+  kbm_open_close(!b_show_win_kbm);
 }
 
 

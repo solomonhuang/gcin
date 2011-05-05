@@ -96,9 +96,10 @@ void exec_gcin_setup_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
   exec_gcin_setup();
 }
 
+void kbm_open_close(gboolean b_show);
 void kbm_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
-  kbm_toggle();
+  kbm_open_close(gtk_check_menu_item_get_active(checkmenuitem));
 }
 
 gint inmd_switch_popup_handler (GtkWidget *widget, GdkEvent *event);
@@ -133,7 +134,6 @@ void load_setttings(), load_tab_pho_file();;
 void update_win_kbm();
 void update_win_kbm_inited();
 extern gboolean win_kbm_inited, stat_enabled;
-void toggle_stat_win();
 static void cb_fast_phonetic_kbd_switch(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   char bak[128], cur[128];
@@ -194,10 +194,6 @@ GtkWidget *create_tray_menu(MITEM *mitems)
   }
 
   return menu;
-}
-
-void _null_cb(GtkCheckMenuItem *checkmenuitem, gpointer dat)
-{
 }
 
 void update_item_active(MITEM *mitems)
@@ -276,9 +272,10 @@ void toggle_half_full_char();
 static void cb_activate_state(GtkStatusIcon *status_icon, gpointer user_data)
 {
 //  dbg("cb_activate\n");
-  if (gcin_tray_hf_win_kbm)
+  if (gcin_tray_hf_win_kbm) {
     kbm_toggle();
-  else
+    update_item_active_all();
+  } else
     toggle_half_full_char();
 }
 
@@ -326,8 +323,10 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
           }
         }
 
-        gtk_widget_destroy(tray_menu_state);
-        tray_menu_state = NULL;
+        if (tray_menu_state) {
+          gtk_widget_destroy(tray_menu_state);
+          tray_menu_state = NULL;
+        }
       }
 
       if (!tray_menu_state)
@@ -376,14 +375,14 @@ void load_tray_icon_win32()
 
   char tt[32];
   if (current_CS && current_CS->im_state == GCIN_STATE_CHINESE && !tsin_pho_mode()) {
-	 if ((current_method_type()==method_type_TSIN || current_method_type()==method_type_MODULE)) {
-		strcpy(tt, "en-");
-		strcat(tt, iconame);
-     } else {
-		strcpy(tt, "en-tsin.png");
-     }
+    if ((current_method_type()==method_type_TSIN || current_method_type()==method_type_MODULE)) {
+      strcpy(tt, "en-");
+      strcat(tt, iconame);
+    } else {
+      strcpy(tt, "en-tsin.png");
+    }
 
-	 iconame = tt;
+    iconame = tt;
   }
 
 //  dbg("iconame %s\n", iconame);
@@ -401,23 +400,22 @@ void load_tray_icon_win32()
   if (current_CS && (current_CS->im_state == GCIN_STATE_ENG_FULL ||
       current_CS->im_state != GCIN_STATE_DISABLED && current_CS->b_half_full_char ||
       current_method_type()==method_type_TSIN && tss.tsin_half_full)) {
-		if (gb_output) {
-          icon_st="full-simp.png";
-		   tip = _L("全形/簡體輸出");
-		}
-		else {
-          icon_st="full-trad.png";
-		  tip = _L("全形/正體輸出");
-		}
+      if (gb_output) {
+        icon_st="full-simp.png";
+        tip = _L("全形/簡體輸出");
+      }
+      else {
+        icon_st="full-trad.png";
+        tip = _L("全形/正體輸出");
+      }
   } else {
-	  if (gb_output) {
-        icon_st="half-simp.png";
-		tip= _L("半形/簡體輸出");
-	  }
-	  else {
-        icon_st="half-trad.png";
-		tip = _L("半形/正體輸出");
-	  }
+    if (gb_output) {
+      icon_st="half-simp.png";
+      tip= _L("半形/簡體輸出");
+    } else {
+      icon_st="half-trad.png";
+      tip = _L("半形/正體輸出");
+    }
   }
 
   get_icon_path(icon_st, fname_state);

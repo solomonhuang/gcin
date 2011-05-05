@@ -231,6 +231,7 @@ void set_page_label(char *s)
   if (!label_page)
     return;
   gtk_label_set_text(GTK_LABEL(label_page), s);
+  gtk_widget_show(label_page);
 }
 
 void show_win_sym();

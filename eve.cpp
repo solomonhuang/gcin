@@ -1452,7 +1452,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
 int int_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
 int pho_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len);
 
-int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_comp_len)
+int gcin_get_preedit(ClientState *cs, char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *comp_flag)
 {
 //  dbg("gcin_get_preedit %x\n", current_CS);
   if (!current_CS) {
@@ -1464,23 +1464,23 @@ empty:
   }
 
   str[0]=0;
-  *sub_comp_len=0;
+  *comp_flag=0;
 
 //  cs->use_preedit = TRUE;
 
   switch(current_method_type()) {
     case method_type_PHO:
-		return pho_get_preedit(str, attr, cursor, sub_comp_len);
+      return pho_get_preedit(str, attr, cursor, comp_flag);
     case method_type_INT_CODE:
-		return int_get_preedit(str, attr, cursor, sub_comp_len);
+      return int_get_preedit(str, attr, cursor, comp_flag);
 #if USE_TSIN
     case method_type_TSIN:
-      return tsin_get_preedit(str, attr, cursor, sub_comp_len);
+      return tsin_get_preedit(str, attr, cursor, comp_flag);
 #endif
     case method_type_MODULE:
-      return module_cb()->module_get_preedit(str, attr, cursor);
+      return module_cb()->module_get_preedit(str, attr, cursor, comp_flag);
     default:
-      return gtab_get_preedit(str, attr, cursor, sub_comp_len);
+      return gtab_get_preedit(str, attr, cursor, comp_flag);
 //      dbg("metho %d\n", current_CS->in_method);
   }
 

@@ -912,6 +912,28 @@ static void cb_default_input_method()
 void create_about_window();
 void set_window_gcin_icon(GtkWidget *window);
 
+static gboolean timeout_minimize_main_window(gpointer data)
+{
+  gtk_window_resize(GTK_WINDOW(main_window), 32, 32);
+  return FALSE;
+}
+
+static void
+expander_callback (GObject    *object,
+                   GParamSpec *param_spec,
+                   gpointer    user_data)
+{
+  GtkExpander *expander;
+  expander = GTK_EXPANDER (object);
+
+  if (gtk_expander_get_expanded (expander)) {
+  } else {
+    // cannot do this here
+    // gtk_window_resize(GTK_WINDOW(main_window), 32, 32);
+    g_timeout_add(200, timeout_minimize_main_window, NULL);
+  }
+}
+
 static void create_main_win()
 {
   main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -950,7 +972,6 @@ static void create_main_win()
                     G_CALLBACK (cb_default_input_method), NULL);
 
 
-
   GtkWidget *button_alt_shift = gtk_button_new_with_label(_(_L("alt-shift 片語編輯")));
   gtk_box_pack_start (GTK_BOX (vbox), button_alt_shift, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_alt_shift), "clicked",
@@ -960,13 +981,6 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox), button_symbol_table, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_symbol_table), "clicked",
                     G_CALLBACK (cb_symbol_table), NULL);
-
-#if 0
-  GtkWidget *button_gb_output_toggle = gtk_button_new_with_label(_(_L("簡體字輸出切換")));
-  gtk_box_pack_start (GTK_BOX (vbox), button_gb_output_toggle, TRUE, TRUE, 0);
-  g_signal_connect (G_OBJECT (button_gb_output_toggle), "clicked",
-                    G_CALLBACK (cb_gb_output_toggle), NULL);
-#endif
 
   GtkWidget *button_gb_translate_toggle = gtk_button_new_with_label(_(_L("剪貼區 簡體字->正體字")));
   gtk_box_pack_start (GTK_BOX (vbox), button_gb_translate_toggle, TRUE, TRUE, 0);
@@ -978,15 +992,14 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_juying_learn_toggle), "clicked",
                     G_CALLBACK (cb_juying_learn), NULL);
 
-#if GTK_CHECK_VERSION(2,4,0)
   GtkWidget *expander_ts = gtk_expander_new (_(_L("詞庫選項")));
   gtk_box_pack_start (GTK_BOX (vbox), expander_ts, FALSE, FALSE, 0);
+  g_signal_connect (expander_ts, "notify::expanded",
+                  G_CALLBACK (expander_callback), NULL);
+
   GtkWidget *vbox_ts = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (expander_ts), vbox_ts);
-#else
-  GtkWidget *vbox_ts = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), vbox_ts, FALSE, FALSE, 0);
-#endif
+
 
   GtkWidget *button_ts_export = gtk_button_new_with_label(_(_L("詞庫匯出")));
   gtk_box_pack_start (GTK_BOX (vbox_ts), button_ts_export, FALSE, FALSE, 0);

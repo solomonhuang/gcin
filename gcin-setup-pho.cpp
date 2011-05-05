@@ -7,7 +7,7 @@ struct {
   int RL;
 } selkeys[]={
 {"123456789",0}, {"asdfghjkl;",0}, {"asdfzxcv",0},
-{"fdsavcxz",1}, {"rewfdsvcx",1}, {"fdsvcxrew",1}, {"5432167890", 1},
+{"fdsavcxz",1}, {"rewfdsvcx",1}, {"fdsvcxrew",1}, {"3825416790", 1},
 {NULL}
 };
 
