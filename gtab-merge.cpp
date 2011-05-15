@@ -21,14 +21,14 @@ int lineno;
 
 char *skip_spc(char *s)
 {
-	while ((*s==' ' || *s=='\t') && *s) s++;
-	return s;
+  while ((*s==' ' || *s=='\t') && *s) s++;
+   return s;
 }
 
 char *to_spc(char *s)
 {
-	while (*s!=' ' && *s!='\t' && *s) s++;
-	return s;
+  while (*s!=' ' && *s!='\t' && *s) s++;
+    return s;
 }
 
 void del_nl_spc(char *s)
@@ -217,6 +217,7 @@ int main(int argc, char **argv)
   inp->last_k_bitn = (((inp->key64 ? 64:32) / inp->keybits) - 1) * inp->keybits;
   dbg("inp->key64:%d\n", inp->key64);
 
+  u_int64_t keymask = KEY_MASK;
 
   fread(keymap, 1, th.KeyS, fr);
   fread(kname, CH_SZ, th.KeyS, fr);
@@ -370,7 +371,7 @@ int main(int argc, char **argv)
      cur_inmd->tbl[i].ch[0], cur_inmd->tbl[i].ch[1],
      cur_inmd->tbl[i].ch[2], cur_inmd->tbl[i].ch[3]);
 #endif
-    int kk = (key>>LAST_K_bitN) & 0x3f;
+    int kk = (key>>LAST_K_bitN) & keymask;
 
     if (!def1[kk]) {
       idx1[kk]=(gtab_idx1_t)i;

@@ -1,6 +1,7 @@
 #include "gcin.h"
 #include "config.h"
 #include "gcin-version.h"
+#include "gtab.h"
 #if UNIX
 #include <signal.h>
 #endif
@@ -271,13 +272,19 @@ void change_win_gtab_style();
 void update_item_active_all();
 void destroy_inmd_menu();
 void load_gtab_list(gboolean);
+void change_win1_font();
+void set_wselkey(char *s);
 
 static void reload_data()
 {
   dbg("reload_data\n");
   load_setttings();
+  if (current_method_type()==method_type_TSIN)
+    set_wselkey(pho_selkey);
+
 //  load_tsin_db();
   change_win0_style();
+  change_win1_font();
   change_win_gtab_style();
 //  change_win_pho_style();
   load_tab_pho_file();

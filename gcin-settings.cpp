@@ -83,7 +83,7 @@ void load_setttings()
   gcin_root_x = get_gcin_conf_int(GCIN_ROOT_X, 1600);
   gcin_root_y = get_gcin_conf_int(GCIN_ROOT_Y, 1200);
   gcin_pop_up_win = get_gcin_conf_int(GCIN_POP_UP_WIN, 1);
-  gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 0);
+  gcin_inner_frame = get_gcin_conf_int(GCIN_INNER_FRAME, 1);
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
   gcin_tray_hf_win_kbm = get_gcin_conf_int(GCIN_TRAY_HF_WIN_KBM, 0);
 #if UNIX
@@ -167,15 +167,15 @@ void load_setttings()
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
   gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);
-#if 1
+#if 0
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_BOTH);
-#elif 0
+#elif 1
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_ON_THE_SPOT);
 #else
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_OVER_THE_SPOT);
 #endif
 
-  gcin_on_the_spot_key = get_gcin_conf_int(GCIN_ON_THE_SPOT_KEY, 0);
+  gcin_on_the_spot_key = get_gcin_conf_int(GCIN_ON_THE_SPOT_KEY, 1);
   if (gcin_on_the_spot_key)
     gcin_edit_display = GCIN_EDIT_DISPLAY_ON_THE_SPOT;
 

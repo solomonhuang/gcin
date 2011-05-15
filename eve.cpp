@@ -599,6 +599,8 @@ extern char eng_full_str[], full_char_str[];
 void update_tray_icon(), load_tray_icon(), load_tray_icon_win32();
 static int current_gcin_win32_icon = -1;
 void restart_gcin0();
+extern void destroy_tray_win32();
+extern void destroy_tray_icon();
 
 #if TRAY_ENABLED
 #if UNIX
@@ -896,7 +898,6 @@ gboolean init_in_method(int in_no)
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
   set_tsin_pho_mode0(current_CS);
-  set_wselkey(pho_selkey);
   tsin_set_win1_cb();
 
   switch (inmd[in_no].method_type) {
@@ -905,6 +906,7 @@ gboolean init_in_method(int in_no)
       init_tab_pho();
       break;
     case method_type_TSIN:
+      set_wselkey(pho_selkey);
       current_CS->in_method = in_no;
       init_tab_pp(init_im);
       break;
@@ -931,6 +933,7 @@ gboolean init_in_method(int in_no)
       if (inmd[in_no].mod_cb_funcs->module_init_win(&gmf)) {
         current_CS->in_method = in_no;
         module_cb()->module_show_win();
+        set_wselkey(pho_selkey);
       } else {
         return FALSE;
       }
@@ -964,7 +967,7 @@ gboolean init_in_method(int in_no)
   if (inmd[current_CS->in_method].selkey) {
     set_wselkey(inmd[current_CS->in_method].selkey);
     gtab_set_win1_cb();
-    dbg("selkey %s\n", inmd[current_CS->in_method].selkey);
+//    dbg("aa selkey %s\n", inmd[current_CS->in_method].selkey);
   }
 
   update_in_win_pos();
@@ -1071,12 +1074,16 @@ void disp_win_kbm_capslock_init()
     win_kbm_disp_caplock();
 }
 
+void destroy_phrase_save_menu();
+
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
 {
 #if 0
   dbg("key press %x %x\n", keysym, kev_state);
 #endif
+  destroy_phrase_save_menu();
+
   disp_win_kbm_capslock();
   check_CS();
 
@@ -1543,6 +1550,11 @@ gboolean gcin_edit_display_ap_only()
   return current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
 }
 
+
+gboolean gcin_display_on_the_spot_key()
+{
+  return gcin_edit_display_ap_only() && gcin_on_the_spot_key;
+}
 
 void flush_edit_buffer()
 {

@@ -469,9 +469,11 @@ static int is_legal_char(int k)
 
 #define MAX_KEYS 32
 
+typedef u_short jp_t;
+
 static char keys[MAX_KEYS];
 static short int keysN;
-static u_short *jp;
+static jp_t *jp;
 static short int jpN=0;
 static short pageidx;
 
@@ -506,12 +508,11 @@ static void auto_hide()
   }
 }
 
-static void insert_jp(u_short rom_idx)
+static void insert_jp(jp_t rom_idx)
 {
-//  printf("append %d %s  cursor:%d\n", rom_idx, anthy_romaji_map[rom_idx].ro, cursor);
-  jp = trealloc(jp, u_short, jpN);
+  jp = trealloc(jp, jp_t, jpN);
   if (cursor < jpN)
-    memmove(jp+cursor+1, jp+cursor, jpN - cursor);
+    memmove(jp+cursor+1, jp+cursor, sizeof(jp[0]) * (jpN - cursor));
 
   jp[cursor]=rom_idx;
   cursor++;
@@ -570,7 +571,7 @@ static void parse_key()
     char *en = anthy_romaji_map[sendpre_i].en;
     int len =strlen(en);
     int nlen = keysN - len;
-    memmove(keys, keys+len, nlen);
+    memmove(keys, keys+len, sizeof(keys[0])*nlen);
     keys[nlen] = 0;
     keysN = nlen;
 
@@ -619,7 +620,7 @@ static void disp_input()
 {
   int i;
 
-  if (gcin_edit_display_ap_only())
+  if (gmf.mf_gcin_edit_display_ap_only())
     return;
 
   clear_seg_label();
@@ -664,7 +665,7 @@ static void delete_jpstr(int idx)
 {
   if (idx==jpN)
     return;
-  memmove(jp+idx, jp+idx+1, jpN-1-idx);
+  memmove(jp+idx, jp+idx+1, sizeof(jp[0])*(jpN-1-idx));
   jpN--;
 }
 
@@ -1355,6 +1356,7 @@ int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *c
     int idx;
     for(i=0;i < jpN; i++) {
       char *s=idx_hira_kata(jp[i], FALSE);
+
       int N = gmf.mf_utf8_str_N(s);
 //      dbg("%d]%s N:%d\n", i, s, N);
       if (gmf.mf_gcin_edit_display_ap_only() && i==cursor) {

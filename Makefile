@@ -10,8 +10,8 @@ gcin_gtab_o = gtab.o win-gtab.o gtab-util.o gtab-list.o gtab-buf.o
 
 GCIN_SO= gcin1.so gcin2.so
 
-OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o \
-     gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o \
+OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o about.o html-browser.o \
+     gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o phrase-save-menu.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o gtab-use-count.o \
      win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o gcin-module.o
 
@@ -28,7 +28,7 @@ OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
-OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o \
+OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
 	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o pho-kbm-name.o
 
@@ -105,6 +105,10 @@ PROGS_CV=kbmcv pin-juyin
 
 ifeq ($(USE_ANTHY),Y)
 GCIN_MODULE+=anthy-module.so
+endif
+
+ifeq ($(USE_CHEWING),Y)
+GCIN_MODULE+=chewing-module.so
 endif
 
 all:	$(PROGS) $(GCIN_MODULE) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
@@ -194,11 +198,7 @@ gcin-version.h:	VERSION.gcin
 	echo '#define GCIN_VERSION "'`cat VERSION.gcin`'"' > gcin-version.h
 
 gcin1_so += intcode.pico win-int.pico win-message.pico win-sym.pico \
-win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico
-
-ifeq ($(USE_ANTHY),Y)
-gcin1_so += gcin-module.pico
-endif
+win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico gcin-module.pico
 
 gcin1.so: $(gcin1_so) pho.o tsin.o eve.o gtab.o win-sym.o
 	$(CCLD) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)
@@ -212,8 +212,10 @@ anthy-module.so: $(anthy_module_so)
 	$(CCLD) $(SO_FLAGS) -o $@ $(anthy_module_so) $(LDFLAGS) -lanthy
 	ln -sf $(PWD)/$@ data
 
-#gtk_bug_fix.so: gtk_bug_fix.pico
-#	$(CC) $(SO_FLAGS) -o $@ gtk_bug_fix.pico
+chewing_module_so = chewing.pico
+chewing-module.so: $(chewing_module_so)
+	$(CCLD) $(SO_FLAGS) -o $@ $(chewing_module_so) $(LDFLAGS) -lchewing -I/usr/include/chewing
+	ln -sf $(PWD)/$@ data
 
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib

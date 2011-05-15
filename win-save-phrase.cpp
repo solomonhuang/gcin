@@ -127,8 +127,12 @@ void create_win_save_phrase(WSP_S *wsp, int wspN)
 {
 #if WIN32
   if (test_mode)
-	  return;
+    return;
 #endif
+
+  if (!wspN)
+    return;
+
   SAVE_SESS *sess = tzmalloc(SAVE_SESS, 1);
 
   GtkWidget *main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

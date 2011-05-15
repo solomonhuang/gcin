@@ -584,7 +584,7 @@ void create_kbm_window()
 
   GtkWidget *hbox_tsin_buffer_editing_mode = gtk_hbox_new(FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_buffer_editing_mode , TRUE, TRUE, 1);
-  GtkWidget *label_tsin_buffer_editing_mode = gtk_label_new(_(_L("\\鍵切換jkx鍵編輯模式")));
+  GtkWidget *label_tsin_buffer_editing_mode = gtk_label_new(_(_L("\\ 鍵切換jkx鍵編輯模式")));
   gtk_box_pack_start (GTK_BOX (hbox_tsin_buffer_editing_mode), label_tsin_buffer_editing_mode, TRUE, TRUE, 0);
   check_button_tsin_buffer_editing_mode = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_tsin_buffer_editing_mode), check_button_tsin_buffer_editing_mode, FALSE, FALSE, 0);

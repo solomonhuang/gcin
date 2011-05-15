@@ -15,6 +15,9 @@ ifeq ($(USE_ANTHY),Y)
 DATA+=../anthy-module.so
 endif
 
+ifeq ($(USE_CHEWING),Y)
+DATA+=../chewing-module.so
+endif
 
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 

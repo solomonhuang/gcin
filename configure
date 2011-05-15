@@ -9,6 +9,7 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "  --use_i18n=Y   : enable i18n"
     echo "  --use_tsin=N   : disable Tsin input method"
     echo "  --use_anthy=N  : disable Anthy input method"
+    echo "  --use_chewing=N: disable Chewing input method"
     echo "  --use_gcb=N    : disable gcb (gtk copy-paste buffer)"
     echo "  --use_qt3=N    : disable Qt3 immodule"
     echo "  --use_qt4=N    : disable Qt4 immodule"
@@ -50,6 +51,7 @@ use_i18n='N'
 use_tsin='Y'
 use_gcb='Y'
 use_anthy='Y'
+use_chewing='Y'
 use_qt3='N'
 use_qt4='Y'
 use_gtk3='Y'
@@ -73,6 +75,8 @@ for opt do
   --use_gcb=*) use_gcb=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_anthy*) use_anthy=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_chewing*) use_chewing=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_qt3*) use_qt3=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -128,9 +132,7 @@ else
 fi
 
 echo -n ".... Testing anthy    :  "
-
 USE_ANTHY=`pkg-config --libs anthy`
-
 if [ $? != 0 ]; then
   USE_ANTHY=N
   echo "It's ok if you don't want anthy support."
@@ -143,6 +145,22 @@ else
     echo "found."
   fi
 fi
+
+echo -n ".... Testing chewing   :  "
+USE_CHEWING=`pkg-config --libs chewing`
+if [ $? != 0 ]; then
+  USE_CHEWING=N
+  echo "It's ok if you don't want libchewing support."
+else
+  if [ $use_chewing = "N" ]; then
+    USE_CHEWING='N'
+    echo "disabled."
+  else
+    USE_CHEWING='Y'
+    echo "found."
+  fi
+fi
+
 
 LIB='lib'
 if [ -d /lib64 ]; then
@@ -291,6 +309,7 @@ echo "USE_TRAY=$use_tray" >> config.mak
 echo "USE_I18N=$use_i18n" >> config.mak
 echo "USE_TSIN=$use_tsin" >> config.mak
 echo "USE_ANTHY=$USE_ANTHY" >> config.mak
+echo "USE_CHEWING=$USE_CHEWING" >> config.mak
 echo "USE_GCB=$use_gcb" >> config.mak
 
 if [ $prefix = /usr ]; then

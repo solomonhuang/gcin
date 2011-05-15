@@ -114,9 +114,9 @@ static gboolean read_syms()
     bzero(tt, sizeof(tt));
     myfgets(tt, sizeof(tt), fp);
 //    dbg("%d] %s\n",strlen(tt), tt);
-    int len=strlen(tt);
 
 #if 0
+    int len=strlen(tt);
     if (!len)
       continue;
 

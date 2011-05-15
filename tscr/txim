@@ -9,12 +9,12 @@ export LC_CTYPE=zh_TW.UTF-8
 export XMODIFIERS=@im=gcin_test
 export GTK_IM_MODULE=xim
 locale
-../gcin.test &
+../gcin.test --g-fatal-warnings &
 gcinpid=$!
 sleep 1
-#gedit
+gedit
 #leafpad
 #amsn
 #ie6
-firefox
+#firefox
 pkill gcin.test

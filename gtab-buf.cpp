@@ -337,6 +337,8 @@ void inc_dec_tsin_use_count(void *pho, char *ch, int N);
 
 gboolean output_gbuf()
 {
+  hide_gtab_pre_sel();
+
   if (!ggg.gbufN)
     return FALSE;
 #if WIN32
@@ -910,7 +912,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
         attrN++;
       }
 
-      if (gcin_on_the_spot_key && i==ggg.gbuf_cursor)
+      if (gcin_display_on_the_spot_key() && i==ggg.gbuf_cursor)
         strN += get_DispInArea_str(str+strN);
 
       memcpy(str+strN, s, len);
@@ -919,7 +921,7 @@ int gtab_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *sub
   }
 
 
-  if (ap_only && gcin_on_the_spot_key && i==ggg.gbuf_cursor)
+  if (gcin_display_on_the_spot_key() && i==ggg.gbuf_cursor)
     strN += get_DispInArea_str(str+strN);
 
   str[strN]=0;
@@ -1152,7 +1154,7 @@ gboolean gtab_pre_select_idx(int c)
   gbuf[ggg.gbufN-1].flag |= FLAG_CHPHO_PHRASE_TAIL;
 
   hide_gtab_pre_sel();
-  if (gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT)
+  if (gcin_edit_display_ap_only())
     hide_win_gtab();
 
   return TRUE;

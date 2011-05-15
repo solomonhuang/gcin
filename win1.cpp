@@ -3,7 +3,8 @@
 #include "gst.h"
 #include "win1.h"
 
-static GtkWidget *gwin1, *frame;
+GtkWidget *gwin1;
+static GtkWidget *frame;
 static char *wselkey;
 static int wselkeyN;
 //Window xwin1;
@@ -68,8 +69,6 @@ void create_win1()
   gtk_widget_realize (gwin1);
 
 #if UNIX
-  GdkWindow *gdkwin1 = gtk_widget_get_window(gwin1);
-//  xwin1 = GDK_WINDOW_XWINDOW(gdkwin1);
   set_no_focus(gwin1);
 #else
   win32_init_win(gwin1);
@@ -77,6 +76,7 @@ void create_win1()
 
   g_signal_connect (G_OBJECT (gwin1), "scroll-event", G_CALLBACK (button_scroll_event_tsin), NULL);
 }
+
 
 void change_win1_font(), force_preedit_shift();
 
@@ -119,6 +119,7 @@ void create_win1_gui()
 {
   if (frame)
     return;
+//  dbg("create_win1_gui %s\n", wselkey);
 
   frame = gtk_frame_new(NULL);
   gtk_container_add (GTK_CONTAINER(gwin1), frame);
@@ -311,8 +312,8 @@ void disp_selections(int x, int y)
 
   if (x < 0) {
     x = win_x + win_xl - win1_xl;
-	if (x < win_x)
-		x = win_x;
+    if (x < win_x)
+      x = win_x;
   }
 
   if (x + win1_xl > dpy_xl)
@@ -323,7 +324,8 @@ void disp_selections(int x, int y)
 
   gtk_window_move(GTK_WINDOW(gwin1), x, y);
 #if WIN32
-  timeout_handle = g_timeout_add(50, timeout_minimize_win1, NULL);
+  if (!timeout_handle)
+    timeout_handle = g_timeout_add(50, timeout_minimize_win1, NULL);
 #endif
 
 #if UNIX
@@ -375,6 +377,8 @@ void destroy_win1()
 void change_win1_font()
 {
   int i;
+  if (!frame)
+    return;
 
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
@@ -396,11 +400,18 @@ void change_win1_font()
 
 void recreate_win1_if_nessary()
 {
-  if (!frame)
+//  dbg("%x %x\n", current_config(), c_config);
+
+  if (!gwin1)
     return;
 
-  dbg("%x %x\n", current_config(), c_config);
   if (current_config() != c_config) {
+    c_config = current_config();
+//    dbg("destroy frame\n");
+    bzero(labels_sele, sizeof(labels_sele));
+    bzero(labels_seleR, sizeof(labels_seleR));
+    bzero(eve_sele, sizeof(eve_sele));
+    bzero(eve_seleR, sizeof(eve_seleR));
     gtk_widget_destroy(frame); frame = NULL;
     create_win1_gui();
   }
@@ -409,6 +420,10 @@ void recreate_win1_if_nessary()
 
 void set_wselkey(char *s)
 {
-  wselkey = s;
-  wselkeyN = strlen(s);
+  if (!wselkey || strcmp(wselkey, s)) {
+    wselkey = s;
+    wselkeyN = strlen(s);
+    recreate_win1_if_nessary();
+//    dbg("set_wselkey %s\n", s);
+  }
 }

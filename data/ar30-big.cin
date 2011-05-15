@@ -1,7 +1,7 @@
 %gen_inp
 #######################################################################
 #                                                                     #
-#  ar30.cin for gcin (v0.21), 2008-11-23                              #
+#  ar30.cin for gcin (v0.22), 2011-05-15                              #
 #                                                                     #
 #  本 ar30.cin 原始檔案是由霍東靈 Anthony Fok <foka@debian.org>       #
 #  利用行列科技在 porting.exe 檔內提供之 array30.txt 及 arrayhw.txt   #
@@ -21,13 +21,13 @@
 #             在 Unicode 3.1 CJK 漢字的缺字，並解決原 gcin 官版行列   #
 #             簡碼少部分與行列輸入法規格書定義不一的情形。(gontera)   #
 #  2008-11-23 將字鍵統一成小寫之後，w8 羅馬數字的錯誤進行修正         #
+#  2011-05-15 重新定義 w+8 順序（數字）符號組                         #
 #######################################################################
 %ename array30
 %cname 行列30
 %selkey 1234567890
 %endkey 1234567890
 %space_style 2
-%phase_auto_skip_endkey
 %keyname begin
 a	1-
 b	5v
@@ -82193,9 +82193,9 @@ w8	〦
 w8	〧
 w8	〨
 w8	〩
-w8	〸
-w8	〹
-w8	〺
+w8	十
+w8	卄
+w8	卅
 w9	Α
 w9	Β
 w9	Γ
@@ -82266,7 +82266,7 @@ ibm	IBM
 linux	Linux
 gnome	GNOME
 kde	KDE
-pidg	pidgin
+gaim	gaim
 gcin	gcin
 xmms	xmms
 xine	xine

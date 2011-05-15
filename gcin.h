@@ -226,6 +226,7 @@ void change_win_fg_bg(GtkWidget *win, GtkWidget *label);
 void set_no_focus(GtkWidget *win);
 void change_win_bg(GtkWidget *win);
 gboolean gcin_edit_display_ap_only();
+gboolean gcin_display_ap_only_on_the_spot_key();
 void char_play(char *utf8);
 void skip_utf8_sigature(FILE *fp);
 #if WIN32

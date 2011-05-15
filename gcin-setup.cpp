@@ -8,6 +8,10 @@
 #include <libintl.h>
 #endif
 
+#if UNIX
+char utf8_edit[]=GCIN_SCRIPT_DIR"/utf8-edit";
+#endif
+
 static GtkWidget *check_button_root_style_use,
                  *check_button_gcin_pop_up_win,
                  *check_button_gcin_inner_frame,
@@ -225,11 +229,6 @@ static void cb_ts_import()
 #endif
 }
 
-#if UNIX
-char utf8_edit[]=GCIN_SCRIPT_DIR"/utf8-edit";
-char html_browse[]=GCIN_SCRIPT_DIR"/html-browser";
-#endif
-
 static void cb_ts_edit()
 {
 #if UNIX
@@ -294,19 +293,7 @@ static void cb_symbol_table()
 }
 
 
-int html_browser(char *fname)
-{
-#if WIN32
-  LONG r = (LONG)ShellExecuteA(NULL, "open", fname, NULL, NULL, SW_SHOWNORMAL);
-  return r;
-#else
-  char tt[256];
-  sprintf(tt, "%s %s", html_browse, fname);
-  dbg("%s\n", tt);
-  return system(tt);
-#endif
-}
-
+int html_browser(char *fname);
 
 static void cb_help()
 {
@@ -858,7 +845,7 @@ static void cb_gtab_conf()
 }
 
 
-
+#if 0
 static void cb_gb_output_toggle()
 {
   send_gcin_message(
@@ -868,7 +855,7 @@ static void cb_gb_output_toggle()
 	  GB_OUTPUT_TOGGLE);
   exit(0);
 }
-
+#endif
 
 static void cb_gb_translate_toggle()
 {

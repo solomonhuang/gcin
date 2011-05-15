@@ -19,10 +19,9 @@ static GtkWidget *hbox_edit;
 static PangoAttrList* attr_list, *attr_list_blank;
 extern gboolean test_mode;
 
-static void compact_win0();
+void compact_win0();
 void move_win0(int x, int y);
 void get_win0_geom();
-gboolean gcin_edit_display_ap_only();
 
 static struct {
   GtkWidget *vbox;
@@ -37,7 +36,7 @@ static GtkWidget *label_pho;
 extern char text_pho[];
 extern int text_pho_N;
 static GtkWidget *button_eng_ph;
-static int max_yl;
+//static int max_yl;
 
 static void create_win0_gui();
 
@@ -48,6 +47,19 @@ static void recreate_win0()
 
   create_win0_gui();
 }
+
+#if WIN32
+static int timeout_handle;
+gboolean timeout_minimize_win0(gpointer data)
+{
+  if (!gwin0)
+	return FALSE;
+  gtk_window_resize(GTK_WINDOW(gwin0), 10, 10);
+//  gtk_window_present(GTK_WINDOW(gwin0));
+  timeout_handle = 0;
+  return FALSE;
+}
+#endif
 
 
 #if USE_TSIN
@@ -74,11 +86,25 @@ void set_label_font_size();
 
 void drawcursor();
 void open_select_pho();
+void create_phrase_save_menu(GdkEventButton * event);
+
 static void mouse_char_callback( GtkWidget *widget,GdkEventButton *event, gpointer data)
 {
   tss.c_idx = GPOINTER_TO_INT(data);
   drawcursor();
-  open_select_pho();
+
+  switch (event->button) {
+    case 1:
+    case 2:
+      open_select_pho();
+      break;
+    case 3:
+    {
+      int len = tss.c_len - tss.c_idx;
+      create_phrase_save_menu(event);
+      break;
+    }
+  }
 }
 
 static void create_char(int index)
@@ -119,11 +145,6 @@ static void create_char(int index)
     gtk_widget_show_all(event_box);
   }
 }
-
-static void change_tsin_line_color()
-{
-}
-
 
 extern gboolean b_use_full_space;
 
@@ -210,7 +231,6 @@ void clr_tsin_cursor(int index)
 }
 
 void disp_pho_sub(GtkWidget *label, int index, char *pho);
-gboolean gcin_on_the_spot_key_is_on();
 void hide_win0();
 
 void disp_tsin_pho(int index, char *pho)
@@ -219,7 +239,7 @@ void disp_tsin_pho(int index, char *pho)
   if (test_mode)
     return;
 #endif
-  if (gcin_on_the_spot_key) {
+  if (gcin_display_on_the_spot_key()) {
     if (gwin0 && GTK_WIDGET_VISIBLE(gwin0))
       hide_win0();
     return;
@@ -291,6 +311,8 @@ void disp_tsin_select(int index)
   if (index < 0)
     return;
 
+//  dbg("gcin_edit_display_ap_only() %d\n", gcin_edit_display_ap_only());
+
   if (gcin_edit_display_ap_only()) {
     getRootXY(current_CS->client_win, current_CS->spot_location.x, current_CS->spot_location.y, &x, &y);
   } else {
@@ -337,6 +359,7 @@ static void raw_move(int x, int y)
 //  dbg("gwin0:%x raw_move %d,%d\n", gwin0, x, y);
 }
 
+#if 0
 void compact_win0_x()
 {
 #if WIN32
@@ -348,16 +371,31 @@ void compact_win0_x()
 
   gtk_window_resize(GTK_WINDOW(gwin0), 16, 16);
   raw_move(best_win_x, best_win_y);
+#if WIN32
+  if (!timeout_handle)
+	timeout_handle = g_timeout_add(50, timeout_minimize_win0, NULL);
+#endif
 }
+#endif
 
-static void compact_win0()
+void compact_win0()
 {
+#if WIN32
+  if (test_mode)
+    return;
+#endif
+
   if (!gwin0)
     return;
 
-  max_yl = 0;
+//  max_yl = 0;
   gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
   raw_move(best_win_x, best_win_y);
+
+#if WIN32
+  if (!timeout_handle)
+	timeout_handle = g_timeout_add(50, timeout_minimize_win0, NULL);
+#endif
 }
 
 gboolean tsin_has_input();
@@ -390,7 +428,7 @@ void move_win0(int x, int y)
   win_x = x;
   win_y = y;
 
-#if WIN32
+#if WIN32 && 0
   if (gwin1 && GTK_WIDGET_VISIBLE(gwin1)) {
     gtk_window_move(GTK_WINDOW(gwin1), x, y);
   }
@@ -399,7 +437,6 @@ void move_win0(int x, int y)
   move_win_sym();
 }
 
-GtkWidget *gwin1;
 
 void disp_tsin_eng_pho(int eng_pho)
 {
@@ -558,7 +595,7 @@ static void create_win0_gui()
 
   set_win0_bg();
 
-  change_win1_font();
+//  change_win1_font();
 }
 
 static void destroy_top_bin()
@@ -622,8 +659,9 @@ void show_win0()
     move_win0(win_x, win_y);
     gtk_widget_show(gwin0);
 #else
+	move_win0(win_x, win_y);
     gtk_widget_show(gwin0);
-    move_win0(win_x, win_y);
+//    move_win0(win_x, win_y);
 #endif
   }
 
@@ -647,6 +685,14 @@ void hide_win0()
 #endif
   if (!gwin0)
     return;
+
+#if WIN32
+  if (timeout_handle) {
+	  g_source_remove(timeout_handle);
+	  timeout_handle = 0;
+  }
+#endif
+
   gtk_widget_hide(gwin0);
   if (destroy_window)
     destroy_win0();
@@ -685,7 +731,7 @@ void change_tsin_font_size()
 
   compact_win0();
 
-  change_win1_font();
+//  change_win1_font();
 
   set_win0_bg();
 //  change_tsin_line_color();
@@ -725,7 +771,6 @@ void drawcursor();
 #if USE_TSIN
 void change_tsin_color()
 {
-  change_tsin_line_color();
   create_cursor_attr();
 
   drawcursor();

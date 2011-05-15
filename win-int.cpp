@@ -88,15 +88,6 @@ void clear_int_code(int index)
 }
 
 
-#if 0
-static void switch_intcode()
-{
-  current_intcode ^= 1;
-  adj_intcode_buttons();
-}
-#endif
-
-
 void clear_int_code_all()
 {
   int i;
@@ -110,6 +101,7 @@ void hide_win_int()
   if (!gwin_int)
     return;
   gtk_widget_hide(gwin_int);
+  dbg("hide_win_int\n");
 }
 
 extern gboolean force_show;
@@ -120,7 +112,7 @@ void move_win_int(int x, int y)
   if (!gwin_int)
     return;
 
-  dbg("move_win_int %d %d\n",x,y);
+//  dbg("move_win_int %d %d\n",x,y);
 
   gtk_window_get_size(GTK_WINDOW(gwin_int), &win_xl, &win_yl);
 
@@ -199,12 +191,16 @@ void create_win_intcode()
 
   adj_intcode_buttons();
   minimize_win();
+
+//  dbg("create %x\n",gwin_int);
 }
 
 void show_win_int()
 {
-  if (!gwin_int)
-    return;
+  if (!gwin_int) {
+    create_win_intcode();
+//    return;
+  }
 
 #if 0
   if (gcin_pop_up_win && !intcode_cin && !force_show)
@@ -216,10 +212,12 @@ void show_win_int()
 #endif
   {
     gtk_widget_show(gwin_int);
-    move_win_int(win_x, win_y);
   }
 
+//  dbg("show_win_int %x\n", gwin_int);
   gtk_widget_show(gwin_int);
+  move_win_int(win_x, win_y);
+  gtk_window_present(GTK_WINDOW(gwin_int));
 }
 
 

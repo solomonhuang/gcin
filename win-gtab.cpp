@@ -28,7 +28,7 @@ gboolean last_cursor_off;
 
 void set_label_space(GtkWidget *label);
 void minimize_win_gtab();
-gboolean win_size_exceed(GtkWidget *win), gtab_phrase_on(), gcin_edit_display_ap_only();
+gboolean win_size_exceed(GtkWidget *win), gtab_phrase_on();
 void move_win_gtab(int x, int y), toggle_win_sym();
 int win_gtab_max_key_press;
 
@@ -163,8 +163,14 @@ void show_win_gtab();
 
 void disp_gtab_sel(char *s)
 {
-  if (!label_gtab_sele)
-    return;
+//  dbg("disp_gtab_sel %s %x\n", s, label_gtab_sele);
+
+  if (!label_gtab_sele) {
+    if (s && *s)
+      show_win_gtab();
+    else
+      return;
+  }
 #if WIN32
   if (test_mode)
     return;
@@ -373,7 +379,7 @@ static void destroy_if_necessary()
           new_last_cursor_off == last_cursor_off &&
       current_gtab_vertical_select == gtab_vertical_select &&
       current_gtab_phrase_pre_select == gtab_phrase_pre_select &&
-      current_gcin_on_the_spot_key == current_gcin_on_the_spot_key &&
+      current_gcin_on_the_spot_key == gcin_on_the_spot_key &&
       current_gtab_disp_im_name == gtab_disp_im_name &&
       (new_need_label_edit && label_edit || !new_need_label_edit && !label_edit)
       )
@@ -500,7 +506,7 @@ void create_win_gtab_gui_simple()
     gtk_box_pack_start (GTK_BOX (hbox_row2), event_box_gtab, FALSE, FALSE, 0);
 
 
-  if (!gcin_on_the_spot_key) {
+  if (!gcin_display_on_the_spot_key()) {
     GtkWidget *frame_gtab = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame_gtab), GTK_SHADOW_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame_gtab), 0);
@@ -624,6 +630,9 @@ void show_win_gtab()
 #if UNIX
   gtk_widget_show(gwin_gtab);
 #endif
+
+  if (current_CS)
+    set_gtab_input_method_name(inmd[current_CS->in_method].cname);
 
   show_win_sym();
 }
