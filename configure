@@ -146,7 +146,7 @@ else
   fi
 fi
 
-echo -n ".... Testing chewing   :  "
+echo -n ".... Testing chewing  :  "
 USE_CHEWING=`pkg-config --libs chewing`
 if [ $? != 0 ]; then
   USE_CHEWING=N

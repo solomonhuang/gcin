@@ -163,7 +163,7 @@ void show_win_gtab();
 
 void disp_gtab_sel(char *s)
 {
-//  dbg("disp_gtab_sel %s %x\n", s, label_gtab_sele);
+//  dbg("disp_gtab_sel '%s' %x\n", s, label_gtab_sele);
 
   if (!label_gtab_sele) {
     if (s && *s)
@@ -763,7 +763,11 @@ void win_gtab_disp_half_full()
 
 void disp_gtab_pre_sel(char *s)
 {
-//  dbg("disp_gtab_pre_sel %s\n", s);
+  dbg("disp_gtab_pre_sel %s\n", s);
+  if (!label_gtab_pre_sel)
+	  show_win_gtab();
+
+  dbg("label_gtab_pre_sel %x %d\n", label_gtab_pre_sel, use_tsin_sel_win());
   gtk_widget_show(label_gtab_pre_sel);
   gtk_label_set_markup(GTK_LABEL(label_gtab_pre_sel), s);
   minimize_win_gtab();

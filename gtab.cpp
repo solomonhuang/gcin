@@ -1417,13 +1417,14 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
    if ((key==XK_Shift_L||key==XK_Shift_R) && !key_press_time) {
      key_press_time = current_time();
-	 key_press_time_ctrl = 0;
+     key_press_time_ctrl = 0;
    } else
   if ((key==XK_Control_L||key==XK_Control_R) && !key_press_time_ctrl && tss.pre_selN) {
     key_press_time_ctrl = current_time();
     return TRUE;
   } else {
     key_press_time_ctrl = 0;
+    key_press_time = 0;
   }
 
   if (kbstate & (Mod1Mask|Mod4Mask|Mod5Mask|ControlMask)) {

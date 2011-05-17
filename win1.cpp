@@ -208,7 +208,7 @@ void clear_sele()
   int i;
 
   if (!gwin1)
-    create_win1();
+    return;
 
   for(i=0; i < wselkeyN; i++) {
     gtk_widget_hide(labels_sele[i]);
@@ -292,6 +292,7 @@ void disp_selections(int x, int y)
 {
   if (!gwin1)
     p_err("disp_selections !gwin1");
+
 #if WIN32
   if (!GTK_WIDGET_VISIBLE(gwin1)) {
     gtk_widget_show(gwin1);

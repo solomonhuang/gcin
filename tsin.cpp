@@ -1224,13 +1224,23 @@ static gboolean pre_sel_handler(KeySym xkey)
 static gboolean pre_punctuation_sub(KeySym xkey, char shift_punc[], unich_t *chars[])
 {
   char *p;
+  if (xkey > 0x7e)
+    return;
+
   if ((p=strchr(shift_punc, xkey))) {
     int c = p - shift_punc;
     phokey_t key=0;
+    char *pchar = _(chars[c]);
 
-    add_to_tsin_buf(_(chars[c]), &key, 1);
-    if (tsin_cursor_end())
-      flush_tsin_buffer();
+    if (current_method_type() == method_type_PHO) {
+      char tt[CH_SZ+1];
+      utf8cpy(tt, pchar);
+      send_text(tt);
+    } else {
+      add_to_tsin_buf(pchar, &key, 1);
+      if (tsin_cursor_end())
+        flush_tsin_buffer();
+    }
     return 1;
   }
 
@@ -1238,7 +1248,7 @@ static gboolean pre_punctuation_sub(KeySym xkey, char shift_punc[], unich_t *cha
 }
 
 
-static gboolean pre_punctuation(KeySym xkey)
+gboolean pre_punctuation(KeySym xkey)
 {
   static char shift_punc[]="<>?:\"{}!_";
   static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("："),_L("；"),_L("『"),_L("』"),_L("！"),_L("——")};
@@ -1246,7 +1256,7 @@ static gboolean pre_punctuation(KeySym xkey)
 }
 
 static char hsu_punc[]=",./;'";
-static gboolean pre_punctuation_hsu(KeySym xkey)
+gboolean pre_punctuation_hsu(KeySym xkey)
 {
   static unich_t *chars[]={_L("，"),_L("。"),_L("？"),_L("；"),_L("、")};
   return pre_punctuation_sub(xkey, hsu_punc, chars);

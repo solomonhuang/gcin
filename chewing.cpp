@@ -7,9 +7,6 @@
 
 #include <chewing/chewing.h>
 
-// FIXME: change to use the correct DIRs
-#define DATADIR      "/usr/share/chewing"
-#define HASHDIR      "/tmp"
 #define MAX_SEG_NUM  128
 
 typedef struct _SEGMENT {
@@ -162,7 +159,23 @@ gcin_label_cand_show (char *pszWord, int nIdx)
 static gboolean
 chewing_initialize (void)
 {
-    chewing_Init (DATADIR, HASHDIR);
+    char *pszChewingHashDir;
+    char *pszHome;
+
+    pszHome = getenv ("HOME");
+    if (!pszHome)
+        pszHome = "";
+
+    pszChewingHashDir = malloc (strlen (pszHome) + strlen ("/.chewing/") + 1);
+    memset (pszChewingHashDir, 0x00, strlen (pszHome) + strlen ("/.chewing/") + 1);
+    sprintf (pszChewingHashDir, "%s/.chewing", pszHome);
+
+    if (chewing_Init (CHEWING_DATADIR, pszChewingHashDir) != 0)
+    {
+        free (pszChewingHashDir);
+        return FALSE;
+    }
+    free (pszChewingHashDir);
 
     g_pChewingCtx = chewing_new ();
     if (!g_pChewingCtx)

@@ -488,7 +488,20 @@ void init_tab_pho()
   clr_in_area_pho();
 }
 
+static char *pho_idx_str_markup(int ii)
+{
+  char *pho_str = pho_idx_str(ii);
+  if (!strcmp(pho_str, "<"))
+    pho_str = "&lt;";
+  else
+  if (!strcmp(pho_str, ">"))
+    pho_str = "&gt;";
+  return pho_str;
+}
+
+
 gboolean shift_char_proc(KeySym key, int kbstate);
+gboolean pre_punctuation(KeySym xkey);
 void pho_play(phokey_t key);
 void close_gtab_pho_win();
 
@@ -533,8 +546,9 @@ int feedkey_pho(KeySym xkey, int kbstate)
 
       goto llll3;
     case '<':
-       if (!poo.ityp3_pho)
-         return 0;
+       if (!poo.ityp3_pho) {
+         return pre_punctuation(xkey);
+       }
        if (poo.cpg >= phkbm.selkeyN)
          poo.cpg -= phkbm.selkeyN;
        goto proc_state;
@@ -579,7 +593,8 @@ int feedkey_pho(KeySym xkey, int kbstate)
         int ttlen = strlen(tt);
         memcpy(out_buffer+out_bufferN, tt, ttlen);
         out_bufferN+=ttlen;
-        int len = u8cpy(&out_buffer[out_bufferN], pho_idx_str(ii));
+        char *pstr = pho_idx_str_markup(ii);
+        int len = strlen(strcpy(&out_buffer[out_bufferN], pstr));
         out_bufferN+=len;
         out_buffer[out_bufferN++] = ' ';
 
@@ -588,9 +603,9 @@ int feedkey_pho(KeySym xkey, int kbstate)
       }
 
       char *tt;
-	  tt = poo.cpg ? "&lt;" : " ";
+      tt = poo.cpg ? "&lt;" : " ";
       int ttlen;
-	  ttlen = strlen(tt);
+      ttlen = strlen(tt);
       memcpy(out_buffer+out_bufferN, tt, ttlen);
       out_bufferN+=ttlen;
 
@@ -611,8 +626,10 @@ int feedkey_pho(KeySym xkey, int kbstate)
       if (xkey >= 127 || xkey < ' ')
         return 0;
 
-      if ((kbstate & ShiftMask))
-        return shift_char_proc(xkey, kbstate);
+      if ((kbstate & ShiftMask)) {
+//        return shift_char_proc(xkey, kbstate);
+        pre_punctuation(xkey);
+      }
 
       if ((pp=strchr(pho_selkey, xkey)) && poo.maxi && poo.ityp3_pho) {
         int c=pp-pho_selkey;
@@ -654,8 +671,10 @@ llll3:
 #if    0
   dbg("poo.typ_pho %d %d %d %d\n", poo.typ_pho[0], poo.typ_pho[1], poo.typ_pho[2], poo.typ_pho[3]);
 #endif
-  if (!key)
+  if (!key) {
+    pre_punctuation_hsu(xkey);
     return 1;
+  }
 
   pho_play(key);
 
@@ -733,7 +752,7 @@ proc_state:
       memcpy(out_buffer+out_bufferN, tt, ttlen);
       out_bufferN+=ttlen;
       strcat(out_buffer, tt);
-      char *pho_str = pho_idx_str(ii);
+      char *pho_str = pho_idx_str_markup(ii);
       int len = strlen(pho_str);
       memcpy(&out_buffer[out_bufferN], pho_str, len);
       out_bufferN+=len;
@@ -761,7 +780,7 @@ proc_state:
     poo.maxi=i;
   } else {
     while(i<phkbm.selkeyN  && ii < poo.stop_idx) {
-      char *pho_str = pho_idx_str(ii);
+      char *pho_str = pho_idx_str_markup(ii);
       int len = strlen(pho_str);
       memcpy(&out_buffer[out_bufferN], pho_str, len);
       out_bufferN+=len;

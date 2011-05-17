@@ -1045,10 +1045,12 @@ void get_win_gtab_geom();
 void disp_selections(int x, int y);
 
 gboolean use_tsin_sel_win();
+void init_tsin_selection_win();
 
 static int gtab_pre_select_phrase_len;
 
 void disp_gtab_pre_sel(char *s);
+extern GtkWidget *gwin1;
 
 void gtab_scan_pre_select(gboolean b_incr)
 {
@@ -1105,7 +1107,11 @@ void gtab_scan_pre_select(gboolean b_incr)
 //  dbg("selN %d %d\n",selN, tss.pre_selN);
 
   if (use_tsin_sel_win()) {
-    clear_sele();
+	if (gwin1)
+      clear_sele();
+	else
+      init_tsin_selection_win();
+
     int i;
     for(i=0;i<tss.pre_selN; i++)
        set_sele_text(tss.pre_selN,i,tss.pre_sel[i].str, -1);

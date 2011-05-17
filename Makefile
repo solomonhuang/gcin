@@ -109,6 +109,8 @@ endif
 
 ifeq ($(USE_CHEWING),Y)
 GCIN_MODULE+=chewing-module.so
+CHEWING_DATADIR=$(shell pkg-config --variable=datadir chewing)
+CFLAGS += -DCHEWING_DATADIR=\"$(CHEWING_DATADIR)\"
 endif
 
 all:	$(PROGS) $(GCIN_MODULE) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
