@@ -20,7 +20,7 @@ int main()
     if (strlen(tt) < 3)
       break;
 
-    char pin[7], ju[64];
+    char pin[16], ju[64];
     bzero(pin, sizeof(pin));
     sscanf(tt, "%s %s",pin, ju);
 

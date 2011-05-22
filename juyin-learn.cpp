@@ -10,12 +10,6 @@
 
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
-PIN_JUYIN *pin_juyin;
-int pin_juyinN;
-PHOKBM phkbm;
-PHO_ST poo;
-TSIN_ST tss;
-int text_pho_N;
 
 gboolean b_pinyin;
 
@@ -24,13 +18,6 @@ static GtkClipboard *pclipboard;
 GtkWidget *mainwin;
 GtkTextBuffer *buffer;
 
-void bell()
-{
-}
-
-void key_typ_pho(phokey_t phokey, u_char rtyp_pho[])
-{
-}
 
 void do_exit()
 {
@@ -48,31 +35,7 @@ void all_wrap()
   gtk_text_buffer_apply_tag_by_name (buffer, "char_wrap", &mstart, &mend);
 }
 
-char *phokey2pinyin(phokey_t k)
-{
-  static char tt[32];
-  phokey_t tonemask = 7;
-
-  int i;
-  for(i=0; i < pin_juyinN; i++) {
-
-    if ((k & ~tonemask) == pin_juyin[i].key)
-      break;
-  }
-
-  if (i==pin_juyinN)
-    strcpy(tt, "??");
-  else {
-static char tone[2];
-    tone[0] = (k & tonemask) + '0';
-    strcpy(tt, pin_juyin[i].pinyin);
-
-    if (tone[0]!='0')
-      strcat(tt, tone);
-  }
-
-  return tt;
-}
+char *phokey2pinyin(phokey_t k);
 
 static void selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
 {
@@ -140,6 +103,8 @@ void init_gcin_program_files();
 void init_TableDir();
 #endif
 
+gboolean is_pinyin_kbm();
+
 int main(int argc, char **argv)
 {
 #if WIN32
@@ -153,16 +118,7 @@ int main(int argc, char **argv)
   textdomain(GETTEXT_PACKAGE);
 #endif
 
-  char kbm_str[32];
-  get_gcin_conf_fstr(PHONETIC_KEYBOARD, kbm_str, "zo-asdf");
-#if 1
-  b_pinyin = strstr(kbm_str, "pinyin") != NULL;
-#else
-  b_pinyin = 1;
-#endif
-
-  if (b_pinyin)
-    load_pin_juyin();
+  b_pinyin = is_pinyin_kbm();
 
   pho_load();
 

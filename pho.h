@@ -24,7 +24,7 @@ typedef struct {
 
 
 typedef struct {
-  char pinyin[6];
+  char pinyin[7];
   phokey_t key;
 } PIN_JUYIN;
 

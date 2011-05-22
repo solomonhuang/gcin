@@ -151,5 +151,7 @@ int int_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_c
 #endif
 //  dbg("comp_len %x\n", *sub_comp_len);
 #endif
+  str[0]=0;
+  *cursor=0;
   return 0;
 }

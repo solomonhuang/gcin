@@ -72,6 +72,8 @@ void key_typ_pho(phokey_t phokey, u_char rtyp_pho[])
 
 void mask_key_typ_pho(phokey_t *key)
 {
+  if (poo.typ_pho[0] == BACK_QUOTE_NO)
+    return;
   if (!poo.typ_pho[0]) *key &= ~(31<<9);
   if (!poo.typ_pho[1]) *key &= ~(3<<7);
   if (!poo.typ_pho[2]) *key &= ~(15<<3);
@@ -144,6 +146,7 @@ int inph_typ_pho(KeySym newkey)
 
   if (poo.typ_pho[0]==BACK_QUOTE_NO) {
     poo.typ_pho[1]=(char)newkey;
+    poo.inph[1]=newkey;
     return PHO_STATUS_OK;
   }
 
@@ -274,8 +277,13 @@ static void disp_in_area_pho()
       disp_pho(i, &poo.inph[i]);
     }
   } else {
-    for(i=0;i<4;i++)
-      disp_pho(i, &pho_chars[i][poo.typ_pho[i]*3]);
+    for(i=0;i<4;i++) {
+      if (i==1 && poo.typ_pho[0]==BACK_QUOTE_NO) {
+        disp_pho(i, &poo.inph[1]);
+      }
+      else
+        disp_pho(i, &pho_chars[i][poo.typ_pho[i]*3]);
+    }
   }
 }
 
@@ -504,6 +512,7 @@ gboolean shift_char_proc(KeySym key, int kbstate);
 gboolean pre_punctuation(KeySym xkey);
 void pho_play(phokey_t key);
 void close_gtab_pho_win();
+gboolean pre_punctuation_hsu(KeySym xkey);
 
 int feedkey_pho(KeySym xkey, int kbstate)
 {
@@ -517,7 +526,7 @@ int feedkey_pho(KeySym xkey, int kbstate)
   int out_bufferN;
 
 
-  if (xkey >= 'A' && xkey <='Z')
+  if (xkey >= 'A' && xkey <='Z' && poo.typ_pho[0]!=BACK_QUOTE_NO)
     xkey+=0x20;
 
   switch (xkey) {
@@ -649,6 +658,7 @@ int feedkey_pho(KeySym xkey, int kbstate)
   }
 
   inph_typ_pho(xkey);
+//  dbg("typ_pho %x %x\n", poo.typ_pho[0], poo.typ_pho[1]);
 
   if (gcin_pop_up_win)
     show_win_pho();
@@ -692,7 +702,10 @@ llll3:
       vv++;
   }
 
+//  dbg("vv %d %d\n", vv, idxnum_pho);
+
   if (ttt > key || (poo.ityp3_pho && idx_pho[vv].key != key) ) {
+//    dbg("not found\n");
     while (jj<4) {
       while(kk<3)
         if (phkbm.phokbm[(int)poo.inph[jj]][kk].num ) {
@@ -725,10 +738,11 @@ proc_state:
   poo.start_idx = ii = idx_pho[vv].start;
   poo.stop_idx = idx_pho[vv+1].start;
 
-//   dbg("poo.start_idx: %d %d\n", poo.start_idx, poo.stop_idx);
+//  dbg("poo.start_idx: %d %d\n", poo.start_idx, poo.stop_idx);
 
-//  ClrSelArea();
-//  gotoxy(0,MROW-2);
+  if (poo.typ_pho[0]==L_BRACKET_NO||poo.typ_pho[0]==R_BRACKET_NO || poo.typ_pho[0]==BACK_QUOTE_NO && poo.typ_pho[1])
+     poo.ityp3_pho = 1;
+
   ii+=poo.cpg;
 
   if (poo.ityp3_pho && poo.stop_idx - poo.start_idx==1) {
@@ -856,6 +870,8 @@ int pho_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *sub_c
   if (gwin_pho && GTK_WIDGET_VISIBLE(gwin_pho))
     *sub_comp_len|=2;
 #endif
+  *cursor = 0;
+  str[0]=0;
   return 0;
 }
 

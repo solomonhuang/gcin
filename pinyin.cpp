@@ -27,8 +27,8 @@ gboolean pin2juyin(gboolean full_match)
     if (pinN < inphN)
       continue;
 
-	if (full_match && pinN != inphN)
-		continue;
+    if (full_match && pinN != inphN)
+      continue;
 
     if (!memcmp(pin, poo.inph, inphN)) {
 //      dbg("pin %s %s\n", pin, poo.inph);
@@ -54,7 +54,7 @@ gboolean pin2juyin(gboolean full_match)
 
 gboolean inph_typ_pho_pinyin(int newkey)
 {
-  int i;
+  int i=0;
 
 //  dbg("inph_typ_pho_pinyin '%c'\n", newkey);
 
@@ -123,7 +123,7 @@ void load_pin_juyin()
   char pinfname[128];
 
   get_sys_table_file_name("pin-juyin.xlt", pinfname);
-  dbg("pinyin kbm %s\n", pinfname);
+//  dbg("pinyin kbm %s\n", pinfname);
 
   FILE *fr;
   if ((fr=fopen(pinfname,"rb"))==NULL)

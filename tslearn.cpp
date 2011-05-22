@@ -5,6 +5,7 @@
 #include <libintl.h>
 #endif
 
+gboolean b_pinyin;
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
 
@@ -233,7 +234,9 @@ GtkWidget *create_pho_sel_area()
 
     int j;
     for(j=0; j < bigpho[i].phokeysN; j++) {
-      char *phostr = phokey_to_str(bigpho[i].phokeys[j]);
+      char *phostr = b_pinyin?
+      phokey2pinyin(bigpho[i].phokeys[j]):
+      phokey_to_str(bigpho[i].phokeys[j]);
 
 #if GTK_CHECK_VERSION(2,4,0)
       gtk_combo_box_append_text (GTK_COMBO_BOX_TEXT (bigpho[i].opt_menu), phostr);
@@ -326,6 +329,8 @@ void init_gcin_program_files();
 
 int main(int argc, char **argv)
 {
+  b_pinyin = is_pinyin_kbm();
+
   gtk_init (&argc, &argv);
 
   load_setttings();

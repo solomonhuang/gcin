@@ -16,16 +16,19 @@ OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o about.
      win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o gcin-module.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
-             table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o
-OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o \
+             table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o  \
+             pho2pinyin.o pinyin.o
+OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o pho2pinyin.o \
                  gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o pho-dbg.o
 OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o gcin-icon.o
 OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o locale.o \
              gcin-settings.o util.o
-OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o
+OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o \
+pinyin.o pho2pinyin.o pho-dbg.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o util.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
-OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o
+OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o pho2pinyin.o \
+	gcin-conf.o pinyin.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
 OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \

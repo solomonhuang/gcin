@@ -13,6 +13,7 @@ void init_gcin_program_files();
 #endif
 
 void get_keymap_str(u_int64_t k, char *keymap, int keybits, char tkey[]);
+char *phokey2pinyin(phokey_t k);
 
 int main(int argc, char **argv)
 {
@@ -29,10 +30,13 @@ int main(int argc, char **argv)
     exit(1);
   }
 
+  gboolean b_pinyin = is_pinyin_kbm();
+
   for(i=1; i < argc;) {
     if (!strcmp(argv[i], "-nousecount")) {
       i++;
       pr_usecount = FALSE;
+      b_pinyin = FALSE;
     } else
     if (!strcmp(argv[i], "-o")) {
       if (i==argc-1)
@@ -52,7 +56,11 @@ int main(int argc, char **argv)
     fp_out = fopen(fname_out, "w");
     if (!fp_out)
       p_err("cannot create %s\n", fname_out);
+
   }
+
+  if (b_pinyin)
+    fprintf(fp_out, "!!pinyin\n");
 
   if ((fp=fopen(fname,"rb"))==NULL)
     p_err("Cannot open %s", argv[1]);
@@ -114,9 +122,14 @@ int main(int argc, char **argv)
 
     fprintf(fp_out, " ");
     for(i=0;i<clen;i++) {
-      if (phsz==2)
-        prph2(fp_out, phbuf[i]);
-      else {
+      if (phsz==2) {
+        if (b_pinyin) {
+          char *t = phokey2pinyin(phbuf[i]);
+//          dbg("z %s\n", t);
+          fprintf(fp_out, t);
+        } else
+          prph2(fp_out, phbuf[i]);
+      } else {
         u_int64_t k;
         if (phsz==4)
           k = phbuf32[i];
