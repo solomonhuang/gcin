@@ -18,18 +18,26 @@ char *pho_phrase_area;
 int pho_phrase_area_sz;
 static char pho_normal_tab[]="pho.tab2";
 static char pho_huge_tab[]="pho-huge.tab2";
+static char s_pho_normal_tab[]="s-pho.tab2";
+static char s_pho_huge_tab[]="s-pho-huge.tab2";
 void update_table_file(char *name, int version);
+extern gboolean is_chs;
 
 void pho_load()
 {
-  char *pho_tab = phonetic_huge_tab ? pho_huge_tab:pho_normal_tab;
+  char *pho_tab;
+
+  if (is_chs) {
+    pho_tab = phonetic_huge_tab ? s_pho_huge_tab:s_pho_normal_tab;
+  } else
+    pho_tab = phonetic_huge_tab ? pho_huge_tab:pho_normal_tab;
 
   if (!getenv("GCIN_TABLE_DIR") && phonetic_char_dynamic_sequence) {
     get_gcin_user_fname(pho_tab, phofname);
 #if UNIX
     if (access(phofname, W_OK) < 0){
 #else
-	if (_access(phofname, 02) < 0){
+    if (_access(phofname, 02) < 0){
 #endif
       char sys_file[256], vv[256];
 

@@ -518,6 +518,8 @@ void screen_size_changed(GdkScreen *screen, gpointer user_data)
 	get_dpy_xyl();
 }
 
+#include "lang.h"
+
 int main(int argc, char **argv)
 {
 #if UNIX
@@ -550,13 +552,12 @@ int main(int argc, char **argv)
   init_gcin_im_serv();
 #endif
 
-#if USE_XIM
+  set_is_chs();
+
+#if UNIX
   char *lc_ctype = getenv("LC_CTYPE");
   char *lc_all = getenv("LC_ALL");
   char *lang = getenv("LANG");
-
-  dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s  LANG=%s\n", lc_ctype, lc_all, lang);
-
   if (!lc_ctype && lang)
     lc_ctype = lang;
 
@@ -565,7 +566,10 @@ int main(int argc, char **argv)
 
   if (!lc_ctype)
     lc_ctype = "zh_TW.Big5";
+  dbg("gcin get env LC_CTYPE=%s  LC_ALL=%s  LANG=%s\n", lc_ctype, lc_all, lang);
+#endif
 
+#if USE_XIM
   char *t = strchr(lc_ctype, '.');
   if (t) {
     int len = t - lc_ctype;
@@ -579,13 +583,10 @@ int main(int argc, char **argv)
   else
     lc = lc_ctype;
 
-
   char *xim_server_name = get_gcin_xim_name();
 
   strcpy(xim_arr[0].xim_server_name, xim_server_name);
-#endif
 
-#if USE_XIM
   dbg("gcin XIM will use %s as the default encoding\n", lc_ctype);
 #endif
 

@@ -4,11 +4,13 @@
 #if GCIN_i18n_message
 #include <libintl.h>
 #endif
+#include "lang.h"
 
+char *phokey2pinyin(phokey_t k);
 gboolean b_pinyin;
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
-
+extern gboolean is_chs;
 
 GtkWidget *mainwin;
 GtkTextBuffer *buffer;
@@ -37,7 +39,12 @@ void load_ts_phrase()
   phraseN = 0;
 
   get_gcin_dir(fname);
-  strcat(fname,"/tsin32");
+#if UNIX
+  strcat(fname, "/");
+#else
+  strcat(fname, "\\");
+#endif
+  strcat(fname, tsin32_f);
 
   if ((fp=fopen(fname, "rb"))==NULL) {
     printf("Cannot open %s", fname);
@@ -327,8 +334,11 @@ void init_gcin_program_files();
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
+gboolean is_pinyin_kbm();
+
 int main(int argc, char **argv)
 {
+  set_is_chs();
   b_pinyin = is_pinyin_kbm();
 
   gtk_init (&argc, &argv);

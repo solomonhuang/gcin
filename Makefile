@@ -13,11 +13,11 @@ GCIN_SO= gcin1.so gcin2.so
 OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o about.o html-browser.o \
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o phrase-save-menu.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o gtab-use-count.o \
-     win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o gcin-module.o
+     win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o gcin-module.o lang.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o  \
-             pho2pinyin.o pinyin.o
+             pho2pinyin.o pinyin.o lang.o
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o pho2pinyin.o \
                  gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o pho-dbg.o
 OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o gcin-icon.o
@@ -25,14 +25,14 @@ OBJS_phod2a=phod2a.o pho-util.o gcin-conf.o pho-sym.o table-update.o pho-dbg.o l
              gcin-settings.o util.o
 OBJS_tsa2d32=tsa2d32.o gcin-send.o util.o pho-sym.o gcin-conf.o locale.o pho-lookup.o \
 pinyin.o pho2pinyin.o pho-dbg.o
-OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o util.o
+OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o util.o pho-dbg.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o pho2pinyin.o \
 	gcin-conf.o pinyin.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
-OBJS_gcin_steup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \
-	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o \
+OBJS_gcin_setup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \
+	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o lang.o \
 	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o pho-kbm-name.o
 
 OBJS_gcin_gb_toggle = gcin-gb-toggle.o gcin-conf.o util.o gcin-send.o
@@ -42,7 +42,7 @@ OBJS_gcin_message = gcin-message.o gcin-conf.o util.o gcin-send.o
 OBJS_pin_juyin = pin-juyin.o util.o pho-lookup.o locale.o pho-sym.o
 
 OBJS_tsin2gtab_phrase = tsin2gtab-phrase.o gcin-conf.o util.o locale.o \
-	pho-dbg.o pho-sym.o gtab-dbg.o
+	pho-dbg.o pho-sym.o gtab-dbg.o lang.o
 
 #WALL=-Wall
 CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -I./im-client -DDEBUG="0$(GCIN_DEBUG)" \
@@ -149,9 +149,9 @@ sim2trad:        $(OBJS_sim2trad)
 trad2sim:	sim2trad
 	ln -sf sim2trad trad2sim
 
-gcin-setup:     $(OBJS_gcin_steup) im-client/libgcin-im-client.so
+gcin-setup:     $(OBJS_gcin_setup) im-client/libgcin-im-client.so
 	rm -f core.*
-	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_steup) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_setup) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 phoa2d: $(OBJS_phoa2d) im-client/libgcin-im-client.so
 	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_phoa2d) -L./im-client -lgcin-im-client $(LDFLAGS)

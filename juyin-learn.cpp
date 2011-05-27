@@ -11,7 +11,7 @@
 GtkWidget *hbox_buttons;
 char current_str[MAX_PHRASE_LEN*CH_SZ+1];
 
-gboolean b_pinyin;
+gboolean b_pinyin, is_chs;
 
 static GtkClipboard *pclipboard;
 

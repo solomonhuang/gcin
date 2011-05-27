@@ -7,6 +7,7 @@
 #include "tsin.h"
 #include "gtab.h"
 #include "gst.h"
+#include "lang.h"
 
 int hashidx[TSIN_HASH_N];
 //static int *phidx;
@@ -103,10 +104,13 @@ void free_tsin()
   }
 }
 
+extern gboolean is_chs;
 void load_tsin_db()
 {
   char tsfname[512];
-  get_gcin_user_or_sys_fname("tsin32", tsfname);
+  char *fname = tsin32_f;
+
+  get_gcin_user_or_sys_fname(fname, tsfname);
   load_tsin_db0(tsfname, FALSE);
 }
 #endif

@@ -1,6 +1,8 @@
 #include "gcin.h"
 #include "gtab.h"
 
+extern gboolean is_chs;
+
 int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
 int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en;
 int gcin_win_color_use;
@@ -189,7 +191,10 @@ void load_setttings()
     strcpy(phokbm, gcin_pho_kbm);
   else
 #endif
-    get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm, "zo "ASDF" 1 1");
+  {
+    char *kbm_str = is_chs?"zo "ASDF" 1 1":"pinyin "ASDF" 1 1";
+    get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm, kbm_str);
+  }
 
   char phokbm_name[32], selkey[32];
   pho_candicate_col_N=0; pho_candicate_R2L=0;

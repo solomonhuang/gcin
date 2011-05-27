@@ -1225,7 +1225,7 @@ static gboolean pre_punctuation_sub(KeySym xkey, char shift_punc[], unich_t *cha
 {
   char *p;
   if (xkey > 0x7e)
-    return;
+    return FALSE;
 
   if ((p=strchr(shift_punc, xkey))) {
     int c = p - shift_punc;

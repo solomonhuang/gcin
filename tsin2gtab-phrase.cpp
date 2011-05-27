@@ -3,12 +3,14 @@
 #include "gtab.h"
 // #include "gtab-phrase-db.h"
 #include "tsin.h"
+#include "lang.h"
 
 #define MAX_K (500000)
 
 ITEM it[MAX_K];
 ITEM64 it64[MAX_K];
 gboolean key64;
+extern gboolean is_chs;
 int itN;
 
 int qcmp_ch(const void *aa, const void *bb)
@@ -191,7 +193,7 @@ int main(int argc, char **argv)
   fclose(fr);
 
   char fname[128];
-  get_gcin_user_fname("tsin32", fname);
+  get_gcin_user_fname(tsin32_f, fname);
 
   u_int mask = ((1 << th.keybits) - 1);
 

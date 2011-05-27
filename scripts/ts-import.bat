@@ -5,5 +5,5 @@ set gcin_user=%APPDATA_GCIN%
 
 cd /d %gcin_user%
 copy %1 tmpfile
-%gcin_bin%\tsd2a32 tsin32 >> tmpfile
-%gcin_bin%\tsa2d32 tmpfile
+%gcin_bin%\tsd2a32 %2 >> tmpfile
+%gcin_bin%\tsa2d32 tmpfile %2

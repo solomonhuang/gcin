@@ -170,7 +170,8 @@ fi
 QT_IM='N'
 QT_IM_DIR=/usr/$LIB/qt3/plugins/inputmethods
 echo "testing if you have qt3 support"
-if [ -d  $QT_IM_DIR ]; then
+pkg-config --libs qt-mt > /dev/null 2> /dev/null
+if [ $? = 0 ]; then
   QT_IM='Y'
 fi
 
@@ -189,7 +190,8 @@ fi
 QT4_IM='N'
 QT4_IM_DIR=/usr/$LIB/qt4/plugins/inputmethods
 echo "testing if you have qt4 support"
-if [ -d  $QT4_IM_DIR ]; then
+pkg-config --libs QtCore QtGui > /dev/null 2> /dev/null
+if [ $? = 0 ]; then
   QT4_IM='Y'
 fi
 

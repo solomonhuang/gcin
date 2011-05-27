@@ -7,6 +7,9 @@
 #if GCIN_i18n_message
 #include <libintl.h>
 #endif
+#include "lang.h"
+
+extern gboolean is_chs;
 
 #if UNIX
 char utf8_edit[]=GCIN_SCRIPT_DIR"/utf8-edit";
@@ -18,7 +21,7 @@ static GtkWidget *check_button_root_style_use,
 #if TRAY_ENABLED
                  *check_button_gcin_status_tray,
                  *check_button_gcin_win32_icon,
-		     *check_button_gcin_tray_hf_win_kbm,
+                 *check_button_gcin_tray_hf_win_kbm,
 #endif
                  *check_button_gcin_win_color_use,
                  *check_button_gcin_on_the_spot_key;
@@ -29,6 +32,7 @@ static GtkClipboard *pclipboard;
 static GtkWidget *opt_gcin_edit_display;
 GtkWidget *main_window;
 static GdkColor gcin_win_gcolor_fg, gcin_win_gcolor_bg, gcin_sel_key_gcolor;
+
 
 typedef struct {
   GdkColor *color;
@@ -97,6 +101,7 @@ static void create_result_win(int res, char *cmd)
     strcpy(tt, _(_L("結果成功")));
 
   main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_position(GTK_WINDOW(main_window), GTK_WIN_POS_MOUSE);
   gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), FALSE);
 
   GtkWidget *button = gtk_button_new_with_label(tt);
@@ -125,7 +130,7 @@ static void cb_ts_export()
        char *filename=inmd[default_input_method].filename;
 
        if (default_input_method==6)
-         get_gcin_user_fname("tsin32", fname);
+         get_gcin_user_fname(tsin32_f, fname);
        else
        if (filename) {
          char tt[256];
@@ -157,8 +162,8 @@ static void ts_import(const gchar *selected_filename)
 #if UNIX
    if (default_input_method==6) {
      snprintf(cmd, sizeof(cmd),
-        "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile",
-        getenv("HOME"), selected_filename);
+        "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a32 %s > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile %s",
+        getenv("HOME"), tsin32_f, selected_filename, tsin32_f);
      int res = system(cmd);
      res = 0;
      create_result_win(res, cmd);
@@ -170,9 +175,9 @@ static void ts_import(const gchar *selected_filename)
    }
 #else
    if (default_input_method==6)
-     win32exec_script("ts-import.bat", (char *)selected_filename);
+     win32exec_script_va("ts-import.bat", (char *)selected_filename, tsin32_f, NULL);
    else {
-	 win32exec_script_va("ts-gtab-import.bat", inmd[default_input_method].filename,  selected_filename, NULL);
+     win32exec_script_va("ts-gtab-import.bat", inmd[default_input_method].filename,  selected_filename, NULL);
    }
 #endif
 }
@@ -234,7 +239,8 @@ static void cb_ts_edit()
 #if UNIX
   if (default_input_method==6) {
     char tt[512];
-    sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile ) &", utf8_edit);
+    sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 %s > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile %s) &",
+      tsin32_f, utf8_edit, tsin32_f);
     dbg("exec %s\n", tt);
     system(tt);
   } else {
@@ -244,7 +250,7 @@ static void cb_ts_edit()
   }
 #else
   if (default_input_method==6)
-    win32exec_script("ts-edit.bat");
+    win32exec_script("ts-edit.bat", tsin32_f);
   else {
     win32exec_script("ts-gtab-edit.bat", inmd[default_input_method].filename);
   }
@@ -256,11 +262,12 @@ static void cb_ts_import_sys()
 {
 #if UNIX
   char tt[512];
-  sprintf(tt, "cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 tsin32 > tmpfile && "GCIN_BIN_DIR"/tsd2a32 %s/tsin32 >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile", GCIN_TABLE_DIR);
+  sprintf(tt, "cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 %s > tmpfile && "GCIN_BIN_DIR"/tsd2a32 %s/%s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile",
+    tsin32_f, GCIN_TABLE_DIR, tsin32_f);
   dbg("exec %s\n", tt);
   system(tt);
 #else
-  win32exec_script("ts-import-sys.bat");
+  win32exec_script("ts-import-sys.bat", tsin32_f);
 #endif
 }
 
@@ -1052,6 +1059,7 @@ void init_gcin_program_files();
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
+
 int main(int argc, char **argv)
 {
 //  char *messages=getenv("LC_MESSAGES");
@@ -1060,6 +1068,10 @@ int main(int argc, char **argv)
   if (!(ctype && strstr(ctype, "zh_CN")))
     putenv("LANGUAGE=zh_TW.UTF-8");
 #endif
+
+  set_is_chs();
+
+
 #if UNIX
   setenv("GCIN_BIN_DIR", GCIN_BIN_DIR, TRUE);
   setenv("UTF8_EDIT", utf8_edit, TRUE);

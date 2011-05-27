@@ -17,7 +17,7 @@ fi
 
 cd $1 || echo "$1 is not a gcin table dir"
 
-for i in pho.tab2 pho-huge.tab2 tsin* symbol-table phrase.table
+for i in pho.tab2 pho-huge.tab2 s-pho.tab2 s-pho-huge.tab2 tsin* s-tsin* symbol-table phrase.table
 do
   if [ ! -f ~/.gcin/$i ]; then
      cp $i ~/.gcin

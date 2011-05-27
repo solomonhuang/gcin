@@ -11,6 +11,9 @@
 #include "gtab.h"
 #include "gst.h"
 
+void load_pin_juyin();
+phokey_t pinyin2phokey(char *s);
+
 static char *bf;
 static int bfN_a = 0;
 static gboolean b_pinyin;

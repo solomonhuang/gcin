@@ -32,6 +32,17 @@ int qcmp_key(const void *aa, const void *bb)
 }
 
 
+int qcmp_key_del(const void *aa, const void *bb)
+{
+  PHITEM *a=(PHITEM *)aa;
+  PHITEM *b=(PHITEM *)bb;
+
+  int d;
+  if ((d=a->key - b->key))
+    return a->key - b->key;
+
+  return memcmp(a->ch, b->ch, CH_SZ);
+}
 
 void send_gcin_message(Display *dpy, char *s);
 
@@ -109,9 +120,30 @@ int main(int argc, char **argv)
 
   fclose(fp);
 
-  qsort(items, itemsN, sizeof(PHITEM), qcmp_key);
 
+  qsort(items, itemsN, sizeof(PHITEM), qcmp_key_del);
   int i;
+
+#if 1
+  int newN = 1;
+  for(i=1;i<itemsN;i++)
+    if (qcmp_key_del(&items[i-1], &items[i]))
+      items[newN++] = items[i];
+    else {
+#if 0
+      prph(items[i].key);
+      utf8_putchar((char *)items[i].ch);
+      dbg("\n");
+#endif
+    }
+
+  if (itemsN != newN) {
+    dbg("deleted %d %d\n",itemsN, newN);
+    itemsN = newN;
+  }
+#endif
+
+  qsort(items, itemsN, sizeof(PHITEM), qcmp_key);
 
   PHO_IDX pho_idx[3000];
   u_short pho_idxN=0;
@@ -163,12 +195,14 @@ int main(int argc, char **argv)
 
   fclose(fp);
 
-  if (reload)
+  if (reload) {
+    gtk_init(&argc, &argv);
     send_gcin_message(
 #if UNIX
 	GDK_DISPLAY(),
 #endif
 	"reload");
+  }
 
   return 0;
 }

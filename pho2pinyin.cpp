@@ -52,6 +52,7 @@ static char tone[2];
   return tt;
 }
 
+void load_pin_juyin();
 
 gboolean is_pinyin_kbm()
 {

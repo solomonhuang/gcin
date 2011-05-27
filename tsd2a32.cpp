@@ -14,6 +14,7 @@ void init_gcin_program_files();
 
 void get_keymap_str(u_int64_t k, char *keymap, int keybits, char tkey[]);
 char *phokey2pinyin(phokey_t k);
+gboolean is_pinyin_kbm();
 
 int main(int argc, char **argv)
 {

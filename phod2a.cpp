@@ -7,6 +7,7 @@
 #include "pho.h"
 #include "gcin-conf.h"
 
+gboolean is_chs;
 
 int main(int argc, char **argv)
 {

@@ -22,7 +22,12 @@ char gcin_table[128];
 strcat(strcpy(gcin_table, getenv("GCIN_DIR")), "\\table");
 char *app_gcin=getenv("APPDATA_GCIN");
 
-char *files[]={"pho.tab2", "pho-huge.tab2", "tsin32", "tsin32.idx", "symbol-table", "phrase.table"};
+char *files[]={
+"pho.tab2", "pho-huge.tab2",
+"s-pho.tab2", "s-pho-huge.tab2",
+"tsin32", "tsin32.idx",
+"s-tsin32", "s-tsin32.idx",
+"symbol-table", "phrase.table"};
 for(int i=0; i < sizeof(files)/sizeof(files[0]); i++) {
 	char src[MAX_PATH], dest[MAX_PATH];
 	sprintf(src, "%s\\%s", gcin_table, files[i]);

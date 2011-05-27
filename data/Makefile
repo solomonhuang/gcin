@@ -9,7 +9,7 @@ DATA=pho.tab2 tsin32.idx \
      et.kbm et26.kbm zo.kbm pinyin.kbm dvorak.kbm mitac.kbm colemak.kbm \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab2 simplex.gtab symbols.gtab russian.gtab \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
-     t2s.dat s2t.dat cj543.gtab
+     t2s.dat s2t.dat cj543.gtab s-tsin32 s-tsin32.idx s-pho.tab2 s-pho-huge.tab2
 
 ifeq ($(USE_ANTHY),Y)
 DATA+=../anthy-module.so
@@ -25,13 +25,24 @@ all:	$(DATA)
 
 tsin32:	tsin.src ../tsa2d32
 	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../tsa2d32 $<
-
 tsin32.idx:	tsin32
+
+
+s-tsin32:	s-tsin.src ../tsa2d32
+	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../tsa2d32 $< $@
+s-tsin32.idx:	s-tsin32
+
 
 pho.tab2:	 pho.tab2.src ../phoa2d
 	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
+s-pho.tab2:	 s-pho.tab2.src ../phoa2d
+	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
+
 pho-huge.tab2:	 pho-huge.tab2.src ../phoa2d
+	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
+
+s-pho-huge.tab2:	 s-pho-huge.tab2.src ../phoa2d
 	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 t2s.dat:	t2s-file t2s-file.table
