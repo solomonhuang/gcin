@@ -1,0 +1,28 @@
+.SUFFIXES:	.c .o .E .pico .cpp
+
+.cpp.o:
+	$(CCX) $(CFLAGS) -c $<
+.c.pico:
+	$(CC) $(CFLAGS) -c -fpic -o $@ $<
+.cpp.pico:
+	$(CCX) $(CFLAGS) -c -fpic -o $@ $<
+.c.E:
+	$(CC) $(CFLAGS) -E -o $@ $<
+.cpp.E:
+	$(CCX) $(CFLAGS) -E -o $@ $<
+
+
+CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -I./im-client -DDEBUG="0$(GCIN_DEBUG)" \
+        -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" \
+        -DGCIN_OGG_DIR=\"$(GCIN_OGG_DIR)\" \
+        -DDOC_DIR=\"$(DOC_DIR)\" \
+        -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" \
+        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
+        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS) \
+        -DG_DISABLE_SINGLE_INCLUDES -DG_DISABLE_DEPRECATED \
+        -DGDK_DISABLE_SINGLE_INCLUDES -DGDK_DISABLE_DEPRECATED \
+        -DGTK_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_DEPRECATED
+
+ifeq ($(MAC_OS),1)
+EXTRA_LDFLAGS=-bind_at_load
+endif

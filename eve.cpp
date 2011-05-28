@@ -920,8 +920,12 @@ gboolean init_in_method(int in_no)
       init_GCIN_module_main_functions(&gmf);
       if (!module_cb()) {
         char ttt[256];
+#if 0
         if (!find_tab_file(inmd[in_no].filename, ttt))
           return FALSE;
+#else
+        strcpy(ttt, inmd[in_no].filename);
+#endif
 
         dbg("module %s\n", ttt);
         if (!(inmd[in_no].mod_cb_funcs = init_GCIN_module_callback_functions(ttt))) {

@@ -11,14 +11,6 @@ DATA=pho.tab2 tsin32.idx \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
      t2s.dat s2t.dat cj543.gtab s-tsin32 s-tsin32.idx s-pho.tab2 s-pho-huge.tab2
 
-ifeq ($(USE_ANTHY),Y)
-DATA+=../anthy-module.so
-endif
-
-ifeq ($(USE_CHEWING),Y)
-DATA+=../chewing-module.so
-endif
-
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 
 all:	$(DATA)

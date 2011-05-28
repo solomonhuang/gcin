@@ -1,8 +1,7 @@
 OPTFLAGS=-g
 
 include config.mak
-
-.SUFFIXES:	.c .o .E .pico .cpp
+include suffixes-rule
 
 gcin_tsin_o = tsin.o tsin-util.o win0.o win1.o tsin-parse.o
 gcin_pho_o = win-pho.o pho.o pho-util.o pho-sym.o table-update.o pho-dbg.o
@@ -45,24 +44,11 @@ OBJS_tsin2gtab_phrase = tsin2gtab-phrase.o gcin-conf.o util.o locale.o \
 	pho-dbg.o pho-sym.o gtab-dbg.o lang.o
 
 #WALL=-Wall
-CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -I./im-client -DDEBUG="0$(GCIN_DEBUG)" \
-        -DGCIN_TABLE_DIR=\"$(GCIN_TABLE_DIR)\" \
-        -DGCIN_OGG_DIR=\"$(GCIN_OGG_DIR)\" \
-        -DDOC_DIR=\"$(DOC_DIR)\" \
-        -DGCIN_ICON_DIR=\"$(GCIN_ICON_DIR)\" \
-        -DGCIN_SCRIPT_DIR=\"$(GCIN_SCRIPT_DIR)\" -DGCIN_BIN_DIR=\"$(GCIN_BIN_DIR)\" \
-        -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS) \
-        -DG_DISABLE_SINGLE_INCLUDES -DG_DISABLE_DEPRECATED \
-        -DGDK_DISABLE_SINGLE_INCLUDES -DGDK_DISABLE_DEPRECATED \
-        -DGTK_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_DEPRECATED
+
 ifeq ($(USE_XIM),Y)
 IMdkitLIB = IMdkit/lib/libXimd.a
 CFLAGS += -DUSE_XIM=1
 OBJS+=IC.o
-endif
-
-ifeq ($(MAC_OS),1)
-EXTRA_LDFLAGS=-bind_at_load
 endif
 
 ifeq ($(USE_TRAY),Y)
@@ -86,39 +72,17 @@ endif
 
 OBJ_IMSRV=im-addr.o im-dispatch.o im-srv.o gcin-crypt.o
 
-.c.E:
-	$(CC) $(CFLAGS) -E -o $@ $<
-
-.cpp.E:
-	$(CCX) $(CFLAGS) -E -o $@ $<
-
-.cpp.o:
-	$(CCX) $(CFLAGS) -c $<
-
-.c.pico:
-	$(CC) $(CFLAGS) -c -fpic -o $@ $<
-.cpp.pico:
-	$(CCX) $(CFLAGS) -c -fpic -o $@ $<
-
 PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge \
 	gcin-kbm-toggle tsin2gtab-phrase gcin-exit
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
-ifeq ($(USE_ANTHY),Y)
-GCIN_MODULE+=anthy-module.so
-endif
 
-ifeq ($(USE_CHEWING),Y)
-GCIN_MODULE+=chewing-module.so
-CHEWING_DATADIR=$(shell pkg-config --variable=datadir chewing)
-CFLAGS += -DCHEWING_DATADIR=\"$(CHEWING_DATADIR)\"
-endif
-
-all:	$(PROGS) $(GCIN_MODULE) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
+all:	$(PROGS) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C gtk-im
+	$(MAKE) -C modules
 ifeq ($(USE_I18N),Y)
 	$(MAKE) -C po
 endif
@@ -211,16 +175,6 @@ gcin1.so: $(gcin1_so) pho.o tsin.o eve.o gtab.o win-sym.o
 gcin2_so= t2s-lookup.pico
 gcin2.so: $(gcin2_so) gcin-conf.o
 	$(CCLD) $(SO_FLAGS) -o $@ $(gcin2_so) $(LDFLAGS)
-
-anthy_module_so = anthy.pico
-anthy-module.so: $(anthy_module_so)
-	$(CCLD) $(SO_FLAGS) -o $@ $(anthy_module_so) $(LDFLAGS) -lanthy
-	ln -sf $(PWD)/$@ data
-
-chewing_module_so = chewing.pico
-chewing-module.so: $(chewing_module_so)
-	$(CCLD) $(SO_FLAGS) -o $@ $(chewing_module_so) $(LDFLAGS) -lchewing -I/usr/include/chewing
-	ln -sf $(PWD)/$@ data
 
 $(IMdkitLIB):
 	$(MAKE) -C IMdkit/lib
