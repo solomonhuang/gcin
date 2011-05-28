@@ -248,6 +248,7 @@ void disp_tsin_pho(int index, char *pho)
   if (button_pho && !GTK_WIDGET_VISIBLE(button_pho))
     gtk_widget_show(button_pho);
 
+  text_pho_N = pin_juyin?6:3;
   disp_pho_sub(label_pho, index, pho);
 }
 

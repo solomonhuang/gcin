@@ -16,6 +16,7 @@ void disp_pho_sub(GtkWidget *label, int index, char *pho);
 
 void disp_pho(int index, char *phochar)
 {
+//  dbg("%d '", index); utf8_putchar(phochar); dbg("'\n");
   disp_pho_sub(label_pho, index, phochar);
 }
 

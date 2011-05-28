@@ -61,7 +61,6 @@ void disp_pho_sub(GtkWidget *label, int index, char *pho)
   if (index>=text_pho_N)
     return;
 
-
   if (pho[0]==' ' && !pin_juyin) {
     u8cpy(text_pho[index], _(_L("　")));
   }

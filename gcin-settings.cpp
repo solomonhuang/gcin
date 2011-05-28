@@ -192,7 +192,7 @@ void load_setttings()
   else
 #endif
   {
-    char *kbm_str = is_chs?"zo "ASDF" 1 1":"pinyin "ASDF" 1 1";
+    char *kbm_str = is_chs?"pinyin "ASDF" 1 1":"zo "ASDF" 1 1";
     get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm, kbm_str);
   }
 

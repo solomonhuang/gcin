@@ -50,8 +50,6 @@ phokey_t pho2key(char typ_pho[])
     return (BACK_QUOTE_NO<<9) | typ_pho[1];
 
   for(i=1; i < 4; i++) {
-//    if (typ_pho[i] == PHO_PINYIN_TONE1)
-//      continue;
     key =  typ_pho[i] | (key << typ_pho_len[i]) ;
   }
 
@@ -262,8 +260,7 @@ void clr_in_area_pho()
   int i;
 
   clrin_pho();
-
-  for(i=0; i < 4; i++)
+  for(i=0; i < text_pho_N; i++)
     disp_pho(i, "  ");
 }
 
@@ -272,8 +269,9 @@ static void disp_in_area_pho()
 {
   int i;
 
+  text_pho_N = pin_juyin?7:4;
   if (pin_juyin) {
-    for(i=0;i<6;i++) {
+    for(i=0;i<text_pho_N;i++) {
       disp_pho(i, &poo.inph[i]);
     }
   } else {
@@ -448,7 +446,7 @@ void load_tab_pho_file()
   pin_juyin = NULL;
 
   if (!strstr(pho_kbm_name, "pinyin")) {
-    text_pho_N = 3;
+    text_pho_N = 4;
   } else {
     load_pin_juyin();
   }
@@ -524,7 +522,11 @@ int feedkey_pho(KeySym xkey, int kbstate)
   int i,j,jj=0,kk=0;
   char out_buffer[512];
   int out_bufferN;
+  int shift_m=kbstate&ShiftMask;
+  int ctrl_m=kbstate&ControlMask;
 
+  if (ctrl_m)
+    return 0;
 
   if (xkey >= 'A' && xkey <='Z' && poo.typ_pho[0]!=BACK_QUOTE_NO)
     xkey+=0x20;
@@ -567,70 +569,29 @@ int feedkey_pho(KeySym xkey, int kbstate)
           return full_char_proc(xkey);
         return 0;
       }
-      if (!poo.ityp3_pho && xkey==' ') {
-         inph_typ_pho(xkey);
-         ctyp=3;  kno=0; jj=0;
 
-         goto llll1;
+//      dbg("poo.ityp3_pho %d\n", poo.ityp3_pho);
+      if (!poo.ityp3_pho) {
+        poo.ityp3_pho = TRUE;
+        goto lll1;
       }
 
       ii = poo.start_idx+ poo.cpg + phkbm.selkeyN;
 
       if (ii < poo.stop_idx) {
         poo.cpg += phkbm.selkeyN;
-      }
-      else {
-          if (poo.cpg) {
-            poo.cpg=0;
-            ii=poo.start_idx;
-          } else {
-            putkey_pho(key, poo.start_idx);
-          /*      poo.maxi=poo.ityp3_pho=0; */
-            return 1;
-          }
-       }
-      i=0;
-      ClrSelArea();
-
-      out_bufferN=0;
-
-      while(i<phkbm.selkeyN  && ii< poo.stop_idx) {
-        out_buffer[out_bufferN]=0;
-        char tt[128];
-        sprintf(tt, "<span foreground=\"%s\">%c</span>",
-           gcin_sel_key_color, pho_selkey[i]);
-        int ttlen = strlen(tt);
-        memcpy(out_buffer+out_bufferN, tt, ttlen);
-        out_bufferN+=ttlen;
-        char *pstr = pho_idx_str_markup(ii);
-        int len = strlen(strcpy(&out_buffer[out_bufferN], pstr));
-        out_bufferN+=len;
-        out_buffer[out_bufferN++] = ' ';
-
-        ii++;
-        i++;
+        dbg("spc pool.cpg %d\n", poo.cpg);
+      } else {
+        if (poo.cpg) {
+          poo.cpg=0;
+          ii=poo.start_idx;
+        } else {
+          putkey_pho(key, poo.start_idx);
+          return 1;
+        }
       }
 
-      char *tt;
-      tt = poo.cpg ? "&lt;" : " ";
-      int ttlen;
-      ttlen = strlen(tt);
-      memcpy(out_buffer+out_bufferN, tt, ttlen);
-      out_bufferN+=ttlen;
-
-      if (ii < poo.stop_idx) {
-        out_buffer[out_bufferN++] = poo.cpg ? '\\' : ' ';
-        tt = "&gt;";
-        ttlen = strlen(tt);
-        memcpy(out_buffer+out_bufferN, tt, ttlen);
-        out_bufferN+=strlen(tt);
-      }
-
-      out_buffer[out_bufferN] = 0;
-
-      disp_pho_sel(out_buffer);
-      poo.maxi=i;
-      return 1;
+      goto disp;
    default:
       if (xkey >= 127 || xkey < ' ')
         return 0;
@@ -639,6 +600,8 @@ int feedkey_pho(KeySym xkey, int kbstate)
 //        return shift_char_proc(xkey, kbstate);
         pre_punctuation(xkey);
       }
+
+//    dbg("poo.maxi:%d  %d\n", poo.maxi, poo.cpg);
 
       if ((pp=strchr(pho_selkey, xkey)) && poo.maxi && poo.ityp3_pho) {
         int c=pp-pho_selkey;
@@ -657,12 +620,12 @@ int feedkey_pho(KeySym xkey, int kbstate)
 //      poo.cpg=0;
   }
 
+lll1:
   inph_typ_pho(xkey);
 //  dbg("typ_pho %x %x\n", poo.typ_pho[0], poo.typ_pho[1]);
 
   if (gcin_pop_up_win)
     show_win_pho();
-
 
   if (poo.typ_pho[3])
     ctyp = 3;
@@ -751,13 +714,14 @@ proc_state:
     return 1;
   }
 
+disp:
   i=0;
-
-
   out_bufferN=0;
   out_buffer[0]=0;
 
   if (poo.ityp3_pho) {
+//    dbg("poo.cpg %d\n", poo.cpg);
+
     while(i< phkbm.selkeyN  && ii < poo.stop_idx) {
       char tt[128];
       sprintf(tt, "<span foreground=\"%s\">%c</span>",
@@ -787,8 +751,6 @@ proc_state:
       ttlen = strlen(tt);
       memcpy(out_buffer+out_bufferN, tt, ttlen);
       out_bufferN+=strlen(tt);
-    } else {
-      poo.cpg=0;
     }
 
     poo.maxi=i;
