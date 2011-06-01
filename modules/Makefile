@@ -25,3 +25,6 @@ chewing-module.so: $(chewing_module_so)
 
 install:
 	install $(GCIN_MODULE) $(gcinlibdir)
+
+clean:
+	rm -f *.pico *.so

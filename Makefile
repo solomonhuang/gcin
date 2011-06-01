@@ -82,10 +82,8 @@ PROGS_CV=kbmcv pin-juyin
 all:	$(PROGS) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
 	$(MAKE) -C data
 	$(MAKE) -C gtk-im
-	$(MAKE) -C modules
-ifeq ($(USE_I18N),Y)
-	$(MAKE) -C po
-endif
+	if [ $(BUILD_MODULE) = 'Y' ]; then $(MAKE) -C modules; fi
+	if [ $(USE_I18N) = 'Y' ]; then $(MAKE) -C po; fi
 	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im; fi
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im; fi
@@ -195,7 +193,7 @@ install:
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
-	$(MAKE) -C modules install
+	if [ $(BUILD_MODULE) = 'Y' ]; then $(MAKE) -C modules install; fi
 	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im install; fi
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im install; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im install; fi
@@ -214,18 +212,16 @@ install:
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install
 	$(MAKE) -C man install
-ifeq ($(USE_I18N),Y)
-	$(MAKE) -C po install
-endif
+	if [ $(USE_I18N) = 'Y' ]; then $(MAKE) -C po install; fi
+
 clean:
 	$(MAKE) -C IMdkit clean
 	$(MAKE) -C data clean
 	$(MAKE) -C scripts clean
 	$(MAKE) -C im-client clean
 	$(MAKE) -C gtk-im clean
-ifeq ($(GTK3_IM), Y)
-	$(MAKE) -C gtk3-im clean
-endif
+	$(MAKE) -C modules clean
+	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im clean; fi
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C qt4-im clean
 	$(MAKE) -C man clean
