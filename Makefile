@@ -195,6 +195,7 @@ install:
 	$(MAKE) -C data install
 	$(MAKE) -C im-client install
 	$(MAKE) -C gtk-im install
+	$(MAKE) -C modules install
 	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im install; fi
 	if [ $(QT_IM) = 'Y' ]; then $(MAKE) -C qt-im install; fi
 	if [ $(QT4_IM) = 'Y' ]; then $(MAKE) -C qt4-im install; fi
