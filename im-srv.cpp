@@ -7,6 +7,7 @@
 #include <X11/Xatom.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 
 #include "gcin.h"
 #include "gcin-protocol.h"
@@ -111,14 +112,14 @@ static gboolean cb_new_gcin_client(GIOChannel *source, GIOCondition condition, g
 
 static int get_ip_address(u_int *ip)
 {
+
+#if 0
   char hostname[64];
 
   if (gethostname(hostname, sizeof(hostname)) < 0) {
     perror("cannot get hostname\n");
     return -1;
   }
-
-#if 0
   dbg("hostname %s\n", hostname);
   struct hostent *hent;
 
@@ -129,45 +130,32 @@ static int get_ip_address(u_int *ip)
 
   memcpy(ip, hent->h_addr_list[0], hent->h_length);
 #else
-  struct addrinfo hints;
-  struct addrinfo *result, *rp;
+  struct ifaddrs *ifaddr = NULL, *ifa;
+  int family, s;
+  char host[NI_MAXHOST];
 
-  memset(&hints, 0, sizeof(struct addrinfo));
-  hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
-  hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
-  hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
-  hints.ai_protocol = 0;          /* Any protocol */
-  hints.ai_canonname = NULL;
-  hints.ai_addr = NULL;
-  hints.ai_next = NULL;
-
-  int s = getaddrinfo(NULL, hostname, &hints, &result);
-  if (s != 0) {
-      fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-      exit(EXIT_FAILURE);
+  if (getifaddrs(&ifaddr) == -1) {
+    perror("getifaddrs");
+    exit(EXIT_FAILURE);
   }
 
+  for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
+      if (!ifa->ifa_addr)
+        continue;
 
-  for (rp = result; rp != NULL; rp = rp->ai_next) {
-      int sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-      if (sfd == -1)
+      family = ifa->ifa_addr->sa_family;
+      if (family == AF_INET) {
+        struct sockaddr_in *padd=(struct sockaddr_in *)ifa->ifa_addr;
+        char *ipaddr = inet_ntoa(padd->sin_addr);
+        if (!strcmp(ipaddr, "127.0.0.1"))
           continue;
-
-      if (bind(sfd, rp->ai_addr, rp->ai_addrlen) == 0) {
-          close(sfd);
-          break;
+        dbg("ip addr %s\n", ipaddr);
+        memcpy(ip, &padd->sin_addr.s_addr, INET_ADDRSTRLEN);
+        break;
       }
-
-      close(sfd);
   }
 
-  if (rp == NULL) { /* No address succeeded */
-      fprintf(stderr, "Could not bind\n");
-      exit(EXIT_FAILURE);
-  }
-
-  freeaddrinfo(result);
-  memcpy(ip, &rp->ai_addr, rp->ai_addrlen);
+  freeifaddrs(ifaddr);
 #endif
   return 0;
 }
@@ -281,7 +269,7 @@ void init_gcin_im_serv(Window win)
 
   if (listen(im_tcp_sockfd, 5) < 0) {
     perror("cannot listen: ");
-	exit(1);
+    exit(1);
   }
 
   dbg("after listen\n");

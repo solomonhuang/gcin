@@ -26,7 +26,7 @@ greek ` greek.gtab greek.png
 latin-letters [ latin-letters.gtab latin-letters.png
 ### russian by yuriy
 #russian [ russian.gtab
-chewing [ chewing-module.so chewing.png
+新酷音 [ chewing-module.so chewing.png
 #帶調粵拼 ] jyutping.gtab jyutping.png
 ######  亂倉打鳥 http://cle.linux.org.tw/trac/wiki/NewCJ3Cin#檔案下載
 亂倉打鳥 \ NewCJ3.gtab NewCJ3.png

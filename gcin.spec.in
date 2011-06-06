@@ -51,7 +51,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/doc/gcin-__gcin_version__/*
 %{_datadir}/applications/*
 %{_datadir}/control-center-2.0/capplets/*
-%{_libdir}/menu/*
 %{_libdir}/gtk-2.0/*
 %{_libdir}/qt4/plugins/inputmethods/*
 %{_libdir}/gcin/*

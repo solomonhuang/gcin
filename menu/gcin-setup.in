@@ -1,1 +1,0 @@
-?package(gcin): icon="gcin.png" title="gcin-setup 設定" longtitle="gcin-setup 設定" needs="x11" section="Chinese" command="/usr/local/bin/gcin-setup"

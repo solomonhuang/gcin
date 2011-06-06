@@ -47,6 +47,16 @@ static void callback_et26( GtkWidget *widget, gpointer   data)
 #endif
 }
 
+#define PUNC_URL "http://hyperrate.com/thread.php?tid=19444#19444"
+static void callback_punc( GtkWidget *widget, gpointer   data)
+{
+#if WIN32
+	ShellExecuteA(NULL, "open", PUNC_URL, NULL, NULL, SW_SHOWNORMAL);
+#else
+	html_browser(PUNC_URL);
+#endif
+}
+
 
 void sys_icon_fname(char *iconame, char fname[]);
 void create_about_window()
@@ -96,11 +106,13 @@ void create_about_window()
                 "<a href='http://hyperrate.com?eid=215'>%s</a>\n"
                 "<a href='"LOG_URL"'>%s</a>\n"
                 "<a href='"ET26_URL"'>%s</a>\n"
+				"<a href='"PUNC_URL"'>%s</a>\n"
                 ,
                 _(_L("點選連結前往 gcin 討論區")),
                 _(_L("gcin也有 Windows版")),
                 _(_L("gcin改變記錄")),
-                _(_L("推薦使用26鍵的注音鍵盤"))
+                _(_L("推薦使用26鍵的注音鍵盤")),
+				_(_L("使用詞音輸入標點符號"))
           );
    GtkWidget *label = gtk_label_new(tmp);
    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
@@ -120,6 +132,10 @@ void create_about_window()
     g_signal_connect (G_OBJECT (button_et26), "clicked",
 		      G_CALLBACK (callback_et26), NULL);
 
+    GtkWidget *button_punc = gtk_button_new_with_label(_(_L("使用詞音輸入標點符號")));
+    gtk_box_pack_start(GTK_BOX(vbox), button_punc, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (button_punc), "clicked",
+		      G_CALLBACK (callback_punc), NULL);
 #endif
 
 

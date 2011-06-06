@@ -71,7 +71,6 @@ static void cb_kbm()
   create_kbm_window();
 }
 
-
 static void cb_tslearn()
 {
 #if UNIX
@@ -928,6 +927,15 @@ expander_callback (GObject    *object,
   }
 }
 
+#include "pho.h"
+#include "tsin.h"
+#include "gst.h"
+#include "im-client/gcin-im-client-attr.h"
+#include "win1.h"
+#include "gcin-module.h"
+#include "gcin-module-cb.h"
+GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile);
+
 static void create_main_win()
 {
   main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -959,6 +967,29 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_gtab_conf), "clicked",
                     G_CALLBACK (cb_gtab_conf), NULL);
 
+  int i;
+  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+    INMD *pinmd = &inmd[i];
+    if (pinmd->method_type != method_type_MODULE || pinmd->disabled)
+      continue;
+
+    GCIN_module_callback_functions *f = init_GCIN_module_callback_functions(pinmd->filename);
+    if (!f)
+      continue;
+
+    if (!f->module_setup_window_create) {
+      free(f);
+      continue;
+    }
+
+    char tt[128];
+    strcpy(tt, pinmd->cname);
+    strcat(tt, _(_L("設定")));
+    GtkWidget *button_chewing_input_method = gtk_button_new_with_label(tt);
+    gtk_box_pack_start (GTK_BOX (vbox), button_chewing_input_method, TRUE, TRUE, 0);
+    g_signal_connect (G_OBJECT (button_chewing_input_method), "clicked",
+                    G_CALLBACK (f->module_setup_window_create), NULL);
+  }
 
   GtkWidget *button_default_input_method = gtk_button_new_with_label(_(_L("內定輸入法 & 開啟/關閉")));
   gtk_box_pack_start (GTK_BOX (vbox), button_default_input_method, TRUE, TRUE, 0);

@@ -1,1 +1,0 @@
-#define GCIN_VERSION 

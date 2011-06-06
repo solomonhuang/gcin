@@ -9,6 +9,7 @@
 #include "im-client/gcin-im-client-attr.h"
 #include "win1.h"
 #include "gcin-module.h"
+#include "gcin-module-cb.h"
 
 #define STRBUFLEN 64
 

@@ -329,16 +329,3 @@ else
 fi
 
 echo "gcc_ld_run_path=-Wl,-rpath,\$(gcin_ld_run_path)" >> config.mak
-
-cd menu
-for i in *.in
-do
-  outf=`echo $i | sed -e "s/\.in//"`
-#  echo $outf
-  if [ $bindir = /usr/bin ]; then
-    sed -e "s~/usr/local/bin~/usr/bin~" < $i > $outf
-  else
-    cp $i $outf
-  fi
-done
-

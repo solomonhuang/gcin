@@ -1,10 +1,13 @@
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
 sh gen-gtk3
+sed -i '/^$/d' Changelog.html
 rm -f tags core.*
 cd ..
 rm -fr $GCIN_VERSION
 cp -a gcin $GCIN_VERSION
 cd $GCIN_VERSION
+rm -f gcin-version.h
+make gcin-version.h
 make clean
 cd ..
 

@@ -572,6 +572,12 @@ static void create_win0_gui()
 
   g_signal_connect(G_OBJECT(button_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
+#if GTK_CHECK_VERSION(2,18,0)
+   gtk_widget_set_can_focus(button_pho, FALSE);
+   gtk_widget_set_can_default(button_pho, FALSE);
+#else
+  GTK_WIDGET_UNSET_FLAGS(button_pho,  GTK_CAN_FOCUS|GTK_CAN_DEFAULT);
+#endif
 
   if (left_right_button_tips) {
 #if GTK_CHECK_VERSION(2,12,0)

@@ -4,6 +4,7 @@
 #include "im-client/gcin-im-client-attr.h"
 #include "win1.h"
 #include "gcin-module.h"
+#include "gcin-module-cb.h"
 #include <anthy/anthy.h>
 #if WIN32
 extern gboolean test_mode;
@@ -1144,7 +1145,7 @@ int module_init_win(GCIN_module_main_functions *funcs)
 {
   gmf = *funcs;
 
-  dbg("module_init_win\n");
+//  dbg("module_init_win\n");
 
   gmf.mf_set_tsin_pho_mode();
   gmf.mf_set_win1_cb((cb_selec_by_idx_t)select_idx, prev_page, next_page);
@@ -1243,7 +1244,7 @@ void module_hide_win()
 
 void module_change_font_size()
 {
-  dbg("change_anthy_font_size\n");
+//  dbg("change_anthy_font_size\n");
   GdkColor fg;
   gdk_color_parse(*gmf.mf_gcin_win_color_fg, &fg);
   gmf.mf_change_win_bg(win_anthy);

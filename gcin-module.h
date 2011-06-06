@@ -42,6 +42,7 @@ typedef struct {
   PHOKBM *mf_phkbm;
   TSIN_ST *mf_tss;
   int *mf_tsin_chinese_english_toggle_key;
+  char **mf_pho_chars;
 
   int *mf_gcin_pop_up_win;
   int *mf_gcin_font_size, *mf_gcin_win_color_use;
@@ -54,40 +55,3 @@ typedef struct {
 #endif
 
 void init_GCIN_module_main_functions(GCIN_module_main_functions *func);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-  int module_init_win(GCIN_module_main_functions *funcs);
-  void module_get_win_geom();
-  int module_reset();
-  int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *compose_flag);
-  gboolean module_feedkey(int kv, int kvstate);
-  int module_feedkey_release(KeySym xkey, int kbstate);
-  void module_move_win(int x, int y);
-  void module_change_font_size();
-  void module_show_win();
-  void module_hide_win();
-  int module_win_visible();
-  int module_flush_input();
-#ifdef __cplusplus
-}
-#endif
-
-
-
-///////// for gcin main() only
-typedef struct _GCIN_module_callback_functions {
-  int (*module_init_win)(GCIN_module_main_functions *funcs);
-  void (*module_get_win_geom)();
-  int (*module_reset)();
-  int (*module_get_preedit)(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *compose_flag);
-  gboolean (*module_feedkey)(int kv, int kvstate);
-  int (*module_feedkey_release)(KeySym xkey, int kbstate);
-  void (*module_move_win)(int x, int y);
-  void (*module_change_font_size)();
-  void (*module_show_win)();
-  void (*module_hide_win)();
-  int (*module_win_visible)();
-  int (*module_flush_input)();
-} GCIN_module_callback_functions;

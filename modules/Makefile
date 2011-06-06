@@ -19,9 +19,9 @@ anthy_module_so = anthy.pico
 anthy-module.so: $(anthy_module_so)
 	$(CCLD) $(SO_FLAGS) -o $@ $(anthy_module_so) $(LDFLAGS) -lanthy
 
-chewing_module_so = chewing.pico
+chewing_module_so = chewing.pico gcin-setup-chewing.pico
 chewing-module.so: $(chewing_module_so)
-	$(CCLD) $(SO_FLAGS) -o $@ $(chewing_module_so) $(LDFLAGS) -lchewing -I/usr/include/chewing
+	$(CCLD) $(SO_FLAGS) -o $@ $(chewing_module_so) $(LDFLAGS) $(shell pkg-config --cflags --libs chewing)
 
 install:
 	install $(GCIN_MODULE) $(gcinlibdir)

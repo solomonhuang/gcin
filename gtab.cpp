@@ -1133,7 +1133,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
       strcat(tt, www);
 
       if (gtab_vertical_select)
-        strcat(tt, ". ");
+        strcat(tt, " ");
 
       if (phrase_selected && i==ggg.sel1st_i) {
         strcat(tt, "<span foreground=\"red\">");

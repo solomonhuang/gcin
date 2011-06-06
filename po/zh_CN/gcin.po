@@ -68,11 +68,6 @@ msgstr "隐藏第二列(输入键…)"
 msgid "輸入鍵顯示移至第一列"
 msgstr "输入键显示移至第一列"
 
-#: ../gcin-setup-gtab.c:321
-msgid "CapsLock 打開輸入英數"
-msgstr "CapsLock 打开输入英数"
-
-#: ../gcin-setup-gtab.c:334
 msgid "\t用小寫字母"
 msgstr "\t用小写字母"
 
@@ -274,11 +269,6 @@ msgstr "Alt-Shift 片语编辑"
 msgid "符號表編輯"
 msgstr "符号表编辑"
 
-#: ../gcin-setup.c:655
-msgid "簡體字輸出切換"
-msgstr "简体字输出切换"
-
-#: ../gcin-setup.c:660
 msgid "剪貼區 簡體字->正體字"
 msgstr "剪贴区 简体字->正体字"
 
@@ -555,11 +545,6 @@ msgstr "送字到剪贴区"
 msgid "選擇輸入法"
 msgstr "选择输入法"
 
-#: ../gcin-setup-pho.cpp:598
-msgid "\\鍵切換jkx鍵編輯模式"
-msgstr "\\键切换jkx键编辑模态"
-
-#: ../gcin-setup.cpp:790
 msgid "取代主題顏色"
 msgstr "取代主题颜色"
 
@@ -591,8 +576,8 @@ msgstr "gcin 注音/词音/拼音 设置"
 msgid "選擇鍵顯示於候選字(詞)後方"
 msgstr "选择键显示于候选字(词)后方"
 
-msgid "<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
-msgstr "<a href='http://hyperrate.com?eid=67'>点击链接前往 gcin 讨论区</a>\n"
+msgid "點選連結前往 gcin 討論區"
+msgstr "点击链接前往 gcin 讨论区"
 
 msgid "使用預選詞"
 msgstr "使用预选词"
@@ -613,3 +598,33 @@ msgid ""
 msgstr ""
 "全半角左键\n"
 "切换小键盘"
+
+msgid "使用詞音輸入標點符號"
+msgstr "使用拼音输入标点符号"
+
+msgid "\\ 鍵切換jkx鍵編輯模式"
+msgstr "\\ 键切换jkx键编辑模态"
+
+msgid "gcin 新酷音設定"
+msgstr "gcin 新酷音设置"
+
+msgid "空白鍵選字"
+msgstr "空格键选字"
+
+msgid "推薦使用26鍵的注音鍵盤"
+msgstr "推荐使用26键的注音键盘"
+
+msgid "--- 加到詞庫 ---"
+msgstr "--- 加到词库 ---"
+
+msgid "每頁候選字數"
+msgstr "每页候选字数"
+
+msgid "ESC 鍵清空緩衝區"
+msgstr "ESC 键清空缓冲区"
+
+msgid "選字完畢自動跳字"
+msgstr "选字完毕自动跳字"
+
+msgid "向後加詞"
+msgstr "向后加词"

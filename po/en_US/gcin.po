@@ -68,11 +68,6 @@ msgstr "Hide second row of input window"
 msgid "輸入鍵顯示移至第一列"
 msgstr "Move keycodes to first row of input window"
 
-#: ../gcin-setup-gtab.c:321
-msgid "CapsLock 打開輸入英數"
-msgstr "Toggle alphabet-numeric mode with CapsLock key"
-
-#: ../gcin-setup-gtab.c:334
 msgid "\t用小寫字母"
 msgstr "\tUse lower case letters"
 
@@ -282,11 +277,6 @@ msgstr "Edit Alt-Shift phrases"
 msgid "符號表編輯"
 msgstr "Edit symbols"
 
-#: ../gcin-setup.c:655
-msgid "簡體字輸出切換"
-msgstr "Toggle Traditional Chinese to Simplified Chinese conversion"
-
-#: ../gcin-setup.c:660
 msgid "剪貼區 簡體字->正體字"
 msgstr "Convert clipboard's Simplified Chinese to Traditional Chinese"
 
@@ -594,11 +584,9 @@ msgstr "Send data to clipboard"
 msgid "選擇輸入法"
 msgstr "Select input methods"
 
-#: ../gcin-setup-pho.cpp:598
-msgid "\\鍵切換jkx鍵編輯模式"
+msgid "\\ 鍵切換jkx鍵編輯模式"
 msgstr "\\ key to toggle jkx keys editing mode"
 
-#: ../gcin-setup.cpp:790
 msgid "取代主題顏色"
 msgstr "Replace colors of theme"
 
@@ -630,11 +618,11 @@ msgstr "Settings for Bopomofo, Tsin, and Pinyin"
 msgid "選擇鍵顯示於候選字(詞)後方"
 msgstr "Show selection key behind choices"
 
-msgid "<a href='http://hyperrate.com?eid=67'>點選連結前往 gcin 討論區</a>\n"
-msgstr "<a href='http://hyperrate.com?eid=67'>Click to forum of gcin</a>\n"
+msgid "點選連結前往 gcin 討論區"
+msgstr "Click to forum of gcin"
 
-msgid "<a href='http://hyperrate.com?eid=215'>gcin也有 Windows版</a>\n"
-msgstr "<a href='http://hyperrate.com?eid=215'>Windows version of gcin</a>\n"
+msgid "gcin也有 Windows版"
+msgstr "Windows version of gcin"
 
 msgid "使用預選詞"
 msgstr "Enable preselection"
@@ -664,3 +652,30 @@ msgstr "Right Shift"
 
 msgid "打字速度"
 msgstr "Typing Speed"
+
+msgid "使用詞音輸入標點符號"
+msgstr "Enable punctuation marks in Tsin"
+
+msgid "gcin 新酷音設定"
+msgstr "Settings for Chewing"
+
+msgid "空白鍵選字"
+msgstr "Space key to select candidates"
+
+msgid "推薦使用26鍵的注音鍵盤"
+msgstr "26 keys Bopomofo layout"
+
+msgid "--- 加到詞庫 ---"
+msgstr "--- Add phrase to Tsin's database ---"
+
+msgid "每頁候選字數"
+msgstr "Candidates per page"
+
+msgid "ESC 鍵清空緩衝區"
+msgstr "Esc key to clear buffer"
+
+msgid "選字完畢自動跳字"
+msgstr "Move cursor automatically after selections"
+
+msgid "向後加詞"
+msgstr "Add phrase backwards"

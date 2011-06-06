@@ -1,1 +1,0 @@
-?package(gcin): icon="gcin.png" title="gcin" longtitle="gcin chinese input method" needs="x11" section="Chinese" command="/usr/local/bin/gcin"
