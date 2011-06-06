@@ -18,8 +18,8 @@ exec dpkg-buildpackage -b
 +#!/bin/sh
 +[ ! -e debian/gcin/usr/lib/qt4/plugins/inputmethods/im-gcin.so ] && sed -i 's/, gcin-qt4-immodule//' debian/gcin/DEBIAN/control
 +[ ! -e debian/gcin/usr/lib/qt3/plugins/inputmethods/libqgcin.so ] && sed -i 's/, gcin-qt3-immodule//' debian/gcin/DEBIAN/control
-+[ ! -e debian/gcin/usr/share/gcin/table/chewing-module.so ] && sed -i 's/, libchewing3//' debian/gcin/DEBIAN/control
-+if [ ! -e debian/gcin/usr/share/gcin/table/anthy-module.so ]; then
++[ ! -e debian/gcin/usr/lib/gcin/chewing-module.so ] && sed -i 's/, libchewing3//' debian/gcin/DEBIAN/control
++if [ ! -e debian/gcin/usr/lib/gcin/anthy-module.so ]; then
 +  grep -v 'Suggests: kasumi' debian/gcin/DEBIAN/control | sed 's/, anthy//' > debian/gcin/DEBIAN/control.in
 +  mv debian/gcin/DEBIAN/control.in debian/gcin/DEBIAN/control
 +fi

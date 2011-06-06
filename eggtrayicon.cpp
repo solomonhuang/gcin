@@ -26,6 +26,11 @@
 #include <X11/Xatom.h>
 #include "gcin.h"
 
+#if GTK_CHECK_VERSION(2,24,0)
+#define gdk_window_lookup_for_display gdk_x11_window_lookup_for_display
+#endif
+
+
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 #define SYSTEM_TRAY_BEGIN_MESSAGE   1
 #define SYSTEM_TRAY_CANCEL_MESSAGE  2
