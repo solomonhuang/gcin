@@ -57,6 +57,16 @@ static void callback_punc( GtkWidget *widget, gpointer   data)
 #endif
 }
 
+#define ADD_PHRASE_URL "http://hyperrate.com/thread.php?tid=23991#23991"
+static void callback_add_phrase( GtkWidget *widget, gpointer   data)
+{
+#if WIN32
+	ShellExecuteA(NULL, "open", ADD_PHRASE_URL, NULL, NULL, SW_SHOWNORMAL);
+#else
+	html_browser(PUNC_URL);
+#endif
+}
+
 
 void sys_icon_fname(char *iconame, char fname[]);
 void create_about_window()
@@ -106,13 +116,16 @@ void create_about_window()
                 "<a href='http://hyperrate.com?eid=215'>%s</a>\n"
                 "<a href='"LOG_URL"'>%s</a>\n"
                 "<a href='"ET26_URL"'>%s</a>\n"
-				"<a href='"PUNC_URL"'>%s</a>\n"
+                "<a href='"PUNC_URL"'>%s</a>\n"
+                "<a href='"ADD_PHRASE_URL"'>%s</a>\n"
                 ,
-                _(_L("點選連結前往 gcin 討論區")),
+                _(_L("前往 gcin 討論區")),
                 _(_L("gcin也有 Windows版")),
                 _(_L("gcin改變記錄")),
                 _(_L("推薦使用26鍵的注音鍵盤")),
-				_(_L("使用詞音輸入標點符號"))
+                _(_L("使用詞音輸入標點符號")),
+                _(_L("如何新增詞"))
+
           );
    GtkWidget *label = gtk_label_new(tmp);
    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
@@ -136,6 +149,13 @@ void create_about_window()
     gtk_box_pack_start(GTK_BOX(vbox), button_punc, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_punc), "clicked",
 		      G_CALLBACK (callback_punc), NULL);
+
+    GtkWidget *button_add_phrase = gtk_button_new_with_label(_(_L("如何新增詞")));
+    gtk_box_pack_start(GTK_BOX(vbox), button_add_phrase, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (button_add_phrase), "clicked",
+		      G_CALLBACK (callback_add_phrase), NULL);
+
+
 #endif
 
 

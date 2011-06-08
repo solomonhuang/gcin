@@ -116,7 +116,7 @@ extern gboolean win_kbm_inited;
 extern int win_kbm_on;
 
 static MITEM mitems_main[] = {
-  {N_(_L("關於 gcin")), NULL, cb_about_window},
+  {N_(_L("關於gcin/常見問題")), NULL, cb_about_window},
   {N_(_L("設定")), GTK_STOCK_PREFERENCES, exec_gcin_setup_},
 #if USE_GCB
   {N_(_L("gcb(剪貼區暫存)")), NULL, cb_tog_gcb, &gcb_enabled},

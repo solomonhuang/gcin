@@ -14,7 +14,7 @@ exec dpkg-buildpackage -b
 + -- Kan-Ru Chen <koster@debian.org>  Mon, 28 Feb 2011 18:07:18 +0800
 --- a/debian/ckqt.sh
 +++ b/debian/ckqt.sh
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,16 @@
 +#!/bin/sh
 +[ ! -e debian/gcin/usr/lib/qt4/plugins/inputmethods/im-gcin.so ] && sed -i 's/, gcin-qt4-immodule//' debian/gcin/DEBIAN/control
 +[ ! -e debian/gcin/usr/lib/qt3/plugins/inputmethods/libqgcin.so ] && sed -i 's/, gcin-qt3-immodule//' debian/gcin/DEBIAN/control
@@ -23,6 +23,12 @@ exec dpkg-buildpackage -b
 +  grep -v 'Suggests: kasumi' debian/gcin/DEBIAN/control | sed 's/, anthy//' > debian/gcin/DEBIAN/control.in
 +  mv debian/gcin/DEBIAN/control.in debian/gcin/DEBIAN/control
 +fi
++if [ -d debian/gcin/usr/lib/gtk-3.0/immodules ]; then
++  mkdir -p debian/gcin/usr/lib/gtk-3.0/3.0.0
++  mv debian/gcin/usr/lib/gtk-3.0/immodules debian/gcin/usr/lib/gtk-3.0/3.0.0/
++fi
++mkdir -p debian/gcin/usr/lib/gtk-2.0/2.10.0
++mv debian/gcin/usr/lib/gtk-2.0/immodules debian/gcin/usr/lib/gtk-2.0/2.10.0/
 +/usr/lib/libgtk2.0-0/gtk-query-immodules-2.0 debian/gcin/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so | grep gcin | tail -n 1 >> debian/gcin/usr/lib/gtk-2.0/2.10.0/immodule-files.d/gcin.immodules
 +true
 --- a/debian/compat
@@ -65,12 +71,16 @@ exec dpkg-buildpackage -b
 +"/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so" 
 --- a/debian/im-switch/gcin
 +++ b/debian/im-switch/gcin
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,10 @@
 +XIM=gcin
 +XIM_PROGRAM=/usr/bin/gcin
 +XIM_ARGS=
 +GTK_IM_MODULE=gcin
-+QT_IM_MODULE=gcin
++if [ ! -e /usr/lib/qt3/plugins/inputmethods/libqgcin.so ] && [ ! -e /usr/lib/qt4/plugins/inputmethods/im-gcin.so ]; then
++  QT_IM_MODULE=xim
++else
++  QT_IM_MODULE=gcin
++fi
 +DEPENDS=
 --- a/debian/install
 +++ b/debian/install
@@ -81,15 +91,13 @@ exec dpkg-buildpackage -b
 +debian/gcin.immodules usr/lib/gtk-2.0/2.10.0/immodule-files.d
 --- a/debian/links
 +++ b/debian/links
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,6 @@
 +usr/share/man/man1/gcin-setup.1.gz usr/share/man/man1/gcin-setup-tab.1.gz
 +usr/share/man/man1/phoa2d.1.gz usr/share/man/man1/phod2a.1.gz
 +usr/share/man/man1/sim2trad.1.gz usr/share/man/man1/trad2sim.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a32.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsin2gtab-phrase.1.gz
-+usr/lib/gtk-2.0/immodules/im-gcin.so usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so
-+usr/lib/gtk-3.0/immodules/im-gcin.so usr/lib/gtk-3.0/3.0.0/immodules/im-gcin.so
 --- a/debian/postinst
 +++ b/debian/postinst
 @@ -0,0 +1,32 @@

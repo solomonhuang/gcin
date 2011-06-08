@@ -528,6 +528,16 @@ int feedkey_pho(KeySym xkey, int kbstate)
   if (ctrl_m)
     return 0;
 
+  if (xkey >= 127 || xkey < ' ')
+        return 0;
+
+  if (kbstate&LockMask) {
+    if (gcin_capslock_lower)
+      case_inverse(&xkey, shift_m);
+    send_ascii(xkey);
+    return 1;
+  }
+
   if (xkey >= 'A' && xkey <='Z' && poo.typ_pho[0]!=BACK_QUOTE_NO)
     xkey+=0x20;
 
@@ -593,12 +603,12 @@ int feedkey_pho(KeySym xkey, int kbstate)
 
       goto disp;
    default:
-      if (xkey >= 127 || xkey < ' ')
-        return 0;
 
-      if ((kbstate & ShiftMask)) {
+      if (shift_m) {
 //        return shift_char_proc(xkey, kbstate);
-        pre_punctuation(xkey);
+        if (pre_punctuation(xkey))
+          return 1;
+        return 0;
       }
 
 //    dbg("poo.maxi:%d  %d\n", poo.maxi, poo.cpg);

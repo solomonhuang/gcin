@@ -27,7 +27,7 @@ GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile
   }
 #else
   HMODULE handle = LoadLibrary(sofile);
-  if (!hanlle)
+  if (!handle)
     return NULL;
 #define dlsym GetProcAddress
 #endif
