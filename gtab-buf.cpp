@@ -595,6 +595,7 @@ void set_gbuf_c_sel(int v)
 //  dbg("zzzsel v:%d %d %s\n",v, pbuf->c_sel,pbuf->ch);
   pbuf->flag |= FLAG_CHPHO_FIXED;
   ggg.gtab_buf_select = 0;
+  ggg.more_pg = 0;
   disp_gtab_sel("");
   gtab_parse();
   disp_gbuf();

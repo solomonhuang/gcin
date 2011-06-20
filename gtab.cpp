@@ -1143,7 +1143,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
         char uu[MAX_CIN_PHR];
 
         if (gtab_vertical_select) {
-          utf8cpy_bytes(uu, selback, 60);
+          utf8cpy_bytes(uu, selback, 120);
           strcat(tt, uu);
         } else {
           char *p = selback;
@@ -1552,6 +1552,7 @@ shift_proc:
 #if UNIX
     case XK_KP_Down:
 #endif
+
       if (AUTO_SELECT_BY_PHRASE)
         return show_buf_select();
       else
@@ -1625,7 +1626,11 @@ next_page:
       } else {
         if (key==XK_KP_Add)
           goto keypad_proc;
-        return win_sym_page_down();
+        if (win_sym_page_down())
+          return TRUE;
+        if (!ggg.gtab_buf_select && ggg.gbufN && AUTO_SELECT_BY_PHRASE)
+          return show_buf_select();
+        return FALSE;
       }
     case ' ':
       hide_gtab_pre_sel();
@@ -1671,8 +1676,8 @@ next_page:
 
         if (ggg.gbufN) {
           output_gbuf();
-	} else
-	  return 0;
+        } else
+          return 0;
       } else
       if (!has_wild) {
 //        dbg("iii %d  ggg.defselN:%d   %d\n", ggg.sel1st_i, ggg.defselN, cur_inmd->M_DUP_SEL);
@@ -2170,6 +2175,8 @@ next_pg:
       ggg.spc_pressed = 1;
     }
 
+    if (ggg.ci==cur_inmd->MaxPress)
+      ggg.last_full=1;
     int full_send = gtab_press_full_auto_send && ggg.last_full;
 
 //    dbg("flag %d\n",!(pendkey && (cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY)));
@@ -2209,8 +2216,6 @@ next_pg:
     ggg.exa_match = ggg.defselN;
 //    dbg("ggg.defselN %d\n", ggg.defselN);
 
-    if (ggg.ci==cur_inmd->MaxPress)
-      ggg.last_full=1;
 
     if (ggg.defselN==1 && !ggg.more_pg) {
       if (ggg.spc_pressed || full_send || gtab_unique_auto_send) {

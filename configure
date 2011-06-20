@@ -261,9 +261,6 @@ if [ $USE_ANTHY = 'Y' ] || [ $USE_CHEWING = 'Y' ]; then
 fi
 
 OPTFLAGS="-g"
-if [ $prefix = /usr ]; then
-  OPTFLAGS="-O"
-fi
 
 if [ -z $CC ]; then
   CC=gcc
@@ -285,7 +282,7 @@ echo "datadir_r=$datadir" >> config.mak
 echo "libdir=\$(DESTDIR)$libdir" >> config.mak
 echo "gcinlibdir=\$(libdir)/gcin" >> config.mak
 echo "includedir=\$(DESTDIR)$includedir" >> config.mak
-echo "LDFLAGS=$GTKLDFLAGS -lX11 -ldl" >> config.mak
+echo "LDFLAGS=$GTKLDFLAGS -lX11 -ldl -lm" >> config.mak
 echo "GCIN_VERSION=$GCIN_VERSION" >> config.mak
 echo "GCIN_TABLE_DIR=\$(datadir_r)/gcin/table" >> config.mak
 echo "GCIN_OGG_DIR=\$(datadir_r)/gcin/ogg" >> config.mak
@@ -319,13 +316,11 @@ echo "USE_CHEWING=$USE_CHEWING" >> config.mak
 echo "USE_GCB=$use_gcb" >> config.mak
 echo "BUILD_MODULE=$BUILD_MODULE" >> config.mak
 
-if [ $prefix = /usr ]; then
-  echo "gcin_ld_run_path=\$(gcinlibdir)" >> config.mak
-# moved to Makefile
-#  echo "LDFLAGS+=-Wl,-rpath,\$(gcinlibdir)" >> config.mak
-else
-  echo "gcin_ld_run_path=\$(PWD):\$(gcinlibdir)" >> config.mak
+if [ $prefix = /usr/local ]; then
+  echo "gcin_ld_run_path=$PWD:\$(gcinlibdir)" >> config.mak
   echo "GCIN_DEBUG=1" >> config.mak
+else
+  echo "gcin_ld_run_path=\$(gcinlibdir)" >> config.mak
 fi
 
 echo "gcc_ld_run_path=-Wl,-rpath,\$(gcin_ld_run_path)" >> config.mak

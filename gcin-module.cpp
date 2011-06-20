@@ -62,6 +62,7 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_gcin_pop_up_win = &gcin_pop_up_win;
   func->mf_gcin_font_size = &gcin_font_size;
   func->mf_gcin_win_color_fg = &gcin_win_color_fg;
+
   func->mf_gcin_win_color_use = &gcin_win_color_use;
   func->mf_tsin_cursor_color = &tsin_cursor_color;
   func->mf_pho_selkey = &pho_selkey;

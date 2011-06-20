@@ -296,9 +296,9 @@ static int qcmp_count(const void *aa, const void *bb)
 void disp_pho_sel(char *s);
 void minimize_win_pho();
 
-static void ClrSelArea()
+static void ClrPhoSelArea()
 {
-  disp_pho_sel(" ");
+  disp_pho_sel("");
   minimize_win_pho();
 }
 
@@ -511,6 +511,7 @@ gboolean pre_punctuation(KeySym xkey);
 void pho_play(phokey_t key);
 void close_gtab_pho_win();
 gboolean pre_punctuation_hsu(KeySym xkey);
+void case_inverse(KeySym *xkey, int shift_m);
 
 int feedkey_pho(KeySym xkey, int kbstate)
 {
@@ -528,8 +529,6 @@ int feedkey_pho(KeySym xkey, int kbstate)
   if (ctrl_m)
     return 0;
 
-  if (xkey >= 127 || xkey < ' ')
-        return 0;
 
   if (kbstate&LockMask) {
     if (gcin_capslock_lower)
@@ -545,7 +544,7 @@ int feedkey_pho(KeySym xkey, int kbstate)
     case XK_Escape:
       if (typ_pho_empty())
         return 0;
-      ClrSelArea();
+      ClrPhoSelArea();
       clr_in_area_pho();
       if (is_gtab_query_mode())
         close_gtab_pho_win();
@@ -603,6 +602,8 @@ int feedkey_pho(KeySym xkey, int kbstate)
 
       goto disp;
    default:
+      if (xkey >= 127 || xkey < ' ')
+        return 0;
 
       if (shift_m) {
 //        return shift_char_proc(xkey, kbstate);

@@ -15,7 +15,7 @@ all:    im-gcin.so
 	$(CXX) -E $(CFLAGS) $(INCS) $< > $@
 
 moc_gcin-qt.cpp:	gcin-qt.h
-	/usr/lib/$(QT)/bin/moc $< -o moc_gcin-qt.cpp
+	/usr/$(LIB)/$(QT)/bin/moc $< -o moc_gcin-qt.cpp
 
 im-gcin.so: $(OBJS)
 	export LD_RUN_PATH=$(gcinlibdir) ;\

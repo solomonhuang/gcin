@@ -1244,7 +1244,7 @@ void module_hide_win()
 
 void module_change_font_size()
 {
-//  dbg("change_anthy_font_size\n");
+  dbg("change_anthy_font_size\n");
   GdkColor fg;
   gdk_color_parse(*gmf.mf_gcin_win_color_fg, &fg);
   gmf.mf_change_win_bg(win_anthy);
