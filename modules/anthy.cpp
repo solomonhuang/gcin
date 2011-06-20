@@ -805,7 +805,7 @@ void hide_selections_win();
 
 int module_flush_input()
 {
-  hide_selections_win();
+  gmf.mf_hide_selections_win();
 
   int val;
   if (state==STATE_CONVERT) {
@@ -859,7 +859,7 @@ gboolean module_feedkey(int kv, int kvstate)
     return FALSE;
 
   if (kv==XK_Shift_L||kv==XK_Shift_R) {
-    key_press_time = current_time();
+    key_press_time = gmf.mf_current_time();
   }
 
   if (!gmf.mf_tsin_pho_mode())
@@ -1253,7 +1253,7 @@ void module_change_font_size()
   int i;
   for(i=0; i < MAX_SEG_N; i++) {
     GtkWidget *label = seg[i].label;
-    set_label_font_size(label, *gmf.mf_gcin_font_size);
+    gmf.mf_set_label_font_size(label, *gmf.mf_gcin_font_size);
     if (*gmf.mf_gcin_win_color_use) {
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &fg);
     }
@@ -1296,7 +1296,7 @@ int module_feedkey_release(KeySym xkey, int kbstate)
      && xkey == XK_Shift_L) ||
    (*gmf.mf_tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_ShiftR
      && xkey == XK_Shift_R))
-          &&  current_time() - key_press_time < 300000) {
+          &&  gmf.mf_current_time() - key_press_time < 300000) {
 #if WIN32
           if (!test_mode)
 #endif

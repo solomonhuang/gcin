@@ -1,61 +1,5 @@
-#include <chewing/chewing.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include "chewing.h"
 
-#include "gcin.h"
-#include "pho.h"
-#include "gst.h"
-#include "im-client/gcin-im-client-attr.h"
-#include "win1.h"
-#include "gcin-module.h"
-#include "gcin-module-cb.h"
-
-#define MAX_SEG_NUM  128
-#define GCIN_CHEWING_CONFIG "/.gcin/config/chewing_conf.dat"
-
-typedef struct _SEGMENT {
-    GtkWidget *label;
-    unsigned char selidx, selN;
-} SEG;
-
-/*---------------------------------------------------------------------------*/
-/*    call back funcs                                                        */
-/*---------------------------------------------------------------------------*/
-int module_init_win (GCIN_module_main_functions *pFuncs);
-void module_get_win_geom (void);
-int module_reset (void);
-int module_get_preedit (char *pszStr, GCIN_PREEDIT_ATTR attr[],
-                        int *pnCursor, int *pCompFlag);
-gboolean module_feedkey (int nKeyVal, int nKeyState);
-int module_feedkey_release (KeySym xkey, int nKbState);
-void module_move_win(int x, int y);
-void module_change_font_size (void);
-void module_show_win (void);
-void module_hide_win (void);
-int module_win_visible (void);
-int module_flush_input (void);
-
-/*---------------------------------------------------------------------------*/
-/*    local funcs                                                            */
-/*---------------------------------------------------------------------------*/
-static gboolean select_idx (int c);
-static void prev_page (void);
-static void next_page (void);
-static gboolean chewing_initialize (void);
-static gboolean is_empty (void);
-static gboolean gcin_label_show (char *pszPho, int nPos);
-static gboolean gcin_label_clear (int nCount);
-static gboolean gcin_label_cand_show (char *pszWord, int nCount);
-static gboolean gtk_pango_font_pixel_size_get (int *pnFontWidth, int *pnFontHeight);
-static gboolean chewing_config_open (void);
-static void chewing_config_load (void);
-static void chewing_config_set (void);
-static void chewing_config_dump (void);
-void chewing_config_close (void);
-
-/*---------------------------------------------------------------------------*/
-/*    global vars                                                            */
-/*---------------------------------------------------------------------------*/
 static GCIN_module_main_functions g_gcinModMainFuncs;
 static GtkWidget *g_pWinChewing      = NULL;
 static ChewingContext *g_pChewingCtx = NULL;
@@ -63,9 +7,7 @@ static GtkWidget *g_pEvBoxChewing    = NULL;
 static GtkWidget *g_pHBoxChewing     = NULL;
 static SEG *g_pSeg = NULL;
 static int g_nCurrentCursorPos = 0;
-static ChewingConfigData g_chewingConfig;
 static int g_nFd;
-static gboolean g_bUseDefault = FALSE;
 
 // FIXME: impl
 static gboolean
@@ -96,8 +38,9 @@ gcin_label_show (char *pszPho, int nPos)
 
     memset (szTmp, 0x00, 128);
 
-    sprintf (szTmp, "<span background=\"%s\">%s</span>",
+    sprintf (szTmp, "<span background=\"%s\" foreground=\"%s\">%s</span>",
              *g_gcinModMainFuncs.mf_tsin_cursor_color,
+             *g_gcinModMainFuncs.mf_gcin_win_color_fg,
              pszPho);
 
     gtk_label_set_markup (GTK_LABEL (g_pSeg[nPos].label),
@@ -171,6 +114,8 @@ chewing_initialize (void)
 {
     char *pszChewingHashDir;
     char *pszHome;
+    gboolean bWriteMode = FALSE;
+    ChewingConfigData dummyConfig;
 
     pszHome = getenv ("HOME");
     if (!pszHome)
@@ -191,10 +136,11 @@ chewing_initialize (void)
     if (!g_pChewingCtx)
         return FALSE;
 
-    if (chewing_config_open ())
-        chewing_config_load ();
+    chewing_config_open (bWriteMode);
 
-    chewing_config_set ();
+    chewing_config_load (&dummyConfig);
+
+    chewing_config_set (g_pChewingCtx);
 
     chewing_config_close ();
 
@@ -628,103 +574,5 @@ module_flush_input (void)
 
     chewing_Reset (g_pChewingCtx);
     return 0;
-}
-
-static gboolean
-chewing_config_open (void)
-{
-    char *pszChewingConfig;
-    char *pszHome;
-
-    pszHome = getenv ("HOME");
-    if (!pszHome)
-        pszHome = "";
-
-    pszChewingConfig = malloc (strlen (pszHome) + strlen (GCIN_CHEWING_CONFIG) + 1);
-    memset (pszChewingConfig, 0x00, strlen (pszHome) + strlen (GCIN_CHEWING_CONFIG) + 1);
-    sprintf (pszChewingConfig, "%s%s", pszHome, GCIN_CHEWING_CONFIG);
-
-    g_nFd = open (pszChewingConfig,
-                  O_RDONLY,
-                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-    free (pszChewingConfig);
-
-    return (g_nFd == -1 ? !(g_bUseDefault = TRUE) : TRUE);
-}
-
-static void
-chewing_config_load (void)
-{
-    int nReadSize;
-
-    nReadSize = read (g_nFd, &g_chewingConfig, sizeof (g_chewingConfig));
-    if (nReadSize == 0 || nReadSize != sizeof (g_chewingConfig))
-        g_bUseDefault = TRUE;
-}
-
-// TODO: add kbtype into gcin_conf.dat
-//       or use the gcin setting instead
-static void
-chewing_config_set (void)
-{
-    if (g_bUseDefault)
-    {
-        int nDefaultSelKey[MAX_SELKEY] = {'a', 's', 'd', 'f',
-                                          'g', 'h', 'j', 'k',
-                                          'l', ';'};
-
-        g_chewingConfig.candPerPage           = 10;
-        g_chewingConfig.maxChiSymbolLen       = 16;
-        g_chewingConfig.bAddPhraseForward     = 1;
-        g_chewingConfig.bSpaceAsSelection     = 1;
-        g_chewingConfig.bEscCleanAllBuf       = 0;
-        g_chewingConfig.bAutoShiftCur         = 1;
-        g_chewingConfig.bEasySymbolInput      = 0;
-        g_chewingConfig.bPhraseChoiceRearward = 1;
-        g_chewingConfig.hsuSelKeyType         = 0;
-        memcpy (&g_chewingConfig.selKey,
-                &nDefaultSelKey,
-                sizeof (g_chewingConfig.selKey));
-    }
-
-    chewing_set_KBType (g_pChewingCtx, chewing_KBStr2Num ("KB_DEFAULT"));
-    chewing_set_selKey (g_pChewingCtx, g_chewingConfig.selKey, 10);
-    chewing_set_candPerPage (g_pChewingCtx, g_chewingConfig.candPerPage);
-    chewing_set_maxChiSymbolLen (g_pChewingCtx, g_chewingConfig.maxChiSymbolLen);
-    chewing_set_addPhraseDirection (g_pChewingCtx, g_chewingConfig.bAddPhraseForward);
-    chewing_set_spaceAsSelection (g_pChewingCtx, g_chewingConfig.bSpaceAsSelection);
-    chewing_set_escCleanAllBuf (g_pChewingCtx, g_chewingConfig.bEscCleanAllBuf);
-    chewing_set_autoShiftCur (g_pChewingCtx, g_chewingConfig.bAutoShiftCur);
-    chewing_set_easySymbolInput (g_pChewingCtx, g_chewingConfig.bEasySymbolInput);
-    chewing_set_phraseChoiceRearward (g_pChewingCtx, g_chewingConfig.bPhraseChoiceRearward);
-    chewing_set_hsuSelKeyType (g_pChewingCtx, g_chewingConfig.hsuSelKeyType);
-}
-
-static void
-chewing_config_dump (void)
-{
-    int nIdx = 0;
-    printf ("chewing config:\n");
-    printf ("\tcandPerPage: %d\n", g_chewingConfig.candPerPage);
-    printf ("\tmaxChiSymbolLen: %d\n", g_chewingConfig.maxChiSymbolLen);
-    printf ("\tbAddPhraseForward: %d\n", g_chewingConfig.bAddPhraseForward);
-    printf ("\tbSpaceAsSelection: %d\n", g_chewingConfig.bSpaceAsSelection);
-    printf ("\tbEscCleanAllBuf: %d\n", g_chewingConfig.bEscCleanAllBuf);
-    printf ("\tbAutoShiftCur: %d\n", g_chewingConfig.bAutoShiftCur);
-    printf ("\tbEasySymbolInput: %d\n", g_chewingConfig.bEasySymbolInput);
-    printf ("\tbPhraseChoiceRearward: %d\n", g_chewingConfig.bPhraseChoiceRearward);
-    printf ("\thsuSelKeyType: %d\n", g_chewingConfig.hsuSelKeyType);
-    printf ("\tselKey: ");
-    for (nIdx = 0; nIdx < MAX_SELKEY; nIdx++)
-        printf ("%c ", g_chewingConfig.selKey[nIdx]);
-    printf ("\n");
-}
-
-void
-chewing_config_close (void)
-{
-    if (g_nFd != -1)
-        close (g_nFd);
 }
 

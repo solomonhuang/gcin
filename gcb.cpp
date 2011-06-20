@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "os-dep.h"
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <time.h>

@@ -1,10 +1,4 @@
-#include <chewing/chewing.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include "gcin.h"
-
-#define GCIN_CHEWING_CONFIG "/.gcin/config/chewing_conf.dat"
+#include "chewing.h"
 
 // TODO:
 //     the hbox/label could be moved to local func
@@ -36,132 +30,6 @@ static GtkWidget *g_pLabelAddPhraseForward = NULL;
 static GtkWidget *g_pCheckButtonAddPhraseForward = NULL;
 
 static ChewingConfigData g_chewingConfig;
-static int g_nFd = -1;
-
-static void
-chewing_config_dump (void)
-{
-    int nIdx = 0;
-    printf ("chewing config:\n");
-    printf ("\tcandPerPage: %d\n", g_chewingConfig.candPerPage);
-    printf ("\tmaxChiSymbolLen: %d\n", g_chewingConfig.maxChiSymbolLen);
-    printf ("\tbAddPhraseForward: %d\n", g_chewingConfig.bAddPhraseForward);
-    printf ("\tbSpaceAsSelection: %d\n", g_chewingConfig.bSpaceAsSelection);
-    printf ("\tbEscCleanAllBuf: %d\n", g_chewingConfig.bEscCleanAllBuf);
-    printf ("\tbAutoShiftCur: %d\n", g_chewingConfig.bAutoShiftCur);
-    printf ("\tbEasySymbolInput: %d\n", g_chewingConfig.bEasySymbolInput);
-    printf ("\tbPhraseChoiceRearward: %d\n", g_chewingConfig.bPhraseChoiceRearward);
-    printf ("\thsuSelKeyType: %d\n", g_chewingConfig.hsuSelKeyType);
-    printf ("\tselKey: ");
-    for (nIdx = 0; nIdx < MAX_SELKEY; nIdx++)
-        printf ("%c ", g_chewingConfig.selKey[nIdx]);
-    printf ("\n");
-}
-
-static void
-chewing_config_default_set (void)
-{
-    int nDefaultSelKey[MAX_SELKEY] = {'a', 's', 'd', 'f',
-                                      'g', 'h', 'j', 'k',
-                                      'l', ';'};
-
-    g_chewingConfig.candPerPage           = 10;
-    g_chewingConfig.maxChiSymbolLen       = 16;
-    g_chewingConfig.bAddPhraseForward     = 1;
-    g_chewingConfig.bSpaceAsSelection     = 1;
-    g_chewingConfig.bEscCleanAllBuf       = 0;
-    g_chewingConfig.bAutoShiftCur         = 1;
-    g_chewingConfig.bEasySymbolInput      = 0;
-    g_chewingConfig.bPhraseChoiceRearward = 1;
-    g_chewingConfig.hsuSelKeyType         = 0;
-    memcpy (&g_chewingConfig.selKey,
-            &nDefaultSelKey,
-            sizeof (g_chewingConfig.selKey));
-}
-
-static gboolean
-chewing_config_open (void)
-{
-    char *pszChewingConfig;
-    char *pszHome;
-
-    pszHome = getenv ("HOME");
-    if (!pszHome)
-        pszHome = "";
-
-    pszChewingConfig = malloc (strlen (pszHome) + strlen (GCIN_CHEWING_CONFIG) + 1);
-    memset (pszChewingConfig, 0x00, strlen (pszHome) + strlen (GCIN_CHEWING_CONFIG) + 1);
-    sprintf (pszChewingConfig, "%s%s", pszHome, GCIN_CHEWING_CONFIG);
-
-    g_nFd = open (pszChewingConfig,
-                  O_RDWR  | O_CREAT,
-                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-    free (pszChewingConfig);
-
-    return (g_nFd == -1 ? FALSE : TRUE);
-}
-
-static void
-chewing_config_close (void)
-{
-    if (g_nFd != -1)
-        close (g_nFd);
-    g_nFd = -1;
-}
-
-static gboolean
-chewing_config_load (void)
-{
-    int nReadSize;
-
-    if (!chewing_config_open ())
-        return FALSE;
-
-    nReadSize = read (g_nFd, &g_chewingConfig, sizeof (g_chewingConfig));
-    if (nReadSize == 0)
-        chewing_config_default_set ();
-    else if (nReadSize != sizeof (g_chewingConfig))
-        return FALSE;
-
-    chewing_config_close ();
-
-    return TRUE;
-}
-
-static gboolean
-chewing_config_save (void)
-{
-    int nWriteSize;
-
-    if (!chewing_config_open ())
-        return FALSE;
-
-    g_chewingConfig.candPerPage =
-        (int)gtk_spin_button_get_value (GTK_SPIN_BUTTON (g_pSpinButtonCandPerPage));
-    if (g_chewingConfig.candPerPage > MAX_SELKEY)
-        g_chewingConfig.candPerPage = MAX_SELKEY;
-
-    g_chewingConfig.bSpaceAsSelection =
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonSpaceAsSelection));
-
-    g_chewingConfig.bEscCleanAllBuf =
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonEscCleanAllBuf));
-
-    g_chewingConfig.bAutoShiftCur =
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonAutoShiftCur));
-
-    g_chewingConfig.bAddPhraseForward =
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonAddPhraseForward));
-
-    nWriteSize = write (g_nFd, &g_chewingConfig, sizeof (g_chewingConfig));
-    if (nWriteSize != sizeof (g_chewingConfig))
-        return FALSE;
-
-    chewing_config_close ();
-
-    return TRUE;
-}
 
 static gboolean
 cb_close_window (GtkWidget *widget, GdkEvent *event, gpointer data)
@@ -170,13 +38,29 @@ cb_close_window (GtkWidget *widget, GdkEvent *event, gpointer data)
 
     gtk_widget_destroy (gcin_chewing_window);
     gcin_chewing_window = NULL;
+    memset (&g_chewingConfig, 0x00, sizeof (g_chewingConfig));
+
     return TRUE;
 }
 
 static gboolean
 cb_update_setting (GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-    chewing_config_save ();
+    int nVal[] = 
+    {
+        gtk_spin_button_get_value (GTK_SPIN_BUTTON (g_pSpinButtonCandPerPage)),
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonSpaceAsSelection)),
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonEscCleanAllBuf)),
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonAutoShiftCur)),
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (g_pCheckButtonAddPhraseForward)) 
+    };
+
+    if (!chewing_config_save (nVal))
+    {
+        chewing_config_close ();
+        return FALSE;
+    }
+
     chewing_config_close ();
 
     gtk_widget_destroy (gcin_chewing_window);
@@ -186,8 +70,11 @@ cb_update_setting (GtkWidget *widget, GdkEvent *event, gpointer data)
 
 void module_setup_window_create ()
 {
-    if (!chewing_config_load ())
-        return;
+    gboolean bWriteMode = TRUE;
+
+    chewing_config_open (bWriteMode);
+    
+    chewing_config_load (&g_chewingConfig);
 
     if (gcin_chewing_window)
     {

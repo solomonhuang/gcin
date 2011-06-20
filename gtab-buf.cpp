@@ -192,7 +192,7 @@ static char *gen_buf_str_disp()
     char *t = spec;
 
     if (i==ggg.gbuf_cursor) {
-      sprintf(www, "<span background=\"%s\">%s</span>", "red", spec);
+      sprintf(www, "<span background=\"%s\">%s</span>", tsin_cursor_color, spec);
       t = www;
     }
 
