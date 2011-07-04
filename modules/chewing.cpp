@@ -136,6 +136,8 @@ chewing_initialize (void)
     if (!g_pChewingCtx)
         return FALSE;
 
+    memset (&dummyConfig, 0x00, sizeof (ChewingConfigData));
+
     chewing_config_open (bWriteMode);
 
     chewing_config_load (&dummyConfig);

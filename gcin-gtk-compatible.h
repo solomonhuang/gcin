@@ -41,6 +41,15 @@
 #define GDK_DISPLAY() GDK_DISPLAY_XDISPLAY(gdk_display_get_default())
 #endif
 
+#if GTK_CHECK_VERSION(2,90,0)
+#define gtk_hseparator_new() gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)
+#define gtk_vseparator_new() gtk_separator_new(GTK_ORIENTATION_VERTICAL)
+#endif
+
+#if !GTK_CHECK_VERSION(2,91,0)
+#define gtk_widget_get_preferred_size(x,y,z) gtk_widget_size_request(x,z)
+#endif
+
 #if GTK_CHECK_VERSION(2,91,0)
 #define GTK_OBJECT
 #endif
@@ -57,6 +66,10 @@
 #define gtk_combo_box_new_text gtk_combo_box_text_new
 #define gtk_combo_box_append_text gtk_combo_box_text_append_text
 #define gtk_widget_hide_all gtk_widget_hide
+#endif
+
+#if !GTK_CHECK_VERSION(2,91,6)
+#define gtk_widget_override_font gtk_widget_modify_font
 #endif
 
 #if GTK_CHECK_VERSION(2,91,6)

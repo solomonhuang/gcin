@@ -23,6 +23,7 @@ int pin_juyinN;
 
 gboolean full_char_proc(KeySym keysym);
 void hide_win_pho();
+void ClrSelArea();
 
 #define MAX_HASH_PHO 27
 u_short hash_pho[MAX_HASH_PHO+1];
@@ -641,7 +642,6 @@ lll1:
   if (poo.typ_pho[3])
     ctyp = 3;
 
-llll1:
   jj=0;
   kk=1;
 llll2:
@@ -734,13 +734,13 @@ disp:
 //    dbg("poo.cpg %d\n", poo.cpg);
 
     while(i< phkbm.selkeyN  && ii < poo.stop_idx) {
-      char tt[128];
+      char tt[512];
       sprintf(tt, "<span foreground=\"%s\">%c</span>",
          gcin_sel_key_color, pho_selkey[i]);
       int ttlen = strlen(tt);
       memcpy(out_buffer+out_bufferN, tt, ttlen);
       out_bufferN+=ttlen;
-      strcat(out_buffer, tt);
+//      strcat(out_buffer, tt);
       char *pho_str = pho_idx_str_markup(ii);
       int len = strlen(pho_str);
       memcpy(&out_buffer[out_bufferN], pho_str, len);

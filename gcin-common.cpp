@@ -127,7 +127,7 @@ void set_label_font_size(GtkWidget *label, int size)
        (pango_context);
   pango_font_description_set_family(font, gcin_font_name);
   pango_font_description_set_size(font, PANGO_SCALE * size);
-  gtk_widget_modify_font(label, font);
+  gtk_widget_override_font(label, font);
 }
 
 // the width of ascii space in firefly song

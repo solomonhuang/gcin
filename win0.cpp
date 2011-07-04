@@ -272,7 +272,7 @@ int get_widget_xy(GtkWidget *win, GtkWidget *widget, int *rx, int *ry)
 //  gdk_flush();
 
   GtkRequisition sz;
-  gtk_widget_size_request(widget, &sz);
+  gtk_widget_get_preferred_size(widget, NULL, &sz);
   int wx, wy;
 
   wx=wy=0;

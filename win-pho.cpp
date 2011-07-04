@@ -27,7 +27,7 @@ void get_win_size(GtkWidget *win, int *width, int *height)
 {
   GtkRequisition sz;
   sz.width = sz.height = 0;
-  gtk_widget_size_request(GTK_WIDGET(win), &sz);
+  gtk_widget_get_preferred_size(GTK_WIDGET(win), NULL, &sz);
   *width = sz.width;
   *height = sz.height;
 }
