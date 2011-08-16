@@ -1,4 +1,4 @@
-﻿#include "gcin.h"
+#include "gcin.h"
 #include "gtab.h"
 #include "config.h"
 #if UNIX

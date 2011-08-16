@@ -1,4 +1,4 @@
-﻿#include "gcin.h"
+#include "gcin.h"
 #include "pho.h"
 #include "config.h"
 #if GCIN_i18n_message
@@ -8,6 +8,9 @@
 #include "tsin.h"
 #include "gtab.h"
 #include <gdk/gdkkeysyms.h>
+#if GTK_CHECK_VERSION(2,90,7)
+#include <gdk/gdkkeysyms-compat.h>
+#endif
 
 char txt[128];
 
@@ -39,7 +42,7 @@ int tsN;
 int page_ofs, select_cursor;
 GtkWidget *labels[PAGE_LEN];
 GtkWidget *button_check[PAGE_LEN];
-GtkWidget *last_row, *find_textentry;
+GtkWidget *last_row, *find_textentry, *label_page_ofs;
 int del_ofs[1024];
 int del_ofsN;
 
@@ -243,6 +246,10 @@ void disp_page()
     gtk_label_set_text(GTK_LABEL(labels[li]), line);
     gtk_widget_show(button_check[li]);
   }
+
+  char tt[32];
+  sprintf(tt, "%d", page_ofs+1);
+  gtk_label_set_text(label_page_ofs, tt);
 }
 
 static void cb_button_delete(GtkButton *button, gpointer user_data)
@@ -632,7 +639,6 @@ int main(int argc, char **argv)
     button_check[i] = gtk_check_button_new();
     gtk_box_pack_start (GTK_BOX (hbox), button_check[i], FALSE, FALSE, 0);
 
-
     labels[i]=gtk_label_new(NULL);
 #if 0
     g_signal_connect (G_OBJECT (labels[i]), "scroll-event",
@@ -673,6 +679,9 @@ int main(int argc, char **argv)
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_quit, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_quit), "clicked",
      G_CALLBACK (do_exit), NULL);
+
+  label_page_ofs = gtk_label_new(NULL);
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), label_page_ofs, FALSE, FALSE, 3);
 
   g_signal_connect (G_OBJECT (mainwin), "delete_event",
                     G_CALLBACK (do_exit), NULL);
