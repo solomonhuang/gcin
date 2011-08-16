@@ -26,6 +26,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
 GtkWidget *check_button_gcin_capslock_lower;
 
 static GtkWidget *opt_kbm_opts, *opt_selkeys, *opt_eng_ch_opts;
+extern gboolean button_order;
 
 
 static struct {
@@ -631,9 +632,15 @@ void create_kbm_window()
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok , FALSE, FALSE, 5);
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
   GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
 
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
                             G_CALLBACK (close_kbm_window),

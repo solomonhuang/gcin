@@ -64,12 +64,15 @@ struct TableHead {
 };
 
 
+#define KeyBits1(inm) (inm->keybits)
 #define KeyBits (cur_inmd->keybits)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
 #define MAX_GTAB_NUM_KEY (17)
 #define MAX_TAB_KEY_NUM (32/KeyBits)
+#define MAX_TAB_KEY_NUM1(inm) (32/KeyBits1(inm))
 #define MAX_TAB_KEY_NUM64 (64/KeyBits)
+#define MAX_TAB_KEY_NUM641(inm) (64/KeyBits1(inm))
 
 struct _GCIN_module_callback_functions;
 typedef u_int gtab_idx1_t;
@@ -138,3 +141,6 @@ char current_method_type();
 #define NEED_SWAP (1)
 #endif
 
+#define tblch2(inm, i) (inm->key64 ? inm->tbl64[i].ch:inm->tbl[i].ch)
+#define Max_tab_key_num1(inm) (inm->key64 ? MAX_TAB_KEY_NUM641(inm) : MAX_TAB_KEY_NUM1(inm))
+#define Max_tab_key_num Max_tab_key_num1(cur_inmd)

@@ -55,7 +55,7 @@ void *memdup(void *p, int n);
 extern Display *dpy;
 #endif
 
-
+extern char *TableDir;
 extern GtkWidget *gwin0;
 extern GdkWindow *gdkwin0;
 extern Window xwin0;

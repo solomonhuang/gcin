@@ -11,7 +11,7 @@
 符號表 4 !SYMBOL_TABLE symbols.png
 # gtab 拼音現在不用了，改用詞音的拼音
 #拼音 5 pinyin.gtab pinyin.png
-詞音 6 !TSIN tsin.png
+詞音/拼音 6 !TSIN tsin.png
 大易 7 dayi3.gtab dayi3.png
 #大易 7 gdayi3.gtab dayi3.png
 #行列 8 ar30.gtab ar30.png

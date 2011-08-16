@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 #include "gtab.h"
 #include "config.h"
 #if UNIX
@@ -32,6 +32,7 @@ static GtkClipboard *pclipboard;
 static GtkWidget *opt_gcin_edit_display;
 GtkWidget *main_window;
 static GdkColor gcin_win_gcolor_fg, gcin_win_gcolor_bg, gcin_sel_key_gcolor;
+gboolean button_order;
 
 
 typedef struct {
@@ -235,8 +236,9 @@ static void cb_ts_import()
 
 static void cb_ts_edit()
 {
+#if 0
 #if UNIX
-  if (default_input_method==6) {
+  if (inmd[default_input_method].method_type==method_type_TSIN) {
     char tt[512];
     sprintf(tt, "( cd ~/.gcin && "GCIN_BIN_DIR"/tsd2a32 %s > tmpfile && %s tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile %s) &",
       tsin32_f, utf8_edit, tsin32_f);
@@ -248,11 +250,18 @@ static void cb_ts_edit()
     system(tt);
   }
 #else
-  if (default_input_method==6)
+  if (inmd[default_input_method].method_type==method_type_TSIN)
     win32exec_script("ts-edit.bat", tsin32_f);
   else {
     win32exec_script("ts-gtab-edit.bat", inmd[default_input_method].filename);
   }
+#endif
+#else
+#if UNIX
+  system(GCIN_BIN_DIR"/ts-edit");
+#else
+  win32exec("ts-edit.exe");
+#endif
 #endif
 }
 
@@ -816,14 +825,20 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
 
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, FALSE, FALSE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_cancel, FALSE, FALSE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, FALSE, FALSE, 0);
 
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
                             G_CALLBACK (close_appearance_conf_window),
                             G_OBJECT (gcin_appearance_conf_window));
 
   GtkWidget *button_close = gtk_button_new_from_stock (GTK_STOCK_OK);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
 
   g_signal_connect_swapped (G_OBJECT (button_close), "clicked",
                             G_CALLBACK (cb_appearance_conf_ok),
@@ -1122,6 +1137,8 @@ int main(int argc, char **argv)
   bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
   textdomain(GETTEXT_PACKAGE);
 #endif
+
+  g_object_get(gtk_settings_get_default(), "gtk-alternative-button-order", &button_order, NULL);
 
   create_main_win();
 

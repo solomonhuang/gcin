@@ -1,4 +1,4 @@
-#include "gcin.h"
+﻿#include "gcin.h"
 #include "pho.h"
 #include "config.h"
 #if GCIN_i18n_message
@@ -7,15 +7,21 @@
 #include "lang.h"
 #include "tsin.h"
 #include "gtab.h"
+#include <gdk/gdkkeysyms.h>
 
-char *current_tsin_fname;
+char txt[128];
+
+extern char *current_tsin_fname;
 typedef unsigned int u_int32_t;
+
+#define PAGE_LEN 20
 
 void init_TableDir();
 void init_gtab(int inmdno);
 gboolean init_tsin_table_fname(INMD *p, char *fname);
 void load_tsin_db0(char *infname, gboolean is_gtab_i);
 
+GtkWidget *vbox_top;
 INMD *pinmd;
 char gtab_tsin_fname[256];
 char is_gtab;
@@ -27,11 +33,15 @@ char current_str[MAX_PHRASE_LEN*CH_SZ+1];
 extern gboolean is_chs;
 
 GtkWidget *mainwin;
-GtkTextBuffer *buffer;
 
-static char **phrase;
-static int phraseN=0;
-
+static int *ts_idx;
+int tsN;
+int page_ofs, select_cursor;
+GtkWidget *labels[PAGE_LEN];
+GtkWidget *button_check[PAGE_LEN];
+GtkWidget *last_row, *find_textentry;
+int del_ofs[1024];
+int del_ofsN;
 
 void cp_ph_key(void *in, int idx, void *dest)
 {
@@ -107,22 +117,21 @@ void load_ts_phrase()
   char fname[256];
 
   int i;
-  for(i=0; i < phraseN; i++)
-    free(phrase[i]);
-  free(phrase); phrase = NULL;
-  phraseN = 0;
-
   dbg("fname %s\n", current_tsin_fname);
 
   int ofs = is_gtab ? sizeof(TSIN_GTAB_HEAD):0;
   fseek(fp, ofs, SEEK_SET);
 
+  tsN=0;
+  free(ts_idx);
+
   while (!feof(fp)) {
+    ts_idx = trealloc(ts_idx, int, tsN);
+    ts_idx[tsN] = ftell(fp);
     u_int64_t phbuf[MAX_PHRASE_LEN];
     char chbuf[MAX_PHRASE_LEN * CH_SZ + 1];
     u_char clen;
     usecount_t usecount;
-
     clen = 0;
 
     fread(&clen,1,1,fp);
@@ -147,101 +156,196 @@ void load_ts_phrase()
       continue;
 
     chbuf[tlen]=0;
-    phrase = trealloc(phrase, char *, phraseN+1);
-
-    phrase[phraseN++] = strdup(chbuf);
+    tsN++;
   }
 
+  page_ofs = tsN - PAGE_LEN;
 
 stop:
-
+   dbg("load_ts_phrase\n");
 //  fclose(fp);
 
-  qsort(phrase, phraseN, sizeof(char *), qcmp_str);
-
-  dbg("phraseN: %d\n", phraseN);
 }
 
-gboolean pharse_search(char *s)
+int gtab_key2name(INMD *tinmd, u_int64_t key, char *t, int *rtlen);
+void get_key_str(void *key, int idx, char *out_str)
 {
-  return bsearch(&s, phrase, phraseN, sizeof(char *), qcmp_str) != NULL;
+  char t[128];
+  char *phostr;
+
+  if (is_gtab) {
+     int tlen;
+     u_int64_t key64;
+     if (ph_key_sz == 4) {
+       u_int32_t key32;
+       cp_ph_key(key, idx, &key32);
+       key64 = key32;
+     } else
+       cp_ph_key(key, idx, &key64);
+     int kn = gtab_key2name(pinmd, key64, t, &tlen);
+     phostr = t;
+   } else {
+     phokey_t k;
+     cp_ph_key(key, idx, &k);
+     phostr = b_pinyin?
+     phokey2pinyin(k):phokey_to_str(k);
+   }
+
+   strcpy(out_str, phostr);
 }
 
-void all_wrap()
-{
-  GtkTextIter mstart,mend;
+void load_tsin_entry0(char *len, usecount_t *usecount, void *pho, u_char *ch);
 
-  gtk_text_buffer_get_bounds (buffer, &mstart, &mend);
-  gtk_text_buffer_apply_tag_by_name (buffer, "char_wrap", &mstart, &mend);
+void load_tsin_at_ts_idx(int ts_row, char *len, usecount_t *usecount, void *pho, u_char *ch)
+{
+    int ofs = ts_idx[ts_row];
+    fseek(fph, ofs, SEEK_SET);
+
+    load_tsin_entry0(len, usecount, pho, ch);
 }
 
-
-static void cb_button_parse(GtkButton *button, gpointer user_data)
+void disp_page()
 {
-  int char_count = gtk_text_buffer_get_char_count (buffer);
-
-  int i;
-
-  load_ts_phrase();
-
-  char_count = gtk_text_buffer_get_char_count (buffer);
-
-  all_wrap();
-
-  dbg("parse char_count:%d\n", char_count);
-
-  for(i=0; i < char_count; ) {
-    int len;
-
-    for(len=MAX_PHRASE_LEN; len>=2 ; len--) {
-      u_char txt[MAX_PHRASE_LEN*CH_SZ + 1];
-      int txtN=0, u8chN=0;
-
-      gboolean b_ignore = FALSE;
-      int k;
-      for(k=0; k<len && i+k < char_count; k++) {
-        GtkTextIter start,end;
-        gtk_text_buffer_get_iter_at_offset (buffer, &start, i+k);
-        gtk_text_buffer_get_iter_at_offset (buffer, &end, i+k+1);
-        char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-
-        if (!(utf8[0] & 128))
-          b_ignore = TRUE;
-
-        int wn = strlen(utf8);
-
-        memcpy(&txt[txtN], utf8, wn);
-
-        txtN+= wn;
-        u8chN++;
-      }
-
-      if (b_ignore || txtN < 2)
-        continue;
-
-      txt[txtN] = 0;
-//      dbg("try len:%d txtN:%d %s\n", len, txtN, txt);
-      if (!pharse_search((char *)txt))
-        continue;
-
-//      dbg("match .... %d %d\n", i, len);
-
-      GtkTextIter mstart,mend;
-
-      gtk_text_buffer_get_iter_at_offset (buffer, &mstart, i);
-      gtk_text_buffer_get_iter_at_offset (buffer, &mend, i+len);
-      gtk_text_buffer_apply_tag_by_name (buffer, "blue_background", &mstart, &mend);
-#if 1
-      // why do I have to repeat this
-      gtk_text_buffer_get_iter_at_offset (buffer, &mstart, i);
-      gtk_text_buffer_get_iter_at_offset (buffer, &mend, i+len);
-      gtk_text_buffer_apply_tag_by_name (buffer, "blue_background", &mstart, &mend);
-#endif
-      gdk_flush();
+  int li;
+  for(li=0;li<PAGE_LEN;li++) {
+    char line[256];
+    line[0];
+    int ts_row = page_ofs + li;
+    if (ts_row >= tsN) {
+      gtk_label_set_text(GTK_LABEL(labels[li]), "-");
+      gtk_widget_hide(button_check[li]);
+      continue;
     }
 
-    i+=len;
+
+    u_int64_t phbuf[MAX_PHRASE_LEN];
+    char chbuf[MAX_PHRASE_LEN * CH_SZ + 1];
+    char clen;
+    usecount_t usecount;
+    int i;
+
+    load_tsin_at_ts_idx(ts_row, &clen, &usecount, phbuf, (u_char *)chbuf);
+
+    strcpy(line, chbuf);
+    strcat(line, " ");
+
+    char tt[512];
+
+    for(i=0; i < clen; i++) {
+      get_key_str(phbuf, i, tt);
+      strcat(line, tt);
+      strcat(line, " ");
+    }
+
+    sprintf(tt, " %d", usecount);
+    strcat(line, tt);
+
+    gtk_label_set_text(GTK_LABEL(labels[li]), line);
+    gtk_widget_show(button_check[li]);
   }
+}
+
+static void cb_button_delete(GtkButton *button, gpointer user_data)
+{
+  int i;
+  for(i=0; i < PAGE_LEN; i++) {
+    if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button_check[i])))
+      continue;
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_check[i]), FALSE);
+
+    del_ofs[del_ofsN++] = ts_idx[page_ofs+i];
+    ts_idx[page_ofs+i]=-1;
+  }
+
+  int ntsN=0;
+
+  for(i=0;i<tsN;i++)
+    if (ts_idx[i]>=0)
+      ts_idx[ntsN++]=ts_idx[i];
+  tsN = ntsN;
+
+  disp_page();
+}
+
+static void cb_button_find_ok(GtkButton *button, gpointer user_data)
+{
+  txt[0]=0;
+  strcpy(txt, gtk_entry_get_text(GTK_ENTRY(find_textentry)));
+  gtk_widget_destroy(last_row);
+  last_row = NULL;
+  if (!txt[0])
+    return;
+  int row;
+  for(row=page_ofs+1; row < tsN; row++) {
+    u_int64_t phbuf[MAX_PHRASE_LEN];
+    char chbuf[MAX_PHRASE_LEN * CH_SZ + 1];
+    char clen;
+    usecount_t usecount;
+
+    load_tsin_at_ts_idx(row, &clen, &usecount, phbuf, (u_char *)chbuf);
+    if (strstr(chbuf, txt))
+      break;
+  }
+
+  if (row==tsN) {
+    GtkWidget *dia = gtk_message_dialog_new(NULL,GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_OK,"%s not found",
+      txt);
+    gtk_dialog_run (GTK_DIALOG (dia));
+    gtk_widget_destroy (dia);
+  } else {
+    page_ofs = row;
+    disp_page();
+  }
+}
+
+static void cb_button_find(GtkButton *button, gpointer user_data)
+{
+  if (last_row)
+    gtk_widget_destroy(last_row);
+  last_row = gtk_hbox_new (FALSE, 0);
+  GtkWidget *lab = gtk_label_new("Find");
+  gtk_box_pack_start (GTK_BOX (last_row), lab, FALSE, FALSE, 0);
+  find_textentry = gtk_entry_new();
+  gtk_box_pack_start (GTK_BOX (last_row), find_textentry, FALSE, FALSE, 5);
+  GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
+  g_signal_connect (G_OBJECT (button_ok), "clicked",
+     G_CALLBACK (cb_button_find_ok), NULL);
+  gtk_box_pack_start (GTK_BOX (last_row), button_ok, FALSE, FALSE, 5);
+
+  gtk_box_pack_start (GTK_BOX (vbox_top), last_row, FALSE, FALSE, 0);
+
+  gtk_entry_set_text(GTK_ENTRY(find_textentry), txt);
+
+  gtk_widget_show_all(last_row);
+}
+
+static void cb_button_edit(GtkButton *button, gpointer user_data)
+{
+}
+
+static void cb_button_save(GtkButton *button, gpointer user_data)
+{
+  int i;
+  for(i=0;i<del_ofsN;i++) {
+    fseek(fph, del_ofs[i], SEEK_SET);
+    char clen;
+    fread(&clen, 1, 1, fph);
+    if (clen > 0) {
+      clen = -clen;
+      fseek(fph, del_ofs[i], SEEK_SET);
+      fwrite(&clen, 1, 1, fph);
+    }
+  }
+  fclose(fph);
+
+#if UNIX
+  unix_exec(GCIN_BIN_DIR"/tsd2a32 %s -o tsin.tmp", current_tsin_fname);
+  unix_exec(GCIN_BIN_DIR"/tsa2d32 tsin.tmp %s", current_tsin_fname);
+#else
+  win32exec_va("tsd2a32", current_tsin_fname, "-o" "tsin.tmp", NULL);
+  win32exec_va("tsa2d32", "tsin.tmp",  current_tsin_fname, NULL);
+#endif
+  exit(0);
 }
 
 #define MAX_SAME_CHAR_PHO (16)
@@ -279,17 +383,10 @@ static void cb_button_ok(GtkButton *button, gpointer user_data)
   save_phrase_to_db(pharr8, current_str, bigphoN, 0);
 
   destroy_pho_sel_area();
-
-  GtkTextMark *selebound =  gtk_text_buffer_get_selection_bound(buffer);
-  gtk_text_mark_set_visible(selebound, FALSE);
-
-  cb_button_parse(NULL, NULL);
-
 }
 
 static void cb_button_cancel(GtkButton *button, gpointer user_data)
 {
-  destroy_pho_sel_area();
 }
 
 int gtab_key2name(INMD *tinmd, u_int64_t key, char *t, int *rtlen);
@@ -358,7 +455,6 @@ GtkWidget *create_pho_sel_area()
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
      G_CALLBACK (cb_button_cancel), NULL);
 
-
   return hbox_pho_sel;
 }
 
@@ -367,13 +463,6 @@ static void cb_button_add(GtkButton *button, gpointer user_data)
 {
   GtkTextIter start, end;
 
-  if (!gtk_text_buffer_get_selection_bounds(buffer, &start, &end))
-    return;
-
-  char *utf8 = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-  strcpy(current_str, utf8);
-
-  g_free(utf8);
 
   bigphoN = 0;
   char *p = current_str;
@@ -421,7 +510,58 @@ void init_gcin_program_files();
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
+static gboolean  scroll_event(GtkWidget *widget,GdkEventScroll *event, gpointer user_data)
+{
+  dbg("scroll_event\n");
+
+  if (event->direction!=GDK_SCROLL_DOWN)
+    return TRUE;
+
+  return FALSE;
+}
+
+gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+  if (last_row)
+    return FALSE;
+  dbg("key_press_event %x\n", event->keyval);
+  switch (event->keyval) {
+    case GDK_Up:
+      if (page_ofs>0)
+        page_ofs--;
+      break;
+    case GDK_Down:
+      if (page_ofs<tsN-1)
+        page_ofs++;
+      break;
+    case GDK_Page_Up:
+      page_ofs -= PAGE_LEN;
+      if (page_ofs < 0)
+        page_ofs = 0;
+      break;
+    case GDK_Page_Down:
+      page_ofs += PAGE_LEN;
+      if (page_ofs>= tsN)
+        page_ofs = tsN-1;
+      break;
+    case GDK_Home:
+      page_ofs = 0;
+      break;
+    case GDK_End:
+      page_ofs = tsN - PAGE_LEN;
+      break;
+  }
+
+  disp_page();
+
+  return TRUE;
+}
+
 gboolean is_pinyin_kbm();
+
+#if WIN32
+#include <direct.h>
+#endif
 
 int main(int argc, char **argv)
 {
@@ -432,6 +572,14 @@ int main(int argc, char **argv)
   gtk_init (&argc, &argv);
   load_setttings();
   load_gtab_list(TRUE);
+
+  char gcin_dir[512];
+  get_gcin_dir(gcin_dir);
+#if UNIX
+  chdir(gcin_dir);
+#else
+  _chdir(gcin_dir);
+#endif
 
 
 #if GCIN_i18n_message
@@ -464,65 +612,76 @@ int main(int argc, char **argv)
 #endif
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_position(GTK_WINDOW(mainwin), GTK_WIN_POS_CENTER);
+
+  g_signal_connect (G_OBJECT (mainwin), "key-press-event",
+                   G_CALLBACK (key_press_event), NULL);
+
   gtk_window_set_has_resize_grip(GTK_WINDOW(mainwin), FALSE);
-  gtk_window_set_default_size(GTK_WINDOW (mainwin), 640, 520);
+//  gtk_window_set_default_size(GTK_WINDOW (mainwin), 640, 520);
   set_window_gcin_icon(mainwin);
 
-  GtkWidget *sw = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
-                                  GTK_POLICY_AUTOMATIC,
-                                  GTK_POLICY_AUTOMATIC);
-
-  GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
+  vbox_top = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER(mainwin), vbox_top);
 
-  GtkWidget *view = gtk_text_view_new ();
-  gtk_container_add (GTK_CONTAINER(sw), view);
+  int i;
+  for(i=0;i<PAGE_LEN;i++) {
+    GtkWidget *hbox;
+    hbox = gtk_hbox_new (FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (vbox_top), hbox, FALSE, FALSE, 0);
+    button_check[i] = gtk_check_button_new();
+    gtk_box_pack_start (GTK_BOX (hbox), button_check[i], FALSE, FALSE, 0);
 
-  gtk_box_pack_start (GTK_BOX (vbox_top), sw, TRUE, TRUE, 0);
 
-  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-
-#if UNIX
-  char *text = _(_L("按滑鼠中鍵, 貼上你要 tslearn 學習的文章。"));
-#else
-  char *text = _(_L("按 ctrl-V, 貼上你要 tslearn 學習的文章。"));
+    labels[i]=gtk_label_new(NULL);
+#if 0
+    g_signal_connect (G_OBJECT (labels[i]), "scroll-event",
+                      G_CALLBACK (scroll_event), NULL);
 #endif
-
-  gtk_text_buffer_set_text (buffer, text, -1);
-
-  gtk_text_buffer_create_tag (buffer,
-     "blue_background", "background", "blue", "foreground", "white", NULL);
-
-  gtk_text_buffer_create_tag (buffer, "char_wrap",
-			      "wrap_mode", GTK_WRAP_CHAR, NULL);
+    GtkWidget *align = gtk_alignment_new (0, 0, 0, 0);
+    gtk_container_add(GTK_CONTAINER(align), labels[i]);
+    gtk_box_pack_start (GTK_BOX (hbox), align, FALSE, FALSE, 0);
+  }
 
   hbox_buttons = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_buttons, FALSE, FALSE, 0);
 
-  GtkWidget *button_parse = gtk_button_new_with_label(_(_L("標示已知詞")));
-  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_parse, FALSE, FALSE, 0);
-  g_signal_connect (G_OBJECT (button_parse), "clicked",
-     G_CALLBACK (cb_button_parse), NULL);
+  GtkWidget *button_delete = gtk_button_new_from_stock (GTK_STOCK_DELETE);
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_delete, FALSE, FALSE, 0);
+  g_signal_connect (G_OBJECT (button_delete), "clicked",
+     G_CALLBACK (cb_button_delete), NULL);
 
-  GtkWidget *button_add = gtk_button_new_with_label(_(_L("新增詞")));
-  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_add, TRUE, TRUE, 0);
-  g_signal_connect (G_OBJECT (button_add), "clicked",
-     G_CALLBACK (cb_button_add), NULL);
+  GtkWidget *button_find = gtk_button_new_from_stock (GTK_STOCK_FIND);
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_find, FALSE, FALSE, 0);
+  g_signal_connect (G_OBJECT (button_find), "clicked",
+     G_CALLBACK (cb_button_find), NULL);
+
+#if 0
+  GtkWidget *button_edit = gtk_button_new_from_stock (GTK_STOCK_EDIT);
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_edit, FALSE, FALSE, 0);
+  g_signal_connect (G_OBJECT (button_edit), "clicked",
+     G_CALLBACK (cb_button_edit), NULL);
+#endif
+
+  GtkWidget *button_save = gtk_button_new_from_stock (GTK_STOCK_SAVE);
+  gtk_box_pack_start (GTK_BOX (hbox_buttons), button_save, FALSE, FALSE, 0);
+  g_signal_connect (G_OBJECT (button_save), "clicked",
+     G_CALLBACK (cb_button_save), NULL);
 
 
-  GtkWidget *button_quit = gtk_button_new_with_label(_(_L("離開 tslearn")));
+  GtkWidget *button_quit = gtk_button_new_from_stock (GTK_STOCK_QUIT);
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_quit, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_quit), "clicked",
      G_CALLBACK (do_exit), NULL);
 
-
   g_signal_connect (G_OBJECT (mainwin), "delete_event",
                     G_CALLBACK (do_exit), NULL);
 
-  all_wrap();
-
   gtk_widget_show_all(mainwin);
+
+  load_ts_phrase();
+
+  disp_page();
 
   gtk_main();
   return 0;

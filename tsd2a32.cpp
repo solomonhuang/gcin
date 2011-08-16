@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 {
   FILE *fp;
   int i;
-  u_char clen;
+  char clen;
   usecount_t usecount;
   gboolean pr_usecount = TRUE;
   char *fname;
@@ -89,8 +89,14 @@ int main(int argc, char **argv)
     phokey_t phbuf[MAX_PHRASE_LEN];
     u_int phbuf32[MAX_PHRASE_LEN];
     u_int64_t phbuf64[MAX_PHRASE_LEN];
+    gboolean is_deleted = FALSE;
 
     fread(&clen,1,1,fp);
+    if (clen < 0) {
+      clen = - clen;
+      is_deleted = TRUE;
+    }
+
     fread(&usecount, sizeof(usecount_t), 1,fp);
     if (!pr_usecount)
       usecount = 0;
@@ -105,6 +111,9 @@ int main(int argc, char **argv)
       fread(phbuf64, 8, clen, fp);
 
 
+    char tt[512];
+    int ttlen=0;
+    tt[0]=0;
     for(i=0;i<clen;i++) {
       char ch[CH_SZ];
 
@@ -116,12 +125,19 @@ int main(int argc, char **argv)
 
       fread(&ch[1], 1, len-1, fp);
 
-      int j;
-      for(j=0; j < len; j++)
-        fprintf(fp_out, "%c", ch[j]);
+      memcpy(tt+ttlen, ch, len);
+      ttlen+=len;
     }
+    tt[ttlen]=0;
 
-    fprintf(fp_out, " ");
+    if (!tt[0])
+      continue;
+
+    if (is_deleted)
+      continue;
+
+    fprintf(fp_out, "%s ", tt);
+
     for(i=0;i<clen;i++) {
       if (phsz==2) {
         if (b_pinyin) {

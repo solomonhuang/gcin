@@ -19,6 +19,7 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_phrase_pre_select;
 
 extern GtkWidget *check_button_gcin_capslock_lower;
+extern gboolean button_order;
 
 struct {
   unich_t *str;
@@ -446,14 +447,20 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
 
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
 
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
                             G_CALLBACK (close_gtab_conf_window),
                             G_OBJECT (gcin_gtab_conf_window));
 
   GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-  gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 0);
 
   g_signal_connect_swapped (G_OBJECT (button_ok), "clicked",
                             G_CALLBACK (cb_gtab_conf_ok),

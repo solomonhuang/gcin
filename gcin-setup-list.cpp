@@ -38,6 +38,7 @@ static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
 #if USE_GCB
 static GtkWidget *spinner_gcb_position_x, *spinner_gcb_position_y;
 #endif
+extern gboolean button_order;
 
 char *pho_speaker[16];
 int pho_speakerN;
@@ -806,12 +807,18 @@ void create_gtablist_window (void)
   button = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_cancel), treeview);
-  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
   button = gtk_button_new_from_stock (GTK_STOCK_OK);
   g_signal_connect (G_OBJECT (button), "clicked",
                     G_CALLBACK (cb_ok), model);
-  gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+  if (button_order)
+    gtk_box_pack_end (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+  else
+    gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 #if UNIX
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 520, 450);
 #else

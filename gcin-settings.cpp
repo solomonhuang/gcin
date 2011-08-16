@@ -145,7 +145,7 @@ void load_setttings()
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);
   phonetic_speak = get_gcin_conf_int(PHONETIC_SPEAK, 0);
-  get_gcin_conf_str(PHONETIC_SPEAK_SEL, &phonetic_speak_sel, "");
+  get_gcin_conf_str(PHONETIC_SPEAK_SEL, &phonetic_speak_sel, "3.ogg");
 
   pho_hide_row2 = get_gcin_conf_int(PHO_HIDE_ROW2, 0);
   pho_in_row1 = get_gcin_conf_int(PHO_IN_ROW1, 1);

@@ -12,7 +12,7 @@
 int hashidx[TSIN_HASH_N];
 //static int *phidx;
 static FILE *fp_phidx;
-static FILE *fph;
+FILE *fph;
 int phcount;
 int ph_key_sz; // bytes
 gboolean tsin_is_gtab;
@@ -20,7 +20,7 @@ static int tsin_hash_shift;
 
 #define PHIDX_SKIP  (sizeof(phcount) + sizeof(hashidx))
 
-static char *current_tsin_fname;
+char *current_tsin_fname;
 int ts_gtabN;
 static int *ts_gtab_hash;
 #define HASHN 256
@@ -29,7 +29,6 @@ static int a_phcount;
 
 void get_gcin_user_or_sys_fname(char *name, char fname[]);
 
-#if USE_TSIN
 void load_tsin_db0(char *infname, gboolean is_gtab_i)
 {
   char tsidxfname[512];
@@ -113,7 +112,6 @@ void load_tsin_db()
   get_gcin_user_or_sys_fname(fname, tsfname);
   load_tsin_db0(tsfname, FALSE);
 }
-#endif
 
 static void seek_fp_phidx(int i)
 {
@@ -122,7 +120,6 @@ static void seek_fp_phidx(int i)
 
 void reload_tsin_db()
 {
-#if USE_TSIN
   char tt[512];
   if (!current_tsin_fname)
     return;
@@ -130,7 +127,6 @@ void reload_tsin_db()
   strcpy(tt, current_tsin_fname);
   free(current_tsin_fname); current_tsin_fname = NULL;
   load_tsin_db0(tt, tsin_is_gtab);
-#endif
 }
 
 inline static int get_phidx(int i)
@@ -272,12 +268,12 @@ gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usec
     if ((ord=phseq(sbuf,tbuf)) > 0)
       break;
 
-	if (!ord && !memcmp(&sbuf[sbuf[0]*ph_key_sz+1+sizeof(usecount_t)], utf8str, tlen)) {
+    if (!ord && !memcmp(&sbuf[sbuf[0]*ph_key_sz+1+sizeof(usecount_t)], utf8str, tlen)) {
 //    bell();
-	    dbg("Phrase already exists\n");
-		inc_dec_tsin_use_count(phkeys, utf8str, len);
-		return FALSE;
-	}
+      dbg("Phrase already exists\n");
+      inc_dec_tsin_use_count(phkeys, utf8str, len);
+      return FALSE;
+    }
   }
 
   int wN = phcount - mid;
@@ -327,21 +323,9 @@ gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usec
 #include <sys/stat.h>
 
 
-void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho, u_char *ch)
+void load_tsin_entry0(char *len, usecount_t *usecount, void *pho, u_char *ch)
 {
   *usecount = 0;
-
-
-  if (idx >= phcount) {
-    reload_tsin_db(); // probably db changed, reload;
-    *len = 0;
-    return;
-  }
-
-  int ph_ofs=get_phidx(idx);
-//  dbg("idx %d:%d\n", idx, ph_ofs);
-
-  fseek(fph, ph_ofs , SEEK_SET);
   *len = 0;
   fread(len, 1, 1, fph);
 
@@ -359,6 +343,25 @@ void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho, u_char
     int tlen = utf8_tlen((char *)ch, *len);
     ch[tlen]=0;
   }
+}
+
+
+void load_tsin_entry(int idx, char *len, usecount_t *usecount, void *pho, u_char *ch)
+{
+  *usecount = 0;
+
+
+  if (idx >= phcount) {
+    reload_tsin_db(); // probably db changed, reload;
+    *len = 0;
+    return;
+  }
+
+  int ph_ofs=get_phidx(idx);
+//  dbg("idx %d:%d\n", idx, ph_ofs);
+
+  fseek(fph, ph_ofs , SEEK_SET);
+  load_tsin_entry0(len, usecount, pho, ch);
 }
 
 // tone_mask : 1 -> pho has tone

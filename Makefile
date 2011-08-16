@@ -13,11 +13,18 @@ OBJS=gcin.o eve.o util.o gcin-conf.o gcin-settings.o locale.o gcin-icon.o about.
      gcin-switch.o gcin-exec-script.o $(GCIN_SO) pho-play.o cache.o gtk_bug_fix.o phrase-save-menu.o \
      $(gcin_pho_o) $(gcin_gtab_o) gcin-common.o phrase.o t2s-lookup.o gtab-use-count.o \
      win-save-phrase.o unix-exec.o pho-kbm-name.o statistic.o tsin-scan.o gcin-module.o lang.o \
-     gcin-module-cb.o
+     gcin-module-cb.o gtab-init.o fullchar.o gtab-tsin-fname.o
 
 OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o  \
-             pho2pinyin.o pinyin.o lang.o
+             pho2pinyin.o pinyin.o lang.o gtab-list.o gcin-switch.o gtab-init.o fullchar.o \
+             gtab-tsin-fname.o unix-exec.o gtab-util.o
+
+OBJS_TS_EDIT=ts-edit.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
+             table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o  \
+             pho2pinyin.o pinyin.o lang.o gtab-list.o gcin-switch.o gtab-init.o fullchar.o \
+             gtab-tsin-fname.o unix-exec.o gtab-util.o
+
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o pho2pinyin.o \
                  gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o pho-dbg.o
 OBJS_sim2trad=sim2trad.o util.o gcin2.so locale.o gcin-conf.o gcin-icon.o
@@ -75,7 +82,7 @@ OBJ_IMSRV=im-addr.o im-dispatch.o im-srv.o gcin-crypt.o
 
 PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge \
-	gcin-kbm-toggle tsin2gtab-phrase gcin-exit
+	gcin-kbm-toggle tsin2gtab-phrase gcin-exit ts-edit
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -102,6 +109,9 @@ gcin-nocur:   $(OBJS) $(IMdkitLIB) $(OBJ_IMSRV)
 
 tslearn:        $(OBJS_TSLEARN)
 	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_TSLEARN) -L./im-client -lgcin-im-client $(LDFLAGS)
+
+ts-edit:        $(OBJS_TS_EDIT)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_TS_EDIT) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 juyin-learn:        $(OBJS_JUYIN_LEARN)
 	$(CCLD) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)
