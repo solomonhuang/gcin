@@ -48,6 +48,7 @@
 
 #if !GTK_CHECK_VERSION(2,91,0)
 #define gtk_widget_get_preferred_size(x,y,z) gtk_widget_size_request(x,z)
+#define gtk_widget_set_halign(x,y);
 #endif
 
 #if GTK_CHECK_VERSION(2,91,0)
@@ -56,6 +57,23 @@
 
 #if !GTK_CHECK_VERSION(2,91,1)
 #define gtk_window_set_has_resize_grip(x,y);
+#define gtk_widget_set_hexpand(x,y);
+#define gtk_widget_set_vexpand(x,y);
+#endif
+
+#if !GTK_CHECK_VERSION(2,91,2)
+#define gtk_grid_set_column_homogeneous(x,y);
+#define gtk_grid_set_row_homogeneous(x,y);
+#define gtk_orientable_set_orientation(x,y);
+#endif
+
+#if GTK_CHECK_VERSION(2,91,2)
+#undef GTK_BOX
+#define GTK_BOX GTK_GRID
+#define gtk_hbox_new(x,y) gtk_grid_new()
+#define gtk_vbox_new(x,y) gtk_grid_new()
+#define gtk_box_pack_end(v,w,x,y,z) gtk_container_add(GTK_CONTAINER(v),w)
+#define gtk_box_pack_start(v,w,x,y,z) gtk_container_add(GTK_CONTAINER(v),w)
 #endif
 
 #ifndef GTK_COMBO_BOX_TEXT

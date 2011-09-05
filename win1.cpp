@@ -125,6 +125,7 @@ void create_win1_gui()
   gtk_container_add (GTK_CONTAINER(gwin1), frame);
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER(frame), vbox_top);
 
   GtkWidget *eve_box_up = gtk_event_box_new();
@@ -383,14 +384,25 @@ void change_win1_font()
 
   GdkColor fg;
   gdk_color_parse(gcin_win_color_fg, &fg);
+#if GTK_CHECK_VERSION(2,91,6)
+  GdkRGBA rgbfg;
+  gdk_rgba_parse(&rgbfg, gdk_color_to_string(&fg));
+#endif
 
   for(i=0; i < wselkeyN; i++) {
     set_label_font_size(labels_sele[i], gcin_font_size_tsin_presel);
     set_label_font_size(labels_seleR[i], gcin_font_size_tsin_presel);
+#if !GTK_CHECK_VERSION(2,91,6)
     if (labels_sele[i])
       gtk_widget_modify_fg(labels_sele[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
     if (labels_seleR[i])
       gtk_widget_modify_fg(labels_seleR[i], GTK_STATE_NORMAL, gcin_win_color_use?&fg:NULL);
+#else
+    if (labels_sele[i])
+      gtk_widget_override_color(labels_sele[i], GTK_STATE_FLAG_NORMAL, gcin_win_color_use?&rgbfg:NULL);
+    if (labels_seleR[i])
+      gtk_widget_override_color(labels_seleR[i], GTK_STATE_FLAG_NORMAL, gcin_win_color_use?&rgbfg:NULL);
+#endif
     change_win_bg(eve_sele[i]);
     if (eve_seleR[i])
       change_win_bg(eve_seleR[i]);

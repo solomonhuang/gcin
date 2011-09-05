@@ -25,7 +25,7 @@ static GtkWidget *vbox;
 static GtkWidget *hbox;
 static GtkWidget *sw;
 static GtkWidget *treeview;
-static GtkWidget *button, *check_button_phonetic_speak, *opt_speaker_opts, *check_button_gcin_bell_off;
+static GtkWidget *button, *button2, *check_button_phonetic_speak, *opt_speaker_opts, *check_button_gcin_bell_off;
 static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
 #if USE_GCB
        *check_button_gcb_enabled,
@@ -630,6 +630,7 @@ void create_gtablist_window (void)
                       G_CALLBACK (callback_win_delete), NULL);
 
   vbox = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (gtablist_window), vbox);
 
   gtk_box_pack_start (GTK_BOX (vbox),
@@ -649,6 +650,8 @@ void create_gtablist_window (void)
 
   /* create tree view */
   treeview = gtk_tree_view_new_with_model (model);
+  gtk_widget_set_hexpand (treeview, TRUE);
+  gtk_widget_set_vexpand (treeview, TRUE);
   g_object_unref (G_OBJECT (model));
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
 
@@ -802,6 +805,7 @@ void create_gtablist_window (void)
   }
 
   hbox = gtk_hbox_new (TRUE, 4);
+  gtk_grid_set_column_homogeneous(GTK_GRID(hbox), TRUE);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
   button = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
@@ -812,13 +816,20 @@ void create_gtablist_window (void)
   else
     gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_OK);
-  g_signal_connect (G_OBJECT (button), "clicked",
+  button2 = gtk_button_new_from_stock (GTK_STOCK_OK);
+  g_signal_connect (G_OBJECT (button2), "clicked",
                     G_CALLBACK (cb_ok), model);
+#if !GTK_CHECK_VERSION(2,91,2)
   if (button_order)
-    gtk_box_pack_end (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+    gtk_box_pack_end (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
   else
-    gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
+#else
+  if (button_order)
+    gtk_grid_attach_next_to (GTK_BOX (hbox), button2, button, GTK_POS_LEFT, 1, 1);
+  else
+    gtk_grid_attach_next_to (GTK_BOX (hbox), button2, button, GTK_POS_RIGHT, 1, 1);
+#endif
 #if UNIX
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 520, 450);
 #else

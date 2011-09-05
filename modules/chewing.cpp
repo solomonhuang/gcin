@@ -511,7 +511,8 @@ module_change_font_size (void)
     for (n = 0; n < MAX_SEG_NUM; n++)
     {
         pLabel = g_pSeg[n].label;
-        set_label_font_size (pLabel, *g_gcinModMainFuncs.mf_gcin_font_size);
+        g_gcinModMainFuncs.mf_set_label_font_size (pLabel,
+            *g_gcinModMainFuncs.mf_gcin_font_size);
 
         if (*g_gcinModMainFuncs.mf_gcin_win_color_use)
             gtk_widget_modify_fg (pLabel, GTK_STATE_NORMAL, &colorFG);

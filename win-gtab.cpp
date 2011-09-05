@@ -64,7 +64,18 @@ void disp_gtab(char *str)
 
 void set_gtab_input_color(GdkColor *color)
 {
-  if (label_gtab) gtk_widget_modify_fg(label_gtab, GTK_STATE_NORMAL, color);
+  if (label_gtab) {
+#if !GTK_CHECK_VERSION(2,91,6)
+    gtk_widget_modify_fg(label_gtab, GTK_STATE_NORMAL, color);
+#else
+    if (color) {
+      GdkRGBA rgbfg;
+      gdk_rgba_parse(&rgbfg, gdk_color_to_string(color));
+      gtk_widget_override_color(label_gtab, GTK_STATE_FLAG_NORMAL, &rgbfg);
+    } else
+      gtk_widget_override_color(label_gtab, GTK_STATE_FLAG_NORMAL, NULL);
+#endif
+  }
 }
 
 void set_gtab_input_error_color()
@@ -113,29 +124,52 @@ static void set_disp_im_name();
 void change_win_bg(GtkWidget *win)
 {
   if (!gcin_win_color_use) {
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_bg(win, GTK_STATE_NORMAL, NULL);
+#else
+    gtk_widget_override_background_color(win, GTK_STATE_FLAG_NORMAL, NULL);
+#endif
     return;
   }
 
   GdkColor col;
   gdk_color_parse(gcin_win_color_bg, &col);
+#if !GTK_CHECK_VERSION(2,91,6)
   gtk_widget_modify_bg(win, GTK_STATE_NORMAL, &col);
+#else
+  GdkRGBA rgbbg;
+  gdk_rgba_parse(&rgbbg, gdk_color_to_string(&col));
+  gtk_widget_override_background_color(win, GTK_STATE_FLAG_NORMAL, &rgbbg);
+#endif
 }
 
 void change_win_fg_bg(GtkWidget *win, GtkWidget *label)
 {
   if (!gcin_win_color_use) {
     if (label)
+#if !GTK_CHECK_VERSION(2,91,6)
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, NULL);
+#else
+      gtk_widget_override_color(label, GTK_STATE_FLAG_NORMAL, NULL);
+#endif
     return;
   }
 
   GdkColor col;
   gdk_color_parse(gcin_win_color_fg, &col);
+#if !GTK_CHECK_VERSION(2,91,6)
   if (label)
     gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &col);
   if (label_edit)
     gtk_widget_modify_fg(label_edit, GTK_STATE_NORMAL, &col);
+#else
+  GdkRGBA rgbfg;
+  gdk_rgba_parse(&rgbfg, gdk_color_to_string(&col));
+  if (label)
+    gtk_widget_override_color(label, GTK_STATE_FLAG_NORMAL, &rgbfg);
+  if (label_edit)
+    gtk_widget_override_color(label_edit, GTK_STATE_FLAG_NORMAL, &rgbfg);
+#endif
 
   change_win_bg(win);
 }
@@ -213,10 +247,20 @@ void set_key_codes_label(char *s, int better)
     }
   }
 
-  if (better)
+  if (better) {
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_fg(label_key_codes, GTK_STATE_NORMAL, &better_color);
-  else
+#else
+    GdkRGBA rgbfg;
+    gdk_rgba_parse(&rgbfg, gdk_color_to_string(&better_color));
+    gtk_widget_override_color(label_key_codes, GTK_STATE_FLAG_NORMAL, &rgbfg);
+#endif
+  } else
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_fg(label_key_codes, GTK_STATE_NORMAL, NULL);
+#else
+    gtk_widget_override_color(label_key_codes, GTK_STATE_FLAG_NORMAL, NULL);
+#endif
 
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
   if (s && s[0])
@@ -416,6 +460,7 @@ void create_win_gtab_gui_simple()
   last_cursor_off = FALSE;
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
 
   GtkWidget *event_box_gtab = gtk_event_box_new();
   gtk_container_set_border_width (GTK_CONTAINER (event_box_gtab), 0);

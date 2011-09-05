@@ -249,7 +249,7 @@ void disp_page()
 
   char tt[32];
   sprintf(tt, "%d", page_ofs+1);
-  gtk_label_set_text(label_page_ofs, tt);
+  gtk_label_set_text(GTK_LABEL(label_page_ofs), tt);
 }
 
 static void cb_button_delete(GtkButton *button, gpointer user_data)
@@ -343,13 +343,13 @@ static void cb_button_save(GtkButton *button, gpointer user_data)
       fwrite(&clen, 1, 1, fph);
     }
   }
-  fclose(fph);
+  fflush(fph);
 
 #if UNIX
   unix_exec(GCIN_BIN_DIR"/tsd2a32 %s -o tsin.tmp", current_tsin_fname);
   unix_exec(GCIN_BIN_DIR"/tsa2d32 tsin.tmp %s", current_tsin_fname);
 #else
-  win32exec_va("tsd2a32", current_tsin_fname, "-o" "tsin.tmp", NULL);
+  win32exec_va("tsd2a32", current_tsin_fname, "-o", "tsin.tmp", NULL);
   win32exec_va("tsa2d32", "tsin.tmp",  current_tsin_fname, NULL);
 #endif
   exit(0);
@@ -629,6 +629,7 @@ int main(int argc, char **argv)
   set_window_gcin_icon(mainwin);
 
   vbox_top = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER(mainwin), vbox_top);
 
   int i;

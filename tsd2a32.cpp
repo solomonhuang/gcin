@@ -15,6 +15,7 @@ void init_gcin_program_files();
 void get_keymap_str(u_int64_t k, char *keymap, int keybits, char tkey[]);
 char *phokey2pinyin(phokey_t k);
 gboolean is_pinyin_kbm();
+char *sys_err_strA();
 
 int main(int argc, char **argv)
 {
@@ -64,7 +65,7 @@ int main(int argc, char **argv)
     fprintf(fp_out, "!!pinyin\n");
 
   if ((fp=fopen(fname,"rb"))==NULL)
-    p_err("Cannot open %s", argv[1]);
+    p_err("Cannot open %s %s", fname, sys_err_strA());
 
 
   TSIN_GTAB_HEAD head;

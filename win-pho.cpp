@@ -139,6 +139,7 @@ void create_win_pho_gui_simple()
     return;
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
 
   GtkWidget *event_box_pho = gtk_event_box_new();
   gtk_container_set_border_width (GTK_CONTAINER (event_box_pho), 0);

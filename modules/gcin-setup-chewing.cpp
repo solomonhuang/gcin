@@ -98,6 +98,7 @@ void module_setup_window_create ()
     gtk_container_set_border_width (GTK_CONTAINER (gcin_chewing_window), 1);
 
     vbox_top = gtk_vbox_new (FALSE, 3);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
     gtk_container_add (GTK_CONTAINER (gcin_chewing_window), vbox_top);
 
     // cand per page

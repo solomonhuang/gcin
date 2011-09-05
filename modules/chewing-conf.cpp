@@ -10,6 +10,7 @@ static kbmapping_t g_kbMappingTable[] =
     {"et26",      "KB_ET26"},
     {"hsu",       "KB_HSU"},
     {"pinyin",    "KB_HANYU_PINYIN"},
+    {"pinyin-no-tone", "KB_HANYU_PINYIN"},
     {"dvorak",    "KB_DVORAK"},
     {"ibm",       "KB_IBM"},
     {"mitac",     NULL},

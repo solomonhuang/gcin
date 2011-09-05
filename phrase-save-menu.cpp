@@ -62,6 +62,7 @@ void create_phrase_save_menu(GdkEventButton * event)
   win32_init_win(phrase_save_win);
 #endif
   GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add(GTK_CONTAINER(phrase_save_win), vbox);
   char tt[512];
 

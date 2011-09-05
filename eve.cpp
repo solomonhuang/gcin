@@ -3,6 +3,11 @@
 #if UNIX
 #include <signal.h>
 #include <X11/extensions/XTest.h>
+#if !GTK_CHECK_VERSION(2,16,0)
+#include <X11/XKBlib.h>
+#include <gdk/gdkx.h>
+#define gdk_keymap_get_caps_lock_state(x) get_caps_lock_state()
+#endif
 #endif
 #include "gst.h"
 #include "pho.h"
@@ -1053,6 +1058,19 @@ gboolean timeout_raise_window(gpointer data)
 extern Window xwin_pho, xwin0, xwin_gtab;
 void create_win_sym(), win_kbm_disp_caplock();
 int gcin_switch_keys_lookup(int key);
+
+#if !GTK_CHECK_VERSION(2,16,0)
+gboolean get_caps_lock_state()
+{
+	XkbStateRec states;
+	
+	if (XkbGetState(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), XkbUseCoreKbd, &states) == Success)
+	{   
+		if (states.locked_mods & LockMask) return TRUE;
+	}
+	return FALSE;
+}
+#endif
 
 void disp_win_kbm_capslock()
 {

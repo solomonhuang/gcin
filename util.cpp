@@ -1,4 +1,7 @@
 #include "gcin.h"
+#if UNIX
+#include <errno.h>
+#endif
 
 #if UNIX
 #if !CLIENT_LIB || DEBUG
@@ -75,6 +78,11 @@ void __gcin_dbg_(char *fmt,...)
 }
 #endif
 
+char *sys_err_strA()
+{
+	sys_errlist[errno];
+}
+
 #else
 #include <share.h>
 #include <io.h>
@@ -82,7 +90,7 @@ void __gcin_dbg_(char *fmt,...)
 
 #if _DEBUG
 #define _DBG 1
-#define CONSOLE_OFF 1
+#define CONSOLE_OFF 0
 #endif
 
 
@@ -160,6 +168,33 @@ void __gcin_dbg_(char *format, ...) {
 }
 #endif
 
+char *err_strA(DWORD dw)
+{
+	static char msgstr[256];
+    LPVOID lpMsgBuf;
+
+    FormatMessageA(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and exit the process
+
+    StringCchPrintfA(msgstr, ARRAYSIZE(msgstr), "%d: %s", dw, lpMsgBuf);
+	return msgstr;
+}
+
+
+char *sys_err_strA()
+{
+	return err_strA(GetLastError());
+}
+
 void p_err(char *format, ...) {
 
 	va_list ap;
@@ -172,7 +207,9 @@ void p_err(char *format, ...) {
 #endif
 	char tt[512];
 	vsprintf_s(tt, sizeof(tt), format, ap);
-	MessageBoxA(NULL, tt, NULL, MB_OK);
+	char exe[512];
+	GetModuleFileNameA(NULL, exe, sizeof(exe));
+	MessageBoxA(NULL, tt, exe, MB_OK);
 	exit(0);
 	va_end(ap);
 

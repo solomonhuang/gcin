@@ -53,10 +53,19 @@ void update_win_kbm();
 
 void mod_fg_all(GtkWidget *lab, GdkColor *col)
 {
+#if !GTK_CHECK_VERSION(2,91,6)
   gtk_widget_modify_fg(lab, GTK_STATE_NORMAL, col);
   gtk_widget_modify_fg(lab, GTK_STATE_ACTIVE, col);
   gtk_widget_modify_fg(lab, GTK_STATE_SELECTED, col);
   gtk_widget_modify_fg(lab, GTK_STATE_PRELIGHT, col);
+#else
+  GdkRGBA rgbfg;
+  gdk_rgba_parse(&rgbfg, gdk_color_to_string(col));
+  gtk_widget_override_color(lab, GTK_STATE_FLAG_NORMAL, &rgbfg);
+  gtk_widget_override_color(lab, GTK_STATE_FLAG_ACTIVE, &rgbfg);
+  gtk_widget_override_color(lab, GTK_STATE_FLAG_SELECTED, &rgbfg);
+  gtk_widget_override_color(lab, GTK_STATE_FLAG_PRELIGHT, &rgbfg);
+#endif
 }
 
 
@@ -170,9 +179,11 @@ static void create_win_kbm()
 
 
   GtkWidget *vbox_l = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_l), GTK_ORIENTATION_VERTICAL);
   gtk_box_pack_start (GTK_BOX (hbox_top), vbox_l, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox_l), 0);
   GtkWidget *vbox_r = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_r), GTK_ORIENTATION_VERTICAL);
   gtk_box_pack_start (GTK_BOX (hbox_top), vbox_r, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox_r), 0);
 
@@ -207,6 +218,7 @@ static void create_win_kbm()
         gtk_box_pack_start (GTK_BOX (hbox), but, FALSE, FALSE, 0);
 
       GtkWidget *v = gtk_vbox_new (FALSE, 0);
+      gtk_orientable_set_orientation(GTK_ORIENTABLE(v), GTK_ORIENTATION_VERTICAL);
       gtk_container_set_border_width (GTK_CONTAINER (v), 0);
       gtk_container_add (GTK_CONTAINER (but), v);
       GtkWidget *laben = ppk->laben=gtk_label_new(_(ppk->enkey));

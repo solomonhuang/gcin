@@ -443,10 +443,22 @@ static void cb_savecb_gcin_win_color_fg(GtkWidget *widget, gpointer user_data)
   GdkColor *col = sel->color;
   gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_selector))), col);
 
-  if (sel->color == &gcin_win_gcolor_fg)
+  if (sel->color == &gcin_win_gcolor_fg) {
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, col);
-  else {
+#else
+    GdkRGBA rgbfg;
+    gdk_rgba_parse(&rgbfg, gdk_color_to_string(col));
+    gtk_widget_override_color(label_win_color_test, GTK_STATE_FLAG_NORMAL, &rgbfg);
+#endif
+  } else {
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_bg(event_box_win_color_test, GTK_STATE_NORMAL, col);
+#else
+    GdkRGBA rgbbg;
+    gdk_rgba_parse(&rgbbg, gdk_color_to_string(col));
+    gtk_widget_override_background_color(event_box_win_color_test, GTK_STATE_FLAG_NORMAL, &rgbbg);
+#endif
   }
 }
 
@@ -477,11 +489,24 @@ static gboolean cb_gcin_win_color_fg( GtkWidget *widget,
 void disp_fg_bg_color()
 {
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(check_button_gcin_win_color_use))) {
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_fg);
     gtk_widget_modify_bg(event_box_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_bg);
+#else
+    GdkRGBA rgbfg, rgbbg;
+    gdk_rgba_parse(&rgbfg, gdk_color_to_string(&gcin_win_gcolor_fg));
+    gdk_rgba_parse(&rgbbg, gdk_color_to_string(&gcin_win_gcolor_bg));
+    gtk_widget_override_color(label_win_color_test, GTK_STATE_FLAG_NORMAL, &rgbfg);
+    gtk_widget_override_background_color(event_box_win_color_test, GTK_STATE_FLAG_NORMAL, &rgbbg);
+#endif
   } else {
+#if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, NULL);
     gtk_widget_modify_bg(event_box_win_color_test, GTK_STATE_NORMAL, NULL);
+#else
+    gtk_widget_override_color(label_win_color_test, GTK_STATE_FLAG_NORMAL, NULL);
+    gtk_widget_override_background_color(event_box_win_color_test, GTK_STATE_FLAG_NORMAL, NULL);
+#endif
   }
 
   char *key_color = gtk_color_selection_palette_to_string(&gcin_sel_key_gcolor, 1);
@@ -616,6 +641,7 @@ void create_appearance_conf_window()
   gtk_container_set_border_width (GTK_CONTAINER (gcin_appearance_conf_window), 3);
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (gcin_appearance_conf_window), vbox_top);
 
   GtkWidget *hbox_gcin_font_size = gtk_hbox_new (FALSE, 10);
@@ -713,6 +739,7 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_root_style, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_root_style), 3);
   GtkWidget *vbox_root_style = gtk_vbox_new (FALSE, 10);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_root_style), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_root_style), vbox_root_style);
 
   GtkWidget *hbox_root_style_use = gtk_hbox_new (FALSE, 10);
@@ -731,11 +758,13 @@ void create_appearance_conf_window()
   GtkAdjustment *adj_root_style_x =
    (GtkAdjustment *) gtk_adjustment_new (gcin_root_x, 0.0, 5120.0, 1.0, 1.0, 0.0);
   spinner_root_style_x = gtk_spin_button_new (adj_root_style_x, 0, 0);
+  gtk_widget_set_hexpand (spinner_root_style_x, TRUE);
   gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_x);
 
   GtkAdjustment *adj_root_style_y =
    (GtkAdjustment *) gtk_adjustment_new (gcin_root_y, 0.0, 2880.0, 1.0, 1.0, 0.0);
   spinner_root_style_y = gtk_spin_button_new (adj_root_style_y, 0, 0);
+  gtk_widget_set_hexpand (spinner_root_style_y, TRUE);
   gtk_container_add (GTK_CONTAINER (hbox_root_style), spinner_root_style_y);
 
 
@@ -779,6 +808,7 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_win_color, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_win_color), 1);
   GtkWidget *vbox_win_color = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_win_color), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_win_color), vbox_win_color);
 
   GtkWidget *hbox_win_color_use = gtk_hbox_new (FALSE, 10);
@@ -800,6 +830,8 @@ void create_appearance_conf_window()
   GtkWidget *hbox_win_color_fbg = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX(vbox_win_color), hbox_win_color_fbg, FALSE, FALSE, 0);
   GtkWidget *button_fg = gtk_button_new_with_label(_(_L("前景顏色")));
+  gtk_widget_set_hexpand (button_fg, TRUE);
+  gtk_widget_set_halign (button_fg, GTK_ALIGN_FILL);
   gtk_box_pack_start (GTK_BOX(hbox_win_color_fbg), button_fg, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_fg), "clicked",
                     G_CALLBACK (cb_gcin_win_color_fg), &colorsel[0]);
@@ -809,11 +841,15 @@ void create_appearance_conf_window()
 //  gtk_widget_modify_bg(event_box_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_bg);
 
   GtkWidget *button_bg = gtk_button_new_with_label(_(_L("背景顏色")));
+  gtk_widget_set_hexpand (button_bg, TRUE);
+  gtk_widget_set_halign (button_bg, GTK_ALIGN_FILL);
   gtk_box_pack_start (GTK_BOX(hbox_win_color_fbg), button_bg, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_bg), "clicked",
                     G_CALLBACK (cb_gcin_win_color_fg), &colorsel[1]);
 
   GtkWidget *button_gcin_sel_key_color = gtk_button_new_with_label(_(_L("選擇鍵顏色")));
+  gtk_widget_set_hexpand (button_gcin_sel_key_color, TRUE);
+  gtk_widget_set_halign (button_gcin_sel_key_color, GTK_ALIGN_FILL);
   g_signal_connect (G_OBJECT (button_gcin_sel_key_color), "clicked",
                     G_CALLBACK (cb_gcin_sel_key_color), G_OBJECT (gcin_kbm_window));
   gdk_color_parse(gcin_sel_key_color, &gcin_sel_key_gcolor);
@@ -822,6 +858,7 @@ void create_appearance_conf_window()
   disp_fg_bg_color();
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
+  gtk_grid_set_column_homogeneous(GTK_GRID(hbox_cancel_ok), TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
 
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
@@ -835,10 +872,17 @@ void create_appearance_conf_window()
                             G_OBJECT (gcin_appearance_conf_window));
 
   GtkWidget *button_close = gtk_button_new_from_stock (GTK_STOCK_OK);
+#if !GTK_CHECK_VERSION(2,91,2)
   if (button_order)
     gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
   else
     gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
+#else
+  if (button_order)
+    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_close, button_cancel, GTK_POS_LEFT, 1, 1);
+  else
+    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_close, button_cancel, GTK_POS_RIGHT, 1, 1);
+#endif
 
   g_signal_connect_swapped (G_OBJECT (button_close), "clicked",
                             G_CALLBACK (cb_appearance_conf_ok),
@@ -965,6 +1009,7 @@ static void create_main_win()
   set_window_gcin_icon(main_window);
 
   GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (main_window), vbox);
 
   GtkWidget *button_kbm = gtk_button_new_with_label(_(_L("gcin 注音/詞音/拼音 設定")));
@@ -1038,20 +1083,24 @@ static void create_main_win()
                   G_CALLBACK (expander_callback), NULL);
 
   GtkWidget *vbox_ts = gtk_vbox_new (FALSE, 0);
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_ts), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (expander_ts), vbox_ts);
 
 
   GtkWidget *button_ts_export = gtk_button_new_with_label(_(_L("詞庫匯出")));
+  gtk_widget_set_hexpand (button_ts_export, TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_ts), button_ts_export, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_ts_export), "clicked",
                     G_CALLBACK (cb_ts_export), NULL);
 
   GtkWidget *button_ts_import = gtk_button_new_with_label(_(_L("詞庫匯入")));
+  gtk_widget_set_hexpand (button_ts_import, TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_ts), button_ts_import, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_ts_import), "clicked",
                     G_CALLBACK (cb_ts_import), NULL);
 
   GtkWidget *button_ts_edit = gtk_button_new_with_label(_(_L("詞庫編輯")));
+  gtk_widget_set_hexpand (button_ts_edit, TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_ts), button_ts_edit, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_ts_edit), "clicked",
                     G_CALLBACK (cb_ts_edit), NULL);
