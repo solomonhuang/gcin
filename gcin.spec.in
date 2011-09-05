@@ -12,7 +12,7 @@ License: 	LGPL
 Vendor:		Edward Liu
 URL: 	        http://hyperrate.com/dir.php?eid=67
 Group: 		Applications/System
-Source0:	%{name}-%{version}.tar.bz2
+Source0:	%{name}-%{version}.tar.xz
 Packager:       Edward Liu <cp76@csie.nctu.edu.tw>
 BuildRoot:	%{_builddir}/%{name}-%{version}-root
 

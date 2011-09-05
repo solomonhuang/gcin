@@ -12,14 +12,14 @@ make clean
 cd ..
 
 /usr/local/bin/tsd2a32 -nousecount ~/.gcin/tsin32 > $GCIN_VERSION/data/tsin.src
-tar -cvj --owner=0 --group=0 -f $GCIN_VERSION.tar.bz2 $GCIN_VERSION
+XZ_OPT=-7e tar -cvJ --owner=0 --group=0 -f $GCIN_VERSION.tar.xz $GCIN_VERSION
 
 cd gcin; ./configure
 
 cd ~/rpm/SOURCES
 
-if [ ! -f $GCIN_VERSION.tar.bz2 ]; then
-  ln -sf ~/$GCIN_VERSION.tar.bz2 .
+if [ ! -f $GCIN_VERSION.tar.xz ]; then
+  ln -sf ~/$GCIN_VERSION.tar.xz .
 fi
 
 cd

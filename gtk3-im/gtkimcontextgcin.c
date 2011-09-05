@@ -509,7 +509,7 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 
   if (!context_xim->gcin_ch)
-    get_im(context);
+    get_im(context_xim);
 
 //  if (context_xim->gcin_ch)
   {
