@@ -98,6 +98,11 @@ exec dpkg-buildpackage -b
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a32.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsin2gtab-phrase.1.gz
+--- a/debian/mvqt.sh
++++ b/debian/mvqt.sh
+@@ -0,0 +1,2 @@
++#!/bin/sh
++sed -i 's~/usr/share/~/usr/$(LIB)/~' qt4-im/Makefile
 --- a/debian/postinst
 +++ b/debian/postinst
 @@ -0,0 +1,32 @@
@@ -173,14 +178,14 @@ exec dpkg-buildpackage -b
 +
 +override_dh_auto_configure:
 +	sed -i 's~/usr/lib/~/usr/share/~' qt-im/Makefile
-+	sed -i 's~/usr/lib/~/usr/share/~' qt4-im/Makefile
++	sed -i 's~/usr/..LIB./~/usr/share/~' qt4-im/Makefile
 +	sed -i 's~lib64~lib64foo~' configure
 +	./configure --prefix=/usr --use_i18n=Y --use_qt3=Y
 +
 +override_dh_auto_clean:
 +	$(MAKE) clean
 +	sed -i 's~/usr/share/~/usr/lib/~' qt-im/Makefile
-+	sed -i 's~/usr/share/~/usr/lib/~' qt4-im/Makefile
++	sh debian/mvqt.sh
 +	sed -i 's~lib64foo~lib64~' configure
 +	dh_clean
 +

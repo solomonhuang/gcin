@@ -156,7 +156,11 @@ static void shutdown_client(HANDLE fd)
 
   free(gcin_clients[idx].cs);
   gcin_clients[idx].cs = NULL;
+#if UNIX
+  gcin_clients[idx].fd = 0;
+#else
   gcin_clients[idx].fd = NULL;
+#endif
 
 #if UNIX
   int uid = getuid();

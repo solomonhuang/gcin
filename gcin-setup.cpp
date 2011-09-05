@@ -115,7 +115,16 @@ static void create_result_win(int res, char *cmd)
 
 static void cb_ts_export()
 {
-   GtkWidget *file_selector = gtk_file_chooser_dialog_new(_(_L("請輸入要匯出的檔案名稱")),
+   GtkWidget *file_selector;
+   if (button_order)
+       file_selector = gtk_file_chooser_dialog_new(_(_L("請輸入要匯出的檔案名稱")),
+                              GTK_WINDOW(main_window),
+                              GTK_FILE_CHOOSER_ACTION_OPEN,
+                              GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                              NULL);
+   else
+       file_selector = gtk_file_chooser_dialog_new(_(_L("請輸入要匯出的檔案名稱")),
                               GTK_WINDOW(main_window),
                               GTK_FILE_CHOOSER_ACTION_OPEN,
                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -200,7 +209,16 @@ static void cb_ts_import()
    /* Create the selector */
 
 #if GTK_CHECK_VERSION(2,4,0)
-   GtkWidget *file_selector = gtk_file_chooser_dialog_new(_(_L("請輸入要匯入的檔案名稱")),
+   GtkWidget *file_selector;
+   if (button_order)
+       file_selector = gtk_file_chooser_dialog_new(_(_L("請輸入要匯入的檔案名稱")),
+                              GTK_WINDOW(main_window),
+                              GTK_FILE_CHOOSER_ACTION_OPEN,
+                              GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                              NULL);
+   else
+       file_selector = gtk_file_chooser_dialog_new(_(_L("請輸入要匯入的檔案名稱")),
                               GTK_WINDOW(main_window),
                               GTK_FILE_CHOOSER_ACTION_OPEN,
                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,

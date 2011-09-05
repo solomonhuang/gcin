@@ -151,9 +151,24 @@ void module_setup_window_create ()
     gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok , FALSE, FALSE, 5);
 
     button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
-    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+    gboolean button_order;
+    g_object_get(gtk_settings_get_default(), "gtk-alternative-button-order", &button_order, NULL);
+    if (button_order)
+      gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+    else
+      gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
     button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
+#if !GTK_CHECK_VERSION(2,91,2)
+    if (button_order)
+      gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
+    else
+      gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
+#else
+    if (button_order)
+      gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_ok, button_cancel, GTK_POS_LEFT, 1, 1);
+    else
+      gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_ok, button_cancel, GTK_POS_RIGHT, 1, 1);
+#endif
 
     g_signal_connect (G_OBJECT (button_cancel), "clicked",
                       G_CALLBACK (cb_close_window),

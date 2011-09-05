@@ -169,6 +169,7 @@ gcin_kb_config_set (ChewingContext *pChewingCtx)
         g_chewingConfig.selKey[nIdx] = szKbSelKey[nIdx];
     chewing_set_selKey (pChewingCtx, g_chewingConfig.selKey, strlen (szKbSelKey));
 
+    nIdx = 0;
     while (g_kbMappingTable[nIdx].pszGcinKbName)
     {
         if (!strncmp (g_kbMappingTable[nIdx].pszGcinKbName,

@@ -656,8 +656,7 @@ llll3:
   dbg("poo.typ_pho %d %d %d %d\n", poo.typ_pho[0], poo.typ_pho[1], poo.typ_pho[2], poo.typ_pho[3]);
 #endif
   if (!key) {
-    pre_punctuation_hsu(xkey);
-    return 1;
+    return pre_punctuation_hsu(xkey);
   }
 
   pho_play(key);
