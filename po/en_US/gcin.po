@@ -618,9 +618,6 @@ msgstr "Settings for Bopomofo, Tsin, and Pinyin"
 msgid "選擇鍵顯示於候選字(詞)後方"
 msgstr "Show selection key behind choices"
 
-msgid "點選連結前往 gcin 討論區"
-msgstr "Click to forum of gcin"
-
 msgid "gcin也有 Windows版"
 msgstr "Windows version of gcin"
 
@@ -654,7 +651,7 @@ msgid "打字速度"
 msgstr "Typing Speed"
 
 msgid "使用詞音輸入標點符號"
-msgstr "Enable punctuation marks in Tsin"
+msgstr "Input punctuation marks in Tsin"
 
 msgid "gcin 新酷音設定"
 msgstr "Settings for Chewing"
@@ -679,3 +676,15 @@ msgstr "Move cursor automatically after selections"
 
 msgid "向後加詞"
 msgstr "Add phrase backwards"
+
+msgid "前往 gcin 討論區"
+msgstr "Forum of gcin"
+
+msgid "如何新增詞"
+msgstr "How to append phrases"
+
+msgid "拼音無聲調"
+msgstr "Pinyin, toneless"
+
+msgid "關於gcin/常見問題"
+msgstr "About gcin / FAQ"

@@ -8,7 +8,7 @@
 #include "tsin.h"
 #include "gtab.h"
 
-char *current_tsin_fname;
+extern char *current_tsin_fname;
 typedef unsigned int u_int32_t;
 
 void init_TableDir();

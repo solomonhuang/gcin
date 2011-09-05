@@ -129,14 +129,14 @@ gcin_kb_config_set (ChewingContext *pChewingCtx)
     char *pszHome;
     char *pszGcinKBConfig;
     char szBuf[32];
-    char szKbType[8];
+    char szKbType[16];
     char szKbSelKey[16];
     int  nFd;
     int  nRead;
     int  nIdx = 0;
 
     memset (szBuf, 0x00, 32);
-    memset (szKbType, 0x00, 8);
+    memset (szKbType, 0x00, 16);
     memset (szKbSelKey, 0x00, 16);
 
     pszHome = getenv ("HOME");
@@ -162,7 +162,7 @@ gcin_kb_config_set (ChewingContext *pChewingCtx)
     
     sscanf (szBuf, "%s %s ", szKbType, szKbSelKey);
 
-    if (!szKbType || !szKbSelKey)
+    if (!strlen (szKbType) || !strlen (szKbSelKey))
         return;
 
     for (nIdx = 0; nIdx < strlen (szKbSelKey); nIdx++)

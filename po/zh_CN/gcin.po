@@ -576,9 +576,6 @@ msgstr "gcin 注音/词音/拼音 设置"
 msgid "選擇鍵顯示於候選字(詞)後方"
 msgstr "选择键显示于候选字(词)后方"
 
-msgid "點選連結前往 gcin 討論區"
-msgstr "点击链接前往 gcin 讨论区"
-
 msgid "使用預選詞"
 msgstr "使用预选词"
 
@@ -628,3 +625,15 @@ msgstr "选字完毕自动跳字"
 
 msgid "向後加詞"
 msgstr "向后加词"
+
+msgid "前往 gcin 討論區"
+msgstr "前往 gcin 讨论区"
+
+msgid "如何新增詞"
+msgstr "如何新增词"
+
+msgid "拼音無聲調"
+msgstr "拼音无声调"
+
+msgid "關於gcin/常見問題"
+msgstr "关于gcin/常见问题"

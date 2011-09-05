@@ -1362,7 +1362,6 @@ int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *c
 
     keys[keysN]=0;
 
-    int idx;
     for(i=0;i < jpN; i++) {
       char *s=idx_hira_kata(jp[i], FALSE);
 
@@ -1397,7 +1396,6 @@ int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *c
   if (segN || jpN)
     *comp_flag|=4;
 
-ret:
   return attrN;
 }
 

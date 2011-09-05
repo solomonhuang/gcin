@@ -1,5 +1,16 @@
 #include "chewing.h"
 
+// gcin-chewing funcs
+static gboolean select_idx (int c);
+static void prev_page (void);
+static void next_page (void);
+static gboolean chewing_initialize (void);
+static gboolean is_empty (void);
+static gboolean gcin_label_show (char *pszPho, int nPos);
+static gboolean gcin_label_clear (int nCount);
+static gboolean gcin_label_cand_show (char *pszWord, int nCount);
+static gboolean gtk_pango_font_pixel_size_get (int *pnFontWidth, int *pnFontHeight);
+
 static GCIN_module_main_functions g_gcinModMainFuncs;
 static GtkWidget *g_pWinChewing      = NULL;
 static ChewingContext *g_pChewingCtx = NULL;
@@ -7,7 +18,6 @@ static GtkWidget *g_pEvBoxChewing    = NULL;
 static GtkWidget *g_pHBoxChewing     = NULL;
 static SEG *g_pSeg = NULL;
 static int g_nCurrentCursorPos = 0;
-static int g_nFd;
 
 // FIXME: impl
 static gboolean
@@ -64,7 +74,6 @@ gtk_pango_font_pixel_size_get (int *pnFontWidth, int *pnFontHeight)
     PangoLayout *pPangoLayout;
     PangoContext *pPangoContext;
     PangoFontDescription *pPangoFontDesc;
-    int nFontWidth, nFontHeight;
 
     pPangoLayout = gtk_widget_create_pango_layout (g_pWinChewing, "中");
     //pPangoLayout = gtk_widget_create_pango_layout (
@@ -150,7 +159,6 @@ chewing_initialize (void)
     return TRUE;
 }
 
-// FIXME: impl
 static gboolean
 is_empty (void)
 {
@@ -319,13 +327,10 @@ module_feedkey (int nKeyVal, int nKeyState)
     int nZuinLen         = 0;
     char szWord[4];
     int nPhoIdx, nBufIdx;
-    int nShiftModifier;
-    int nTotalCandNum, nIdx;
+    int nIdx;
 
     if (!g_pChewingCtx)
         return FALSE;
-
-    nShiftModifier = (nKeyState & ShiftMask) > 0;
 
     memset (szWord, 0x00, 4);
 
@@ -429,7 +434,7 @@ module_feedkey (int nKeyVal, int nKeyState)
 
         if (chewing_cand_TotalChoice (g_pChewingCtx))
         {
-            nTotalCandNum = nIdx = 0;
+            nIdx = 0;
             while (chewing_cand_hasNext (g_pChewingCtx))
             {
                 pszChewingCand = chewing_cand_String (g_pChewingCtx);
@@ -531,6 +536,9 @@ void
 module_show_win (void)
 {
     if (g_gcinModMainFuncs.mf_gcin_edit_display_ap_only ())
+        return;
+
+    if (is_empty ())
         return;
 
     gtk_window_resize (GTK_WINDOW (g_pWinChewing),

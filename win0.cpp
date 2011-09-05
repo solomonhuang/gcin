@@ -434,6 +434,7 @@ void move_win0(int x, int y)
   if (gwin0)
     gtk_window_move(GTK_WINDOW(gwin0), x, y);
 
+//  dbg("move_win0 %d %d\n",x,y);
   win_x = x;
   win_y = y;
 
@@ -670,7 +671,7 @@ void show_win0()
   if (!GTK_WIDGET_VISIBLE(gwin0))
 #endif
   {
-// dbg("gtk_widget_show %x\n", gwin0);
+//    dbg("gtk_widget_show %x\n", gwin0);
 #if UNIX
     move_win0(win_x, win_y);
     gtk_widget_show(gwin0);

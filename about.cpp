@@ -111,7 +111,8 @@ void create_about_window()
     GtkWidget *separator = gtk_hseparator_new ();
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
-#if GTK_CHECK_VERSION(2,18,9)
+// this doesn't work on win32
+#if GTK_CHECK_VERSION(2,18,9) && UNIX
    char tmp[512];
    sprintf(tmp, "<a href='http://hyperrate.com?eid=67'>%s</a>\n"
                 "<a href='http://hyperrate.com?eid=215'>%s</a>\n"

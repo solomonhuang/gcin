@@ -346,6 +346,7 @@ void process_client_req(HANDLE fd)
 #if DBG
       dbg_time("GCIN_req_focus_in  %x %d %d\n",cs, cs->spot_location.x, cs->spot_location.y);
 #endif
+//      current_CS = cs;
       gcin_FocusIn(cs);
       break;
     case GCIN_req_focus_out:

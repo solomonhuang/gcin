@@ -11,7 +11,7 @@
 #endif
 
 #if !GTK_CHECK_VERSION(2,15,0)
-#define gtk_status_icon_set_tooltip_text(x,y) gtk_status_icon_set_tooltip(x,y)
+#define gtk_status_icon_set_tooltip_text gtk_status_icon_set_tooltip
 #endif
 
 #if GTK_CHECK_VERSION(2,17,5)
@@ -47,6 +47,7 @@
 #endif
 
 #if !GTK_CHECK_VERSION(2,91,0)
+#define gdk_error_trap_pop_ignored gdk_error_trap_pop
 #define gtk_widget_get_preferred_size(x,y,z) gtk_widget_size_request(x,z)
 #define gtk_widget_set_halign(x,y);
 #endif

@@ -45,17 +45,6 @@ void module_hide_win (void);
 int module_win_visible (void);
 int module_flush_input (void);
 
-// gcin-chewing funcs
-static gboolean select_idx (int c);
-static void prev_page (void);
-static void next_page (void);
-static gboolean chewing_initialize (void);
-static gboolean is_empty (void);
-static gboolean gcin_label_show (char *pszPho, int nPos);
-static gboolean gcin_label_clear (int nCount);
-static gboolean gcin_label_cand_show (char *pszWord, int nCount);
-static gboolean gtk_pango_font_pixel_size_get (int *pnFontWidth, int *pnFontHeight);
-
 // config funcs
 void chewing_config_open (gboolean bWrite);
 void chewing_config_load (ChewingConfigData *pChewingConfig);

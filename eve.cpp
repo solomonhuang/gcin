@@ -386,8 +386,8 @@ void show_win_gtab();
 void check_CS()
 {
   if (!current_CS) {
+//    dbg("!current_CS");
     current_CS = &temp_CS;
-
     temp_CS.input_style = InputStyleOverSpot;
   }
   else
@@ -450,7 +450,7 @@ void move_in_win(ClientState *cs, int x, int y)
 #if 0
   dbg("move_in_win %d %d\n",x, y);
 #endif
-#if 1
+#if 0
   if (current_in_win_x == x && current_in_win_y == y)
     return;
 #endif
@@ -509,18 +509,19 @@ void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
 void move_IC_in_win(ClientState *cs)
 {
 #if 0
-   dbg("move_IC_in_win\n");
+   dbg("move_IC_in_win %d,%d\n", cs->spot_location.x, cs->spot_location.y);
 #endif
    Window inpwin = cs->client_win;
 #if UNIX
    if (!inpwin) {
-//	   dbg("no inpwin\n");
-      return;
+     dbg("no inpwin\n");
+     return;
    }
 #endif
    // non focus win filtering is done in the client lib
-   if (inpwin != focus_win && focus_win && !cs->b_gcin_protocol)
+   if (inpwin != focus_win && focus_win && !cs->b_gcin_protocol) {
       return;
+   }
 
    int inpx = cs->spot_location.x;
    int inpy = cs->spot_location.y;
@@ -528,8 +529,9 @@ void move_IC_in_win(ClientState *cs)
 #if UNIX
    XWindowAttributes att;
    XGetWindowAttributes(dpy, inpwin, &att);
-   if (att.override_redirect)
-     return;
+// chrome window is override_redirect
+//   if (att.override_redirect)
+//     return;
 
    if (inpx >= att.width)
      inpx = att.width - 1;
@@ -538,7 +540,7 @@ void move_IC_in_win(ClientState *cs)
 #else
    if (inpwin) {
      RECT rect;
-	 GetClientRect((HWND)inpwin, &rect);
+     GetClientRect((HWND)inpwin, &rect);
      if (inpx >= rect.right)
        inpx = rect.right - 1;
      if (inpy >= rect.bottom)
@@ -559,9 +561,9 @@ void move_IC_in_win(ClientState *cs)
 
 void update_in_win_pos()
 {
-//  dbg("update_in_win_pos %d\n", current_CS->input_style);
-
   check_CS();
+
+//  dbg("update_in_win_pos %x %d\n", current_CS, current_CS->input_style);
 
   if (current_CS->input_style == InputStyleRoot) {
 #if UNIX
@@ -688,7 +690,7 @@ void update_win_kbm();
 
 void toggle_im_enabled()
 {
-//    dbg("toggle_im_enabled\n");
+    dbg("toggle_im_enabled\n");
     check_CS();
 
     if (current_CS->in_method < 0 || current_CS->in_method > MAX_GTAB_NUM_KEY)
@@ -1063,9 +1065,9 @@ int gcin_switch_keys_lookup(int key);
 gboolean get_caps_lock_state()
 {
 	XkbStateRec states;
-	
+
 	if (XkbGetState(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), XkbUseCoreKbd, &states) == Success)
-	{   
+	{
 		if (states.locked_mods & LockMask) return TRUE;
 	}
 	return FALSE;
@@ -1364,6 +1366,7 @@ void gcin_reset();
 
 int gcin_FocusIn(ClientState *cs)
 {
+//  dbg("gcin_FocusIn\n");
   Window win = cs->client_win;
 
   gcin_reset();

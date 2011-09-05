@@ -301,7 +301,7 @@ egg_tray_icon_send_manager_message (EggTrayIcon *icon,
   XSendEvent (display,
 	      icon->manager_window, False, NoEventMask, (XEvent *)&ev);
   XSync (display, False);
-  gdk_error_trap_pop ();
+  gdk_error_trap_pop_ignored ();
 }
 
 static void
@@ -580,7 +580,7 @@ egg_tray_icon_send_message (EggTrayIcon *icon,
 		  icon->manager_window, False, StructureNotifyMask, (XEvent *)&ev);
       XSync (xdisplay, False);
     }
-  gdk_error_trap_pop ();
+  gdk_error_trap_pop_ignored ();
 
   return stamp;
 }

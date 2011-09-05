@@ -739,7 +739,7 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
 void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y)
 {
   if (!handle)
-	  return;
+    return;
 
 //  dbg("gcin_im_client_set_cursor_location %d   %d,%d\n", handle->flag, x, y);
 
@@ -770,6 +770,9 @@ void gcin_im_client_set_window(GCIN_client_handle *handle, Window win)
     return;
 #endif
   handle->client_win = win;
+
+// For chrome
+//  gcin_im_client_set_cursor_location(handle, handle->spot_location.x, handle->spot_location.y);
 }
 
 void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_flag)

@@ -224,8 +224,7 @@ gtk_im_context_gcin_finalize (GObject *obj)
 }
 
 
-static void
-set_ic_client_window (GtkIMContextGCIN *context_xim,
+static void set_ic_client_window (GtkIMContextGCIN *context_xim,
                       GdkWindow       *client_window)
 {
 #if DBG
@@ -507,11 +506,15 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
                                         GdkRectangle *area)
 {
 #if DBG
-  printf("gtk_im_context_gcin_set_cursor_location %d\n", area->x);
+  printf("gtk_im_context_gcin_set_cursor_location %d,%d,%d\n", area->x, area->y, area->height);
 #endif
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 
-  if (context_xim->gcin_ch) {
+  if (!context_xim->gcin_ch)
+    get_im(context);
+
+//  if (context_xim->gcin_ch)
+  {
     gcin_im_client_set_cursor_location(context_xim->gcin_ch, area->x, area->y + area->height);
   }
 
