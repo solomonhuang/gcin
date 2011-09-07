@@ -21,9 +21,9 @@ export LD_LIBRARY_PATH="./im-client"
 export GTK_IM_MODULE=gcin
 #export GTK_IM_MODULE=xim
 #sleep 5; gcin-message -text 'abcde' -duration 5000;
-#gedit a.txt
+gedit a.txt
 #leafpad
-google-chrome
+#google-chrome
 #pcmanx
 #firefox
 #gnome-terminal

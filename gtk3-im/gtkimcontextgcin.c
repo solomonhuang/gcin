@@ -125,13 +125,19 @@ static void gcin_display_closed (GdkDisplay *display,
 static void
 get_im (GtkIMContextGCIN *context_xim)
 {
-#if 0
   GdkWindow *client_window = context_xim->client_window;
+  if (!client_window)
+    return;
   GdkScreen *screen = gdk_drawable_get_screen (client_window);
+  if (!screen)
+    return;
+
   GdkDisplay *display = gdk_screen_get_display (screen);
-#endif
+  if (!display)
+    return;
+
   if (!context_xim->gcin_ch) {
-    if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()))))
+    if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
       perror("cannot open gcin_ch");
 #if 1
     context_xim->timeout_handle = 0;
@@ -511,17 +517,26 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
                                         GdkRectangle *area)
 {
 #if DBG
-  printf("gtk_im_context_gcin_set_cursor_location %d,%d,%d\n", area->x, area->y, area->height);
+  printf("a gtk_im_context_gcin_set_cursor_location %d,%d,%d\n", area->x, area->y, area->height);
 #endif
+  if (!area) {
+    return;
+  }
+
+
   GtkIMContextGCIN *context_xim = GTK_IM_CONTEXT_GCIN (context);
 
-  if (!context_xim->gcin_ch)
+  if (!context_xim->gcin_ch) {
     get_im(context_xim);
+  }
 
-  if (context_xim->gcin_ch)
-  {
+  if (context_xim->gcin_ch) {
     gcin_im_client_set_cursor_location(context_xim->gcin_ch, area->x, area->y + area->height);
   }
+
+#if DBG
+  printf("b gtk_im_context_gcin_set_cursor_location %d,%d,%d\n", area->x, area->y, area->height);
+#endif
 
   return;
 }
