@@ -513,7 +513,7 @@ gtk_im_context_gcin_set_cursor_location (GtkIMContext *context,
   if (!context_xim->gcin_ch)
     get_im(context_xim);
 
-//  if (context_xim->gcin_ch)
+  if (context_xim->gcin_ch)
   {
     gcin_im_client_set_cursor_location(context_xim->gcin_ch, area->x, area->y + area->height);
   }

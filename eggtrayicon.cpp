@@ -259,7 +259,11 @@ egg_tray_icon_unrealize (GtkWidget *widget)
     }
 
 #if GTK_CHECK_VERSION(2,1,0)
-  root_window = gdk_screen_get_root_window (gtk_widget_get_screen (widget));
+  GdkScreen *screen = gtk_widget_get_screen (widget);
+  if (screen)
+    root_window = gdk_screen_get_root_window (screen);
+  else
+    return;
 #else
   root_window = gdk_window_lookup (gdk_x11_get_default_root_xwindow ());
 #endif
@@ -448,7 +452,7 @@ static void
 egg_tray_icon_realize (GtkWidget *widget)
 {
   EggTrayIcon *icon = EGG_TRAY_ICON (widget);
-  gint screen;
+  gint screen = -1;
   Display *xdisplay;
   char buffer[256];
   GdkWindow *root_window;
@@ -459,7 +463,8 @@ egg_tray_icon_realize (GtkWidget *widget)
   make_transparent (widget, NULL);
 
 #if GTK_CHECK_VERSION(2,1,0)
-  screen = gdk_screen_get_number (gtk_widget_get_screen (widget));
+  GdkScreen *Screen = gtk_widget_get_screen (widget);
+  if (Screen) screen = gdk_screen_get_number (Screen);
   xdisplay = GDK_DISPLAY_XDISPLAY (gtk_widget_get_display (widget));
 #else
   screen = XScreenNumberOfScreen (DefaultScreenOfDisplay (gdk_display));
@@ -487,7 +492,10 @@ egg_tray_icon_realize (GtkWidget *widget)
   egg_tray_icon_send_dock_request (icon);
 
 #if GTK_CHECK_VERSION(2,1,0)
-  root_window = gdk_screen_get_root_window (gtk_widget_get_screen (widget));
+  if (Screen)
+    root_window = gdk_screen_get_root_window (Screen);
+  else
+    return;
 #else
   root_window = gdk_window_lookup (gdk_x11_get_default_root_xwindow ());
 #endif
