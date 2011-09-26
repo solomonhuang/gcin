@@ -71,11 +71,14 @@ void gcin_im_client_reset(GCIN_client_handle *handle);
 void gcin_im_client_message(GCIN_client_handle *handle, char *message);
 
 #include "gcin-im-client-attr.h"
-#if WIN32 || 1
 int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor, int *sub_comp_len);
+
+#if UNIX
+Window find_gcin_window(Display *dpy);
 #else
-int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREEDIT_ATTR att[], int *cursor);
+Window find_gcin_window();
 #endif
+
 
 #ifdef __cplusplus
 }

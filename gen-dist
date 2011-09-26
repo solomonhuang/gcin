@@ -1,5 +1,5 @@
 GCIN_VERSION="gcin-`cat VERSION.gcin`"
-sh gen-gtk3
+#sh gen-gtk3
 sed -i '/^$/d' Changelog.html
 rm -f tags core.*
 cd ..

@@ -20,8 +20,12 @@
 #ifndef __GTK_IM_CONTEXT_GCIN_H__
 #define __GTK_IM_CONTEXT_GCIN_H__
 
+#include <gtk/gtk.h>
+#if !GTK_CHECK_VERSION(3,0,0)
 #include <gtk/gtkimcontext.h>
+#endif
 #include "gdk/gdkx.h"
+#include "../gcin-gtk-compatible.h"
 
 #ifdef __cplusplus
 extern "C" {

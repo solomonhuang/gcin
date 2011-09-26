@@ -22,9 +22,12 @@
 #include <stdlib.h>
 
 //#include "gtkintl.h"
+#include <gtk/gtk.h>
+#if !GTK_CHECK_VERSION(3,0,0)
 #include "gtk/gtklabel.h"
 #include "gtk/gtksignal.h"
 #include "gtk/gtkwindow.h"
+#endif
 #include "gtkimcontextgcin.h"
 // #include "gcin.h"  // for debug only
 #include "gcin-im-client.h"
@@ -305,7 +308,16 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   KeySym keysym = 0;
   Status status;
   gboolean result = FALSE;
+#if !GTK_CHECK_VERSION(3,0,0)
   GdkWindow *root_window = gdk_screen_get_root_window (gdk_drawable_get_screen (event->window));
+#else
+  GdkWindow *root_window = NULL;
+  GdkScreen *screen = gdk_window_get_screen (event->window);
+  if (screen)
+    root_window = gdk_screen_get_root_window (screen);
+  else
+    return result;
+#endif
 
   XKeyPressedEvent xevent;
   xevent.type = (event->type == GDK_KEY_PRESS) ? KeyPress : KeyRelease;

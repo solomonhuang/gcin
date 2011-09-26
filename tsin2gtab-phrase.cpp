@@ -97,6 +97,8 @@ void init_gcin_program_files();
 
 int main(int argc, char **argv)
 {
+  gtk_init(&argc, &argv);
+
 #if 1
   if (argc != 3)
     p_err("%s a_file.gtab outfile", argv[0]);

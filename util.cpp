@@ -11,20 +11,25 @@ static FILE *out_fp;
 void p_err(char *fmt,...)
 {
   va_list args;
-  FILE *out = stdout;
+  char out[4096];
 
   va_start(args, fmt);
-  fprintf(out,"gcin:");
-  vfprintf(out, fmt, args);
+  vsprintf(out, fmt, args);
   va_end(args);
-  fprintf(out,"\n");
-  fflush(out);
+
+  GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE,
+                                   out);
+
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+
 #if DEBUG && 1
   abort();
 #else
   if (getenv("GCIN_ERR_COREDUMP"))
     abort();
-
   exit(-1);
 #endif
 }
@@ -80,7 +85,7 @@ void __gcin_dbg_(char *fmt,...)
 
 char *sys_err_strA()
 {
-	sys_errlist[errno];
+  return (char *)sys_errlist[errno];
 }
 
 #else

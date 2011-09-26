@@ -307,6 +307,9 @@ void show_win_kbm()
 
   gtk_widget_show_all(gwin_kbm);
   win_kbm_on = 1;
+#if WIN32
+  gtk_window_present(GTK_WINDOW(gwin_kbm));
+#endif
   move_win_kbm();
 }
 

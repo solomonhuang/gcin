@@ -54,6 +54,8 @@ int main(int argc, char **argv)
   int phrase_area_N=0;
   char *phrase_area = NULL;
 
+  gtk_init(&argc, &argv);
+
   gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
   if (argc > 1)

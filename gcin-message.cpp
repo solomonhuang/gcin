@@ -12,6 +12,8 @@ int main(int argc, char **argv)
   char icon[128];
   int duration = 3000;
 
+  gtk_init(&argc, &argv);
+
   if (argc < 3)
     print_help();
 

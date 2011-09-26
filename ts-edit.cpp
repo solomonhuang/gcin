@@ -229,21 +229,27 @@ void disp_page()
 
     load_tsin_at_ts_idx(ts_row, &clen, &usecount, phbuf, (u_char *)chbuf);
 
-    strcpy(line, chbuf);
-    strcat(line, " ");
+    char *t;
+    strcpy(line, t=g_markup_escape_text(chbuf, -1));
+    g_free(t);
+    strcat(line, " <span foreground=\"blue\">");
+
 
     char tt[512];
 
     for(i=0; i < clen; i++) {
       get_key_str(phbuf, i, tt);
-      strcat(line, tt);
+      strcat(line, t=g_markup_escape_text(tt, -1));
+      g_free(t);
       strcat(line, " ");
     }
 
     sprintf(tt, " %d", usecount);
     strcat(line, tt);
+    strcat(line, "</span>");
 
-    gtk_label_set_text(GTK_LABEL(labels[li]), line);
+    dbg("%s\n", line);
+    gtk_label_set_markup(GTK_LABEL(labels[li]), line);
     gtk_widget_show(button_check[li]);
   }
 

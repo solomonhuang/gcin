@@ -202,6 +202,8 @@ int main(int argc, char **argv)
   int lineCnt=0;
   gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
+  gtk_init(&argc, &argv);
+
   dbg("enter %s\n", argv[0]);
 
   if (argc < 2)

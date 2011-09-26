@@ -42,6 +42,12 @@
 #endif
 
 #if GTK_CHECK_VERSION(2,90,0)
+#undef GTK_CHECK_CAST
+#define GTK_CHECK_CAST G_TYPE_CHECK_INSTANCE_CAST
+#undef GDK_DRAWABLE_XID
+#define GDK_DRAWABLE_XID GDK_WINDOW_XID
+#undef GDK_DRAWABLE_XDISPLAY
+#define GDK_DRAWABLE_XDISPLAY GDK_WINDOW_XDISPLAY
 #define gtk_hseparator_new() gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)
 #define gtk_vseparator_new() gtk_separator_new(GTK_ORIENTATION_VERTICAL)
 #endif
@@ -54,6 +60,7 @@
 
 #if GTK_CHECK_VERSION(2,91,0)
 #define GTK_OBJECT
+#define gdk_drawable_get_screen gdk_window_get_screen
 #endif
 
 #if !GTK_CHECK_VERSION(2,91,1)

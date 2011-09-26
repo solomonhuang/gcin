@@ -1572,6 +1572,8 @@ gboolean gcin_edit_display_ap_only()
   if (test_mode)
     return TRUE;
 #endif
+  if (!current_CS)
+    return FALSE;
 //  dbg("gcin_edit_display_ap_only %d\n", current_CS->use_preedit)
   return current_CS->use_preedit && gcin_edit_display==GCIN_EDIT_DISPLAY_ON_THE_SPOT;
 }

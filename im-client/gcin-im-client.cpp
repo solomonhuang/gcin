@@ -45,15 +45,32 @@ Atom get_gcin_addr_atom(Display *dpy);
 
 
 
+#if UNIX
+Window find_gcin_window(Display *dpy)
+{
+  Atom gcin_addr_atom = get_gcin_addr_atom(dpy);
+  if (!gcin_addr_atom)
+    return FALSE;
+  return XGetSelectionOwner(dpy, gcin_addr_atom);
+}
+#else
+Window find_gcin_window()
+{
+  return FindWindowA(GCIN_WIN_NAME, NULL);
+}
+#endif
+
+
 #if WIN32
 bool sys_end_session;
 HWND serverWnd;
+
 
 HANDLE open_pipe_client()
 {
   int retried=0;
 restart:
-  serverWnd = FindWindowA(GCIN_WIN_NAME, NULL);
+  serverWnd = find_gcin_window();
   if (!serverWnd) {
     if (retried < 10) {
 	  if (!retried)
@@ -167,8 +184,7 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 #define MAX_TRY 3
   int loop;
   for(loop=0; loop < MAX_TRY; loop++) {
-    if ((gcin_addr_atom && (gcin_win=XGetSelectionOwner(dpy, gcin_addr_atom))!=None)
-        || getenv("GCIN_IM_CLIENT_NO_AUTO_EXEC"))
+    if ((gcin_win=find_gcin_window(dpy))!=None || getenv("GCIN_IM_CLIENT_NO_AUTO_EXEC"))
       break;
     static time_t exec_time;
 

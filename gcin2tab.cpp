@@ -171,6 +171,8 @@ int main(int argc, char **argv)
   char *phrbuf = NULL;
   int prbf_cou=0;
 
+  gtk_init(&argc, &argv);
+
   printf("-- gcin2tab encoding UTF-8 --\n");
   printf("--- please use iconv -f big5 -t utf-8 if your file is in big5 encoding\n");
 

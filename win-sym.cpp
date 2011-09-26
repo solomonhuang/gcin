@@ -303,6 +303,9 @@ void show_win_sym()
 #endif
   gtk_widget_show_all(gwin_sym);
   move_win_sym();
+#if WIN32
+  gtk_window_present(GTK_WINDOW(gwin_sym));
+#endif
 }
 
 
