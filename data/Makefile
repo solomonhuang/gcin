@@ -1,8 +1,8 @@
 include ../config.mak
 
 .SUFFIXES:	.kbmsrc .kbm .cin .gtab
-CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I.. -DDEBUG="0$(GCIN_DEBUG)" \
-
+CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I.. -DDEBUG="0$(GCIN_DEBUG)"
+export NO_GTK_INIT=
 
 DATA=pho.tab2 tsin32.idx NewCJ3.gtab \
      cj.gtab ar30.gtab ar30-big.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \
@@ -17,26 +17,26 @@ DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 all:	$(DATA)
 
 tsin32:	tsin.src ../tsa2d32
-	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../tsa2d32 $<
+	export LD_LIBRARY_PATH=../im-client;../tsa2d32 $<
 tsin32.idx:	tsin32
 
 
 s-tsin32:	s-tsin.src ../tsa2d32
-	GCIN_NO_RELOAD=; export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../tsa2d32 $< $@
+	export LD_LIBRARY_PATH=../im-client;../tsa2d32 $< $@
 s-tsin32.idx:	s-tsin32
 
 
 pho.tab2:	 pho.tab2.src ../phoa2d
-	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
+	export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 s-pho.tab2:	 s-pho.tab2.src ../phoa2d
-	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
+	export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 pho-huge.tab2:	 pho-huge.tab2.src ../phoa2d
-	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
+	export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 s-pho-huge.tab2:	 s-pho-huge.tab2.src ../phoa2d
-	GCIN_NO_RELOAD=;export GCIN_NO_RELOAD;export LD_LIBRARY_PATH=../im-client;../phoa2d $<
+	export LD_LIBRARY_PATH=../im-client;../phoa2d $<
 
 t2s.dat:	t2s-file t2s-file.table
 	./t2s-file

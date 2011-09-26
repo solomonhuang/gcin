@@ -54,7 +54,7 @@ Window find_gcin_window(Display *dpy)
   return XGetSelectionOwner(dpy, gcin_addr_atom);
 }
 #else
-Window find_gcin_window()
+HWND find_gcin_window()
 {
   return FindWindowA(GCIN_WIN_NAME, NULL);
 }

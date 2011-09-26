@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
   gtk_init(&argc, &argv);
 
-  gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
+  gboolean reload = getenv("NO_GTK_INIT")==NULL;
 
   if (argc > 1)
     fname = argv[1];

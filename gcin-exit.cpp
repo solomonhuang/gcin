@@ -1,4 +1,5 @@
 #include "gcin.h"
+#include "gcin-im-client.h"
 
 #if WIN32
  #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
@@ -15,7 +16,7 @@ int main()
   send_gcin_message(dpy, GCIN_EXIT_MESSAGE);
 #else
   if (!find_gcin_window())
-    return;
+    return 0;
   send_gcin_message(GCIN_EXIT_MESSAGE);
 #endif
 

@@ -17,6 +17,9 @@ void p_err(char *fmt,...)
   vsprintf(out, fmt, args);
   va_end(args);
 
+  if (getenv("NO_GTK_INIT")) {
+    fprintf(stderr, "%s\n", out);
+  } else {
   GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_CLOSE,
@@ -24,6 +27,7 @@ void p_err(char *fmt,...)
 
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
+  }
 
 #if DEBUG && 1
   abort();

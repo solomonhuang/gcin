@@ -200,7 +200,13 @@ int main(int argc, char **argv)
   int hashidx[TSIN_HASH_N];
   u_char clen;
   int lineCnt=0;
-  gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
+  gboolean reload = getenv("NO_GTK_INIT")==NULL;
+
+  if (reload) {
+    dbg("need reload\n");
+  } else {
+    dbg("NO_GTK_INIT\n");
+  }
 
   gtk_init(&argc, &argv);
 

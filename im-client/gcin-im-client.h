@@ -76,7 +76,7 @@ int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREE
 #if UNIX
 Window find_gcin_window(Display *dpy);
 #else
-Window find_gcin_window();
+HWND find_gcin_window();
 #endif
 
 
