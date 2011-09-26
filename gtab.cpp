@@ -78,7 +78,7 @@ gboolean gtab_has_input()
 
 #define tblch(i) tblch2(cur_inmd, i)
 
-static int load_phr_ch(INMD *inm, u_char *ch, char *tt)
+int load_phr_ch(INMD *inm, u_char *ch, char *tt)
 {
   int phrno =((int)(ch[0])<<16)|((int)ch[1]<<8)|ch[2];
   int ofs = inm->phridx[phrno], ofs1 = inm->phridx[phrno+1];
@@ -121,33 +121,12 @@ static void clear_page_label()
 
 int gtab_key2name(INMD *tinmd, u_int64_t key, char *t, int *rtlen);
 
-void lookup_gtabn(char *ch, char *out)
+
+int ch_to_gtab_keys(INMD *tinmd, char *ch, u_int64_t keys[])
 {
-  char outbuf[512];
-  char *tbuf[128];
-  int tbufN=0;
-  INMD *tinmd = &inmd[default_input_method];
   int n = utf8_str_N(ch);
   gboolean phrase = n > 1 || !(ch[0] & 0x80);
-
-  if (!tinmd->DefChars)
-    tinmd = cur_inmd;
-
-  if (!tinmd)
-    return;
-
-  gboolean need_disp = FALSE;
-
-  if (!out) {
-    out = outbuf;
-    need_disp = TRUE;
-  }
-
-  out[0]=0;
-
-  int min_klen = 100;
-
-  int i;
+  int i, keysN=0;
   for(i=0; i < tinmd->DefChars; i++) {
     char *chi = (char *)tblch2(tinmd, i);
 
@@ -166,12 +145,44 @@ void lookup_gtabn(char *ch, char *out)
     }
 
     u_int64_t key = CONVT2(tinmd, i);
+    keys[keysN++] = key;
+  }
+  return keysN;
+}
 
-    int j;
+void lookup_gtabn(char *ch, char *out)
+{
+  char outbuf[512];
+  char *tbuf[128];
+  int tbufN=0;
+  INMD *tinmd = &inmd[default_input_method];
 
+  if (!tinmd->DefChars)
+    tinmd = cur_inmd;
+
+  if (!tinmd)
+    return;
+
+  gboolean need_disp = FALSE;
+
+  if (!out) {
+    out = outbuf;
+    need_disp = TRUE;
+  }
+
+  out[0]=0;
+
+
+  int min_klen = 100;
+  u_int64_t keys[64];
+  int keysN = ch_to_gtab_keys(tinmd, ch, keys);
+
+  int i;
+  for(i=0; i < keysN; i++) {
     int tlen, klen;
     char t[CH_SZ * 10 + 1];
-    klen = gtab_key2name(tinmd, key, t, &tlen);
+
+    klen = gtab_key2name(tinmd, keys[i], t, &tlen);
 
     if (klen < min_klen)
       min_klen = klen;

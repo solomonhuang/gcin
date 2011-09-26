@@ -85,7 +85,7 @@ void __gcin_dbg_(char *fmt,...)
 
 char *sys_err_strA()
 {
-  return (char *)sys_errlist[errno];
+  return (char *)strerror(errno);
 }
 
 #else

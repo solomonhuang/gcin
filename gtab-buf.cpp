@@ -945,6 +945,8 @@ void gtab_reset()
   return;
 }
 
+int ch_to_gtab_keys(INMD *tinmd, char *ch, u_int64_t keys[]);
+
 void save_gtab_buf_phrase_idx(int idx0, int len)
 {
   WSP_S wsp[MAX_PHRASE_LEN];
@@ -953,7 +955,16 @@ void save_gtab_buf_phrase_idx(int idx0, int len)
   int i;
   for(i=0; i < len; i++) {
     u8cpy(wsp[i].ch, gbuf[idx0 + i].ch);
-    wsp[i].key = gbuf[idx0 + i].keys[0];
+    u_int64_t key = gbuf[idx0 + i].keys[0];
+
+    if (!key) {
+      u_int64_t keys[64];
+      int keysN = ch_to_gtab_keys(cur_inmd, wsp[i].ch, keys);
+      if (keysN)
+        key = keys[0];
+    }
+
+    wsp[i].key = key;
   }
 
   create_win_save_phrase(wsp, len);

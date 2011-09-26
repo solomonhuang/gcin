@@ -514,6 +514,8 @@ void screen_size_changed(GdkScreen *screen, gpointer user_data)
 
 int main(int argc, char **argv)
 {
+  gtk_init (&argc, &argv);
+
 #if UNIX
   signal(SIGCHLD, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);
@@ -590,7 +592,6 @@ int main(int argc, char **argv)
   load_setttings();
   load_gtab_list(TRUE);
 
-  gtk_init (&argc, &argv);
 
 #if GCIN_i18n_message
   bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
