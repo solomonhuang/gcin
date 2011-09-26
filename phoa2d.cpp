@@ -54,7 +54,8 @@ int main(int argc, char **argv)
   int phrase_area_N=0;
   char *phrase_area = NULL;
 
-  gtk_init(&argc, &argv);
+  if (!getenv("NO_GTK_INIT"))
+    gtk_init(&argc, &argv);
 
   gboolean reload = getenv("NO_GTK_INIT")==NULL;
 

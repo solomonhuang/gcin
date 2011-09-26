@@ -208,7 +208,8 @@ int main(int argc, char **argv)
     dbg("NO_GTK_INIT\n");
   }
 
-  gtk_init(&argc, &argv);
+  if (!getenv("NO_GTK_INIT"))
+    gtk_init(&argc, &argv);
 
   dbg("enter %s\n", argv[0]);
 
