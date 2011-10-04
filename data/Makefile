@@ -3,6 +3,7 @@ include ../config.mak
 .SUFFIXES:	.kbmsrc .kbm .cin .gtab
 CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I.. -DDEBUG="0$(GCIN_DEBUG)"
 export NO_GTK_INIT=
+export GCIN_NO_RELOAD=
 
 DATA=pho.tab2 tsin32.idx NewCJ3.gtab \
      cj.gtab ar30.gtab ar30-big.gtab dayi3.gtab pinyin.gtab jyutping.gtab cj5.gtab \

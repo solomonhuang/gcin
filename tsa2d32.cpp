@@ -200,7 +200,7 @@ int main(int argc, char **argv)
   int hashidx[TSIN_HASH_N];
   u_char clen;
   int lineCnt=0;
-  gboolean reload = getenv("NO_GTK_INIT")==NULL;
+  gboolean reload = getenv("GCIN_NO_RELOAD")==NULL;
 
   if (reload) {
     dbg("need reload\n");
@@ -208,7 +208,7 @@ int main(int argc, char **argv)
     dbg("NO_GTK_INIT\n");
   }
 
-  if (!getenv("NO_GTK_INIT"))
+  if (getenv("NO_GTK_INIT")==NULL)
     gtk_init(&argc, &argv);
 
   dbg("enter %s\n", argv[0]);
@@ -536,10 +536,12 @@ int main(int argc, char **argv)
   printf("%d phrases\n",phcount);
 
   fclose(fw);
+  free(sf);
+  free(bf);
+
 
   if (reload) {
     printf("reload....\n");
-    gtk_init(&argc, &argv);
     send_gcin_message(
 #if UNIX
     GDK_DISPLAY(),

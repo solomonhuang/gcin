@@ -1051,6 +1051,7 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 shift_proc:
   if (shift_m && !strchr(cur_inmd->selkey, key) && !ggg.more_pg && key>=' ' && key < 0x7e &&
        key!='*' && (key!='?' || gtab_shift_phrase_key && !ggg.ci)) {
+    dbg("uuuuuuuuuu\n");
     if (gtab_shift_phrase_key) {
       if (tss.pre_selN && shift_char_proc(key, kbstate))
         return TRUE;
@@ -1382,7 +1383,8 @@ next:
       else
         inkey = 0;
 
-      if (shift_m && !inkey && tss.pre_selN && shift_char_proc(key, kbstate))
+      if (shift_m && !inkey && !tss.ctrl_pre_sel &&
+        tss.pre_selN && shift_char_proc(key, kbstate))
         return TRUE;
 
       clear_gtab_input_error_color();

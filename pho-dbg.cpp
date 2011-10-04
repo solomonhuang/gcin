@@ -18,7 +18,9 @@ void prph2(FILE *fp, phokey_t kk)
 
   if (k[0]==BACK_QUOTE_NO*PHO_CHAR_LEN) {
     utf8_putchar(&pho_chars[0][k[0]]);
-    fprintf(fp, "%c", okk & 0x7f);
+    char c = okk & 0x7f;
+    if (c > ' ')
+      fprintf(fp, "%c", c);
   } else {
     int i;
     for(i=0; i < 3; i++) {

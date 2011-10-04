@@ -187,7 +187,9 @@ void process_client_req(HANDLE fd)
 #endif
 {
   GCIN_req req;
-//  dbg("svr--> process_client_req %d\n", fd);
+#if DBG
+  dbg("svr--> process_client_req %d\n", fd);
+#endif
   int rn = myread(fd, &req, sizeof(req));
 
   if (rn <= 0) {
@@ -213,11 +215,11 @@ void process_client_req(HANDLE fd)
     cs = current_CS;
   } else {
 #if UNIX
-	int idx = fd;
+    int idx = fd;
     cs = gcin_clients[fd].cs;
 #else
-	int idx = find_im_client(fd);
-	cs = gcin_clients[idx].cs;
+    int idx = find_im_client(fd);
+    cs = gcin_clients[idx].cs;
 #endif
 
     int new_cli = 0;
@@ -238,7 +240,7 @@ void process_client_req(HANDLE fd)
 #else
     if (new_cli)
 #endif
-	{
+    {
       current_CS = cs;
       init_state_chinese(cs);
     }
@@ -390,6 +392,7 @@ void process_client_req(HANDLE fd)
       update_in_win_pos();
       break;
     case GCIN_req_set_flags:
+//      dbg("GCIN_req_set_flags\n");
       if (BITON(req.flag, FLAG_GCIN_client_handle_raise_window)) {
 #if DBG
         dbg("********* raise * window\n");

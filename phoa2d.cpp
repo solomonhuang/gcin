@@ -57,8 +57,6 @@ int main(int argc, char **argv)
   if (!getenv("NO_GTK_INIT"))
     gtk_init(&argc, &argv);
 
-  gboolean reload = getenv("NO_GTK_INIT")==NULL;
-
   if (argc > 1)
     fname = argv[1];
 
@@ -198,8 +196,7 @@ int main(int argc, char **argv)
 
   fclose(fp);
 
-  if (reload) {
-    gtk_init(&argc, &argv);
+  if (getenv("GCIN_NO_RELOAD")==NULL) {
     send_gcin_message(
 #if UNIX
 	GDK_DISPLAY(),

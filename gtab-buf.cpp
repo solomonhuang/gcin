@@ -1167,8 +1167,8 @@ int feedkey_gtab_release(KeySym xkey, int kbstate)
 #if 1
      case XK_Shift_L:
      case XK_Shift_R:
-		kpt = key_press_time;
-		key_press_time = 0;
+       kpt = key_press_time;
+       key_press_time = 0;
 
 // dbg("release xkey %x\n", xkey);
         if (
@@ -1179,10 +1179,10 @@ int feedkey_gtab_release(KeySym xkey, int kbstate)
      && xkey == XK_Shift_R))
           &&  current_time() - kpt < 300000) {
           if (!test_mode) {
-			  tsin_toggle_eng_ch();
+            tsin_toggle_eng_ch();
           }
           return 1;
-		} else
+        } else
           return 0;
 #endif
      default:

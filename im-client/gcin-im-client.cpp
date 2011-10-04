@@ -311,11 +311,11 @@ tcp:
   dbg("sock %d\n", sockfd);
 
   if (connect(sockfd, (struct sockaddr *)&in_serv_addr, servlen) < 0) {
-	dbg("gcin_im_client_open cannot open: ") ;
+    dbg("gcin_im_client_open cannot open: ") ;
     perror("");
     close(sockfd);
     sockfd = 0;
-	goto next;
+    goto next;
   }
 
   pp = (u_char *)&srv_ip_port.ip;
@@ -329,7 +329,6 @@ tcp:
   tcp = TRUE;
 
 next:
-
   if (!gcin_ch)
     handle = tzmalloc(GCIN_client_handle, 1);
   else {
@@ -795,6 +794,10 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 {
   GCIN_req req;
 
+#if DBG
+  dbg("gcin_im_client_set_flags\n");
+#endif
+
   if (!handle)
     return;
 
@@ -805,10 +808,18 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
 
   flags_backup = req.flag;
 
+#if DBG
+  dbg("gcin_im_client_set_flags b\n");
+#endif
+
   if (handle_write(handle, &req, sizeof(req)) <=0) {
     error_proc(handle,"gcin_im_client_set_flags error");
   }
   send_req_msg(handle);
+
+#if DBG
+  dbg("gcin_im_client_set_flags c\n");
+#endif
 
   if (handle_read(handle, ret_flag, sizeof(int)) <= 0) {
     error_proc(handle, "cannot read reply str from gcin server");
