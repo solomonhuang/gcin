@@ -2,6 +2,8 @@ include ../config.mak
 
 OBJS = imgcin.o gtkimcontextgcin.o
 GTK2IM=gtk-2.0/immodules
+GTKINC=`pkg-config --cflags gtk+-2.0`
+LDFLAGS=`pkg-config --libs gtk+-2.0`
 IMMODULES=$(libdir)/$(GTK2IM)
 IMMODULES_LOCAL=/usr/$(LIB)/$(GTK2IM)
 

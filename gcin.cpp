@@ -585,6 +585,7 @@ int main(int argc, char **argv)
 #endif
 
   if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {
+    setenv("NO_GTK_INIT", NULL, TRUE);
     p_err(" version %s\n", GCIN_VERSION);
   }
 

@@ -13,6 +13,8 @@ int main(int argc, char **argv)
 {
   int i;
 
+  gtk_init(&argc, &argv);
+
   load_setttings();
 
   if (argc > 1) {

@@ -514,7 +514,7 @@ int main(int argc, char **argv)
      G_CALLBACK (cb_button_add), NULL);
 
 
-  GtkWidget *button_quit = gtk_button_new_with_label(_(_L("離開 tslearn")));
+  GtkWidget *button_quit = gtk_button_new_from_stock (GTK_STOCK_QUIT);
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_quit, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_quit), "clicked",
      G_CALLBACK (do_exit), NULL);
