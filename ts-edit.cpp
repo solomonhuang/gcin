@@ -248,7 +248,7 @@ void disp_page()
     strcat(line, tt);
     strcat(line, "</span>");
 
-    dbg("%s\n", line);
+//    dbg("%s\n", line);
     gtk_label_set_markup(GTK_LABEL(labels[li]), line);
     gtk_widget_show(button_check[li]);
   }
@@ -537,7 +537,7 @@ gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 {
   if (last_row)
     return FALSE;
-  dbg("key_press_event %x\n", event->keyval);
+//  dbg("key_press_event %x\n", event->keyval);
   switch (event->keyval) {
     case GDK_Up:
       if (page_ofs>0)

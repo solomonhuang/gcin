@@ -260,7 +260,7 @@ if [ $USE_ANTHY = 'Y' ] || [ $USE_CHEWING = 'Y' ]; then
   BUILD_MODULE='Y'
 fi
 
-OPTFLAGS="-g"
+OPTFLAGS="-O"
 
 if [ -z $CC ]; then
   CC=gcc

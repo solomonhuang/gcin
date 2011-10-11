@@ -578,6 +578,14 @@ void cb_button_gcin_on_the_spot_key(GtkToggleButton *togglebutton, gpointer user
      gtk_combo_box_set_active (GTK_COMBO_BOX (opt_gcin_edit_display), i);
 }
 
+void combo_selected(GtkWidget *widget, gpointer window)
+{
+  int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_gcin_edit_display));
+  if (edit_disp[idx].keynum !=  GCIN_EDIT_DISPLAY_ON_THE_SPOT) {
+	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(check_button_gcin_on_the_spot_key), FALSE);
+  }
+}
+
 static GtkWidget *create_gcin_edit_display()
 {
 
@@ -590,6 +598,9 @@ static GtkWidget *create_gcin_edit_display()
   GtkWidget *menu = gtk_menu_new ();
 #endif
   gtk_box_pack_start (GTK_BOX (hbox), opt_gcin_edit_display, FALSE, FALSE, 0);
+
+  g_signal_connect(G_OBJECT(opt_gcin_edit_display), "changed",
+        G_CALLBACK(combo_selected), (gpointer) NULL);
 
   int i, current_idx=0;
 

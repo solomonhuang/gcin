@@ -1453,7 +1453,7 @@ keypad_proc:
           vv=9;
 
         if (seltab[vv][0]) {
-          if (AUTO_SELECT_BY_PHRASE) {
+          if (AUTO_SELECT_BY_PHRASE && !same_query_show_pho_win()) {
             if (ggg.gtab_buf_select && poo.same_pho_query_state != SAME_PHO_QUERY_gtab_input)
               set_gbuf_c_sel(vv);
             else

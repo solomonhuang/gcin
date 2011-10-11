@@ -1369,7 +1369,6 @@ int gcin_FocusIn(ClientState *cs)
 //  dbg("gcin_FocusIn\n");
   Window win = cs->client_win;
 
-  gcin_reset();
 #if UNIX
   if (skip_window(win))
     return FALSE;
@@ -1381,6 +1380,9 @@ int gcin_FocusIn(ClientState *cs)
     Window win = cs->client_win;
 
     if (focus_win != win) {
+#if 1
+      gcin_reset();
+#endif
       hide_in_win(current_CS);
       focus_win = win;
     }
