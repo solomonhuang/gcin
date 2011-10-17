@@ -108,8 +108,7 @@ void load_setttings()
   gcin_win_sym_click_close = get_gcin_conf_int(GCIN_WIN_SYM_CLICK_CLOSE, 1);
 #if WIN32
   gcin_win32_icon = 1;
-#endif
-#if UNIX
+#else
   gcin_win32_icon = get_gcin_conf_int(GCIN_WIN32_ICON, 1);
 #endif
 

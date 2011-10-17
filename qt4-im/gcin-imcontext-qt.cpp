@@ -89,7 +89,7 @@ void GCINIMContext::update_preedit()
   preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
 
   const QWidget *focused_widget = qApp->focusWidget ();
-  if (!focused_widget || !str || !*str) {
+  if (!focused_widget || !str) {
 free_mem:
     free(str);
     return;
@@ -101,7 +101,7 @@ free_mem:
   const QBrush &reversed_background = palette.text ();
 
 #if DBG || 0
-  printf("gtk_im_context_gcin_get_preedit_string attN:%d '%s'\n", attN, str);
+  printf("update_preedit attN:%d '%s'\n", attN, str);
 #endif
   int i;
   for(i=0; i < attN; i++) {

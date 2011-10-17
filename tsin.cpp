@@ -2175,7 +2175,7 @@ int tsin_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *comp
   int i;
   int tn=0;
   int attrN=0;
-#if _DEBUG && 0
+#if DEBUG && 0
   dbg("tsin_get_preedit\n");
 #endif
 
@@ -2198,7 +2198,7 @@ fin:
   if (i==tss.c_idx && gcin_display_on_the_spot_key())
     get_in_area_pho_tsin_str(str+tn);
 
-#if _DEBUG && 0
+#if DEBUG && 0
   dbg("'%s'\n", str);
 #endif
   if (tss.c_len) {

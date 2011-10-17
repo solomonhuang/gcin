@@ -21,7 +21,7 @@ export LD_LIBRARY_PATH="./im-client"
 export GTK_IM_MODULE=gcin
 #export GTK_IM_MODULE=xim
 #sleep 5; gcin-message -text 'abcde' -duration 5000;
-gedit a.txt
+#gedit a.txt
 #leafpad
 #google-chrome
 #pcmanx
@@ -29,4 +29,5 @@ gedit a.txt
 #gnome-terminal
 #mozilla-thunderbird
 #~/eclipse/eclipse
+/usr/lib/qt4/bin/qtconfig
 pkill gcin.test
