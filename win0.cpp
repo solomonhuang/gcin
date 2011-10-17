@@ -53,7 +53,7 @@ static int timeout_handle;
 gboolean timeout_minimize_win0(gpointer data)
 {
   if (!gwin0)
-	return FALSE;
+    return FALSE;
   gtk_window_resize(GTK_WINDOW(gwin0), 10, 10);
 //  gtk_window_present(GTK_WINDOW(gwin0));
   timeout_handle = 0;
@@ -666,6 +666,10 @@ void show_win0()
 //    dbg("show ret\n");
     return;
   }
+
+#if WIN32
+  compact_win0();
+#endif
 
 #if UNIX && 0
   if (!GTK_WIDGET_VISIBLE(gwin0))

@@ -89,12 +89,28 @@ void disp_gcb_selection(const gchar *text)
    GtkWidget *button = snoop_button;
    int i;
    int textlen;
+static char bombom[]="\xef\xbb\xbf\xef\xbb\xbf";
+
 
    if (!text || !text[0])
      return;
 
+  textlen=strlen(text);
+  if (textlen==1 && text[0] <= ' ')
+    return;
+  // google chrome
+  if (!strcmp(text,bombom))
+    return;
+
+#if 0
+  dbg("textlen %d\n", textlen);
+  for(i=0; i < textlen;i++)
+    dbg("%x ", (unsigned char)text[i]);
+  dbg("\n");
+#endif
+
   if (!buttonArr)
-         return;
+    return;
 
    for(i=0;i<buttonArrN;i++) {
      if (buttonStr[i] && !strcmp(buttonStr[i],text))
@@ -106,7 +122,6 @@ void disp_gcb_selection(const gchar *text)
    // strncpy doesn't work as expected on Mandrake 9.0
    strncpy(tmpstr,text,maxButtonStrlen);
 #else
-   textlen=strlen(text);
    if (textlen > maxButtonStrlen)
      textlen = maxButtonStrlen;
    memcpy(tmpstr,text,textlen);
@@ -165,7 +180,8 @@ void disp_gcb_selection(const gchar *text)
 
 void cb_selection_received(GtkClipboard *pclip, const gchar *text, gpointer data)
 {
-        disp_gcb_selection(text);
+//  dbg("cb_selection_received %s\n", text);
+  disp_gcb_selection(text);
 }
 
 
@@ -297,17 +313,10 @@ gboolean hist_focus_out_callback(GtkWidget *widget, GdkEventFocus *event,
    return TRUE;
 }
 
-#if 0
-gboolean timeout_periodic_clipboard_fetch(void *data)
-{
-//  dbg("timeout_periodic_clipboard_fetch\n");
-  get_selection(data);
-  return TRUE;
-}
-#endif
 
 static void cb_owner_change(GtkClipboard *clipboard, GdkEvent *event, gpointer ser_data)
 {
+//  dbg("cb_owner_change\n");
   get_selection(clipboard);
 }
 
@@ -450,23 +459,14 @@ void gcb_main()
   gtk_widget_show (mainwin);
 
 
-#if 0
-  gdk_input_set_extension_events(gtk_widget_get_window(mainwin), GDK_EXTENSION_EVENTS_ALL,
-                                 GDK_EXTENSION_EVENTS_ALL);
-#endif
   pclipboard_prim = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
   pclipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
 
   set_snoop_button(buttonArr[0]);
   get_selection(pclipboard);
   get_selection(pclipboard_prim);
-#if 0
-  gdk_window_set_events (GDK_ROOT_PARENT (), GDK_PROPERTY_CHANGE_MASK);
-  gdk_window_add_filter (GDK_ROOT_PARENT (), property_change_event, NULL);
-#endif
   gtk_container_set_border_width(GTK_CONTAINER(hbox),0);
   gtk_container_set_border_width(GTK_CONTAINER(mainwin),0);
-
 
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
 #if GTK_CHECK_VERSION(2,6,0)

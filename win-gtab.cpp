@@ -652,6 +652,10 @@ void show_win_gtab()
       move_win_gtab(0,0);
   }
 
+#if WIN32
+  minimize_win_gtab();
+#endif
+
 //  init_gtab(current_CS->in_method);
 
   if (gcin_pop_up_win && !gtab_has_input() &&
