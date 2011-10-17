@@ -166,7 +166,7 @@ static MITEM mitems_state[] = {
 };
 
 
-static GtkWidget *tray_menu, *tray_menu_state;
+static GtkWidget *tray_menu=NULL, *tray_menu_state=NULL;
 
 
 void toggle_im_enabled();
@@ -253,7 +253,7 @@ static void cb_activate(GtkStatusIcon *status_icon, gpointer user_data)
 
 static void cb_popup(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
 {
-//  dbg("cb_popup\n");
+  dbg("cb_popup\n");
   switch (button) {
 #if UNIX
     case 1:
@@ -290,7 +290,6 @@ static void cb_activate_state(GtkStatusIcon *status_icon, gpointer user_data)
 
 static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
 {
-//  dbg("cb_popup_state\n");
   switch (button) {
 
     case 1:
@@ -303,11 +302,11 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
       break;
     case 3:
     {
-      char bak[128], cur[128];
+      char bak[512], cur[512];
       get_gcin_conf_fstr(PHONETIC_KEYBOARD, cur, "");
       get_gcin_conf_fstr(PHONETIC_KEYBOARD_BAK, bak, "");
       if (bak[0] && strcmp(bak, cur)) {
-        char kbm[128];
+        char kbm[512];
 
         strcpy(kbm, bak);
         char *p=strchr(kbm, ' ');
@@ -331,6 +330,7 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
           }
         }
 
+//        dbg("hhhhhhhhhhhh %x\n", tray_menu_state);
         if (tray_menu_state) {
           gtk_widget_destroy(tray_menu_state);
           tray_menu_state = NULL;
@@ -344,6 +344,8 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
       break;
     }
   }
+
+//  dbg("zzzzzzzzzzzzz\n");
 }
 
 
