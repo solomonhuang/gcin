@@ -1307,12 +1307,19 @@ direct_select:
         if (AUTO_SELECT_BY_PHRASE && ggg.gbufN) {
           insert_gbuf_cursor_char(key);
           return 1;
-        } else
-          return 0;
+        } else {
+          if (current_CS->b_half_full_char)
+            return full_char_proc(key);
+		  else
+            return 0;
+		}
       }
     case '*':
       if (tss.pre_selN && shift_char_proc(key, kbstate))
         return TRUE;
+
+      if (current_CS->b_half_full_char)
+        return full_char_proc(key);
 
       inkey=cur_inmd->keymap[key];
       if ((inkey && (inkey!=cur_inmd->WILD_STAR && inkey!=cur_inmd->WILD_QUES)) || ptr_selkey(key)) {
