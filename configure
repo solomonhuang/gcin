@@ -163,7 +163,7 @@ fi
 
 
 LIB='lib'
-if [ -d /lib64 ]; then
+if [ -d /usr/lib64 && -d /lib ]; then
 LIB='lib64'
 fi
 

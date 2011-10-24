@@ -104,7 +104,6 @@ extern FILE *fph;
 void load_ts_phrase()
 {
   FILE *fp = fph;
-  char fname[256];
 
   int i;
   for(i=0; i < phraseN; i++)
@@ -321,7 +320,7 @@ GtkWidget *create_pho_sel_area()
         } else
           cp_ph_key(bigpho[i].phokeys,j, &key64);
 
-        int kn = gtab_key2name(pinmd, key64, t, &tlen);
+        gtab_key2name(pinmd, key64, t, &tlen);
 //        dbg("%d,%d] %s\n", i,j, t);
         phostr = t;
       } else {

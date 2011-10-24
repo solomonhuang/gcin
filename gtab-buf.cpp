@@ -85,7 +85,6 @@ _L("ŃńŅņŇňŉŊŋŌōŎŏŐőŒŒœœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦ
 
 int en_word_len(char *bf)
 {
-  int i;
   char *s;
 
   for(s=bf;*s;) {
@@ -938,7 +937,6 @@ void gtab_reset()
   if (!gwin_gtab)
     return;
 #endif
-  int v = ggg.gbufN > 0;
   clear_gtab_buf_all();
   clear_gbuf_sel();
   ClrIn();
@@ -1042,7 +1040,7 @@ void gtab_scan_pre_select(gboolean b_incr)
   if (Maxlen > MAX_PHRASE_LEN)
     Maxlen = MAX_PHRASE_LEN;
 
-  int len, selN, pre_selN=0, max_len=-1, max_selN;
+  int len, selN, max_len=-1, max_selN;
   for(len=1; len <= Maxlen; len++) {
     int idx = ggg.gbufN - len;
     if (gbuf[idx].flag & FLAG_CHPHO_PHRASE_TAIL)

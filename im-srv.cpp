@@ -131,8 +131,7 @@ static int get_ip_address(u_int *ip)
   memcpy(ip, hent->h_addr_list[0], hent->h_length);
 #else
   struct ifaddrs *ifaddr = NULL, *ifa;
-  int family, s;
-  char host[NI_MAXHOST];
+  int family;
 
   if (getifaddrs(&ifaddr) == -1) {
     perror("getifaddrs");

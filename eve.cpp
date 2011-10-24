@@ -241,7 +241,7 @@ void set_output_buffer_bak_to_clipboard()
   char *text, *utf8_gbtext=NULL;
 
   if (gb_output) {
-    int len = trad2sim(output_buffer_raw_bak, strlen(output_buffer_raw_bak),
+    trad2sim(output_buffer_raw_bak, strlen(output_buffer_raw_bak),
       &utf8_gbtext);
     text = utf8_gbtext;
   } else
@@ -389,6 +389,10 @@ void check_CS()
 //    dbg("!current_CS");
     current_CS = &temp_CS;
     temp_CS.input_style = InputStyleOverSpot;
+    temp_CS.im_state = GCIN_STATE_CHINESE;
+#if TRAY_ENABLED
+    disp_tray_icon();
+#endif
   }
   else
     temp_CS = *current_CS;

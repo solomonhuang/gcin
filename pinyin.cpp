@@ -106,7 +106,7 @@ gboolean inph_typ_pho_pinyin(int newkey)
     if (pin_juyin[j].pinyin[0]==newkey)
       break;
 
-  int r = pin2juyin(FALSE);
+  pin2juyin(FALSE);
   if (j==pin_juyinN)
     return PHO_STATUS_REJECT;
 

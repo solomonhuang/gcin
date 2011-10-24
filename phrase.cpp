@@ -164,7 +164,7 @@ gboolean feed_phrase(KeySym ksym, int state)
     trN = tranN;
   }
 
-  char tt[2], *str;
+  char *str;
 
   for(i=0; i < trN; i++) {
     if (tr[i].ksym!= ksym)
@@ -193,6 +193,7 @@ send_it:
   }
 
 #if 0
+  char tt[2];
   if ((state&(ControlMask|ShiftMask|Mod1Mask|Mod4Mask|Mod5Mask))==ShiftMask && ksym>=' ' && ksym < 0x7e) {
     str = tt;
     tt[0]=ksym;

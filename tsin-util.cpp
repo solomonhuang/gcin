@@ -199,7 +199,6 @@ static int phokey_t_seq(void *a, void *b, int len)
 static int phseq(u_char *a, u_char *b)
 {
   u_char lena, lenb, mlen;
-  int i;
 
   lena=*(a++); lenb=*(b++);
   a+=sizeof(usecount_t); b+=sizeof(usecount_t);   // skip usecount
@@ -225,7 +224,7 @@ static gboolean saved_phrase;
 
 gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usecount)
 {
-  int mid, ord = 0, ph_ofs, hashno, i;
+  int mid, ord = 0, ph_ofs, hashno;
   u_char tbuf[MAX_PHRASE_LEN*(sizeof(u_int64_t)+CH_SZ) + 1 + sizeof(usecount_t)],
          sbuf[MAX_PHRASE_LEN*(sizeof(u_int64_t)+CH_SZ) + 1 + sizeof(usecount_t)];
 

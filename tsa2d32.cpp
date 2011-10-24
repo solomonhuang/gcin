@@ -76,7 +76,6 @@ static int qcmp(const void *a, const void *b)
   int idxa=*((int *)a);  char *pa = (char *)&bf[idxa];
   int idxb=*((int *)b);  char *pb = (char *)&bf[idxb];
   u_char lena,lenb, len;
-  int i;
   usecount_t usecounta, usecountb;
 
   lena=*(pa++); memcpy(&usecounta, pa, sizeof(usecount_t)); pa+= sizeof(usecount_t);
@@ -116,7 +115,6 @@ static int qcmp_eq(const void *a, const void *b)
   int idxa=*((int *)a);  char *pa = (char *)&bf[idxa];
   int idxb=*((int *)b);  char *pb = (char *)&bf[idxb];
   u_char lena,lenb, len;
-  int i;
 
   lena=*(pa++);  pa+= sizeof(usecount_t);
   char *ka = pa;
@@ -151,7 +149,6 @@ static int qcmp_usecount(const void *a, const void *b)
   int idxa=*((int *)a);  char *pa = (char *)&sf[idxa];
   int idxb=*((int *)b);  char *pb = (char *)&sf[idxb];
   u_char lena,lenb, len;
-  int i;
   usecount_t usecounta, usecountb;
 
   lena=*(pa++); memcpy(&usecounta, pa, sizeof(usecount_t)); pa+= sizeof(usecount_t);

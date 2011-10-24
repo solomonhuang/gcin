@@ -221,9 +221,6 @@ void init_gtab(int inmdno)
   utf8cpy(&inp->keyname[inp->WILD_STAR*CH_SZ], "*");
 #endif
 
-  char *keyname = &inp->keyname[1 * CH_SZ];
-
-
   // for boshiamy
   gboolean all_full_ascii = TRUE;
   char keyname_lookup[256];

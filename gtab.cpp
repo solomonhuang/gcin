@@ -433,7 +433,6 @@ static void putstr_inp(char *p)
   if (test_mode)
     return;
 #endif
-  extern int c_len;
 
   clear_page_label();
 

@@ -151,7 +151,6 @@ int main(int argc, char **argv)
     key64 = FALSE;
   }
 
-  int last_k_bitn = (((key64 ? 64:32) / th.keybits) - 1) * th.keybits;
   dbg("key64:%d\n", key64);
 
   char kname[128][CH_SZ];
@@ -196,8 +195,6 @@ int main(int argc, char **argv)
 
   char fname[128];
   get_gcin_user_fname(tsin32_f, fname);
-
-  u_int mask = ((1 << th.keybits) - 1);
 
   FILE *fp;
   if ((fp=fopen(fname,"rb"))==NULL) {

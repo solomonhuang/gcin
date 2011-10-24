@@ -100,7 +100,6 @@ static void mouse_char_callback( GtkWidget *widget,GdkEventButton *event, gpoint
       break;
     case 3:
     {
-      int len = tss.c_len - tss.c_idx;
       create_phrase_save_menu(event);
       break;
     }

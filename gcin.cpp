@@ -514,6 +514,10 @@ void screen_size_changed(GdkScreen *screen, gpointer user_data)
 
 int main(int argc, char **argv)
 {
+#if WIN32
+   putenv("PANGO_WIN32_NO_UNISCRIBE=1");
+#endif
+
   gtk_init (&argc, &argv);
 
 #if UNIX
@@ -532,16 +536,12 @@ int main(int argc, char **argv)
 
 //putenv("GDK_NATIVE_WINDOWS=1");
 #if WIN32
-#if 1
-        typedef BOOL (WINAPI* pImmDisableIME)(DWORD);
-        pImmDisableIME pd;
-        HMODULE imm32=LoadLibraryA("imm32");
-//      printf("****** imm32 %x\n", imm32);
-        if (imm32 && (pd=(pImmDisableIME)GetProcAddress(imm32, "ImmDisableIME"))) {
-//              puts("imm loaded");
-                (*pd)(0);
-        }
-#endif
+  typedef BOOL (WINAPI* pImmDisableIME)(DWORD);
+  pImmDisableIME pd;
+  HMODULE imm32=LoadLibraryA("imm32");
+  if (imm32 && (pd=(pImmDisableIME)GetProcAddress(imm32, "ImmDisableIME"))) {
+     (*pd)(0);
+  }
   init_gcin_program_files();
   init_gcin_im_serv();
 #endif
@@ -585,7 +585,6 @@ int main(int argc, char **argv)
 #endif
 
   if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {
-    setenv("NO_GTK_INIT", NULL, TRUE);
     p_err(" version %s\n", GCIN_VERSION);
   }
 

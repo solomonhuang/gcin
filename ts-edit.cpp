@@ -117,7 +117,6 @@ extern FILE *fph;
 void load_ts_phrase()
 {
   FILE *fp = fph;
-  char fname[256];
 
   int i;
   dbg("fname %s\n", current_tsin_fname);
@@ -185,7 +184,7 @@ void get_key_str(void *key, int idx, char *out_str)
        key64 = key32;
      } else
        cp_ph_key(key, idx, &key64);
-     int kn = gtab_key2name(pinmd, key64, t, &tlen);
+     gtab_key2name(pinmd, key64, t, &tlen);
      phostr = t;
    } else {
      phokey_t k;
@@ -431,7 +430,7 @@ GtkWidget *create_pho_sel_area()
         } else
           cp_ph_key(bigpho[i].phokeys,j, &key64);
 
-        int kn = gtab_key2name(pinmd, key64, t, &tlen);
+        gtab_key2name(pinmd, key64, t, &tlen);
 //        dbg("%d,%d] %s\n", i,j, t);
         phostr = t;
       } else {
@@ -474,9 +473,6 @@ GtkWidget *create_pho_sel_area()
 
 static void cb_button_add(GtkButton *button, gpointer user_data)
 {
-  GtkTextIter start, end;
-
-
   bigphoN = 0;
   char *p = current_str;
   while (*p) {

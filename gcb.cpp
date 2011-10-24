@@ -112,10 +112,12 @@ static char bombom[]="\xef\xbb\xbf\xef\xbb\xbf";
   if (!buttonArr)
     return;
 
-   for(i=0;i<buttonArrN;i++) {
-     if (buttonStr[i] && !strcmp(buttonStr[i],text))
-       return;
-   }
+
+  for(i=0;i<buttonArrN;i++) {
+    if (buttonStr[i] && !strcmp(buttonStr[i],text))
+      return;
+  }
+
 
    tmpstr=(char *)g_malloc(maxButtonStrlen+1);
 #if 0
@@ -156,7 +158,8 @@ static char bombom[]="\xef\xbb\xbf\xef\xbb\xbf";
    for(i=0;i< hist_strArrN; i++) {
      if (!hist_strArr[i])
        continue;
-     if (strcmp(hist_strArr[i],text))
+     int len = strlen(hist_strArr[i]);
+     if (strncmp(hist_strArr[i], text, len))
        continue;
 
      g_free(hist_strArr[i]);

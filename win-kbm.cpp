@@ -343,8 +343,6 @@ static KEY *get_keys_ent(KeySym keysym)
 
 static void set_kbm_key(KeySym keysym, char *str)
 {
-  int i;
-
   if (!gwin_kbm)
     return;
 #if 0

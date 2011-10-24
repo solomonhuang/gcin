@@ -1414,7 +1414,6 @@ int tsin_pho_sel(int c)
   char *sel_text;
   int is_pho_phrase;
   int len = fetch_user_selection(c, &sel_text, &is_pho_phrase);
-  int cpsta = tss.chpho[tss.c_idx].psta;
   int sel_idx = tss.c_idx;
   if (tss.c_idx == tss.c_len)
     sel_idx = tss.c_len - len;
@@ -1509,11 +1508,9 @@ int feedkey_pp(KeySym xkey, int kbstate)
   char ctyp=0;
   static u_int ii;
   static u_short key;
-  int i,k,pst;
-  u_char match_len;
   int shift_m=kbstate&ShiftMask;
   int ctrl_m=kbstate&ControlMask;
-  int j,jj,kk, idx;
+  int jj,kk, idx;
   char kno;
   int caps_eng_tog = tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock;
   int status=0;

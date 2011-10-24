@@ -29,5 +29,5 @@ leafpad
 #gnome-terminal
 #mozilla-thunderbird
 #~/eclipse/eclipse
-/usr/lib/qt4/bin/qtconfig
+#/usr/lib/qt4/bin/qtconfig
 pkill gcin.test
