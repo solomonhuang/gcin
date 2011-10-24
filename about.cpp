@@ -115,7 +115,7 @@ void create_about_window()
 #if GTK_CHECK_VERSION(2,18,9) && UNIX
    char tmp[512];
    sprintf(tmp, "<a href='http://hyperrate.com/dir.php?eid=67'>%s</a>\n"
-                "<a href='http://hyperrate.com/dir.php??eid=215'>%s</a>\n"
+                "<a href='http://hyperrate.com/dir.php?eid=215'>%s</a>\n"
                 "<a href='"LOG_URL"'>%s</a>\n"
                 "<a href='"ET26_URL"'>%s</a>\n"
                 "<a href='"PUNC_URL"'>%s</a>\n"

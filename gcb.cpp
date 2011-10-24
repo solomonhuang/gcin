@@ -85,14 +85,13 @@ void set_win_title(const gchar *text)
 void disp_gcb_selection(const gchar *text)
 {
   // dbg("selection_received '%s'\n", text);
-   char *tmpstr;
-   GtkWidget *button = snoop_button;
-   int i;
-   int textlen;
-static char bombom[]="\xef\xbb\xbf\xef\xbb\xbf";
+  char *tmpstr;
+  GtkWidget *button = snoop_button;
+  int i;
+  int textlen;
+  static char bombom[]="\xef\xbb\xbf\xef\xbb\xbf";
 
-
-   if (!text || !text[0])
+  if (!text || !text[0])
      return;
 
   textlen=strlen(text);
@@ -120,9 +119,9 @@ static char bombom[]="\xef\xbb\xbf\xef\xbb\xbf";
 
 
    tmpstr=(char *)g_malloc(maxButtonStrlen+1);
-#if 0
-   // strncpy doesn't work as expected on Mandrake 9.0
+#if 1
    strncpy(tmpstr,text,maxButtonStrlen);
+   tmpstr[maxButtonStrlen]=0;
 #else
    if (textlen > maxButtonStrlen)
      textlen = maxButtonStrlen;
@@ -263,31 +262,13 @@ gboolean delete_hist_win()
   return TRUE;
 }
 
-#if 0
-static void free_mem()
-{
-  int i;
-
-  for(i=0;i<buttonArrN;i++)
-    g_free(buttonStr[i]);
-
-  g_free(buttonArr);
-  g_free(buttonStr);
-
-  for(i=0;i<hist_strArrN;i++)
-    g_free(hist_strArr[i]);
-  g_free(hist_strArr);
-  g_free(hist_buttonArr);
-}
-#endif
-
 gboolean  key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
 #if 0
    if ((event->string && event->string[0]=='q') || event->keyval==GDK_Escape)
      do_exit();
 #endif
-        return TRUE;
+  return TRUE;
 }
 
 

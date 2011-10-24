@@ -1368,7 +1368,7 @@ int gcin_FocusIn(ClientState *cs)
 //  dbg("gcin_FocusIn\n");
   Window win = cs->client_win;
 
-#if UNIX
+#if UNIX && 0
   if (skip_window(win))
     return FALSE;
 #endif
@@ -1435,7 +1435,7 @@ int xim_gcin_FocusIn(IMChangeFocusStruct *call_data)
       load_IC(ic);
     }
 
-#if DEBUG && 0
+#if DEBUG
     dbg("xim_gcin_FocusIn %d\n", call_data->icid);
 #endif
     return True;
@@ -1449,11 +1449,12 @@ static gint64 last_focus_out_time;
 int gcin_FocusOut(ClientState *cs)
 {
   gint64 t = current_time();
+//  dbg("gcin_FocusOut\n");
 
   if (cs != current_CS)
      return FALSE;
 
-#if UNIX
+#if UNIX && 0
 //  dbg("gcin_FocusOut\n");
   if (skip_window(cs->client_win))
     return FALSE;
