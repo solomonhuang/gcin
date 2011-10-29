@@ -54,7 +54,7 @@ gboolean timeout_minimize_win0(gpointer data)
 {
   if (!gwin0)
     return FALSE;
-  gtk_window_resize(GTK_WINDOW(gwin0), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin0), 1, 1);
 //  gtk_window_present(GTK_WINDOW(gwin0));
   timeout_handle = 0;
   return FALSE;
@@ -377,7 +377,7 @@ void compact_win0_x()
   if (!gwin0)
     return;
 
-  gtk_window_resize(GTK_WINDOW(gwin0), 16, 16);
+  gtk_window_resize(GTK_WINDOW(gwin0), 1, 1);
   raw_move(best_win_x, best_win_y);
 #if WIN32
   if (!timeout_handle)
@@ -397,7 +397,7 @@ void compact_win0()
     return;
 
 //  max_yl = 0;
-  gtk_window_resize(GTK_WINDOW(gwin0), MIN_X_SIZE, 16);
+  gtk_window_resize(GTK_WINDOW(gwin0), 1, 1);
   raw_move(best_win_x, best_win_y);
 
 #if WIN32

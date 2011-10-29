@@ -751,7 +751,7 @@ void minimize_win_gtab()
   if (!gwin_gtab)
     return;
 
-  gtk_window_resize(GTK_WINDOW(gwin_gtab), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin_gtab), 1, 1);
 }
 
 

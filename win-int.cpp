@@ -19,7 +19,7 @@ static GtkWidget *opt_int_opts;
 
 static void minimize_win()
 {
-  gtk_window_resize(GTK_WINDOW(gwin_int), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin_int), 1, 1);
 }
 
 static void adj_intcode_buttons()

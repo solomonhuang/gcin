@@ -65,7 +65,7 @@ static void show_hist_window()
 
   update_hist_button();
 
-  gtk_window_resize(GTK_WINDOW(hist_window), 40, 100);
+  gtk_window_resize(GTK_WINDOW(hist_window), 1, 1);
   gtk_widget_show (hist_window);
   gtk_window_present(GTK_WINDOW(hist_window));
 }

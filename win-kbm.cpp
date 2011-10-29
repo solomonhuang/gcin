@@ -513,7 +513,7 @@ void update_win_kbm()
   }
 
 ret:
-  gtk_window_resize(GTK_WINDOW(gwin_kbm), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin_kbm), 1, 1);
   move_win_kbm();
 }
 

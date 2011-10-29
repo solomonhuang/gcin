@@ -219,7 +219,7 @@ void clear_sele()
 
   gtk_widget_hide(arrow_up);
   gtk_widget_hide(arrow_down);
-  gtk_window_resize(GTK_WINDOW(gwin1), 16, 20);
+  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
 #if WIN32
   gdk_flush();
 #endif
@@ -274,7 +274,7 @@ void set_sele_text(int tN, int i, char *text, int len)
 static int timeout_handle;
 gboolean timeout_minimize_win1(gpointer data)
 {
-  gtk_window_resize(GTK_WINDOW(gwin1), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
   gtk_window_present(GTK_WINDOW(gwin1));
   timeout_handle = 0;
   return FALSE;
@@ -352,7 +352,7 @@ void hide_selections_win()
 #endif
 
 #if WIN32
-  gtk_window_resize(GTK_WINDOW(gwin1), 10, 20);
+  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
 #endif
   gtk_widget_hide(gwin1);
 }

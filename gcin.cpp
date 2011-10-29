@@ -195,17 +195,17 @@ int gcin_ProtoHandler(XIMS ims, IMProtocol *call_data)
      MyTriggerNotifyHandler((IMTriggerNotifyStruct *)call_data);
      return True;
   case XIM_PREEDIT_START_REPLY:
-#if DEBUG && 0
+#if DEBUG && 1
      dbg("XIM_PREEDIT_START_REPLY\n");
 #endif
      return True;
   case XIM_PREEDIT_CARET_REPLY:
-#if DEBUG && 0
+#if DEBUG && 1
      dbg("XIM_PREEDIT_CARET_REPLY\n");
 #endif
      return True;
   case XIM_STR_CONVERSION_REPLY:
-#if DEBUG && 0
+#if DEBUG && 1
      dbg("XIM_STR_CONVERSION_REPLY\n");
 #endif
      return True;

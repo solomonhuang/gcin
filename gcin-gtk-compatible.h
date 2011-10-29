@@ -101,3 +101,9 @@
 #if GTK_CHECK_VERSION(2,91,6)
 #define GDK_WINDOW_XWINDOW GDK_WINDOW_XID
 #endif
+
+#if GTK_CHECK_VERSION(3,3,2)
+#define     GTK_TABLE GTK_GRID
+#define     gtk_table_attach_defaults(u,v,w,x,y,z) gtk_grid_attach(u,v,w,y,1,1)
+#define     gtk_table_new(x,y,z) gtk_grid_new()
+#endif

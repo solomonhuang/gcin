@@ -87,7 +87,7 @@ void move_win_pho(int x, int y)
 
 void minimize_win_pho()
 {
-  gtk_window_resize(GTK_WINDOW(gwin_pho), 10, 10);
+  gtk_window_resize(GTK_WINDOW(gwin_pho), 1, 1);
 }
 
 
@@ -220,7 +220,7 @@ void create_win_pho_gui()
 
   if (pho_hide_row2) {
     gtk_widget_hide(hbox_row2);
-    gtk_window_resize(GTK_WINDOW(gwin_pho), 10, 20);
+    gtk_window_resize(GTK_WINDOW(gwin_pho), 1, 1);
   }
 
   current_gcin_inner_frame = gcin_inner_frame;

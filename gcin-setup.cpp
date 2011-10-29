@@ -939,7 +939,6 @@ static void cb_gtab_conf()
 }
 
 
-#if 0
 static void cb_gb_output_toggle()
 {
   send_gcin_message(
@@ -949,7 +948,6 @@ static void cb_gb_output_toggle()
 	  GB_OUTPUT_TOGGLE);
   exit(0);
 }
-#endif
 
 static void cb_gb_translate_toggle()
 {
@@ -1095,6 +1093,18 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox), button_symbol_table, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_symbol_table), "clicked",
                     G_CALLBACK (cb_symbol_table), NULL);
+
+#if TRAY_ENABLED
+  if (!gcin_status_tray)
+  {
+#endif
+    GtkWidget *button_gb_output_toggle = gtk_button_new_with_label(_(_L("簡體字輸出切換")));
+    gtk_box_pack_start (GTK_BOX (vbox), button_gb_output_toggle, TRUE, TRUE, 0);
+    g_signal_connect (G_OBJECT (button_gb_output_toggle), "clicked",
+                      G_CALLBACK (cb_gb_output_toggle), NULL);
+#if TRAY_ENABLED
+  }
+#endif
 
   GtkWidget *button_gb_translate_toggle = gtk_button_new_with_label(_(_L("剪貼區 簡體字->正體字")));
   gtk_box_pack_start (GTK_BOX (vbox), button_gb_translate_toggle, TRUE, TRUE, 0);
