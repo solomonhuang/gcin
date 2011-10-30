@@ -980,10 +980,11 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
     return 0;
 
   if (caps_eng_tog) {
-	gboolean new_tsin_pho_mode =!capslock_on;
-	if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
+    gboolean new_tsin_pho_mode =!capslock_on;
+    if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
       current_CS->tsin_pho_mode = new_tsin_pho_mode;
-	}
+      save_CS_current_to_temp();
+    }
   }
 
   if ((kbstate & (Mod1Mask|Mod4Mask|Mod5Mask|ControlMask))==ControlMask

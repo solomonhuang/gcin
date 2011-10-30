@@ -707,7 +707,7 @@ void create_gtablist_window (void)
 
   GtkWidget *hbox_gcin_single_state = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_single_state, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_single_state = gtk_label_new(_(_L("單一狀態")));
+  GtkWidget *label_gcin_single_state = gtk_label_new(_(_L("不記憶個別程式的輸入法狀態狀態")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state), label_gcin_single_state,  FALSE, FALSE, 0);
   check_button_gcin_single_state = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state),check_button_gcin_single_state,  FALSE, FALSE, 0);

@@ -34,6 +34,7 @@ extern int hashidx[TSIN_HASH_N];
 
 void clrin_pho(), hide_win0();
 void show_tsin_stat();
+void save_CS_current_to_temp();
 
 gboolean tsin_pho_mode()
 {
@@ -45,6 +46,7 @@ void set_tsin_pho_mode0(ClientState *cs)
   if (!cs)
     return;
   cs->tsin_pho_mode = 1;
+  save_CS_current_to_temp();
 }
 
 void set_tsin_pho_mode()
@@ -922,8 +924,10 @@ void tsin_set_eng_ch(int nmod)
   if (test_mode)
     return;
 #endif
-  if (current_CS)
+  if (current_CS) {
     current_CS->tsin_pho_mode = nmod;
+    save_CS_current_to_temp();
+  }
 
   if (current_method_type()==method_type_TSIN) {
     show_tsin_stat();
@@ -1521,12 +1525,11 @@ int feedkey_pp(KeySym xkey, int kbstate)
 //    dbg("aaa\n");
 
   if (caps_eng_tog) {
-	gboolean new_tsin_pho_mode =!(kbstate&LockMask);
-	if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
-	  close_selection_win();
-      current_CS->tsin_pho_mode = new_tsin_pho_mode;
-	  tsin_set_eng_ch(new_tsin_pho_mode);
-	}
+    gboolean new_tsin_pho_mode =!(kbstate&LockMask);
+    if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
+      close_selection_win();
+      tsin_set_eng_ch(new_tsin_pho_mode);
+    }
   }
 
 //  key_press_time = 0;
