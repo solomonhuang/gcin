@@ -5,7 +5,7 @@ extern gboolean is_chs;
 
 int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
 int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en;
-int gcin_win_color_use;
+int gcin_win_color_use, gcin_single_state;
 int gcin_remote_client;
 int default_input_method;
 int left_right_button_tips;
@@ -93,6 +93,8 @@ void load_setttings()
 #else
   gcin_init_im_enabled = true;
 #endif
+
+  gcin_single_state = get_gcin_conf_int(GCIN_SINGLE_STATE, 0);
 
   gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);
   gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 0);

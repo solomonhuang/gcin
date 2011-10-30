@@ -27,6 +27,7 @@
 #define GCIN_BELL_OFF "gcin-bell-off"
 #define GCIN_ON_THE_SPOT_KEY "gcin-on-the-spot-key"
 #define GCIN_TRAY_HF_WIN_KBM "gcin-tray-hf-win-kbm"
+#define GCIN_SINGLE_STATE "gcin-single-state"
 
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
@@ -94,7 +95,7 @@
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_font_size_pho_near,
            gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en,
-           gcin_inner_frame,
+           gcin_inner_frame, gcin_single_state,
            gcin_flags_im_enabled, gcin_remote_client,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,

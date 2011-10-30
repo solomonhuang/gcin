@@ -347,6 +347,9 @@ static void disp_win_sym()
   destory_win();
 //  win_sym_enabled = 0;
   create_win_sym();
+#if WIN32
+  show_win_sym();
+#endif
 }
 
 gboolean win_sym_page_up()
@@ -519,7 +522,11 @@ void create_win_sym()
 
   g_signal_connect (G_OBJECT (gwin_sym), "scroll-event", G_CALLBACK (button_scroll_event), NULL);
 
+#if WIN32
+  show_win_sym();
+#else
   move_win_sym();
+#endif
 #if 0
   dbg("in_method:%d\n", current_CS->in_method);
 #endif

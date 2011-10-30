@@ -115,6 +115,36 @@ void output_buffer_call_back()
 ClientState *current_CS;
 static ClientState temp_CS;
 
+void save_CS_current_to_temp()
+{
+#if UNIX
+  if (!gcin_single_state)
+    return;
+
+//  dbg("save_CS_current_to_temp\n");
+  temp_CS.b_half_full_char = current_CS->b_half_full_char;
+  temp_CS.im_state = current_CS->im_state;
+  temp_CS.in_method = current_CS->in_method;
+  temp_CS.tsin_pho_mode = current_CS->tsin_pho_mode;
+#endif
+}
+
+
+void save_CS_temp_to_current()
+{
+#if UNIX
+  if (!gcin_single_state)
+    return;
+
+//  dbg("save_CS_temp_to_current\n");
+  current_CS->b_half_full_char = temp_CS.b_half_full_char;
+  current_CS->im_state = temp_CS.im_state;
+  current_CS->in_method = temp_CS.in_method;
+  current_CS->tsin_pho_mode = temp_CS.tsin_pho_mode;
+#endif
+}
+
+
 gboolean init_in_method(int in_no);
 
 
@@ -382,20 +412,27 @@ void show_win_pho();
 void show_win0();
 void show_win_int();
 void show_win_gtab();
+void disp_tray_icon();
 
 void check_CS()
 {
   if (!current_CS) {
 //    dbg("!current_CS");
     current_CS = &temp_CS;
-    temp_CS.input_style = InputStyleOverSpot;
-    temp_CS.im_state = GCIN_STATE_CHINESE;
+//    temp_CS.input_style = InputStyleOverSpot;
+//    temp_CS.im_state = GCIN_STATE_CHINESE;
 #if TRAY_ENABLED
     disp_tray_icon();
 #endif
   }
-  else
-    temp_CS = *current_CS;
+  else {
+#if 0
+    if (gcin_single_state)
+      save_CS_temp_to_current();
+    else
+#endif
+      temp_CS = *current_CS;
+  }
 }
 
 gboolean force_show;
@@ -687,6 +724,8 @@ void init_state_chinese(ClientState *cs)
     last_input_method = default_input_method;
   init_in_method(last_input_method);
 #endif
+
+  save_CS_current_to_temp();
 }
 
 gboolean output_gbuf();
@@ -705,6 +744,7 @@ void toggle_im_enabled()
       if (current_CS->im_state == GCIN_STATE_ENG_FULL) {
         current_CS->im_state = GCIN_STATE_CHINESE;
         disp_im_half_full();
+        save_CS_current_to_temp();
         return;
       }
 
@@ -750,6 +790,8 @@ void toggle_im_enabled()
       disp_tray_icon();
 #endif
     }
+
+    save_CS_current_to_temp();
 }
 
 void get_win_gtab_geom();
@@ -850,6 +892,8 @@ void toggle_half_full_char()
 //    dbg("current_CS->in_method %d\n", current_CS->in_method);
     disp_im_half_full();
   }
+
+  save_CS_current_to_temp();
 //  dbg("half full toggle\n");
 }
 
@@ -1388,6 +1432,7 @@ int gcin_FocusIn(ClientState *cs)
   }
 
   current_CS = cs;
+  save_CS_temp_to_current();
 
 //  dbg("current_CS %x %d %d\n", cs, cs->im_state, current_CS->im_state);
 

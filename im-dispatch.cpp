@@ -179,6 +179,8 @@ static void shutdown_client(HANDLE fd)
 }
 
 void message_cb(char *message);
+void save_CS_temp_to_current();
+
 
 #if UNIX
 void process_client_req(int fd)
@@ -231,8 +233,10 @@ void process_client_req(HANDLE fd)
     cs->client_win = req.client_win;
     cs->b_gcin_protocol = TRUE;
     cs->input_style = InputStyleOverSpot;
+
+
 #if WIN32
-	cs->use_preedit = TRUE;
+    cs->use_preedit = TRUE;
 #endif
 
 #if UNIX
@@ -242,6 +246,7 @@ void process_client_req(HANDLE fd)
 #endif
     {
       current_CS = cs;
+      save_CS_temp_to_current();
       init_state_chinese(cs);
     }
   }
@@ -262,6 +267,8 @@ void process_client_req(HANDLE fd)
     case GCIN_req_key_press:
     case GCIN_req_key_release:
       current_CS = cs;
+      save_CS_temp_to_current();
+
 #if DBG && 0
       {
         char tt[128];
@@ -325,6 +332,7 @@ void process_client_req(HANDLE fd)
     case GCIN_req_test_key_press:
     case GCIN_req_test_key_release:
       current_CS = cs;
+      save_CS_temp_to_current();
       to_gcin_endian_4(&req.keyeve.key);
       to_gcin_endian_4(&req.keyeve.state);
 

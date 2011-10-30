@@ -38,6 +38,9 @@ static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
 #if USE_GCB
 static GtkWidget *spinner_gcb_position_x, *spinner_gcb_position_y;
 #endif
+#if UNIX
+static GtkWidget *check_button_gcin_single_state;
+#endif
 extern gboolean button_order;
 
 char *pho_speaker[16];
@@ -230,6 +233,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   save_gcin_conf_int(GCIN_BELL_OFF,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off)));
+
+  save_gcin_conf_int(GCIN_SINGLE_STATE,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_single_state)));
 
   if (opt_speaker_opts) {
     idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_speaker_opts));
@@ -698,6 +704,15 @@ void create_gtablist_window (void)
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full),
      gcin_shift_space_eng_full);
 
+
+  GtkWidget *hbox_gcin_single_state = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_single_state, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_single_state = gtk_label_new(_(_L("單一狀態")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state), label_gcin_single_state,  FALSE, FALSE, 0);
+  check_button_gcin_single_state = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state),check_button_gcin_single_state,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_single_state),
+     gcin_single_state);
 
   GtkWidget *hbox_gcin_eng_phrase_enabled = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_eng_phrase_enabled, FALSE, FALSE, 0);

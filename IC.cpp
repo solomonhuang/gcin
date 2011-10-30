@@ -124,15 +124,17 @@ extern Display *dpy;
 void move_in_win(ClientState *cs, int x, int y);
 void show_in_win(ClientState *cs);
 extern Window focus_win;
-
+void save_CS_temp_to_current();
 
 void load_IC(IC *rec)
 {
    ClientState *cs = &rec->cs;
    Window win = cs->client_win;
 
-   if (win == focus_win && !current_CS)
+   if (win == focus_win && !current_CS) {
      current_CS = cs;
+     save_CS_temp_to_current();
+   }
 
    if (win == focus_win) {
      if (cs->im_state == GCIN_STATE_DISABLED)
@@ -165,8 +167,10 @@ StoreIC(IC *rec, IMChangeICStruct *call_data)
 	XICAttribute *sts_attr = call_data->status_attr;
 	register int i;
 
-	if (!current_CS)
+	if (!current_CS) {
           current_CS = cs;
+          save_CS_temp_to_current();
+        }
 #if DEBUG && 0
         dbg(".... StoreIC\n");
 #endif
