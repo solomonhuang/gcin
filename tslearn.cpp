@@ -526,7 +526,7 @@ int main(int argc, char **argv)
 
   gtk_widget_show_all(mainwin);
 #if WIN32
-  gtk_window_present(mainwin);
+  gtk_window_present(GTK_WINDOW(mainwin));
 #endif
 
   gtk_main();

@@ -32,6 +32,22 @@ static void del_nl(char *tmpstr)
    }
 }
 
+void utf8ncpy(char *t, int tsize, char *s)
+{
+   int tlen = 0;
+   char *p=s;
+   int slen = strlen(s);
+   while (*p) {
+     char sz = utf8_sz(p);
+     if (tlen + sz > slen || tlen+sz >= tsize-1) // incomplete utf8 char
+       break;
+     memcpy(t + tlen, p, sz);
+     tlen += sz;
+     p+=sz;
+   }
+   t[tlen]=0;
+}
+
 static void update_hist_button()
 {
   int i;
@@ -42,9 +58,7 @@ static void update_hist_button()
     if (!hist_strArr[i])
       continue;
 
-//    snprintf(tstr,sizeof(tstr),"%s",hist_strArr[i]);
-        strncpy(tstr, hist_strArr[i], sizeof(tstr)-1);
-        tstr[sizeof(tstr)-1]=0;
+    utf8ncpy(tstr, sizeof(tstr), hist_strArr[i]);
 
     del_nl(tstr);
     gtk_button_set_label(GTK_BUTTON(hist_buttonArr[i]),tstr);
@@ -72,12 +86,8 @@ static void show_hist_window()
 
 void set_win_title(const gchar *text)
 {
-
    char titlestr[34];
-   bzero(titlestr, sizeof(titlestr));
-   strncpy(titlestr, text, sizeof(titlestr)-1);
-   titlestr[sizeof(titlestr)-1]=0;
-
+   utf8ncpy(titlestr, sizeof(titlestr), text);
    gtk_window_set_title (GTK_WINDOW (mainwin),titlestr);
 }
 
@@ -117,17 +127,8 @@ void disp_gcb_selection(const gchar *text)
       return;
   }
 
-
-   tmpstr=(char *)g_malloc(maxButtonStrlen+1);
-#if 1
-   strncpy(tmpstr,text,maxButtonStrlen);
-   tmpstr[maxButtonStrlen]=0;
-#else
-   if (textlen > maxButtonStrlen)
-     textlen = maxButtonStrlen;
-   memcpy(tmpstr,text,textlen);
-   tmpstr[textlen]=0;
-#endif
+   tmpstr=(char *)g_malloc(maxButtonStrlen);
+   utf8ncpy(tmpstr, maxButtonStrlen, text);
 
    del_nl(tmpstr);
 

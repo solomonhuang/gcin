@@ -233,10 +233,10 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   save_gcin_conf_int(GCIN_BELL_OFF,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off)));
-
+#if UNIX
   save_gcin_conf_int(GCIN_SINGLE_STATE,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_single_state)));
-
+#endif
   if (opt_speaker_opts) {
     idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_speaker_opts));
     save_gcin_conf_str(PHONETIC_SPEAK_SEL, pho_speaker[idx]);
@@ -704,15 +704,16 @@ void create_gtablist_window (void)
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_shift_space_eng_full),
      gcin_shift_space_eng_full);
 
-
+#if UNIX
   GtkWidget *hbox_gcin_single_state = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_single_state, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_single_state = gtk_label_new(_(_L("不記憶個別程式的輸入法狀態狀態")));
+  GtkWidget *label_gcin_single_state = gtk_label_new(_(_L("不記憶個別程式的輸入法狀態")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state), label_gcin_single_state,  FALSE, FALSE, 0);
   check_button_gcin_single_state = gtk_check_button_new ();
   gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state),check_button_gcin_single_state,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_single_state),
      gcin_single_state);
+#endif
 
   GtkWidget *hbox_gcin_eng_phrase_enabled = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_eng_phrase_enabled, FALSE, FALSE, 0);

@@ -235,18 +235,13 @@ void open_xim()
           IMServerWindow,         xim_arr[0].xim_xwin,        //input window
           IMModifiers,            "Xi18n",        //X11R6 protocol
           IMServerName,           xim_arr[0].xim_server_name, //XIM server name
-#if 0
-          IMLocale,               xim_arr[0].server_locale,
-#else
           IMLocale,               lc,
-#endif
           IMServerTransport,      "X/",      //Comm. protocol
           IMInputStyles,          &im_styles,   //faked styles
           IMEncodingList,         &encodings,
           IMProtocolHandler,      gcin_ProtoHandler,
           IMFilterEventMask,      KeyPressMask|KeyReleaseMask,
           IMOnKeysList, &triggerKeys,
-//        IMOffKeysList, &triggerKeys,
           NULL)) == NULL) {
           p_err("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
           xim_arr[0].xim_server_name);

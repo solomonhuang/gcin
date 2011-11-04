@@ -532,6 +532,8 @@ int feedkey_pho(KeySym xkey, int kbstate)
 
 
   if (kbstate&LockMask) {
+    if (xkey >= 0x7e || xkey < ' ')
+      return FALSE;
     if (gcin_capslock_lower)
       case_inverse(&xkey, shift_m);
     send_ascii(xkey);

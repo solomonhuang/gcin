@@ -957,6 +957,7 @@ gboolean save_gtab_buf_shift_enter();
 gboolean win_sym_page_up(), win_sym_page_down();
 u_int64_t vmaskci;
 gboolean gtab_pre_select_idx(int c);
+void save_CS_current_to_temp();
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
