@@ -34,13 +34,24 @@ char *phokey2pinyin(phokey_t k)
       break;
   }
 
-  if (notone && i==pin_juyinN) {
+#if 0
+  if (i==pin_juyinN)
+#else
+  if (notone && i==pin_juyinN)
+#endif
+  {
     prph(k);
     strcpy(tt, "??");
   } else {
 static char tone[2];
+    tone[1]=0;
     tone[0] = (k & tonemask) + '0';
-    strcpy(tt, pin_juyin[i].pinyin);
+//    dbg("%d %d %s\n", i, pin_juyinN, pin_juyin[i].pinyin);
+
+    if (i < pin_juyinN)
+      strcpy(tt, pin_juyin[i].pinyin);
+    else
+      tt[0]=0;
 
     if (tone[0]=='1')
       tone[0]='5';

@@ -424,10 +424,10 @@ gboolean is_pinyin_kbm();
 
 int main(int argc, char **argv)
 {
+  init_TableDir();
   set_is_chs();
   b_pinyin = is_pinyin_kbm();
 
-  init_TableDir();
   gtk_init (&argc, &argv);
   load_setttings();
   load_gtab_list(TRUE);

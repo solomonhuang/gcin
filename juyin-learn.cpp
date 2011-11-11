@@ -94,7 +94,6 @@ gboolean cb_button_fetch()
   return TRUE;
 }
 
-void load_pin_juyin();
 void set_window_gcin_icon(GtkWidget *window);
 
 #if WIN32

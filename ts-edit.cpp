@@ -238,6 +238,7 @@ void disp_page()
 
     for(i=0; i < clen; i++) {
       get_key_str(phbuf, i, tt);
+//      dbg("tt %s\n", tt);
       strcat(line, t=g_markup_escape_text(tt, -1));
       g_free(t);
       strcat(line, " ");
@@ -575,9 +576,9 @@ gboolean is_pinyin_kbm();
 int main(int argc, char **argv)
 {
   set_is_chs();
+  init_TableDir();
   b_pinyin = is_pinyin_kbm();
 
-  init_TableDir();
   gtk_init (&argc, &argv);
   load_setttings();
   load_gtab_list(TRUE);

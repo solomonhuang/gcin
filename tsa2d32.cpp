@@ -183,6 +183,8 @@ void send_gcin_message(Display *dpy, char *s);
  #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
+void init_TableDir();
+
 int main(int argc, char **argv)
 {
   FILE *fp,*fw;
@@ -212,6 +214,9 @@ int main(int argc, char **argv)
 
   if (argc < 2)
     p_err("must specify input file");
+
+
+  init_TableDir();
 
   if ((fp=fopen(argv[1], "rb"))==NULL) {
      printf("Cannot open %s\n", argv[1]);
