@@ -20,6 +20,7 @@ static GtkWidget *check_button_tsin_phrase_pre_select,
                  *check_button_tsin_tab_phrase_end,
                  *check_button_tsin_tail_select_key,
                  *check_button_tsin_buffer_editing_mode,
+                 *check_button_tsin_use_pho_near,
                  *spinner_tsin_buffer_size,
                  *spinner_pho_candicate_col_N;
 
@@ -130,6 +131,9 @@ static gboolean cb_ok( GtkWidget *widget,
 
   save_gcin_conf_int(TSIN_TONE_CHAR_INPUT,
        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_tone_char_input)));
+
+  save_gcin_conf_int(TSIN_USE_PHO_NEAR,
+       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_tsin_use_pho_near)));
 
 
   save_gcin_conf_int(TSIN_TAB_PHRASE_END,
@@ -630,6 +634,16 @@ void create_kbm_window()
   gtk_toggle_button_set_active(
      GTK_TOGGLE_BUTTON(check_button_tsin_buffer_editing_mode), tsin_buffer_editing_mode);
 
+  GtkWidget *hbox_tsin_use_pho_near = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox_r), hbox_tsin_use_pho_near , TRUE, TRUE, 1);
+  GtkWidget *label_tsin_use_pho_near = gtk_label_new(_(_L("↑鍵近似音查詢")));
+  gtk_widget_set_hexpand (label_tsin_use_pho_near, TRUE);
+  gtk_widget_set_halign (label_tsin_use_pho_near, GTK_ALIGN_CENTER);
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_use_pho_near), label_tsin_use_pho_near , TRUE, TRUE, 0);
+  check_button_tsin_use_pho_near = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_tsin_use_pho_near), check_button_tsin_use_pho_near, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(
+     GTK_TOGGLE_BUTTON(check_button_tsin_use_pho_near), tsin_use_pho_near);
 
   GtkWidget *frame_tsin_buffer_size = gtk_frame_new(_(_L("詞音編輯緩衝區大小")));
   gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_buffer_size, FALSE, FALSE, 0);
@@ -638,21 +652,6 @@ void create_kbm_window()
    (GtkAdjustment *) gtk_adjustment_new (tsin_buffer_size, 10.0, MAX_PH_BF, 1.0, 1.0, 0.0);
   spinner_tsin_buffer_size = gtk_spin_button_new (adj_gtab_in, 0, 0);
   gtk_container_add (GTK_CONTAINER (frame_tsin_buffer_size), spinner_tsin_buffer_size);
-
-#if 0
-  GtkWidget *frame_tsin_phrase_line_color = gtk_frame_new(_(_L("詞音標示詞的底線顏色")));
-  gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_phrase_line_color, FALSE, FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_phrase_line_color), 1);
-  GtkWidget *button_tsin_phrase_line_color = gtk_button_new();
-  g_signal_connect (G_OBJECT (button_tsin_phrase_line_color), "clicked",
-                    G_CALLBACK (cb_tsin_phrase_line_color), G_OBJECT (gcin_kbm_window));
-  da_phrase_line =  gtk_drawing_area_new();
-  gtk_container_add (GTK_CONTAINER (button_tsin_phrase_line_color), da_phrase_line);
-  gdk_color_parse(tsin_phrase_line_color, &tsin_phrase_line_gcolor);
-  gtk_widget_modify_bg(da_phrase_line, GTK_STATE_NORMAL, &tsin_phrase_line_gcolor);
-  gtk_widget_set_size_request(da_phrase_line, 16, 2);
-  gtk_container_add (GTK_CONTAINER (frame_tsin_phrase_line_color), button_tsin_phrase_line_color);
-#endif
 
   GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_(_L("詞音游標的顏色")));
   gtk_box_pack_start (GTK_BOX (vbox_r), frame_tsin_cursor_color, FALSE, FALSE, 0);
