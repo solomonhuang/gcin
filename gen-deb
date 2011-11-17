@@ -71,15 +71,20 @@ exec dpkg-buildpackage -b
 +"/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so" 
 --- a/debian/im-switch/gcin
 +++ b/debian/im-switch/gcin
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,15 @@
 +XIM=gcin
 +XIM_PROGRAM=/usr/bin/gcin
 +XIM_ARGS=
 +GTK_IM_MODULE=gcin
-+if [ ! -e /usr/lib/qt3/plugins/inputmethods/libqgcin.so ] && [ ! -e /usr/lib/qt4/plugins/inputmethods/im-gcin.so ]; then
++if [ ! -e /usr/lib/qt3/plugins/inputmethods/libqgcin.so ]; then
 +  QT_IM_MODULE=xim
 +else
 +  QT_IM_MODULE=gcin
++fi
++if [ ! -e /usr/lib/qt4/plugins/inputmethods/im-gcin.so ]; then
++  QT4_IM_MODULE=xim
++else
++  QT4_IM_MODULE=gcin
 +fi
 +DEPENDS=
 --- a/debian/install
@@ -98,11 +103,6 @@ exec dpkg-buildpackage -b
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a32.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsin2gtab-phrase.1.gz
---- a/debian/mvqt.sh
-+++ b/debian/mvqt.sh
-@@ -0,0 +1,2 @@
-+#!/bin/sh
-+sed -i 's~/usr/share/~/usr/$(LIB)/~' qt4-im/Makefile
 --- a/debian/postinst
 +++ b/debian/postinst
 @@ -0,0 +1,32 @@
@@ -178,14 +178,14 @@ exec dpkg-buildpackage -b
 +
 +override_dh_auto_configure:
 +	sed -i 's~/usr/lib/~/usr/share/~' qt-im/Makefile
-+	sed -i 's~/usr/..LIB./~/usr/share/~' qt4-im/Makefile
++	sed -i 's~/usr/$$(LIB)/~/usr/share/~' qt4-im/Makefile
 +	sed -i 's~lib64~lib64foo~' configure
 +	./configure --prefix=/usr --use_i18n=Y --use_qt3=Y
 +
 +override_dh_auto_clean:
 +	$(MAKE) clean
 +	sed -i 's~/usr/share/~/usr/lib/~' qt-im/Makefile
-+	sh debian/mvqt.sh
++	sed -i 's~/usr/share/~/usr/$$(LIB)/~' qt4-im/Makefile
 +	sed -i 's~lib64foo~lib64~' configure
 +	dh_clean
 +

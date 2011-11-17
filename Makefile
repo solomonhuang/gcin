@@ -176,7 +176,7 @@ gcin-version.h:	VERSION.gcin
 	echo '#define GCIN_VERSION "'`cat VERSION.gcin`'"' > gcin-version.h
 
 gcin1_so += intcode.pico win-int.pico win-message.pico win-sym.pico \
-win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico gcin-module.pico
+win-inmd-switch.pico pinyin.pico win-pho-near.pico win-kbm.pico gcin-module.pico pho2pinyin.pico
 
 gcin1.so: $(gcin1_so) pho.o tsin.o eve.o gtab.o win-sym.o
 	$(CCLD) $(SO_FLAGS) -o $@ $(gcin1_so) $(LDFLAGS)

@@ -8,7 +8,7 @@
 #include "tsin.h"
 
 static gboolean b_pinyin;
-
+#if !GCIN_SVR
 PIN_JUYIN *pin_juyin;
 int pin_juyinN;
 PHOKBM phkbm;
@@ -19,7 +19,7 @@ int text_pho_N;
 void key_typ_pho(phokey_t phokey, u_char rtyp_pho[])
 {
 }
-
+#endif
 
 char *phokey2pinyin(phokey_t k)
 {
@@ -34,24 +34,13 @@ char *phokey2pinyin(phokey_t k)
       break;
   }
 
-#if 0
-  if (i==pin_juyinN)
-#else
-  if (notone && i==pin_juyinN)
-#endif
-  {
-    prph(k);
+  if (notone && i==pin_juyinN) {
+//    prph(k);
     strcpy(tt, "??");
   } else {
 static char tone[2];
-    tone[1]=0;
     tone[0] = (k & tonemask) + '0';
-//    dbg("%d %d %s\n", i, pin_juyinN, pin_juyin[i].pinyin);
-
-    if (i < pin_juyinN)
-      strcpy(tt, pin_juyin[i].pinyin);
-    else
-      tt[0]=0;
+    strcpy(tt, pin_juyin[i].pinyin);
 
     if (tone[0]=='1')
       tone[0]='5';

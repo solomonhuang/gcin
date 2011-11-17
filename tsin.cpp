@@ -1343,6 +1343,8 @@ static int cursor_backspace()
             if (poo.inph[j]) {
               poo.inph[j]=0;
               pho_cleared = TRUE;
+			  if (j==0)
+				clrin_pho();
               break;
             }
           }
@@ -1357,6 +1359,7 @@ static int cursor_backspace()
         }
 
         if (pho_cleared) {
+//          dbg("pho cleared %d %d %d\n",tss.c_len, gcin_pop_up_win, typ_pho_empty());
 		  if (typ_pho_empty())
 			  bzero(poo.inph, sizeof(poo.inph));
 

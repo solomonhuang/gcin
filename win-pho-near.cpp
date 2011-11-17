@@ -70,6 +70,7 @@ static void cb_sel (GtkWidget *button, gpointer user_data)
   close_win_pho_near();
 }
 
+char *phokey2pinyin(phokey_t k);
 
 void create_win_pho_near(phokey_t pho)
 {
@@ -117,7 +118,9 @@ gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_pho_near), FALSE);
       for (mtyp_pho[3]=0;  mtyp_pho[3]< 5; mtyp_pho[3]++) {
 //      dbg("  %d\n",mtyp_pho[2]);
         phokey_t pk = pho2key(mtyp_pho);
-        char *pho_str = phokey_to_str(pk);
+        char *pho_str = pin_juyin ?
+        phokey2pinyin(pk):phokey_to_str(pk);
+
         int start_i, stop_i;
 
         if (!get_start_stop_idx(pk, &start_i, &stop_i))
