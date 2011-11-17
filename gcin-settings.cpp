@@ -212,7 +212,6 @@ void load_setttings()
 
   if (pho_selkey)
     free(pho_selkey);
-
   pho_selkey = strdup(selkey);
 
   if (pho_kbm_name)

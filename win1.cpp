@@ -434,7 +434,9 @@ void recreate_win1_if_nessary()
 void set_wselkey(char *s)
 {
   if (!wselkey || strcmp(wselkey, s)) {
-    wselkey = s;
+    if (wselkey)
+      free(wselkey);
+    wselkey = strdup(s);
     wselkeyN = strlen(s);
     recreate_win1_if_nessary();
 //    dbg("set_wselkey %s\n", s);
