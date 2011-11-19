@@ -1,4 +1,5 @@
-內碼 0 !INT_CODE intcode.png
+內碼 0  intcode-module.so intcode.png
+#內碼 0  intcode-module.dll intcode.png
 倉頡 1 cj.gtab cj.png
 #標點倉頡 4 cj-punc.gtab cj-punc.png
 #輕鬆 2 ez7.gtab

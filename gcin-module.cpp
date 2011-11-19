@@ -17,6 +17,7 @@ void get_win_size(GtkWidget *win, int *width, int *height);
 void exec_gcin_setup();
 void load_tab_pho_file();
 void clear_sele();
+void send_utf8_ch(char *s);
 extern gboolean force_show;
 
 void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
@@ -53,6 +54,7 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_inmd_switch_popup_handler = inmd_switch_popup_handler;
   func->mf_load_tab_pho_file = load_tab_pho_file;
   func->mf_send_text = send_text;
+  func->mf_send_utf8_ch = send_utf8_ch;
   func->mf_utf8_str_N = utf8_str_N;
 
   func->mf_phkbm = &phkbm;
@@ -62,6 +64,7 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_gcin_pop_up_win = &gcin_pop_up_win;
   func->mf_gcin_font_size = &gcin_font_size;
   func->mf_gcin_win_color_fg = &gcin_win_color_fg;
+  func->mf_gtab_press_full_auto_send = &gtab_press_full_auto_send;
 
   func->mf_gcin_win_color_use = &gcin_win_color_use;
   func->mf_tsin_cursor_color = &tsin_cursor_color;
@@ -74,4 +77,8 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_dpy_xl = &dpy_xl;
   func->mf_dpy_yl = &dpy_yl;
   func->mf_pho_chars = pho_chars;
+
+#if WIN32
+  func->test_mode = &test_mode;
+#endif
 }

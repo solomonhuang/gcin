@@ -38,6 +38,7 @@ typedef struct {
 
   // call this function to return the string
   void (*mf_send_text)(char *str);
+  void (*mf_send_utf8_ch)(char *str);
 
   PHOKBM *mf_phkbm;
   TSIN_ST *mf_tss;
@@ -46,9 +47,13 @@ typedef struct {
 
   int *mf_gcin_pop_up_win;
   int *mf_gcin_font_size, *mf_gcin_win_color_use;
+  int *mf_gtab_press_full_auto_send;
   char **mf_gcin_win_color_fg, **mf_pho_selkey, **mf_tsin_cursor_color;
   gboolean *mf_force_show;
   int *mf_win_x, *mf_win_y, *mf_win_xl, *mf_win_yl, *mf_dpy_xl, *mf_dpy_yl;
+#if WIN32
+  int *mf_test_mode;
+#endif
 } GCIN_module_main_functions;
 #if UNIX && defined(__cplusplus)
 }

@@ -123,10 +123,17 @@ void set_label_font_size(GtkWidget *label, int size)
     return;
 
   PangoContext *pango_context = gtk_widget_get_pango_context (label);
-  PangoFontDescription* font=pango_context_get_font_description
-       (pango_context);
+  PangoFontDescription* font=pango_context_get_font_description (pango_context);
+#if 0
   pango_font_description_set_family(font, gcin_font_name);
   pango_font_description_set_size(font, PANGO_SCALE * size);
+#else
+  char tt[256];
+  sprintf(tt, "%s %d", gcin_font_name, size);
+  PangoFontDescription* nfont = pango_font_description_from_string(tt);
+  pango_font_description_merge(font, nfont, TRUE);
+  pango_font_description_free(nfont);
+#endif
   gtk_widget_override_font(label, font);
 }
 

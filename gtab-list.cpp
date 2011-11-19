@@ -85,6 +85,14 @@ void load_gtab_list(gboolean skip_disabled)
 #endif
     }
 
+    if (!strcmp(file, "!INT_CODE")) {
+#if UNIX
+       strcpy(file, "intcode-module.so");
+#else
+       strcpy(file, "intcode-module.dll");
+#endif
+    }
+
     inmd[keyidx].filename = strdup(file);
 
     if (strstr(file, ".so") || strstr(file, ".dll")) {

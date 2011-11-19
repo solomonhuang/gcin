@@ -1691,8 +1691,8 @@ tab_phrase_end:
 #if UNIX
      case XK_KP_Up:
 #endif
-       if (!tss.sel_pho && tsin_use_pho_near) {
-         if (tss.c_len && tss.c_idx == tss.c_len) {
+       if (!tss.sel_pho) {
+         if (tsin_use_pho_near && tss.c_len && tss.c_idx == tss.c_len) {
            int idx = tss.c_len-1;
            phokey_t pk = tss.chpho[idx].pho;
 
@@ -1705,7 +1705,7 @@ tab_phrase_end:
          }
          return 0;
        }
-//       tsin_page_up();
+
        int N;
        N = phrase_count + pho_count - tss.current_page;
        if (N > phkbm.selkeyN)
