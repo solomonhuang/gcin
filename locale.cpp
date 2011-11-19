@@ -1,32 +1,6 @@
 #include "gcin.h"
 
 #if !GCIN_IME && !TSF
-void big5_utf8_n(char *s, int len, char out[])
-{
-  out[0]=0;
-
-  GError *err = NULL;
-  gsize rn, wn;
-  char *utf8 = g_convert(s, len, "UTF-8", "Big5", &rn, &wn, &err);
-
-  if (err) {
-    dbg("big5_utf8  convert error\n");
-    out[0]=0;
-//    abort();
-    return;
-  }
-
-  strcpy(out, utf8);
-  g_free(utf8);
-}
-
-
-void big5_utf8(char *s, char out[])
-{
-  big5_utf8_n(s, strlen(s), out);
-}
-
-
 void utf8_big5_n(char *s, int len, char out[])
 {
   out[0]=0;
