@@ -470,7 +470,7 @@ static void putstr_inp(char *p)
     if (to_tsin)
       add_to_tsin_buf_str(p);
     else
-      send_utf8_ch(p);
+      sendkey_b5(p);
   }
 
   clear_after_put();

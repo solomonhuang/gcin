@@ -2,7 +2,6 @@ include ../config.mak
 include ../suffixes-rule
 
 CFLAGS+=-I.. -I../IMdkit/include
-GCIN_MODULE=intcode-module.so
 
 ifeq ($(USE_ANTHY),Y)
 GCIN_MODULE+=anthy-module.so
@@ -19,10 +18,6 @@ all:	$(GCIN_MODULE)
 anthy_module_so = anthy.pico
 anthy-module.so: $(anthy_module_so)
 	$(CCLD) $(SO_FLAGS) -o $@ $(anthy_module_so) $(LDFLAGS) -lanthy
-
-intcode_module_so = intcode.pico win-int.pico
-intcode-module.so: $(intcode_module_so)
-	$(CCLD) $(SO_FLAGS) -o $@ $(intcode_module_so) $(LDFLAGS)
 
 chewing_module_obj = chewing-conf.pico
 chewing_module_so = chewing.pico gcin-setup-chewing.pico

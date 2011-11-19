@@ -98,7 +98,7 @@ void init_gtab(int inmdno)
 
 //  current_CS->b_half_full_char = FALSE;
   if (!inmd[inmdno].filename || !strcmp(inmd[inmdno].filename,"-")) {
-//    dbg("filename is empty\n");
+    dbg("filename is empty\n");
     return;
   }
 

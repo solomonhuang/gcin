@@ -288,7 +288,7 @@ void set_output_buffer_bak_to_clipboard()
   free(utf8_gbtext);
 }
 
-void send_utf8_ch(char *bchar)
+void sendkey_b5(char *bchar)
 {
   char tt[CH_SZ+1];
   int len = utf8_sz(bchar);
@@ -302,7 +302,7 @@ void send_utf8_ch(char *bchar)
 
 void send_ascii(char key)
 {
-  send_utf8_ch(&key);
+  sendkey_b5(&key);
 }
 
 #if USE_XIM
@@ -346,6 +346,7 @@ static void bounce_back_key()
 
 void hide_win0();
 void hide_win_gtab();
+void hide_win_int();
 void hide_win_pho();
 
 int current_in_win_x = -1, current_in_win_y = -1;  // request x/y
@@ -394,6 +395,9 @@ void hide_in_win(ClientState *cs)
       hide_win0();
       break;
 #endif
+    case method_type_INT_CODE:
+      hide_win_int();
+      break;
     case method_type_MODULE:
       module_cb1(cs)->module_hide_win();
       break;
@@ -451,6 +455,9 @@ void show_in_win(ClientState *cs)
       show_win0();
       break;
 #endif
+    case method_type_INT_CODE:
+      show_win_int();
+      break;
     case method_type_MODULE:
       module_cb1(cs)->module_show_win();
       break;
@@ -499,6 +506,9 @@ void move_in_win(ClientState *cs, int x, int y)
       move_win0(x, y);
       break;
 #endif
+    case method_type_INT_CODE:
+      move_win_int(x, y);
+      break;
     case method_type_MODULE:
       module_cb1(cs)->module_move_win(x, y);
       break;
@@ -801,6 +811,9 @@ void update_active_in_win_geom()
       get_win0_geom();
       break;
 #endif
+    case method_type_INT_CODE:
+      get_win_int_geom();
+      break;
     case method_type_MODULE:
       module_cb()->module_get_win_geom();
       break;
@@ -810,7 +823,7 @@ void update_active_in_win_geom()
   }
 }
 
-extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab;
+extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab, *gwin_int;
 
 gboolean win_is_visible()
 {
@@ -823,6 +836,8 @@ gboolean win_is_visible()
     case method_type_TSIN:
       return gwin0 && GTK_WIDGET_VISIBLE(gwin0);
 #endif
+    case method_type_INT_CODE:
+	  return gwin_int && GTK_WIDGET_VISIBLE(gwin_int);
     case method_type_MODULE:
       return module_cb()->module_win_visible();
     default:
@@ -882,6 +897,7 @@ void toggle_half_full_char()
 //  dbg("half full toggle\n");
 }
 
+void init_inter_code();
 void init_tab_pp(gboolean init);
 void init_tab_pho();
 
@@ -949,6 +965,10 @@ gboolean init_in_method(int in_no)
       set_wselkey(pho_selkey);
       current_CS->in_method = in_no;
       init_tab_pp(init_im);
+      break;
+    case method_type_INT_CODE:
+      current_CS->in_method = in_no;
+      init_inter_code();
       break;
     case method_type_MODULE:
     {
@@ -1068,6 +1088,7 @@ int feedkey_pho(KeySym xkey, int kbstate);
 int feedkey_pp(KeySym xkey, int state);
 int feedkey_gtab(KeySym key, int kbstate);
 int feed_phrase(KeySym ksym, int state);
+int feedkey_intcode(KeySym key);
 void tsin_set_eng_ch(int nmod);
 static KeySym last_keysym;
 
@@ -1281,6 +1302,8 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     case method_type_TSIN:
       return feedkey_pp(keysym, kev_state);
 #endif
+    case method_type_INT_CODE:
+      return feedkey_intcode(keysym);
     case method_type_MODULE:
       return module_cb()->module_feedkey(keysym, kev_state);
     default:
@@ -1528,6 +1551,8 @@ empty:
   switch(current_method_type()) {
     case method_type_PHO:
       return pho_get_preedit(str, attr, cursor, comp_flag);
+    case method_type_INT_CODE:
+      return int_get_preedit(str, attr, cursor, comp_flag);
 #if USE_TSIN
     case method_type_TSIN:
       return tsin_get_preedit(str, attr, cursor, comp_flag);
@@ -1556,6 +1581,8 @@ void gcin_reset()
   switch(current_method_type()) {
     case method_type_PHO:
       pho_reset();
+      return;
+    case method_type_INT_CODE:
       return;
 #if USE_TSIN
     case method_type_TSIN:
@@ -1648,6 +1675,9 @@ gboolean ProcessTestKeyPress(KeySym keysym, u_int kev_state)
       pho_save_gst();
       v = ProcessKeyPress(keysym, kev_state);
       pho_restore_gst();
+      break;
+    case method_type_INT_CODE:
+      v = ProcessKeyPress(keysym, kev_state);
       break;
     case method_type_TSIN:
       tsin_save_gst();

@@ -6,6 +6,9 @@
 #include "gcin-module.h"
 #include "gcin-module-cb.h"
 #include <anthy/anthy.h>
+#if WIN32
+extern gboolean test_mode;
+#endif
 static anthy_context_t ac;
 static gint64 key_press_time;
 static GtkWidget *event_box_anthy;
@@ -1303,7 +1306,7 @@ int module_feedkey_release(KeySym xkey, int kbstate)
      && xkey == XK_Shift_R))
           &&  gmf.mf_current_time() - key_press_time < 300000) {
 #if WIN32
-          if (!*gmf.test_mode)
+          if (!test_mode)
 #endif
           {
             module_flush_input();

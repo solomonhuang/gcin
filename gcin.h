@@ -141,7 +141,7 @@ Atom get_gcin_atom(Display *dpy);
 void get_sys_table_file_name(char *name, char *fname);
 char *half_char_to_full_char(KeySym xkey);
 void send_text(char *text);
-void send_utf8_ch(char *bchar);
+void sendkey_b5(char *bchar);
 void send_ascii(char key);
 void bell();
 void set_label_font_size(GtkWidget *label, int size);

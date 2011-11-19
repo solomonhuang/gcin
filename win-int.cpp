@@ -1,16 +1,8 @@
 #include "gcin.h"
 #include "intcode.h"
-#include "pho.h"
-#include "gst.h"
-#include "im-client/gcin-im-client-attr.h"
-#include "win1.h"
-#include "gcin-module.h"
-#include "gcin-module-cb.h"
 
 GtkWidget *gwin_int;
-extern GCIN_module_main_functions gmf;
 extern int current_intcode;
-void module_show_win();
 
 static GtkWidget *button_int;
 static GtkWidget *labels_int[MAX_INTCODE];
@@ -104,7 +96,7 @@ void clear_int_code_all()
     clear_int_code(i);
 }
 
-void module_hide_win()
+void hide_win_int()
 {
   if (!gwin_int)
     return;
@@ -115,7 +107,7 @@ void module_hide_win()
 extern gboolean force_show;
 extern int intcode_cin;
 
-void module_move_win(int x, int y)
+void move_win_int(int x, int y)
 {
   if (!gwin_int)
     return;
@@ -138,11 +130,12 @@ void module_move_win(int x, int y)
   gtk_window_move(GTK_WINDOW(gwin_int), x, y);
 }
 
+void show_win_int();
 
 void create_win_intcode()
 {
   if (gwin_int) {
-    module_show_win();
+    show_win_int();
     return;
   }
 
@@ -202,7 +195,7 @@ void create_win_intcode()
 //  dbg("create %x\n",gwin_int);
 }
 
-void module_show_win()
+void show_win_int()
 {
   if (!gwin_int) {
     create_win_intcode();
@@ -223,22 +216,17 @@ void module_show_win()
 
 //  dbg("show_win_int %x\n", gwin_int);
   gtk_widget_show(gwin_int);
-  module_move_win(win_x, win_y);
+  move_win_int(win_x, win_y);
   gtk_window_present(GTK_WINDOW(gwin_int));
 }
 
 
-void module_win_geom()
+void get_win_int_geom()
 {
   if (!gwin_int)
     return;
-  gtk_window_get_position(GTK_WINDOW(gwin_int), gmf.mf_win_x, gmf.mf_win_y);
 
-  gmf.mf_get_win_size(gwin_int, gmf.mf_win_xl, gmf.mf_win_yl);
-}
+  gtk_window_get_position(GTK_WINDOW(gwin_int), &win_x, &win_y);
 
-
-int module_win_visible()
-{
-  return GTK_WIDGET_VISIBLE(gwin_int);
+  get_win_size(gwin_int, &win_xl, &win_yl);
 }
