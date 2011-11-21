@@ -122,19 +122,19 @@ void module_move_win(int x, int y)
 
 //  dbg("move_win_int %d %d\n",x,y);
 
-  gtk_window_get_size(GTK_WINDOW(gwin_int), &win_xl, &win_yl);
+  gtk_window_get_size(GTK_WINDOW(gwin_int), gmf.mf_win_xl, gmf.mf_win_yl);
 
-  if (x + win_xl > dpy_xl)
-    x = dpy_xl - win_xl;
+  if (x + *gmf.mf_win_xl > *gmf.mf_dpy_xl)
+    x = *gmf.mf_dpy_xl - *gmf.mf_win_xl;
   if (x < 0)
     x = 0;
 
-  if (y + win_yl > dpy_yl)
-    y = dpy_yl - win_yl;
+  if (y + *gmf.mf_win_yl > *gmf.mf_dpy_yl)
+    y = *gmf.mf_dpy_yl - *gmf.mf_win_yl;
   if (y < 0)
     y = 0;
 
-  win_x = x;  win_y = y;
+  *gmf.mf_win_x = x;  *gmf.mf_win_y = y;
   gtk_window_move(GTK_WINDOW(gwin_int), x, y);
 }
 
@@ -167,7 +167,7 @@ void create_win_intcode()
 
   GtkWidget *button_intcode = gtk_button_new_with_label(_(_L("內碼")));
   g_signal_connect_swapped (GTK_OBJECT (button_intcode), "button_press_event",
-        G_CALLBACK (inmd_switch_popup_handler), NULL);
+        G_CALLBACK (gmf.mf_inmd_switch_popup_handler), NULL);
   gtk_box_pack_start (GTK_BOX (hbox_top), button_intcode, FALSE, FALSE, 0);
 
   button_int = gtk_button_new();
@@ -181,7 +181,7 @@ void create_win_intcode()
     GtkWidget *label = gtk_label_new(_(full_space));
     labels_int[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_int), label, FALSE, FALSE, 0);
-    set_label_font_size(label, gcin_font_size);
+    set_label_font_size(label, *gmf.mf_gcin_font_size);
   }
 
   GtkWidget *intsel = create_int_opts();
@@ -223,7 +223,7 @@ void module_show_win()
 
 //  dbg("show_win_int %x\n", gwin_int);
   gtk_widget_show(gwin_int);
-  module_move_win(win_x, win_y);
+  module_move_win(*gmf.mf_win_x, *gmf.mf_win_y);
   gtk_window_present(GTK_WINDOW(gwin_int));
 }
 

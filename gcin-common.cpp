@@ -111,9 +111,9 @@ void exec_gcin_setup()
 #endif
 
 #if UNIX
-  system(GCIN_BIN_DIR"/gcin-setup &");
+  system(GCIN_BIN_DIR"/gcin-tools &");
 #else
-  win32exec("gcin-setup.exe");
+  win32exec("gcin-tools.exe");
 #endif
 }
 

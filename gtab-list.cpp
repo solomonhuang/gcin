@@ -10,7 +10,6 @@ char gtab_list[]=GTAB_LIST;
 GTAB_LIST_S method_codes[] = {
  {"!PHO", method_type_PHO},
  {"!TSIN", method_type_TSIN},
- {"!INT_CODE", method_type_INT_CODE},
  {"!SYMBOL_TABLE", method_type_SYMBOL_TABLE},
  {NULL}
 };
@@ -22,7 +21,6 @@ void load_gtab_list(gboolean skip_disabled)
 
   inmd[3].method_type = method_type_PHO;
   inmd[6].method_type = method_type_TSIN;
-  inmd[10].method_type = method_type_INT_CODE;
   inmd[12].method_type = method_type_MODULE;
 
   get_gcin_user_fname(gtab_list, ttt);

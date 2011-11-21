@@ -324,7 +324,7 @@ void export_text_xim()
 #endif
 
 #if DEBUG && 0
-  dbg("sendkey_b5: %s\n", text);
+  dbg("send_utf8_ch: %s\n", text);
 #endif
 
   ((IMCommitStruct*)current_forward_eve)->flag |= XimLookupChars;
@@ -406,7 +406,6 @@ void hide_in_win(ClientState *cs)
 
 void show_win_pho();
 void show_win0();
-void show_win_int();
 void show_win_gtab();
 void disp_tray_icon();
 
@@ -464,7 +463,6 @@ void show_in_win(ClientState *cs)
 
 
 void move_win_gtab(int x, int y);
-void move_win_int(int x, int y);
 void move_win0(int x, int y);
 void move_win_pho(int x, int y);
 
@@ -787,7 +785,6 @@ void toggle_im_enabled()
 void get_win_gtab_geom();
 void get_win0_geom();
 void get_win_pho_geom();
-void get_win_int_geom();
 
 void update_active_in_win_geom()
 {

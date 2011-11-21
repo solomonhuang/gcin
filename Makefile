@@ -38,7 +38,7 @@ OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o pho2pinyin
 	gcin-conf.o pinyin.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
-OBJS_gcin_setup=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \
+OBJS_gcin_tools=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \
 	gcin-setup-list.o gcin-switch.o locale.o gcin-setup-pho.o about.o lang.o \
 	gcin-icon.o gcin-setup-gtab.o gtab-list.o gcin-exec-script.o pho-kbm-name.o gcin-module-cb.o
 
@@ -80,7 +80,7 @@ endif
 
 OBJ_IMSRV=im-addr.o im-dispatch.o im-srv.o gcin-crypt.o
 
-PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-setup gcin2tab \
+PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-tools gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge \
 	gcin-kbm-toggle tsin2gtab-phrase gcin-exit ts-edit
 PROGS_SYM=trad2sim
@@ -122,9 +122,9 @@ sim2trad:        $(OBJS_sim2trad)
 trad2sim:	sim2trad
 	ln -sf sim2trad trad2sim
 
-gcin-setup:     $(OBJS_gcin_setup) im-client/libgcin-im-client.so
+gcin-tools:     $(OBJS_gcin_tools) im-client/libgcin-im-client.so
 	rm -f core.*
-	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_setup) -L./im-client -lgcin-im-client $(LDFLAGS)
+	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_gcin_tools) -L./im-client -lgcin-im-client $(LDFLAGS)
 
 phoa2d: $(OBJS_phoa2d) im-client/libgcin-im-client.so
 	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_phoa2d) -L./im-client -lgcin-im-client $(LDFLAGS)

@@ -70,9 +70,9 @@ void load_setttings()
 {
   gcin_font_size = get_gcin_conf_int(GCIN_FONT_SIZE, 16);
 #if UNIX
-  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "sans");
+  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "Sans Bold");
 #else
-  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "MingLiU");
+  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "MingLiU Bold");
 #endif
   gcin_font_size_tsin_presel = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PRESEL, 16);
   gcin_font_size_symbol = get_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, 12);

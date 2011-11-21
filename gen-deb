@@ -10,7 +10,7 @@ exec dpkg-buildpackage -b
 +gcin (9-9) experimental; urgency=low
 +
 +  * New snapshot.
-+  
++
 + -- Kan-Ru Chen <koster@debian.org>  Mon, 28 Feb 2011 18:07:18 +0800
 --- a/debian/ckqt.sh
 +++ b/debian/ckqt.sh
@@ -68,7 +68,7 @@ exec dpkg-buildpackage -b
 --- a/debian/gcin.immodules
 +++ b/debian/gcin.immodules
 @@ -0,0 +1 @@
-+"/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so" 
++"/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so"
 --- a/debian/im-switch/gcin
 +++ b/debian/im-switch/gcin
 @@ -0,0 +1,15 @@
@@ -97,7 +97,7 @@ exec dpkg-buildpackage -b
 --- a/debian/links
 +++ b/debian/links
 @@ -0,0 +1,6 @@
-+usr/share/man/man1/gcin-setup.1.gz usr/share/man/man1/gcin-setup-tab.1.gz
++usr/share/man/man1/gcin-tools.1.gz
 +usr/share/man/man1/phoa2d.1.gz usr/share/man/man1/phod2a.1.gz
 +usr/share/man/man1/sim2trad.1.gz usr/share/man/man1/trad2sim.1.gz
 +usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a.1.gz

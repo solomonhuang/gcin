@@ -463,7 +463,6 @@ void update_win_kbm()
       disp_shift_keys();
 
       break;
-    case method_type_INT_CODE:
     case method_type_MODULE:
       break;
     default:
