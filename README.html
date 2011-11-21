@@ -523,7 +523,7 @@ $ cp gcin-x.x.x.tar.bz2 ~/rpm/SOURCES
 <div class="sectionbody">
 <h3 id="__2">2.1. 介面簡介</h3><div style="clear:left"></div>
 <div class="para"><p>按 ctrl-Space 叫出 gcin 視窗後，在第一排的注音輸入的按鈕 (button) 按滑鼠右鍵
-右鍵可以叫出 gcin-setup window 設定視窗； 按 mouse 左鍵可以叫出符號輸入視窗。</p></div>
+右鍵可以叫出 gcin-tools window 設定視窗； 按 mouse 左鍵可以叫出符號輸入視窗。</p></div>
 <h3 id="__3">2.2. 詞音輸入法</h3><div style="clear:left"></div>
 <div class="ilist"><ul>
 <li>
@@ -664,7 +664,7 @@ net 上網</tt></pre>
 <pre><tt>$ /usr/share/gcin/script/noseeing-inst</tt></pre>
 </div></div>
 <div class="para"><p>logout &amp; login 按 ctrl-alt-9 就可以開始用。
-可以用 gcin-setup 把嘸蝦米設定成內定的輸入法。</p></div>
+可以用 gcin-tools 把嘸蝦米設定成內定的輸入法。</p></div>
 <h4 id="_gcin_4">2.5.5. gcin 的拼音輸入法可以不打音調嗎？</h4>
 <div class="para"><p>pinyin 輸入法必需打音調。輸入拼音後，按 <em>1/2/3/4/5/空白鍵</em> 會進入選字狀態，其中，按 1 或空白鍵時，都只會顯示第一聲的字。</p></div>
 <div class="para"><p>gcin 另有一個 <em>通用拼音輸入法</em> ，可以不必打音調，可於 <a href="http://hyperrate.com/thread.php?tid=7692">Hyperrate: 通用拼音</a> 找到 cin 檔與相關討論。這個通用拼音輸入法的改編版，輸入拼音後，按 <em>空白鍵</em> 會顯示 <em>1/2/3/4/5</em> 聲的字，且支援以前導字元的方式輸入符號。</p></div>
@@ -727,7 +727,7 @@ Up                              詞音中選擇近音字
 Windows+Space                   可設定為輸入法狀態切換開關
 滑鼠左鍵                            符號視窗開關切換 系統列繁體轉簡體開關切換
 滑鼠中鍵                            選擇輸入法
-滑鼠右鍵                            執行gcin-setup 系統列顯示選單
+滑鼠右鍵                            執行gcin-tools 系統列顯示選單
 滑鼠滾輪往上                      符號視窗循環切換成上一組符號表(滑鼠遊標須在符號視窗範圍內)
 滑鼠滾輪往下                      符號視窗循環切換成下一組符號表(滑鼠遊標須在符號視窗範圍內)</tt></pre>
 </div></div>
@@ -749,7 +749,7 @@ export XMODIFIERS=@im=gcin_test</p></div>
 </div></div>
 <h3 id="_gcin_7">3.4. 可以在遠端使用 gcin 嗎？</h3><div style="clear:left"></div>
 <div class="para"><p>gcin 有支援遠端的功能。</p></div>
-<div class="para"><p>勾選 <em>設定</em> (<em>gcin-setup</em>) → <em>內定輸入法&amp;開啟/關閉</em> → <em>遠端 client 程式支援</em> 這個選項，內定是 port 9999，如果9999 被佔用，會自動往下尋找 10000、10001……。gcin im client 會從 XMODIFIERS 自動去找對應的 port。只是如果你有用 IP table，就必須打開對應的 port。</p></div>
+<div class="para"><p>勾選 <em>設定</em> (<em>gcin-tools</em>) → <em>內定輸入法&amp;開啟/關閉</em> → <em>遠端 client 程式支援</em> 這個選項，內定是 port 9999，如果9999 被佔用，會自動往下尋找 10000、10001……。gcin im client 會從 XMODIFIERS 自動去找對應的 port。只是如果你有用 IP table，就必須打開對應的 port。</p></div>
 <div class="para"><p>那如果 gcin server 在 firewall/NAT 裡面，client 在 firwall 外面，然後是用 ssh X11 forward 方式，有兩種解決方式：</p></div>
 <div class="ilist"><ul>
 <li>
@@ -820,14 +820,14 @@ $ iconv -f big5 -t utf-8 file.cin.big5 &gt; file.cin</tt></pre>
 </li>
 <li>
 <p>
-按 control-alt-數字鍵，切換到你在 gtab.list 中定的數字鍵。注音與詞音是固定在 3 &amp; 6 鍵上，不能更改的。執行 gcin-setup 可以設定內定的輸入法。
+按 control-alt-數字鍵，切換到你在 gtab.list 中定的數字鍵。注音與詞音是固定在 3 &amp; 6 鍵上，不能更改的。執行 gcin-tools 可以設定內定的輸入法。
 </p>
 </li>
 </ol></div>
 <h3 id="_gnome_terminal_ctrl_atl">3.7. 在 gnome-terminal 等軟體無法用 ctrl-atl-???? 切換輸入法，該怎麼辨？</h3><div style="clear:left"></div>
 <div class="para"><p>其實有更好的切換方法，就是用 Ctrl-Shift。</p></div>
 <div class="para"><p>譬如你是用行列輸入法，想要與注音循環切換：</p></div>
-<div class="para"><p>gcin-setup → 輸入法開啟關閉→使用 (選 注音 &amp; 行列) ,   第一次內定選行列
+<div class="para"><p>gcin-tools → 輸入法開啟關閉→使用 (選 注音 &amp; 行列) ,   第一次內定選行列
 設定完成之後，就可以用 Ctrl-Shift 循環切換 注音/行列</p></div>
 <h3 id="_gaim_gqview_enter">3.8. gaim 及 gqview 內使用詞音時按 enter 無法送出編輯區內容？</h3><div style="clear:left"></div>
 <div class="para"><p>這是因為某些程式會把 enter 吃掉，沒有送給 gcin 處理，可能解決辦法有：</p></div>
@@ -873,11 +873,11 @@ gedit</tt></pre>
 &gt;  如…
 &gt;  打:ㄅㄛ/ 出來 「嘸 PPD」這樣？</tt></pre>
 </div></div>
-<div class="para"><p>有啊，按 ctrl-alt-3 輸入注音 &amp; 選字，就會顯示 <em>設定</em> (<em>gcin-setup</em>) → <em>內定輸入法 &amp; 開啟/關閉</em> → <em>第一次內定</em> 的所有的可能拆字。如果沒有指定內定的 .gtab 輸入法，則顯示最近一次的 gtab 輸入法。</p></div>
+<div class="para"><p>有啊，按 ctrl-alt-3 輸入注音 &amp; 選字，就會顯示 <em>設定</em> (<em>gcin-tools</em>) → <em>內定輸入法 &amp; 開啟/關閉</em> → <em>第一次內定</em> 的所有的可能拆字。如果沒有指定內定的 .gtab 輸入法，則顯示最近一次的 gtab 輸入法。</p></div>
 <div class="para"><p>gcin 和 windows 的不一樣， 是直接顯示你內定使用的輸入法，不需要另外去設定。所以，你也可以用 gtab 的拼音輸入法去查詢倉頡等 gtab 輸入法。</p></div>
 <div class="para"><p>另外，如果字的某部份忘了如何拆，你可以用 <em>*</em> or <em>?</em> 萬用字元 (wildcard) 來幫助你選字。</p></div>
 <div class="para"><p>gcin 0.6.2 後的版本有類似嘸蝦米的同音字查詢，按 <em>`</em> (backquote) 後就會出現注音的視窗，輸入要查詢的同音字就可以了。</p></div>
-<div class="para"><p>如果需要查詢許多字的讀音，可使用 <em>設定</em> (<em>gcin-setup</em>) → <em>剪貼區 注音查詢</em> 來大量查詢。從網頁或文章中直接選取整段文字，開啟 <em>剪貼區 注音查詢</em> 後即可標示注音，也可在裡面輸入字，用滑鼠選取後，按 <em>自剪貼區更新</em> 。</p></div>
+<div class="para"><p>如果需要查詢許多字的讀音，可使用 <em>設定</em> (<em>gcin-tools</em>) → <em>剪貼區 注音查詢</em> 來大量查詢。從網頁或文章中直接選取整段文字，開啟 <em>剪貼區 注音查詢</em> 後即可標示注音，也可在裡面輸入字，用滑鼠選取後，按 <em>自剪貼區更新</em> 。</p></div>
 <h3 id="__10">3.12. 為什麼倉頡按第二鍵後會跑出一些字，選字視窗中數字的順序還會跳？</h3><div style="clear:left"></div>
 <div class="para"><p>譬如：按 AA日日後</p></div>
 <div class="listingblock">
@@ -885,7 +885,7 @@ gedit</tt></pre>
 <pre><tt>   1昌 2昍   5曝 6暻 7暘   0暍</tt></pre>
 </div></div>
 <div class="para"><p>這是引導初學者按鍵的功能，5曝代表'曝'是在5這個行(TGB廿土月)上。 34 是空白，表示沒有任何字。</p></div>
-<div class="para"><p>如果不喜歡，有選項可以關掉 ( <em>gcin-setup</em> → <em>倉頡/行列…</em> → <em>顯示部份符合的字</em> )。</p></div>
+<div class="para"><p>如果不喜歡，有選項可以關掉 ( <em>gcin-tools</em> → <em>倉頡/行列…</em> → <em>顯示部份符合的字</em> )。</p></div>
 <div class="para"><p>如果是嘸蝦米，則顯示的號碼必須加一。</p></div>
 <h3 id="_gtab_2">3.13. gtab(倉頡、行列) 輸入法中要如何加入新詞？</h3><div style="clear:left"></div>
 <div class="para"><p>用詞音輸入法加入。在中文輸入的狀態下，把 cursor (游標) 移至要存的詞句的開頭，按下 shift-Enter，則會自 cursor 所在位置存到編輯區的結尾，cursor 也會自動跳到結尾，方便繼續輸入。</p></div>
@@ -1106,7 +1106,7 @@ gtk2 (gnome) 程式檢查事項。
 2:      倉頡等
 4:      行列輸入法</tt></pre>
 </div></div>
-<div class="para"><p>有了這個，且在 gcin-setup 中設定成「由 .gtab 指定」，就可以自動設定空白鍵的選項，而且用 ctrl-alt- 切換輸入法時也會自動切換。</p></div>
+<div class="para"><p>有了這個，且在 gcin-tools 中設定成「由 .gtab 指定」，就可以自動設定空白鍵的選項，而且用 ctrl-alt- 切換輸入法時也會自動切換。</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>%selkey 1234567890
@@ -1187,7 +1187,7 @@ gcin:  gcin 1.0.4</p></div>
 <div class="para"><p><em>~/.gcin/config/default-input-method</em></p></div>
 <h3 id="_su_sudo_gcin">3.30. 使用 su 或 sudo 後，無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
 <div class="para"><p>如果使用的 gcin 是 1.4.3 pre7 之前的版本(含 1.4.3 pre7)，可以這麼做：</p></div>
-<div class="para"><p>設定 (<em>gcin-setup</em>) →  內定輸入法 &amp; 開啟/關閉 →  遠端 client 程式支援 (port 9999-)</p></div>
+<div class="para"><p>設定 (<em>gcin-tools</em>) →  內定輸入法 &amp; 開啟/關閉 →  遠端 client 程式支援 (port 9999-)</p></div>
 <div class="para"><p>完成這個動作後，重新登入 X Window System 試試看。</p></div>
 <div class="para"><p>如果用的 gcin 是 1.4.3 pre8 後的版本(含 1.4.3 pre8)，已支援 su root 的中文輸入，注意—要配合新的 libgcin-im-client.so.1.1.0 才可！</p></div>
 <h3 id="_kde_gcin">3.31. 在 KDE 的系統管理頁面無法使用 gcin，該怎麼辦？</h3><div style="clear:left"></div>
@@ -1195,7 +1195,7 @@ gcin:  gcin 1.0.4</p></div>
 <h3 id="_gcin_1_4_3">3.32. 升級到 gcin 1.4.3 後，桌面多出三個方格是什麼東西？</h3><div style="clear:left"></div>
 <div class="para"><p>gcin 1.4.3 pre 8 後的版本，整合了 gcb，gcb 是一個管理剪貼簿 (clipboard) 的小工具。</p></div>
 <div class="para"><p>一般 X Window 會自動複製選取的內容，但如果你不小心再次選取到其他內容，原本複製的東西就會被新選取的內容所覆蓋，gcb 可以避免這種狀況發生。</p></div>
-<div class="para"><p>gcb 提供了三個儲存格，在 gcb 的任一個儲存格上按右鍵可以設定儲存按鈕，每5秒鐘從剪貼區更新。按左鍵把儲存格的內容存到剪貼區。按中鍵可以選擇之前的剪貼區內容的改變。如果不想用，可以在 gcin-setup 內關掉。</p></div>
+<div class="para"><p>gcb 提供了三個儲存格，在 gcb 的任一個儲存格上按右鍵可以設定儲存按鈕，每5秒鐘從剪貼區更新。按左鍵把儲存格的內容存到剪貼區。按中鍵可以選擇之前的剪貼區內容的改變。如果不想用，可以在 gcin-tools 內關掉。</p></div>
 <h3 id="_gcin_10">3.33. gcin 支援輸入日文嗎？</h3><div style="clear:left"></div>
 <div class="para"><p>gcin 1.4.3 pre13 以後的版本支援使用 <a href="http://sourceforge.jp/projects/anthy/">anthy</a> 來輸入日文。</p></div>
 <div class="para"><p><a href="http://hyperrate.com/thread.php?tid=8338#8338">使用方法</a>：</p></div>
