@@ -16,7 +16,6 @@
 extern GtkWidget *gwin_int;
 GCIN_module_main_functions gmf;
 int current_intcode = INTCODE_UTF32;
-extern gboolean test_mode;
 
 static char inch[MAX_INTCODE];
 int intcode_cin;
@@ -29,6 +28,7 @@ int module_init_win(GCIN_module_main_functions *funcs)
   intcode_cin=0;
   gmf = *funcs;
   create_win_intcode();
+  return TRUE;
 }
 
 static int h2i(int x)
@@ -94,7 +94,7 @@ gboolean module_feedkey(int key, int kvstate)
   key=toupper(key);
   if (key==XK_BackSpace||key==XK_Delete) {
 #if WIN32
-    if (test_mode)
+    if (*gmf.mf_test_mode)
       return intcode_cin>0;
 #endif
     if (intcode_cin)
@@ -123,7 +123,7 @@ gboolean module_feedkey(int key, int kvstate)
   if (!intcode_cin && key==' ')
     return 0;
 #if WIN32
-  if (*gmf.test_mode)
+  if (*gmf.mf_test_mode)
     return 1;
 #endif
   if ((intcode_cin<MAX_INTCODE-1 || (current_intcode!=INTCODE_BIG5 && intcode_cin < MAX_INTCODE)) && key!=' ')
@@ -192,6 +192,7 @@ int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *cursor, int *co
 
 int module_feedkey_release(KeySym xkey, int kbstate)
 {
+	return 0;
 }
 
 int module_flush_input()

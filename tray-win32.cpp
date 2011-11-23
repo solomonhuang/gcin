@@ -15,7 +15,7 @@
 gboolean tsin_pho_mode();
 extern int tsin_half_full, gb_output;
 extern int win32_tray_disabled;
-GtkStatusIcon *icon_main, *icon_state;
+GtkStatusIcon *icon_main=NULL, *icon_state=NULL;
 
 void get_icon_path(char *iconame, char fname[]);
 

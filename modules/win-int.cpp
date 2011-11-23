@@ -149,7 +149,7 @@ void create_win_intcode()
   gwin_int = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_int), FALSE);
 #if WIN32
-  set_no_focus(gwin_int);
+  gmf.mf_set_no_focus(gwin_int);
 #endif
 
 //  gtk_window_set_default_size(GTK_WINDOW (gwin_int), 1, 1);
@@ -181,7 +181,7 @@ void create_win_intcode()
     GtkWidget *label = gtk_label_new(_(full_space));
     labels_int[i] = label;
     gtk_box_pack_start (GTK_BOX (hbox_int), label, FALSE, FALSE, 0);
-    set_label_font_size(label, *gmf.mf_gcin_font_size);
+    gmf.mf_set_label_font_size(label, *gmf.mf_gcin_font_size);
   }
 
   GtkWidget *intsel = create_int_opts();
@@ -191,7 +191,7 @@ void create_win_intcode()
 
   gtk_widget_realize (gwin_int);
 #if WIN32
-  win32_init_win(gwin_int);
+  gmf.mf_win32_init_win(gwin_int);
 #else
   set_no_focus(gwin_int);
 #endif
@@ -241,4 +241,9 @@ void module_win_geom()
 int module_win_visible()
 {
   return GTK_WIDGET_VISIBLE(gwin_int);
+}
+
+
+void module_change_font_size()
+{
 }

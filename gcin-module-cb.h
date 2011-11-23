@@ -2,7 +2,7 @@
 extern "C" {
 #endif
   int module_init_win(GCIN_module_main_functions *funcs);
-  void module_get_win_geom();
+  void module_win_geom();
   int module_reset();
   int module_get_preedit(char *str, GCIN_PREEDIT_ATTR attr[], int *pcursor, int *compose_flag);
   gboolean module_feedkey(int kv, int kvstate);

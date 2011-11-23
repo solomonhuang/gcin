@@ -276,7 +276,7 @@ static MITEM mitems[] = {
 };
 
 
-static GtkWidget *tray_menu;
+static GtkWidget *tray_menu=NULL;
 
 GtkWidget *create_tray_menu(MITEM *mitems);
 void update_item_active_all();

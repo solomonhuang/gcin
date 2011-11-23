@@ -16,7 +16,11 @@
 #if UNIX
 #define _(STRING) (STRING)
 #else
+#if _USRDLL
+#define _(x) gmf.mf__utf16_8(x)
+#else
 #define _(x) __utf16_8(x)
+#endif
 #endif
 #endif
 
