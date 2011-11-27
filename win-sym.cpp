@@ -409,7 +409,7 @@ void create_win_sym()
     return;
   }
 
-  if (current_CS->in_method < 0 || current_CS->in_method >= MAX_GTAB_NUM_KEY) {
+  if (current_CS->in_method < 0) {
     p_err("bad current_CS %d\n", current_CS->in_method);
   }
 

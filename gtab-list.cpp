@@ -3,7 +3,8 @@
 #include "gtab-list.h"
 int gcin_switch_keys_lookup(int key);
 
-INMD inmd[MAX_GTAB_NUM_KEY+1];
+INMD *inmd;
+int inmdN;
 
 char gtab_list[]=GTAB_LIST;
 
@@ -14,14 +15,12 @@ GTAB_LIST_S method_codes[] = {
  {NULL}
 };
 
+extern char *default_input_method_str;
+
 void load_gtab_list(gboolean skip_disabled)
 {
   char ttt[128];
   FILE *fp;
-
-  inmd[3].method_type = method_type_PHO;
-  inmd[6].method_type = method_type_TSIN;
-  inmd[12].method_type = method_type_MODULE;
 
   get_gcin_user_fname(gtab_list, ttt);
 
@@ -36,12 +35,14 @@ void load_gtab_list(gboolean skip_disabled)
   skip_utf8_sigature(fp);
 
   int i;
-  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+  for (i=1; i < inmdN; i++) {
     INMD *pinmd = &inmd[i];
     free(pinmd->filename); pinmd->filename=NULL;
     free(pinmd->cname); pinmd->cname=NULL;
     free(pinmd->icon); pinmd->icon=NULL;
   }
+
+  inmdN = 0;
 
   while (!feof(fp)) {
     char line[256];
@@ -50,6 +51,8 @@ void load_gtab_list(gboolean skip_disabled)
     char file[32];
     char icon[128];
 
+    inmd = trealloc(inmd, INMD, inmdN);
+
     name[0]=0;
     key[0]=0;
     file[0]=0;
@@ -57,6 +60,7 @@ void load_gtab_list(gboolean skip_disabled)
 
     line[0]=0;
     myfgets(line, sizeof(line), fp);
+
     if (strlen(line) < 2)
       continue;
 
@@ -66,14 +70,24 @@ void load_gtab_list(gboolean skip_disabled)
     if (skip_disabled && line[0]=='!')
       continue;
 
+
     sscanf(line, "%s %s %s %s", name, key, file, icon);
+//    dbg("%s %c\n", line, key[0]);
 
     if (strlen(name) < 1)
       break;
 
-    int keyidx = gcin_switch_keys_lookup(key[0]);
-    if (keyidx < 0)
-      p_err("bad key value %s in %s\n", key, ttt);
+    if (strchr(default_input_method_str, key[0])) {
+      default_input_method = inmdN;
+//      dbg("default_input_method %s %s %d\n", default_input_method_str, key, default_input_method);
+    }
+    INMD *pinmd = &inmd[inmdN++];
+    bzero(pinmd, sizeof(INMD));
+    pinmd->key_ch = key[0];
+
+    pinmd->in_cycle = strchr(gcin_str_im_cycle, key[0]) != NULL;
+//    dbg("%d %d '%c'\n",inmdN, pinmd->in_cycle, pinmd->key_ch);
+
 
     if (!strcmp(file, "!ANTHY")) {
 #if UNIX
@@ -91,10 +105,10 @@ void load_gtab_list(gboolean skip_disabled)
 #endif
     }
 
-    inmd[keyidx].filename = strdup(file);
+    pinmd->filename = strdup(file);
 
     if (strstr(file, ".so") || strstr(file, ".dll")) {
-      inmd[keyidx].method_type = method_type_MODULE;
+      pinmd->method_type = method_type_MODULE;
       dbg("%s is module file\n", file);
     } else {
       int i;
@@ -102,18 +116,30 @@ void load_gtab_list(gboolean skip_disabled)
         if (!strcmp(file, method_codes[i].id))
           break;
       if (method_codes[i].id)
-        inmd[keyidx].method_type = method_codes[i].method_type;
+        pinmd->method_type = method_codes[i].method_type;
     }
 
     if (name[0]=='!') {
       name++;
-      inmd[keyidx].disabled = TRUE;
+      pinmd->disabled = TRUE;
     }
-    inmd[keyidx].cname = strdup(name);
+    pinmd->cname = strdup(name);
 
     if (strlen(icon))
-      inmd[keyidx].icon = strdup(icon);
+      pinmd->icon = strdup(icon);
   }
   fclose(fp);
 
+}
+
+
+int gcin_switch_keys_lookup(int key)
+{
+  int i;
+
+  for(i=0;i<inmdN;i++)
+    if (inmd[i].key_ch==key)
+      return i;
+
+  return -1;
 }

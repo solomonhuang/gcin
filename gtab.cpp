@@ -236,7 +236,7 @@ void free_gtab()
 {
   int i;
 
-  for(i=0; i < MAX_GTAB_NUM_KEY; i++) {
+  for(i=0; i < inmdN; i++) {
     INMD *inp = &inmd[i];
     free(inp->tbl); inp->tbl = NULL;
     free(inp->tbl64); inp->tbl64 = NULL;
@@ -244,6 +244,8 @@ void free_gtab()
     free(inp->phrbuf); inp->phrbuf = NULL;
     free(inp->keyname_lookup); inp->keyname_lookup = NULL;
   }
+
+  free(inmd);
 }
 
 
@@ -441,7 +443,7 @@ static void putstr_inp(char *p)
 
   char_play(p);
 
-  int to_tsin = (cur_inmd->flag & FLAG_GTAB_SYM_KBM) && default_input_method==6 && tss.c_len;
+  int to_tsin = (cur_inmd->flag & FLAG_GTAB_SYM_KBM) && inmd[default_input_method].method_type==method_type_TSIN && tss.c_len;
 
   if (utf8_str_N(p) > 1  || !(p[0]&128)) {
     if (gtab_disp_key_codes && !gtab_hide_row2 || ggg.wild_mode)

@@ -7,6 +7,7 @@ int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol;
 int gcin_font_size_pho_near, gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en;
 int gcin_win_color_use, gcin_single_state;
 int gcin_remote_client;
+char *default_input_method_str;
 int default_input_method;
 int left_right_button_tips;
 int gcin_im_toggle_keys, gcin_bell_off;
@@ -36,13 +37,12 @@ int tsin_capslock_upper, tsin_use_pho_near;
 int phonetic_char_dynamic_sequence;
 int phonetic_huge_tab;
 int phonetic_speak;
-char *phonetic_speak_sel;
+char *phonetic_speak_sel, *gcin_str_im_cycle;
 int tsin_chinese_english_toggle_key;
 int gcin_font_size_tsin_pho_in;
 int tsin_space_opt;
 int tsin_buffer_size, tsin_tail_select_key;
 int tsin_buffer_editing_mode;
-int gcin_flags_im_enabled;
 int gcin_shift_space_eng_full;
 char *tsin_phrase_line_color;
 char *tsin_cursor_color, *gcin_sel_key_color;
@@ -96,12 +96,12 @@ void load_setttings()
 
   gcin_single_state = get_gcin_conf_int(GCIN_SINGLE_STATE, 0);
 
-  gcin_flags_im_enabled = get_gcin_conf_int(GCIN_FLAGS_IM_ENABLED,0x7fffffff);
+  get_gcin_conf_str(GCIN_STR_IM_CYCLE, &gcin_str_im_cycle, "1234567890-=[]\\");
   gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 0);
   gcin_shift_space_eng_full = get_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL, 1);
   gcin_capslock_lower = get_gcin_conf_int(GCIN_CAPSLOCK_LOWER, 1);
 
-  default_input_method = get_gcin_conf_int(DEFAULT_INPUT_METHOD, 6);
+  get_gcin_conf_str(DEFAULT_INPUT_METHOD, &default_input_method_str, "6");
   left_right_button_tips = get_gcin_conf_int(LEFT_RIGHT_BUTTON_TIPS, 1);
   gcin_im_toggle_keys = get_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, 0);
 #if TRAY_ENABLED

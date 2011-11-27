@@ -1,1 +1,1 @@
-#define GCIN_VERSION "2.1.0"
+#define GCIN_VERSION "2.2.0"

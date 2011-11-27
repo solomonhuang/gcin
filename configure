@@ -318,7 +318,7 @@ echo "BUILD_MODULE=$BUILD_MODULE" >> config.mak
 
 if [ $prefix = /usr/local ]; then
   echo "gcin_ld_run_path=$PWD:\$(gcinlibdir)" >> config.mak
-  echo "GCIN_DEBUG=1" >> config.mak
+  echo "GCIN_DEBUG=0" >> config.mak
 else
   echo "gcin_ld_run_path=\$(gcinlibdir)" >> config.mak
 fi

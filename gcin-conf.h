@@ -33,7 +33,7 @@
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
 #define LEFT_RIGHT_BUTTON_TIPS "left-right-button-tips"
-#define GCIN_FLAGS_IM_ENABLED "gcin-flags-im-enabled"
+#define GCIN_STR_IM_CYCLE "gcin-str-im-cycle"
 #define GCIN_REMOTE_CLIENT "gcin-remote-client"
 #define GCIN_SHIFT_SPACE_ENG_FULL "gcin-shift-space-eng-full"
 #define GCIN_STATUS_TRAY "gcin-status-tray"
@@ -97,7 +97,7 @@ extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_font_size_pho_near,
            gcin_font_size_gtab_in, gcin_font_size_win_kbm, gcin_font_size_win_kbm_en,
            gcin_inner_frame, gcin_single_state,
-           gcin_flags_im_enabled, gcin_remote_client,
+           gcin_remote_client,
            gtab_disp_key_codes, gtab_disp_im_name, gcin_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1, gtab_capslock_in_eng,
            gcin_capslock_lower, pho_hide_row2, pho_in_row1,
@@ -135,7 +135,7 @@ extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use, gcin_bell_off;
 extern int gcin_init_im_enabled, gcin_win32_icon;
 extern int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y, gcin_edit_display;
-extern char *pho_kbm_name, *pho_selkey;
+extern char *pho_kbm_name, *pho_selkey, *gcin_str_im_cycle;
 extern int pho_candicate_col_N, pho_candicate_R2L;
 
 gboolean get_gcin_user_fname(char *name, char fname[]);

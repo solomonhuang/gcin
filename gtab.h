@@ -68,7 +68,6 @@ struct TableHead {
 #define KeyBits (cur_inmd->keybits)
 #define MAX_GTAB_KEYS (1<<KeyBits)
 
-#define MAX_GTAB_NUM_KEY (17)
 #define MAX_TAB_KEY_NUM (32/KeyBits)
 #define MAX_TAB_KEY_NUM1(inm) (32/KeyBits1(inm))
 #define MAX_TAB_KEY_NUM64 (64/KeyBits)
@@ -110,6 +109,7 @@ typedef struct {
   u_char kmask, keybits, last_k_bitn, method_type;
   char WILD_QUES, WILD_STAR;
   struct _GCIN_module_callback_functions *mod_cb_funcs;
+  char key_ch, in_cycle;
 } INMD;
 
 enum {
@@ -120,7 +120,8 @@ enum {
   method_type_SYMBOL_TABLE=13,
 };
 
-extern INMD inmd[MAX_GTAB_NUM_KEY+1];
+extern INMD *inmd;
+int inmdN;
 
 u_int64_t CONVT2(INMD *inmd, int i);
 extern INMD *cur_inmd;

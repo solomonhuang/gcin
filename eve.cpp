@@ -46,16 +46,19 @@ void init_gtab(int inmdno);
 
 char current_method_type()
 {
+//  dbg("default_input_method %d\n",default_input_method);
   if (!current_CS)
 #if UNIX
     return inmd[default_input_method].method_type;
 #else
   {
     if (!last_input_method)
-		last_input_method = default_input_method;
-	return inmd[last_input_method].method_type;
+      last_input_method = default_input_method;
+    return inmd[last_input_method].method_type;
   }
 #endif
+
+//  dbg("current_CS->in_method %d\n", current_CS->in_method);
   return inmd[current_CS->in_method].method_type;
 }
 
@@ -395,7 +398,8 @@ void hide_in_win(ClientState *cs)
       break;
 #endif
     case method_type_MODULE:
-      module_cb1(cs)->module_hide_win();
+      if (inmd[cs->in_method].mod_cb_funcs)
+        module_cb1(cs)->module_hide_win();
       break;
     default:
       hide_win_gtab();
@@ -498,7 +502,8 @@ void move_in_win(ClientState *cs, int x, int y)
       break;
 #endif
     case method_type_MODULE:
-      module_cb1(cs)->module_move_win(x, y);
+      if (inmd[cs->in_method].mod_cb_funcs)
+        module_cb1(cs)->module_move_win(x, y);
       break;
     default:
       if (!cs->in_method)
@@ -724,7 +729,7 @@ void toggle_im_enabled()
 //    dbg("toggle_im_enabled\n");
     check_CS();
 
-    if (current_CS->in_method < 0 || current_CS->in_method > MAX_GTAB_NUM_KEY)
+    if (current_CS->in_method < 0)
       p_err("err found");
 
 
@@ -910,7 +915,7 @@ gboolean init_in_method(int in_no)
 {
   gboolean init_im = !(cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM));
 
-  if (in_no < 0 || in_no > MAX_GTAB_NUM_KEY)
+  if (in_no < 0)
     return FALSE;
 
   check_CS();
@@ -1016,9 +1021,10 @@ static void cycle_next_in_method()
   if (test_mode)
     return;
 #endif
-  for(i=0; i < MAX_GTAB_NUM_KEY; i++) {
-    int v = ((current_CS->in_method + i) % MAX_GTAB_NUM_KEY) + 1;
-    if (!(gcin_flags_im_enabled & (1<<v)))
+
+  for(i=0; i < inmdN; i++) {
+    int v = (current_CS->in_method + 1 + i) % inmdN;
+    if (!inmd[v].in_cycle)
       continue;
     if (!inmd[v].cname || !inmd[v].cname[0])
       continue;
@@ -1078,7 +1084,6 @@ gboolean timeout_raise_window(gpointer data)
 
 extern Window xwin_pho, xwin0, xwin_gtab;
 void create_win_sym(), win_kbm_disp_caplock();
-int gcin_switch_keys_lookup(int key);
 
 #if !GTK_CHECK_VERSION(2,16,0)
 gboolean get_caps_lock_state()
@@ -1530,7 +1535,8 @@ empty:
       return tsin_get_preedit(str, attr, cursor, comp_flag);
 #endif
     case method_type_MODULE:
-      return module_cb()->module_get_preedit(str, attr, cursor, comp_flag);
+      if (inmd[current_CS->in_method].mod_cb_funcs)
+        return module_cb()->module_get_preedit(str, attr, cursor, comp_flag);
     default:
       return gtab_get_preedit(str, attr, cursor, comp_flag);
 //      dbg("metho %d\n", current_CS->in_method);
@@ -1560,7 +1566,8 @@ void gcin_reset()
       return;
 #endif
     case method_type_MODULE:
-      module_cb()->module_reset();
+      if (inmd[current_CS->in_method].mod_cb_funcs)
+        module_cb()->module_reset();
       return;
     default:
       gtab_reset();
@@ -1614,6 +1621,7 @@ void flush_edit_buffer()
       break;
 #endif
     case method_type_MODULE:
+      if (inmd[current_CS->in_method].mod_cb_funcs)
       module_cb()->module_flush_input();
       break;
     default:

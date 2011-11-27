@@ -85,8 +85,6 @@ static int qcmp_key(const void *aa, const void *bb)
 extern char *TableDir;
 void get_icon_path(char *iconame, char fname[]);
 
-extern char gcin_switch_keys[];
-
 static void
 add_items (void)
 {
@@ -97,7 +95,7 @@ add_items (void)
   load_gtab_list(FALSE);
 
   int i;
-  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+  for (i=0; i < inmdN; i++) {
     INMD *pinmd = &inmd[i];
     char *name = pinmd->cname;
     if (!name)
@@ -107,7 +105,8 @@ add_items (void)
     char *file = pinmd->filename;
     char *icon = pinmd->icon;
 
-    key[0] = gcin_switch_keys[i]; key[1]=0;
+    key[0] = pinmd->key_ch;
+    key[1]=0;
 
     foo.name = g_strdup(name);
     char icon_path[128];
@@ -116,14 +115,15 @@ add_items (void)
     foo.icon = gdk_pixbuf_new_from_file(icon_path, &err);
     foo.key = g_strdup(key);
     foo.file = g_strdup(file);
-    foo.cycle = (gcin_flags_im_enabled & (1 << i)) != 0;
+    foo.cycle = pinmd->in_cycle;
+    dbg("%d] %d\n",i,pinmd->in_cycle);
     foo.default_inmd =  default_input_method == i;
     foo.use = !pinmd->disabled;
     foo.editable = FALSE;
     g_array_append_vals (articles, &foo, 1);
   }
 
-  g_array_sort (articles,qcmp_key);
+//  g_array_sort (articles,qcmp_key);
 }
 
 static GtkTreeModel *
@@ -186,7 +186,7 @@ static void save_gtab_list()
     p_err("cannot write to %s\n", ttt);
 
   int i;
-  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+  for (i=0; i < inmdN; i++) {
     INMD *pinmd = &inmd[i];
     char *name = pinmd->cname;
     if (!name)
@@ -194,10 +194,9 @@ static void save_gtab_list()
 
     char *file = pinmd->filename;
     char *icon = pinmd->icon;
-    char key = gcin_switch_keys[i];
     char *disabled = pinmd->disabled?"!":"";
 
-    fprintf(fp, "%s%s %c %s %s\n", disabled,name, key, file, icon);
+    fprintf(fp, "%s%s %c %s %s\n", disabled,name, pinmd->key_ch, file, icon);
   }
 
   fclose(fp);
@@ -206,7 +205,10 @@ static void save_gtab_list()
 
 static void cb_ok (GtkWidget *button, gpointer data)
 {
-  save_gcin_conf_int(DEFAULT_INPUT_METHOD, default_input_method);
+  char tt[128];
+  tt[0]=inmd[default_input_method].key_ch;
+  tt[1]=0;
+  save_gcin_conf_str(DEFAULT_INPUT_METHOD, tt);
 
   int idx;
 #if UNIX
@@ -216,7 +218,21 @@ static void cb_ok (GtkWidget *button, gpointer data)
   save_gcin_conf_int(GCIN_IM_TOGGLE_KEYS, Control_Space);
 #endif
 
-  save_gcin_conf_int(GCIN_FLAGS_IM_ENABLED, gcin_flags_im_enabled);
+  free(gcin_str_im_cycle);
+
+  int i;
+  int ttN=0;
+  for(i=0;i<inmdN;i++) {
+    if (inmd[i].in_cycle) {
+      dbg("in %d %c\n", i, inmd[i].key_ch);
+      tt[ttN++]=inmd[i].key_ch;
+    }
+  }
+  tt[ttN]=0;
+  gcin_str_im_cycle = strdup(tt);
+  save_gcin_conf_str(GCIN_STR_IM_CYCLE, gcin_str_im_cycle);
+  dbg("gcin_str_im_cycle ttN:%d '%s' '%s'\n", ttN, gcin_str_im_cycle, tt);
+
   save_gcin_conf_int(GCIN_REMOTE_CLIENT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_remote_client)));
   save_gcin_conf_int(GCIN_SHIFT_SPACE_ENG_FULL,
@@ -281,19 +297,22 @@ static gboolean toggled (GtkCellRendererToggle *cell, gchar *path_string, gpoint
   GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
   gboolean value;
 
-  printf("toggled\n");
+  dbg("toggled\n");
 
   gtk_tree_model_get_iter (model, &iter, path);
   gtk_tree_model_get (model, &iter, COLUMN_CYCLE, &value, -1);
   int i = gtk_tree_path_get_indices (path)[0];
+
+  dbg("i %d\n", i);
+
   char *key=g_array_index (articles, Item, i).key;
-  int in_no = gcin_switch_keys_lookup(key[0]);
+  int in_no = i;
 
   if (in_no < 0)
     return TRUE;
 
-  gcin_flags_im_enabled ^= 1 << in_no;
   value ^= 1;
+  inmd[in_no].in_cycle = value;
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_CYCLE, value, -1);
 
@@ -339,7 +358,7 @@ static gboolean toggled_default_inmd(GtkCellRendererToggle *cell, gchar *path_st
   dbg("default_input_method %d %c\n", default_input_method, key[0]);
 
   if (default_input_method < 0)
-    default_input_method = 6;
+    default_input_method = gcin_switch_keys_lookup('6');
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_DEFAULT_INMD, TRUE, -1);
 
@@ -362,9 +381,9 @@ static gboolean toggled_use(GtkCellRendererToggle *cell, gchar *path_string, gpo
   gtk_tree_model_get_iter (model, &iter, path);
   int i = gtk_tree_path_get_indices (path)[0];
   char *key=g_array_index (articles, Item, i).key;
-  int input_method = gcin_switch_keys_lookup(key[0]);
+  int input_method = i;
   dbg("toggle use %d %c\n", input_method, key[0]);
-  gboolean must_on = (gcin_flags_im_enabled & (1 << input_method)) || default_input_method==input_method;
+  gboolean must_on = inmd[input_method].in_cycle || default_input_method==input_method;
 
   if (must_on && !inmd[input_method].disabled) {
 //    dbg("must_on\n");
@@ -847,7 +866,7 @@ void create_gtablist_window (void)
     gtk_grid_attach_next_to (GTK_BOX (hbox), button2, button, GTK_POS_RIGHT, 1, 1);
 #endif
 #if UNIX
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 520, 450);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 620, 450);
 #else
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 640, 450);
 #endif

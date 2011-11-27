@@ -138,7 +138,7 @@ static void cb_ts_export()
        char fname[256];
        char *filename=inmd[default_input_method].filename;
 
-       if (default_input_method==6)
+       if (inmd[default_input_method].method_type==method_type_TSIN)
          get_gcin_user_fname(tsin32_f, fname);
        else
        if (filename) {
@@ -169,7 +169,7 @@ static void ts_import(const gchar *selected_filename)
 {
    char cmd[256];
 #if UNIX
-   if (default_input_method==6) {
+   if (inmd[default_input_method].method_type==method_type_TSIN) {
      snprintf(cmd, sizeof(cmd),
         "cd %s/.gcin && "GCIN_BIN_DIR"/tsd2a32 %s > tmpfile && cat %s >> tmpfile && "GCIN_BIN_DIR"/tsa2d32 tmpfile %s",
         getenv("HOME"), tsin32_f, selected_filename, tsin32_f);
@@ -183,7 +183,7 @@ static void ts_import(const gchar *selected_filename)
      system(tt);
    }
 #else
-   if (default_input_method==6)
+   if (inmd[default_input_method].method_type==method_type_TSIN)
      win32exec_script_va("ts-import.bat", (char *)selected_filename, tsin32_f, NULL);
    else {
      win32exec_script_va("ts-gtab-import.bat", inmd[default_input_method].filename,  selected_filename, NULL);
@@ -1055,7 +1055,7 @@ static void create_main_win()
                     G_CALLBACK (cb_gtab_conf), NULL);
 
   int i;
-  for (i=1; i <= MAX_GTAB_NUM_KEY; i++) {
+  for (i=1; i < inmdN; i++) {
     INMD *pinmd = &inmd[i];
     if (pinmd->method_type != method_type_MODULE || pinmd->disabled)
       continue;
@@ -1144,7 +1144,7 @@ static void create_main_win()
   g_signal_connect (G_OBJECT (button_ts_edit), "clicked",
                     G_CALLBACK (cb_ts_edit), NULL);
 
-  if (default_input_method == 6) {
+  if (inmd[default_input_method].method_type == method_type_TSIN) {
   GtkWidget *button_tslearn = gtk_button_new_with_label(_(_L("讓詞音從文章學習詞")));
   gtk_box_pack_start (GTK_BOX (vbox_ts), button_tslearn, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_tslearn), "clicked",

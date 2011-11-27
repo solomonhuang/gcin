@@ -246,6 +246,8 @@ void process_client_req(HANDLE fd)
 #endif
     {
       current_CS = cs;
+      cs->in_method = default_input_method;
+      dbg("new_cli default_input_method:%d\n", default_input_method);
       save_CS_temp_to_current();
       init_state_chinese(cs);
     }

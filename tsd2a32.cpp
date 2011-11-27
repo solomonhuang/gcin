@@ -149,7 +149,7 @@ int main(int argc, char **argv)
         if (b_pinyin) {
           char *t = phokey2pinyin(phbuf[i]);
 //          dbg("z %s\n", t);
-          fprintf(fp_out, t);
+          fprintf(fp_out, "%s", t);
         } else
           prph2(fp_out, phbuf[i]);
       } else {

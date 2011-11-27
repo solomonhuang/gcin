@@ -362,7 +362,7 @@ void load_tray_icon_win32()
 #if WIN32
   // when login, creating icon too early may cause block in gtk_status_icon_new_from_file
   if (win32_tray_disabled)
-	  return;
+    return;
 #endif
 
 //  dbg("load_tray_icon_win32\n");
@@ -458,7 +458,7 @@ void load_tray_icon_win32()
 
   if (icon_main) {
     char tt[64];
-    if (current_CS && current_CS->in_method && inmd[current_CS->in_method].cname[0])
+    if (current_CS && inmd[current_CS->in_method].cname[0])
       strcpy(tt, inmd[current_CS->in_method].cname);
 
     if (!iconame || !strcmp(iconame, GCIN_TRAY_PNG) || !tsin_pho_mode())
