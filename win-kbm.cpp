@@ -98,6 +98,7 @@ static gboolean timeout_repeat(gpointer data)
 static gboolean timeout_first_time(gpointer data)
 {
   KeySym k = GPOINTER_TO_INT(data);
+  dbg("timeout_first_time %c\n", k);
   send_fake_key_eve2(k, TRUE);
   kbm_timeout_handle = g_timeout_add(50, timeout_repeat, data);
   return FALSE;
@@ -118,10 +119,20 @@ static gboolean timeout_clear_hold(gpointer data)
   return FALSE;
 }
 
+void clear_kbm_timeout_handle()
+{
+  if (!kbm_timeout_handle)
+    return;
+  g_source_remove(kbm_timeout_handle);
+  kbm_timeout_handle = 0;
+}
+
 static void cb_button_click(GtkWidget *wid, KEY *k)
 {
   KeySym keysym=k->keysym;
   GtkWidget *laben = k->laben;
+
+  dbg("cb_button_click keysym %d\n", keysym);
 
   if (k->flag & K_HOLD) {
     if (k->flag & K_PRESS) {
@@ -133,6 +144,7 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
       g_timeout_add(10000, timeout_clear_hold, GINT_TO_POINTER(k));
     }
   } else {
+	clear_kbm_timeout_handle();
     kbm_timeout_handle = g_timeout_add(500, timeout_first_time, GINT_TO_POINTER(keysym));
     send_fake_key_eve2(keysym, TRUE);
   }
@@ -141,11 +153,8 @@ static void cb_button_click(GtkWidget *wid, KEY *k)
 
 static void cb_button_release(GtkWidget *wid, KEY *k)
 {
-//    dbg("cb_button_release\n");
-    if (kbm_timeout_handle) {
-      g_source_remove(kbm_timeout_handle);
-      kbm_timeout_handle = 0;
-    }
+    dbg("cb_button_release %d\n", kbm_timeout_handle);
+	clear_kbm_timeout_handle();
 
     send_fake_key_eve2(k->keysym, FALSE);
 
@@ -253,8 +262,9 @@ static void move_win_kbm()
   int ox, oy;
   GdkRectangle r;
   GtkOrientation ori;
-  int szx, szy;
+
 #if UNIX
+  int szx, szy;
   if (tray_da_win) {
     gdk_window_get_origin(tray_da_win, &ox, &oy);
 #if !GTK_CHECK_VERSION(2,91,0)
@@ -525,6 +535,8 @@ void hide_win_kbm()
   if (test_mode)
     return;
 #endif
+
+  clear_kbm_timeout_handle();
   win_kbm_on = 0;
   gtk_widget_hide(gwin_kbm);
 }

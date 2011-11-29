@@ -1,4 +1,4 @@
-﻿if exist %1 goto edit_it
+if exist %1 goto edit_it
 set gcin_sys=%GCIN_DIR%
 set gcin_script=%gcin_sys%\script
 set gcin_table=%gcin_sys%\table

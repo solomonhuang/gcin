@@ -35,7 +35,7 @@ void load_gtab_list(gboolean skip_disabled)
   skip_utf8_sigature(fp);
 
   int i;
-  for (i=1; i < inmdN; i++) {
+  for (i=0; i < inmdN; i++) {
     INMD *pinmd = &inmd[i];
     free(pinmd->filename); pinmd->filename=NULL;
     free(pinmd->cname); pinmd->cname=NULL;

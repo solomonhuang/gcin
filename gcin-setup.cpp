@@ -1055,7 +1055,7 @@ static void create_main_win()
                     G_CALLBACK (cb_gtab_conf), NULL);
 
   int i;
-  for (i=1; i < inmdN; i++) {
+  for (i=0; i < inmdN; i++) {
     INMD *pinmd = &inmd[i];
     if (pinmd->method_type != method_type_MODULE || pinmd->disabled)
       continue;

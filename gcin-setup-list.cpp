@@ -868,7 +868,7 @@ void create_gtablist_window (void)
 #if UNIX
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 620, 450);
 #else
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 640, 450);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 680, 450);
 #endif
 
   g_signal_connect (G_OBJECT (gtablist_window), "delete_event",

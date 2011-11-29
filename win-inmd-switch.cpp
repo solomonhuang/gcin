@@ -25,7 +25,7 @@ void create_inmd_switch()
   menu = gtk_menu_new ();
 
   int i;
-  for(i=1; i < inmdN; i++) {
+  for(i=0; i < inmdN; i++) {
     if (!inmd[i].cname || !inmd[i].cname[0])
       continue;
 

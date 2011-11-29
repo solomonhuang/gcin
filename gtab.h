@@ -121,7 +121,7 @@ enum {
 };
 
 extern INMD *inmd;
-int inmdN;
+extern int inmdN;
 
 u_int64_t CONVT2(INMD *inmd, int i);
 extern INMD *cur_inmd;

@@ -69,7 +69,7 @@ int get_gcin_conf_int(char *name, int default_value);
 void load_setttings()
 {
   gcin_font_size = get_gcin_conf_int(GCIN_FONT_SIZE, 16);
-#if UNIX
+#if UNIX || 1
   get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "Sans Bold");
 #else
   get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "MingLiU Bold");

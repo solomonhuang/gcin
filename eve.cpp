@@ -1124,6 +1124,7 @@ void disp_win_kbm_capslock_init()
 }
 
 void destroy_phrase_save_menu();
+int gcin_switch_keys_lookup(int key);
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
