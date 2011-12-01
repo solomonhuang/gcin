@@ -158,7 +158,7 @@ int main(int argc, char **argv)
   g_signal_connect (G_OBJECT (button_fetch), "clicked",
      G_CALLBACK (cb_button_fetch), NULL);
 
-  GtkWidget *button_exit = gtk_button_new_with_label(_(_L("離開")));
+  GtkWidget *button_exit = gtk_button_new_from_stock(GTK_STOCK_QUIT);
   gtk_box_pack_start (GTK_BOX (hbox_buttons), button_exit, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button_exit), "clicked",
      G_CALLBACK (do_exit), NULL);
