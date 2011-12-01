@@ -507,11 +507,18 @@ void screen_size_changed(GdkScreen *screen, gpointer user_data)
 
 #include "lang.h"
 
+extern int destroy_window;
+
 int main(int argc, char **argv)
 {
 #if WIN32
    putenv("PANGO_WIN32_NO_UNISCRIBE=1");
 #endif
+
+  char *destroy = getenv("GCIN_DESTROY_WINDOW");
+  if (destroy)
+    destroy_window = atoi(destroy);
+  printf("GCIN_DESTROY_WINDOW=%d\n",destroy_window);
 
   gtk_init (&argc, &argv);
 
