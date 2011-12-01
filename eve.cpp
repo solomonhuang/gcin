@@ -1212,7 +1212,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       return FALSE;
 
     int kidx = gcin_switch_keys_lookup(keysym);
-    if (kidx <= 0)
+    if (kidx < 0)
       return FALSE;
 
     if (inmd[kidx].method_type == method_type_SYMBOL_TABLE) {

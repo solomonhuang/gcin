@@ -69,6 +69,9 @@ void move_win_pho(int x, int y)
 
   win_x = x;  win_y = y;
 
+  if (!gwin_pho)
+    return;
+
   get_win_size(gwin_pho, &twin_xl, &twin_yl);
 
   if (x + twin_xl > dpy_xl)
