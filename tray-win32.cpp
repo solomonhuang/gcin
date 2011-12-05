@@ -253,7 +253,7 @@ static void cb_activate(GtkStatusIcon *status_icon, gpointer user_data)
 
 static void cb_popup(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
 {
-  dbg("cb_popup\n");
+//  dbg("cb_popup\n");
   switch (button) {
 #if UNIX
     case 1:
@@ -265,12 +265,13 @@ static void cb_popup(GtkStatusIcon *status_icon, guint button, guint activate_ti
       break;
 #endif
     case 3:
+//      dbg("tray_menu %x\n", tray_menu);
       if (!tray_menu)
         tray_menu = create_tray_menu(mitems_main);
 #if 0
       gtk_menu_popup(GTK_MENU(tray_menu), NULL, NULL, gtk_status_icon_position_menu, status_icon, button, activate_time);
 #else
-	  gtk_menu_popup(GTK_MENU(tray_menu), NULL, NULL, NULL, NULL, button, activate_time);
+      gtk_menu_popup(GTK_MENU(tray_menu), NULL, NULL, NULL, NULL, button, activate_time);
 #endif
       break;
   }
@@ -320,13 +321,16 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
             }
 
           if (kbm_sel[i].kbm) {
-            static unich_t tt[32];
+            unich_t tt[128];
+            if (mitems_state[0].name)
+              free(mitems_state[0].name);
 #if UNIX
             sprintf(tt, "注音換 %s %s", kbm_sel[i].name, p);
+            mitems_state[0].name = strdup(tt);
 #else
             swprintf(tt, L"注音換 %s %S", kbm_sel[i].name, p);
+            mitems_state[0].name = wcsdup(tt);
 #endif
-            mitems_state[0].name = tt;
           }
         }
 
