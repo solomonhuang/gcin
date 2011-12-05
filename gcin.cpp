@@ -518,7 +518,7 @@ int main(int argc, char **argv)
   char *destroy = getenv("GCIN_DESTROY_WINDOW");
   if (destroy)
     destroy_window = atoi(destroy);
-  printf("GCIN_DESTROY_WINDOW=%d\n",destroy_window);
+//  printf("GCIN_DESTROY_WINDOW=%d\n",destroy_window);
 
   gtk_init (&argc, &argv);
 

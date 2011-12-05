@@ -64,6 +64,8 @@
 #define GTAB_UNIQUE_AUTO_SEND "gtab-unique-auto-send"
 #define GTAB_QUE_WILD_CARD "gtab-que-wild-card"
 #define GTAB_PHRASE_PRE_SELECT "gtab-phrase-pre-select"
+#define GTAB_IN_AREA_BUTTON "gtab-in-area-button"
+
 
 #define TSIN_PHRASE_PRE_SELECT "tsin-phrase-pre-select"
 #define TSIN_CHINESE_ENGLISH_TOGGLE_KEY "tsin-chinese-english-toggle_key"
@@ -113,7 +115,7 @@ extern int gcin_im_toggle_keys;
 extern int gtab_pre_select, gtab_phrase_pre_select;
 extern int gtab_press_full_auto_send;
 extern int gtab_disp_partial_match;
-extern int gtab_shift_phrase_key;
+extern int gtab_shift_phrase_key, gtab_in_area_button;
 extern int gtab_vertical_select, gtab_unique_auto_send;
 extern int tsin_buffer_size;
 extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;

@@ -853,6 +853,7 @@ void create_appearance_conf_window()
 
   gtk_box_pack_start (GTK_BOX(hbox_win_color_use), check_button_gcin_win_color_use, FALSE, FALSE, 0);
   event_box_win_color_test = gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_win_color_test), FALSE);
   gtk_box_pack_start (GTK_BOX(vbox_win_color), event_box_win_color_test, FALSE, FALSE, 0);
   label_win_color_test = gtk_label_new(NULL);
   gtk_container_add (GTK_CONTAINER(event_box_win_color_test), label_win_color_test);

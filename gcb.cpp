@@ -433,6 +433,7 @@ void gcb_main()
   // need this because on win32 scoll is not recieved if win is not focused.
   gtk_box_pack_start (GTK_BOX (hbox), gtk_vseparator_new(), FALSE, FALSE, 0);
   GtkWidget *eve_arrow = gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(eve_arrow), FALSE);
   gtk_box_pack_start (GTK_BOX(hbox), eve_arrow, FALSE, FALSE, FALSE);
     g_signal_connect(G_OBJECT(eve_arrow),"button-press-event", G_CALLBACK(mouse_button_callback), NULL);
   gtk_container_add(GTK_CONTAINER(eve_arrow), gtk_arrow_new(GTK_ARROW_DOWN, GTK_SHADOW_IN));
