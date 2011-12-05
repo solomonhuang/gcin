@@ -76,7 +76,7 @@ void load_setttings()
 #endif
   gcin_font_size_tsin_presel = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PRESEL, 16);
   gcin_font_size_symbol = get_gcin_conf_int(GCIN_FONT_SIZE_SYMBOL, 12);
-  gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 10);
+  gcin_font_size_tsin_pho_in = get_gcin_conf_int(GCIN_FONT_SIZE_TSIN_PHO_IN, 13);
   gcin_font_size_gtab_in = get_gcin_conf_int(GCIN_FONT_SIZE_GTAB_IN, 10);
   gcin_font_size_pho_near = get_gcin_conf_int(GCIN_FONT_SIZE_PHO_NEAR, 14);
   gcin_font_size_win_kbm = get_gcin_conf_int(GCIN_FONT_SIZE_WIN_KBM, 10);

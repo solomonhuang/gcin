@@ -58,7 +58,7 @@ void disp_gtab(char *str)
     gtk_widget_show(label_gtab);
     gtk_label_set_text(GTK_LABEL(label_gtab), str);
   } else {
-    if (gcin_status_tray)
+    if (gcin_status_tray || (! gtab_hide_row2))
       gtk_widget_hide(label_gtab);
     else
       win_gtab_disp_half_full();
@@ -541,7 +541,8 @@ void create_win_gtab_gui_simple()
   hbox_row2 = gtk_hbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (vbox_top), hbox_row2);
 
-  label_full = gtk_label_new(_(cht_full_str));
+  label_full = gtk_label_new(NULL);
+  gtk_label_set_markup(GTK_LABEL(label_full), _(cht_full_str));
 
   gtk_box_pack_start (GTK_BOX (hbox_row2), label_full, FALSE, FALSE, 0);
 
@@ -602,7 +603,7 @@ void create_win_gtab_gui_simple()
 
 
     label_gtab = gtk_label_new(NULL);
-    if (current_CS && (! gcin_status_tray))
+    if (current_CS && (! gcin_status_tray) && (gtab_hide_row2))
     {
       gchar *color_cname = g_strdup_printf("<span foreground=\"blue\">[%s]</span>", inmd[current_CS->in_method].cname);
       gtk_label_set_markup(GTK_LABEL(label_gtab), color_cname);
@@ -843,7 +844,7 @@ void win_gtab_disp_half_full()
       gtk_widget_show(label_full);
   }
 
-  if (label_gtab)
+  if (label_gtab && (gtab_hide_row2))
   {
     gtk_label_set_markup(GTK_LABEL(label_gtab), get_full_str());
   }
