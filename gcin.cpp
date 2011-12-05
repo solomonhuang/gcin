@@ -522,6 +522,17 @@ int main(int argc, char **argv)
 
   gtk_init (&argc, &argv);
 
+static char button_rc[]="style \"button\"\n"
+"{\n"
+"   GtkButton::inner-border = {0,0,0,0}\n"
+"\n"
+"xthickness = 1\n"
+"ythickness = 0\n"
+"}\n"
+"class \"GtkButton\" style \"button\"";
+
+  gtk_rc_parse_string(button_rc);
+
 #if UNIX
   signal(SIGCHLD, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);

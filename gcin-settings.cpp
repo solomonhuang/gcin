@@ -131,7 +131,7 @@ void load_setttings()
   gtab_unique_auto_send = get_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND, 0);
   gtab_que_wild_card = get_gcin_conf_int(GTAB_QUE_WILD_CARD, 0);
   gtab_phrase_pre_select = get_gcin_conf_int(GTAB_PHRASE_PRE_SELECT, 1);
-  gtab_in_area_button = get_gcin_conf_int(GTAB_IN_AREA_BUTTON, 0);
+  gtab_in_area_button = get_gcin_conf_int(GTAB_IN_AREA_BUTTON, 1);
 
   tsin_phrase_pre_select = get_gcin_conf_int(TSIN_PHRASE_PRE_SELECT, 1);
   tsin_chinese_english_toggle_key = get_gcin_conf_int(TSIN_CHINESE_ENGLISH_TOGGLE_KEY,
