@@ -500,6 +500,8 @@ void create_win_sym()
   gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_arrow), GTK_ORIENTATION_VERTICAL);
   gtk_box_pack_start (GTK_BOX (hbox_top), vbox_arrow, TRUE, TRUE, 0);
   GtkWidget *eve_up=gtk_event_box_new(), *eve_down=gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(eve_up), FALSE);
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(eve_down), FALSE);
   gtk_box_pack_start (GTK_BOX (vbox_arrow), eve_up, TRUE, TRUE, 0);
   gtk_container_add(GTK_CONTAINER(eve_up), gtk_arrow_new(GTK_ARROW_UP, GTK_SHADOW_IN));
   gtk_box_pack_start (GTK_BOX (vbox_arrow), eve_down, TRUE, TRUE, 0);

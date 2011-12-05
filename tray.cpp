@@ -356,6 +356,7 @@ gboolean create_tray(gpointer data)
     return FALSE;
 
   GtkWidget *event_box = gtk_event_box_new ();
+  gtk_event_box_set_visible_window (event_box, FALSE);
   gtk_container_add (GTK_CONTAINER (egg_tray_icon), event_box);
 #if GTK_CHECK_VERSION(2,12,0)
   gtk_widget_set_tooltip_text (event_box, _("左:中英切換 中:小鍵盤 右:選項"));

@@ -129,6 +129,7 @@ void create_win1_gui()
   gtk_container_add (GTK_CONTAINER(frame), vbox_top);
 
   GtkWidget *eve_box_up = gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(eve_box_up), FALSE);
   gtk_box_pack_start (GTK_BOX (vbox_top), eve_box_up, FALSE, FALSE, 0);
   arrow_up = gtk_arrow_new (GTK_ARROW_UP, GTK_SHADOW_IN);
   gtk_container_add(GTK_CONTAINER(eve_box_up), arrow_up);
@@ -158,6 +159,7 @@ void create_win1_gui()
     GtkWidget *align = gtk_alignment_new(0,0,0,0);
     gtk_table_attach_defaults(GTK_TABLE(table),align, x,x+1,y,y+1);
     GtkWidget *event_box_pho = gtk_event_box_new();
+    gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_pho), FALSE);
     GtkWidget *label = gtk_label_new(NULL);
     gtk_container_add (GTK_CONTAINER (event_box_pho), label);
     labels_sele[i] = label;
@@ -172,6 +174,7 @@ void create_win1_gui()
       GtkWidget *alignR = gtk_alignment_new(0,0,0,0);
       gtk_table_attach_defaults(GTK_TABLE(table), alignR, x+1,x+2,y,y+1);
       GtkWidget *event_box_phoR = gtk_event_box_new();
+      gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_phoR), FALSE);
       GtkWidget *labelR = gtk_label_new(NULL);
       gtk_container_add (GTK_CONTAINER (event_box_phoR), labelR);
       labels_seleR[i] = labelR;
@@ -185,6 +188,7 @@ void create_win1_gui()
   }
 
   GtkWidget *eve_box_down = gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(eve_box_down), FALSE);
   gtk_box_pack_start (GTK_BOX (vbox_top), eve_box_down, FALSE, FALSE, 0);
   arrow_down = gtk_arrow_new (GTK_ARROW_DOWN, GTK_SHADOW_IN);
   gtk_container_add(GTK_CONTAINER(eve_box_down), arrow_down);

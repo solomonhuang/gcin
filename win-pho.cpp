@@ -20,6 +20,30 @@ void disp_pho(int index, char *phochar)
   disp_pho_sub(label_pho, index, phochar);
 }
 
+#if WIN32
+static int timeout_handle_pho;
+gboolean timeout_minimize_win_pho(gpointer data)
+{
+  if (!gwin_pho)
+    return FALSE;
+  gtk_window_resize(GTK_WINDOW(gwin_pho), 1, 1);
+//  gtk_window_present(GTK_WINDOW(gwin0));
+  timeout_handle_pho = 0;
+  return FALSE;
+}
+#endif
+
+
+void minimize_win_pho()
+{
+  gtk_window_resize(GTK_WINDOW(gwin_pho), 1, 1);
+
+#if WIN32
+  if (!timeout_handle_pho)
+	timeout_handle_pho = g_timeout_add(50, timeout_minimize_win_pho, NULL);
+#endif
+}
+
 
 void move_win_pho(int x, int y);
 
@@ -46,6 +70,8 @@ void disp_pho_sel(char *s)
 {
   gtk_label_set_markup(GTK_LABEL(label_pho_sele), s);
 
+  minimize_win_pho();
+
   if (win_size_exceed(gwin_pho)) {
     move_win_pho(current_in_win_x, current_in_win_y);
   }
@@ -57,7 +83,13 @@ void set_key_codes_label_pho(char *s)
   if (!label_key_codes)
     return;
 
+  if (!s || !*s) {
+    gtk_widget_hide(label_key_codes);
+	return;
+  }
+
   gtk_label_set_text(GTK_LABEL(label_key_codes), s);
+  gtk_widget_show(label_key_codes);
 }
 
 
@@ -88,11 +120,6 @@ void move_win_pho(int x, int y)
   move_win_sym();
 }
 
-void minimize_win_pho()
-{
-  gtk_window_resize(GTK_WINDOW(gwin_pho), 1, 1);
-}
-
 
 void create_win_pho()
 {
@@ -100,6 +127,7 @@ void create_win_pho()
     return;
 
   gwin_pho = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size(GTK_WINDOW(gwin_pho), 1 ,1);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_pho), FALSE);
 #if WIN32
   set_no_focus(gwin_pho);
@@ -145,6 +173,7 @@ void create_win_pho_gui_simple()
   gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
 
   GtkWidget *event_box_pho = gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_pho), FALSE);
   gtk_container_set_border_width (GTK_CONTAINER (event_box_pho), 0);
 
   if (gcin_inner_frame) {
@@ -214,6 +243,8 @@ void create_win_pho_gui_simple()
 
   gtk_widget_show_all (gwin_pho);
 
+  gtk_widget_hide(label_key_codes);
+
   gtk_widget_hide(label_full);
 }
 
@@ -272,6 +303,14 @@ void hide_win_pho()
 // dbg("hide_win_pho\n");
   if (!gwin_pho)
     return;
+
+#if WIN32
+  if (timeout_handle_pho) {
+	  g_source_remove(timeout_handle_pho);
+	  timeout_handle_pho = 0;
+  }
+#endif
+
   gtk_widget_hide(gwin_pho);
   hide_win_sym();
 }

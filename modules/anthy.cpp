@@ -1177,6 +1177,7 @@ int module_init_win(GCIN_module_main_functions *funcs)
   gmf.mf_set_no_focus(win_anthy);
 
   event_box_anthy = gtk_event_box_new();
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_anthy), FALSE);
 
   gtk_container_add(GTK_CONTAINER(win_anthy), event_box_anthy);
 

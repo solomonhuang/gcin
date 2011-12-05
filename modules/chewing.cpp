@@ -208,6 +208,8 @@ module_init_win (GCIN_module_main_functions *pFuncs)
     g_gcinModMainFuncs.mf_set_no_focus (g_pWinChewing);
 
     g_pEvBoxChewing = gtk_event_box_new ();
+    gtk_event_box_set_visible_window (GTK_EVENT_BOX(g_pEvBoxChewing), FALSE);
+
     if (!g_pEvBoxChewing)
         return FALSE;
     gtk_container_add (GTK_CONTAINER (g_pWinChewing), g_pEvBoxChewing);

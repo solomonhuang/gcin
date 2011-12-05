@@ -125,6 +125,7 @@ static void create_char(int index)
       return;
 
     GtkWidget *event_box = gtk_event_box_new();
+    gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box), FALSE);
     chars[i].vbox = event_box;
     g_signal_connect (G_OBJECT (event_box), "button-press-event",  G_CALLBACK (mouse_char_callback), GINT_TO_POINTER(index));
 

@@ -32,9 +32,9 @@ gboolean win_size_exceed(GtkWidget *win), gtab_phrase_on();
 void move_win_gtab(int x, int y), toggle_win_sym();
 int win_gtab_max_key_press;
 
-unich_t eng_full_str[]=_L("<span foreground=\"blue\">[英/全]</span>");
-unich_t cht_full_str[]=_L("<span foreground=\"blue\">[全]</span>");
-unich_t cht_halt_str[]=_L("");
+unich_t eng_full_str[]=_L("英/全");
+unich_t cht_full_str[]=_L("全");
+unich_t cht_halt_str[]=_L("半");
 
 static void adj_gtab_win_pos()
 {
@@ -44,8 +44,6 @@ static void adj_gtab_win_pos()
     move_win_gtab(current_in_win_x, current_in_win_y);
 }
 
-void win_gtab_disp_half_full();
-
 void disp_gtab(char *str)
 {
 #if WIN32
@@ -54,15 +52,11 @@ void disp_gtab(char *str)
 #endif
   if (!label_gtab)
      return;
-  if (str && (str[0]!='\0')) {
+  if (str) {
     gtk_widget_show(label_gtab);
     gtk_label_set_text(GTK_LABEL(label_gtab), str);
-  } else {
-    if (gcin_status_tray)
-      gtk_widget_hide(label_gtab);
-    else
-      win_gtab_disp_half_full();
-  }
+  } else
+    gtk_widget_hide(label_gtab);
 
   adj_gtab_win_pos();
 }
@@ -580,12 +574,6 @@ void create_win_gtab_gui_simple()
     gtk_container_add (GTK_CONTAINER (frame_gtab), hbox_gtab);
 
     label_gtab = gtk_label_new(NULL);
-    if (current_CS && (! gcin_status_tray))
-    {
-      gchar *color_cname = g_strdup_printf("<span foreground=\"blue\">[%s]</span>", inmd[current_CS->in_method].cname);
-      gtk_label_set_markup(GTK_LABEL(label_gtab), color_cname);
-      g_free(color_cname);
-    }
     gtk_box_pack_start (GTK_BOX (hbox_gtab), label_gtab, FALSE, FALSE, 0);
   }
 
@@ -818,9 +806,7 @@ void win_gtab_disp_half_full()
   }
 
   if (label_gtab)
-  {
-    gtk_label_set_markup(GTK_LABEL(label_gtab), get_full_str());
-  }
+    gtk_label_set_text(GTK_LABEL(label_gtab), get_full_str());
 
   minimize_win_gtab();
 }
