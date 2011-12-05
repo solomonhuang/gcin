@@ -522,6 +522,19 @@ int main(int argc, char **argv)
 
   gtk_init (&argc, &argv);
 
+#if GTK_CHECK_VERSION(2,91,6)
+  char *css[]=
+"GtkButton\n"
+"{\n"
+"  border-width: 0;\n"
+"  padding: 0;\n"
+"  -GtkButton-inner-border: 0;\n"
+"}"
+  GtkCssProvider *provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(provider, css, -1, NULL);
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref(provider);
+#else
 static char button_rc[]="style \"button\"\n"
 "{\n"
 "   GtkButton::inner-border = {0,0,0,0}\n"
@@ -530,8 +543,8 @@ static char button_rc[]="style \"button\"\n"
 "ythickness = 0\n"
 "}\n"
 "class \"GtkButton\" style \"button\"";
-
   gtk_rc_parse_string(button_rc);
+#endif
 
 #if UNIX
   signal(SIGCHLD, SIG_IGN);

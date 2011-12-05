@@ -172,8 +172,14 @@ void create_win_pho_gui_simple()
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
   gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
 
-  GtkWidget *event_box_pho = gtk_event_box_new();
-  gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_pho), FALSE);
+  GtkWidget *event_box_pho;
+  if (gtab_in_area_button)
+	event_box_pho = gtk_button_new();
+  else {
+	event_box_pho = gtk_event_box_new();
+	gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_pho), FALSE);
+  }
+
   gtk_container_set_border_width (GTK_CONTAINER (event_box_pho), 0);
 
   if (gcin_inner_frame) {
@@ -217,14 +223,20 @@ void create_win_pho_gui_simple()
   g_signal_connect(G_OBJECT(event_box_pho),"button-press-event",
                    G_CALLBACK(mouse_button_callback), NULL);
 
-  GtkWidget *frame_pho = gtk_frame_new(NULL);
-  gtk_frame_set_shadow_type(GTK_FRAME(frame_pho), GTK_SHADOW_OUT);
-  gtk_container_add (GTK_CONTAINER (event_box_pho), frame_pho);
-  gtk_container_set_border_width (GTK_CONTAINER (frame_pho), 0);
 
   label_pho = gtk_label_new(NULL);
-  gtk_container_add (GTK_CONTAINER (frame_pho), label_pho);
 
+  GtkWidget *frame_pho;
+  if (gtab_in_area_button) {
+	gtk_container_add (GTK_CONTAINER (event_box_pho), label_pho);
+  }
+  else {
+	frame_pho = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame_pho), GTK_SHADOW_OUT);
+	gtk_container_add (GTK_CONTAINER (event_box_pho), frame_pho);
+	gtk_container_set_border_width (GTK_CONTAINER (frame_pho), 0);
+	gtk_container_add (GTK_CONTAINER (frame_pho), label_pho);
+  }
 
   if (left_right_button_tips) {
 #if GTK_CHECK_VERSION(2,12,0)
