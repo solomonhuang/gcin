@@ -506,11 +506,9 @@ static gboolean cb_gcin_win_color_fg( GtkWidget *widget,
 
 void disp_fg_bg_color()
 {
-  dbg("disp_fg_bg_color\n");
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(check_button_gcin_win_color_use))) {
 #if !GTK_CHECK_VERSION(2,91,6)
     gtk_widget_modify_fg(label_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_fg);
-    dbg("gcin_win_gcolor_bg %d\n", gcin_win_gcolor_bg);
     gtk_widget_modify_bg(event_box_win_color_test, GTK_STATE_NORMAL, &gcin_win_gcolor_bg);
 #else
     GdkRGBA rgbfg, rgbbg;
@@ -864,8 +862,7 @@ void create_appearance_conf_window()
 
   gtk_box_pack_start (GTK_BOX(hbox_win_color_use), check_button_gcin_win_color_use, FALSE, FALSE, 0);
   event_box_win_color_test = gtk_event_box_new();
-// this will make the color test failed
-//  gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_win_color_test), FALSE);
+  gtk_event_box_set_visible_window (GTK_EVENT_BOX(event_box_win_color_test), FALSE);
   gtk_box_pack_start (GTK_BOX(vbox_win_color), event_box_win_color_test, FALSE, FALSE, 0);
   label_win_color_test = gtk_label_new(NULL);
   gtk_container_add (GTK_CONTAINER(event_box_win_color_test), label_win_color_test);
@@ -905,9 +902,9 @@ void create_appearance_conf_window()
 
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   if (button_order)
-    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+    gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_cancel, FALSE, FALSE, 0);
   else
-    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, FALSE, FALSE, 0);
 
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
                             G_CALLBACK (close_appearance_conf_window),

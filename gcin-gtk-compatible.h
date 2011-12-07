@@ -103,6 +103,7 @@
 #endif
 
 #if GTK_CHECK_VERSION(3,3,2)
+#undef      GTK_TABLE
 #define     GTK_TABLE GTK_GRID
 #define     gtk_table_attach_defaults(u,v,w,x,y,z) gtk_grid_attach(u,v,w,y,1,1)
 #define     gtk_table_new(x,y,z) gtk_grid_new()

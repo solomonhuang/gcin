@@ -637,7 +637,6 @@ void update_in_win_pos()
 void win_pho_disp_half_full();
 void win_tsin_disp_half_full();
 void win_gtab_disp_half_full();
-extern char eng_full_str[], full_char_str[];
 void update_tray_icon(), load_tray_icon(), load_tray_icon_win32();
 static int current_gcin_win32_icon = -1;
 void restart_gcin0();
@@ -839,7 +838,6 @@ gboolean win_is_visible()
 
 void disp_gtab_half_full(gboolean hf);
 void tsin_toggle_half_full();
-extern char eng_full_str[];
 
 void toggle_half_full_char()
 {

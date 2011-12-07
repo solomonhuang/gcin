@@ -46,6 +46,9 @@ int tsin_buffer_editing_mode;
 int gcin_shift_space_eng_full;
 char *tsin_phrase_line_color;
 char *tsin_cursor_color, *gcin_sel_key_color;
+unich_t eng_full_str[]=_L("[英/全]");
+unich_t cht_full_str[]=_L("[全]");
+char eng_color_full_str[128], cht_color_full_str[128];
 int tsin_tab_phrase_end;
 int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
 int gcin_inner_frame;
@@ -156,6 +159,8 @@ void load_setttings()
   get_gcin_conf_str(TSIN_PHRASE_LINE_COLOR, &tsin_phrase_line_color, "blue");
   get_gcin_conf_str(TSIN_CURSOR_COLOR, &tsin_cursor_color, "blue");
   get_gcin_conf_str(GCIN_SEL_KEY_COLOR, &gcin_sel_key_color, "blue");
+  g_snprintf(eng_color_full_str, 128, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, _(eng_full_str));
+  g_snprintf(cht_color_full_str, 128, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, _(cht_full_str));
 
   get_gcin_conf_str(GCIN_WIN_COLOR_FG, &gcin_win_color_fg, "white");
   get_gcin_conf_str(GCIN_WIN_COLOR_BG, &gcin_win_color_bg, "#005BFF");

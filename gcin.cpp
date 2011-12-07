@@ -523,7 +523,7 @@ int main(int argc, char **argv)
   gtk_init (&argc, &argv);
 
 #if GTK_CHECK_VERSION(2,91,6)
-  char *css[]=
+  static char css[]=
 "GtkButton\n"
 "{\n"
 "  border-width: 0;\n"

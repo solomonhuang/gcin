@@ -12,7 +12,6 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_shift_phrase_key,
                  *check_button_gtab_hide_row2,
                  *check_button_gtab_in_row1,
-                 *check_button_gtab_capslock_in_eng,
                  *check_button_gtab_vertical_select,
                  *check_button_gtab_unique_auto_send,
                  *check_button_gtab_que_wild_card,
@@ -79,10 +78,6 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 
   save_gcin_conf_int(GTAB_IN_ROW1,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_in_row1)));
-
-  save_gcin_conf_int(GTAB_CAPSLOCK_IN_ENG,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_capslock_in_eng)));
-
 
   save_gcin_conf_int(GTAB_VERTICAL_SELECT,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_vertical_select)));
