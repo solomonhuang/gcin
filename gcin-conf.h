@@ -134,7 +134,7 @@ extern int tsin_space_opt, tsin_tone_char_input;
 
 extern char *tsin_phrase_line_color, *tsin_cursor_color, *gcin_font_name, *gcin_sel_key_color;
 extern unich_t eng_full_str[], cht_full_str[];
-extern char eng_color_full_str[128], cht_color_full_str[128];
+extern char *eng_color_full_str, *cht_color_full_str;
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use, gcin_bell_off;
 extern int gcin_init_im_enabled, gcin_win32_icon;

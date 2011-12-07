@@ -115,10 +115,10 @@ add_items (void)
     foo.icon = gdk_pixbuf_new_from_file(icon_path, &err);
     foo.key = g_strdup(key);
     foo.file = g_strdup(file);
-    foo.cycle = pinmd->in_cycle;
     dbg("%d] %d\n",i,pinmd->in_cycle);
     foo.default_inmd =  default_input_method == i;
     foo.use = !pinmd->disabled;
+    foo.cycle = pinmd->in_cycle && foo.use;
     foo.editable = FALSE;
     g_array_append_vals (articles, &foo, 1);
   }

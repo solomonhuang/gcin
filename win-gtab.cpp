@@ -825,9 +825,9 @@ char *get_full_str()
     case GCIN_STATE_CHINESE:
       if (current_CS->b_half_full_char)
       {
-	if (gcin_win_color_use)
-	  return cht_color_full_str;
-	else
+        if (gcin_win_color_use)
+          return cht_color_full_str;
+        else
           return _(cht_full_str);
       }
       break;
