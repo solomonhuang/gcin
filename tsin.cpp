@@ -1733,9 +1733,7 @@ tab_phrase_end:
      case XK_space:
        if (!tss.c_len && !poo.ityp3_pho && !poo.typ_pho[0] && !poo.typ_pho[1] && !poo.typ_pho[2]
            && tss.tsin_half_full) {
-#if UNIX
-         send_text("　");
-#endif
+         send_text(_(_L("　")));
          return 1;
        }
 

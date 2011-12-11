@@ -1,0 +1,2 @@
+cp $PWD/gcin-fedora.spec ~/rpmbuild/SPECS
+rpmbuild -ba ~/rpmbuild/SPECS/gcin-fedora.spec

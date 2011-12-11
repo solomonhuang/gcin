@@ -94,6 +94,8 @@
 #define GCB_POSITION_X "gcb-position-x"
 #define GCB_POSITION_Y "gcb-position-y"
 #define GCB_ENABLED "gcb-enabled"
+#define GCB_BUTTON_N "gcb-button-n"
+#define GCB_HISTORY_N "gcb-history-n"
 
 extern int gcin_font_size, gcin_font_size_tsin_presel, gcin_font_size_symbol,
            gcin_font_size_tsin_pho_in, gcin_font_size_pho_near,
@@ -138,7 +140,8 @@ extern char *eng_color_full_str, *cht_color_full_str;
 extern char *gcin_win_color_fg, *gcin_win_color_bg;
 extern int gcin_win_color_use, gcin_bell_off;
 extern int gcin_init_im_enabled, gcin_win32_icon;
-extern int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y, gcin_edit_display;
+extern int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y, gcb_button_n, gcb_history_n;
+extern int gcin_edit_display;
 extern char *pho_kbm_name, *pho_selkey, *gcin_str_im_cycle;
 extern int pho_candicate_col_N, pho_candicate_R2L;
 

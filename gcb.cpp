@@ -10,7 +10,6 @@ static GtkWidget *mainwin;
 static GtkClipboard *pclipboard, *pclipboard_prim;
 static GtkWidget **buttonArr;
 static gchar **buttonStr;
-static int buttonArrN=3;
 static int maxButtonStrlen=9;
 // static GdkAtom atom_cutbuffer0;
 static char geomstr[5];
@@ -20,7 +19,6 @@ static GtkTooltips *button_bar_tips;
 #endif
 static GtkWidget *hist_window;
 static gchar **hist_strArr;
-static int hist_strArrN=10;
 static GtkWidget **hist_buttonArr;
 static void del_nl(char *tmpstr)
 {
@@ -52,7 +50,7 @@ static void update_hist_button()
 {
   int i;
 
-  for(i=0;i<hist_strArrN;i++) {
+  for(i=0;i<gcb_history_n;i++) {
     char tstr[16];
 
     if (!hist_strArr[i])
@@ -87,7 +85,7 @@ static void show_hist_window()
 void set_win_title(const gchar *text)
 {
    char titlestr[34];
-   utf8ncpy(titlestr, sizeof(titlestr), text);
+   utf8ncpy(titlestr, sizeof(titlestr), (char *)text);
    gtk_window_set_title (GTK_WINDOW (mainwin),titlestr);
 }
 
@@ -122,17 +120,17 @@ void disp_gcb_selection(const gchar *text)
     return;
 
 
-  for(i=0;i<buttonArrN;i++) {
+  for(i=0;i<gcb_button_n;i++) {
     if (buttonStr[i] && !strcmp(buttonStr[i],text))
       return;
   }
 
    tmpstr=(char *)g_malloc(maxButtonStrlen);
-   utf8ncpy(tmpstr, maxButtonStrlen, text);
+   utf8ncpy(tmpstr, maxButtonStrlen, (char *)text);
 
    del_nl(tmpstr);
 
-   for(i=0;i<buttonArrN;i++) {
+   for(i=0;i<gcb_button_n;i++) {
      if (buttonArr[i]==button) {
        if (buttonStr[i])
          g_free(buttonStr[i]);
@@ -155,7 +153,7 @@ void disp_gcb_selection(const gchar *text)
    gtk_window_resize(GTK_WINDOW(mainwin), 100, 24);
 
    // remove the duplicate item if any
-   for(i=0;i< hist_strArrN; i++) {
+   for(i=0;i< gcb_history_n; i++) {
      if (!hist_strArr[i])
        continue;
      int len = strlen(hist_strArr[i]);
@@ -165,15 +163,15 @@ void disp_gcb_selection(const gchar *text)
      g_free(hist_strArr[i]);
 
      memmove(&hist_strArr[i],&hist_strArr[i+1],
-             sizeof(hist_strArr[0])*(hist_strArrN- i - 1));
+             sizeof(hist_strArr[0])*(gcb_history_n - i - 1));
 
-     hist_strArr[hist_strArrN-1]=NULL;
+     hist_strArr[gcb_history_n-1]=NULL;
      break;
    }
 
-   g_free(hist_strArr[hist_strArrN-1]);
+   g_free(hist_strArr[gcb_history_n-1]);
    memmove(&hist_strArr[1],&hist_strArr[0],
-           sizeof(hist_strArr[0])*(hist_strArrN-1));
+           sizeof(hist_strArr[0])*(gcb_history_n-1));
 
    hist_strArr[0]=g_strdup(text);
 
@@ -208,7 +206,7 @@ static void get_mouse_button( GtkWidget *widget,GdkEventButton *event, gpointer 
   printf("b gtk_widget_get_events  %d  %x  %d\n",event->type,event->state,event->button);
 #endif
   if (event->button == 3) {
-    for(i=0;i<buttonArrN;i++) {
+    for(i=0;i<gcb_button_n;i++) {
       if (buttonArr[i]!=widget)
         gtk_button_set_relief(GTK_BUTTON(buttonArr[i]),GTK_RELIEF_NORMAL);
     }
@@ -222,7 +220,7 @@ static void get_mouse_button( GtkWidget *widget,GdkEventButton *event, gpointer 
   if (event->button == 1) {
     gtk_window_present(GTK_WINDOW(mainwin));
 
-    for(i=0;i<buttonArrN;i++) {
+    for(i=0;i<gcb_button_n;i++) {
       if (buttonArr[i]!=widget)
         continue;
       if (buttonStr[i]) {
@@ -243,7 +241,7 @@ static void hist_get_mouse_button( GtkWidget *widget,GdkEventButton *event, gpoi
   printf("b gtk_widget_get_events  %d  %x  %d\n",event->type,event->state,event->button);
 #endif
   if (event->button == 1) {
-    for(i=0;i<hist_strArrN;i++) {
+    for(i=0;i<gcb_history_n;i++) {
       if (hist_buttonArr[i]!=widget)
         continue;
       if (hist_strArr[i]) {
@@ -348,13 +346,13 @@ void gcb_main()
 //  puts(geomstr);
 
   if (!buttonArr) {
-    buttonArr=(GtkWidget**)g_malloc(buttonArrN * sizeof(GtkWidget *));
-    buttonStr=(gchar**)g_malloc0(buttonArrN * sizeof(gchar *));
+    buttonArr=(GtkWidget**)g_malloc(gcb_button_n * sizeof(GtkWidget *));
+    buttonStr=(gchar**)g_malloc0(gcb_button_n * sizeof(gchar *));
   }
 
   if (!hist_strArr) {
-    hist_strArr=(gchar**)g_malloc0(hist_strArrN * sizeof(gchar *));
-    hist_buttonArr=(GtkWidget**)g_malloc(hist_strArrN * sizeof(GtkWidget *));
+    hist_strArr=(gchar**)g_malloc0(gcb_history_n * sizeof(gchar *));
+    hist_buttonArr=(GtkWidget**)g_malloc(gcb_history_n * sizeof(GtkWidget *));
   }
 
   mainwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -375,6 +373,8 @@ void gcb_main()
 
   // Under gnome 2.0, the mainwin is not fixed if decorated, annoying
   gtk_window_set_decorated(GTK_WINDOW(hist_window),FALSE);
+  gtk_window_set_skip_pager_hint(GTK_WINDOW(hist_window),TRUE);
+  gtk_window_set_skip_taskbar_hint(GTK_WINDOW(hist_window),TRUE);
   gtk_window_set_title (GTK_WINDOW (hist_window),"gcb history");
 
   gtk_window_set_title (GTK_WINDOW(mainwin), "gcb: gtk copy-paste buffer");
@@ -395,7 +395,7 @@ void gcb_main()
 
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
 
-  for(i=0;i<buttonArrN;i++) {
+  for(i=0;i<gcb_button_n;i++) {
     buttonArr[i] = gtk_button_new_with_label ("---");
 //    gtk_container_set_border_width(GTK_CONTAINER(buttonArr[i]),0);
     gtk_box_pack_start (GTK_BOX(hbox), buttonArr[i], TRUE, TRUE, FALSE);
@@ -416,7 +416,7 @@ void gcb_main()
   gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER(hist_window), vbox);
 
-  for(i=0;i<hist_strArrN;i++) {
+  for(i=0;i<gcb_history_n;i++) {
     hist_buttonArr[i] = gtk_button_new_with_label ("---");
     gtk_container_set_border_width(GTK_CONTAINER(hist_buttonArr[i]),0);
     gtk_box_pack_start (GTK_BOX(vbox), hist_buttonArr[i], TRUE, TRUE, FALSE);

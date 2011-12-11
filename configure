@@ -233,17 +233,6 @@ optdir=/opt
 GCIN_VERSION=`cat VERSION.gcin`
 sed -e "s/__gcin_version__/$GCIN_VERSION/" < gcin.spec.in > gcin.spec
 
-
-# SUSE
-if [ -d /opt/gnome/share/control-center-2.0/capplets ]; then
-  GCIN_SETUP_DESKTOP=/opt/gnome/share/control-center-2.0/capplets
-  GCIN_SETUP_DESKTOP_rpm='$(optdir)/gnome/share/control-center-2.0/capplets'
-else
-  GCIN_SETUP_DESKTOP=/usr/share/control-center-2.0/capplets
-  GCIN_SETUP_DESKTOP_rpm='$(datadir)/control-center-2.0/capplets'
-fi
-
-
 if [ $QT_IM = 'N' ]; then
   mv gcin.spec gcin.spec.tmp
   grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
@@ -303,8 +292,6 @@ echo "QT4_IM=$QT4_IM" >> config.mak
 echo "QT4_IM_DIR=$QT4_IM_DIR" >> config.mak
 echo "GTK3_IM=$GTK3_IM" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
-echo "GCIN_SETUP_DESKTOP=$GCIN_SETUP_DESKTOP" >> config.mak
-echo "GCIN_SETUP_DESKTOP_rpm=$GCIN_SETUP_DESKTOP_rpm" >> config.mak
 echo "LIB=$LIB" >> config.mak
 echo "MAC_OS=$MAC_OS" >> config.mak
 echo "SO_FLAGS=$SO_FLAGS" >> config.mak

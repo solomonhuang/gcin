@@ -87,7 +87,7 @@ PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
 
-all:	$(PROGS) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec
+all:	$(PROGS) trad2sim $(GCIN_SO) $(DATA) $(PROGS_CV) gcin.spec gcin-fedora.spec
 	$(MAKE) -C data
 	$(MAKE) -C gtk-im
 	if [ $(BUILD_MODULE) = 'Y' ]; then $(MAKE) -C modules; fi
@@ -249,6 +249,10 @@ config.mak: VERSION.gcin configure
 	./configure
 
 gcin.spec:	gcin.spec.in
+	rm -f $@
+	sed -e "s/__gcin_version__/$(GCIN_VERSION)/" < $< > $@
+
+gcin-fedora.spec:	gcin-fedora.spec.in
 	rm -f $@
 	sed -e "s/__gcin_version__/$(GCIN_VERSION)/" < $< > $@
 

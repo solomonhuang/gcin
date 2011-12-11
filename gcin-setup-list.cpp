@@ -37,6 +37,7 @@ static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
        *check_button_gcin_win_sym_click_close;
 #if USE_GCB
 static GtkWidget *spinner_gcb_position_x, *spinner_gcb_position_y;
+static GtkWidget *spinner_gcb_history_n, *spinner_gcb_button_n;
 #endif
 #if UNIX
 static GtkWidget *check_button_gcin_single_state;
@@ -150,19 +151,19 @@ create_model (void)
       gtk_list_store_append (model, &iter);
 
       gtk_list_store_set (model, &iter,
-			  COLUMN_NAME,
-			  g_array_index (articles, Item, i).name,
-			  COLUMN_ICON,
-			  g_array_index (articles, Item, i).icon,
-			  COLUMN_KEY,
-			  g_array_index (articles, Item, i).key,
-			  COLUMN_FILE,
-			  g_array_index (articles, Item, i).file,
-			  COLUMN_CYCLE,
+                          COLUMN_NAME,
+                          g_array_index (articles, Item, i).name,
+                          COLUMN_ICON,
+                          g_array_index (articles, Item, i).icon,
+                          COLUMN_KEY,
+                          g_array_index (articles, Item, i).key,
+                          COLUMN_FILE,
+                          g_array_index (articles, Item, i).file,
+                          COLUMN_CYCLE,
                           g_array_index (articles, Item, i).cycle,
-			  COLUMN_DEFAULT_INMD,
+                          COLUMN_DEFAULT_INMD,
                           g_array_index (articles, Item, i).default_inmd,
-			  COLUMN_USE,
+                          COLUMN_USE,
                           g_array_index (articles, Item, i).use,
                           COLUMN_EDITABLE,
                           g_array_index (articles, Item, i).editable,
@@ -267,6 +268,10 @@ static void cb_ok (GtkWidget *button, gpointer data)
   save_gcin_conf_int(GCB_POSITION_X, pos_x);
   int pos_y = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_position_y));
   save_gcin_conf_int(GCB_POSITION_Y, pos_y);
+  int button_n = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_button_n));
+  save_gcin_conf_int(GCB_BUTTON_N, button_n);
+  int history_n = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinner_gcb_history_n));
+  save_gcin_conf_int(GCB_HISTORY_N, history_n);
 #endif
 
   save_gtab_list();
@@ -790,6 +795,20 @@ void create_gtablist_window (void)
    (GtkAdjustment *) gtk_adjustment_new (gcb_position_y, 0.0, 100.0, 1.0, 1.0, 0.0);
   spinner_gcb_position_y = gtk_spin_button_new (adj_gcb_position_y, 0, 0);
   gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), spinner_gcb_position_y, FALSE, FALSE, 0);
+
+
+  GtkWidget *label_n = gtk_label_new(_(_L("儲藏/歷史 格數量 ")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), label_n,  FALSE, FALSE, 0);
+
+  GtkAdjustment *adj_gcb_button_n =
+   (GtkAdjustment *) gtk_adjustment_new (gcb_button_n, 2.0, 9.0, 1.0, 1.0, 0.0);
+  spinner_gcb_button_n = gtk_spin_button_new (adj_gcb_button_n, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), spinner_gcb_button_n, FALSE, FALSE, 0);
+  GtkAdjustment *adj_gcb_history_n =
+   (GtkAdjustment *) gtk_adjustment_new (gcb_history_n, 5.0, 50.0, 1.0, 1.0, 0.0);
+  spinner_gcb_history_n = gtk_spin_button_new (adj_gcb_history_n, 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcb_pos), spinner_gcb_history_n, FALSE, FALSE, 0);
+
 #endif
 
 #if UNIX

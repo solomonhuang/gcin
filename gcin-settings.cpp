@@ -59,7 +59,7 @@ int gcin_status_tray;
 
 int pho_hide_row2, pho_in_row1;
 #if USE_GCB
-int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y;
+int gcb_enabled, gcb_position, gcb_position_x, gcb_position_y, gcb_button_n, gcb_history_n;
 #endif
 int gcin_bell_volume;
 int gcin_sound_play_overlap, gcin_enable_ctrl_alt_switch;
@@ -73,7 +73,7 @@ void load_setttings()
 {
   gcin_font_size = get_gcin_conf_int(GCIN_FONT_SIZE, 16);
 #if UNIX || 1
-  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "Sans Bold");
+  get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "Sans");
 #else
   get_gcin_conf_str(GCIN_FONT_NAME, &gcin_font_name, "MingLiU Bold");
 #endif
@@ -121,7 +121,7 @@ void load_setttings()
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);
   gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, GTAB_AUTO_SELECT_BY_PHRASE_AUTO);
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
-  gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 1);
+  gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 0);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
   gtab_disp_im_name = get_gcin_conf_int(GTAB_DISP_IM_NAME, 1);
@@ -179,13 +179,15 @@ void load_setttings()
   gcb_position = get_gcin_conf_int(GCB_POSITION, 4);
   gcb_position_x = get_gcin_conf_int(GCB_POSITION_X, 0);
   gcb_position_y = get_gcin_conf_int(GCB_POSITION_Y, 0);
+  gcb_button_n = get_gcin_conf_int(GCB_BUTTON_N, 3);
+  gcb_history_n = get_gcin_conf_int(GCB_HISTORY_N, 10);
 #endif
   gcin_bell_volume = get_gcin_conf_int(GCIN_BELL_VOLUME, -97);
   gcin_sound_play_overlap = get_gcin_conf_int(GCIN_SOUND_PLAY_OVERLAP, 0);
   gcin_enable_ctrl_alt_switch = get_gcin_conf_int(GCIN_ENABLE_CTRL_ALT_SWITCH, 1);
-#if 0
+#if 1
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_BOTH);
-#elif 1
+#elif 0
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_ON_THE_SPOT);
 #else
   gcin_edit_display = get_gcin_conf_int(GCIN_EDIT_DISPLAY, GCIN_EDIT_DISPLAY_OVER_THE_SPOT);
