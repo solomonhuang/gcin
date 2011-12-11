@@ -789,7 +789,10 @@ void win_tsin_disp_half_full()
   if (test_mode)
     return;
 #endif
-  gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
+  if (gcin_win_color_use)
+   gtk_label_set_markup(GTK_LABEL(label_pho), get_full_str());
+  else
+    gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
   compact_win0();
 }
 

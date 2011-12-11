@@ -856,7 +856,10 @@ void win_gtab_disp_half_full()
 
   if (label_gtab && (gtab_hide_row2))
   {
-    gtk_label_set_markup(GTK_LABEL(label_gtab), get_full_str());
+    if (gcin_win_color_use)
+      gtk_label_set_markup(GTK_LABEL(label_gtab), get_full_str());
+    else
+      gtk_label_set_text(GTK_LABEL(label_gtab), get_full_str());
   }
 
   minimize_win_gtab();

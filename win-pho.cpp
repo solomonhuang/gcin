@@ -342,7 +342,10 @@ char *get_full_str();
 
 void win_pho_disp_half_full()
 {
-  gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
+  if (gcin_win_color_use)
+     gtk_label_set_markup(GTK_LABEL(label_pho), get_full_str()); 
+  else
+     gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
 
   if (current_CS->im_state == GCIN_STATE_CHINESE && (!current_CS->b_half_full_char))
     gtk_widget_hide(label_full);
