@@ -16,6 +16,7 @@ void extract_gtab_key(int start, int len, void *out);
 gboolean check_gtab_fixed_mismatch(int idx, char *mtch, int plen);
 void mask_tone(phokey_t *pho, int plen, char *tone_mask);
 
+
 static int tsin_parse_len;
 
 void set_tsin_parse_len(int len)
@@ -232,6 +233,7 @@ next:
     dbg("st:%d plen:%d zz muse:%d ma:%d noma:%d  score:%.4e %.4e\n", start, plen,
         maxusecount, match_phr_N, no_match_ch_N, score, bestscore);
 #endif
+
     if (score > bestscore) {
 #if DBG
       dbg("is best org %.4e\n", bestscore);

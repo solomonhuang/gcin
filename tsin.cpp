@@ -18,7 +18,6 @@ extern GtkWidget *gwin1;
 gint64 key_press_time, key_press_time_ctrl;
 extern gboolean b_hsu_kbm;
 extern gboolean test_mode;
-
 extern char *pho_chars[];
 
 TSIN_ST tss;

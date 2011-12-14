@@ -167,6 +167,9 @@ gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_pho_near), FALSE);
   }
 
   gtk_widget_show_all(gwin_pho_near);
+#if WIN32
+  gtk_window_present(GTK_WINDOW(gwin_pho_near));
+#endif
 }
 
 void close_win_pho_near()

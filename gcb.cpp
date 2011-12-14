@@ -212,6 +212,9 @@ static void get_mouse_button( GtkWidget *widget,GdkEventButton *event, gpointer 
     }
 
     gtk_window_present(GTK_WINDOW(mainwin));
+//    dbg("widget %x\n", widget);
+    gtk_widget_set_can_default(widget, TRUE);
+    gtk_widget_grab_default(widget);
     set_snoop_button(widget);
   } else
   if (event->button == 2) {

@@ -456,7 +456,7 @@ add_columns (GtkTreeView *treeview)
 #if UNIX
 	  _(_L("Ctrl-Shift 循環")),
 #else
-	  _(_L("Ctrl-Shift 循環(必須關閉Windows按鍵")),
+	  _(_L("Ctrl-Shift 循環\n需關閉Windows按鍵")),
 #endif
 	  renderer, "active", COLUMN_CYCLE,
                                                NULL);

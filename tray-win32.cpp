@@ -365,7 +365,7 @@ void load_tray_icon_win32()
 
 #if WIN32
   // when login, creating icon too early may cause block in gtk_status_icon_new_from_file
-  if (win32_tray_disabled)
+  if (win32_tray_disabled || !gcin_status_tray)
     return;
 #endif
 
