@@ -333,6 +333,7 @@ void create_win_gtab()
 
   gwin_gtab = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_gtab), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW(gwin_gtab), FALSE);
 #if WIN32
   set_no_focus(gwin_gtab);
 #endif

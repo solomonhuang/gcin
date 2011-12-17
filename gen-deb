@@ -2,7 +2,7 @@
 rm -fr debian
 patch -p1 < $0
 chmod 755 debian/rules
-sed -i "s#9-9#`cat VERSION.gcin | sed -e 's/.pre/~pre/' -e 's/$/-0/'`#" debian/changelog
+sed -i "s#9-9#`cat VERSION.gcin | sed -e 's/.pre/~pre/' -e 's/$/-3/'`#" debian/changelog
 exec dpkg-buildpackage -b
 --- a/debian/changelog
 +++ b/debian/changelog
@@ -11,7 +11,7 @@ exec dpkg-buildpackage -b
 +
 +  * New snapshot.
 +
-+ -- Kan-Ru Chen <koster@debian.org>  Mon, 28 Feb 2011 18:07:18 +0800
++ -- Edward Liu <xxxx@yyy.org>  Wed, 14 Dec 2011 22:07:18 +0800
 --- a/debian/ckqt.sh
 +++ b/debian/ckqt.sh
 @@ -0,0 +1,16 @@
@@ -29,7 +29,7 @@ exec dpkg-buildpackage -b
 +fi
 +mkdir -p debian/gcin/usr/lib/gtk-2.0/2.10.0
 +mv debian/gcin/usr/lib/gtk-2.0/immodules debian/gcin/usr/lib/gtk-2.0/2.10.0/
-+/usr/lib/libgtk2.0-0/gtk-query-immodules-2.0 debian/gcin/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so | grep gcin | tail -n 1 >> debian/gcin/usr/lib/gtk-2.0/2.10.0/immodule-files.d/gcin.immodules
++/usr/bin/gtk-query-immodules-2.0 debian/gcin/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so | grep gcin | tail -n 1 >> debian/gcin/usr/lib/gtk-2.0/2.10.0/immodule-files.d/gcin.immodules
 +true
 --- a/debian/compat
 +++ b/debian/compat
@@ -41,7 +41,7 @@ exec dpkg-buildpackage -b
 +Source: gcin
 +Section: utils
 +Priority: optional
-+Maintainer: Kan-Ru Chen <koster@debian.org>
++Maintainer: Edward Liu <xxxx@yyyy.org>
 +Homepage: http://www.csie.nctu.edu.tw/~cp76/gcin/
 +Vcs-Git: git://git.debian.org/git/users/koster/gcin.git
 +Vcs-Browser: http://git.debian.org/?p=users/koster/gcin.git;a=summary
@@ -68,7 +68,7 @@ exec dpkg-buildpackage -b
 --- a/debian/gcin.immodules
 +++ b/debian/gcin.immodules
 @@ -0,0 +1 @@
-+"/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so" 
++"/usr/lib/gtk-2.0/2.10.0/immodules/im-gcin.so"
 --- a/debian/im-switch/gcin
 +++ b/debian/im-switch/gcin
 @@ -0,0 +1,15 @@
@@ -94,14 +94,6 @@ exec dpkg-buildpackage -b
 +im-client/gcin-im-client-attr.h usr/include
 +debian/im-switch/gcin etc/X11/xinit/xinput.d
 +debian/gcin.immodules usr/lib/gtk-2.0/2.10.0/immodule-files.d
---- a/debian/links
-+++ b/debian/links
-@@ -0,0 +1,5 @@
-+usr/share/man/man1/phoa2d.1.gz usr/share/man/man1/phod2a.1.gz
-+usr/share/man/man1/sim2trad.1.gz usr/share/man/man1/trad2sim.1.gz
-+usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a.1.gz
-+usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsd2a32.1.gz
-+usr/share/man/man1/tsa2d32.1.gz usr/share/man/man1/tsin2gtab-phrase.1.gz
 --- a/debian/postinst
 +++ b/debian/postinst
 @@ -0,0 +1,32 @@
@@ -116,12 +108,14 @@ exec dpkg-buildpackage -b
 +        /etc/X11/xinit/xinput.d/$2 $3 ;
 +}
 +
++[ -x /usr/bin/gtk-query-immodules-3.0 ] && /usr/bin/gtk-query-immodules-3.0 --update-cache
++
 +case "$1" in
 +    configure)
 +        # Set up default
 +        ua_inst all_ALL gcin  0
 +        ua_inst zh_CN   gcin 30
-+        ua_inst zh_TW   gcin 50
++        ua_inst zh_TW   gcin 70
 +    ;;
 +
 +    abort-upgrade|abort-remove|abort-deconfigure)
@@ -151,6 +145,8 @@ exec dpkg-buildpackage -b
 +        /etc/X11/xinit/xinput.d/$2 ;
 +}
 +
++[ -x /usr/bin/gtk-query-immodules-3.0 ] && /usr/bin/gtk-query-immodules-3.0 --update-cache
++
 +case "$1" in
 +    remove|upgrade|deconfigure)
 +        ua_remove all_ALL gcin
@@ -179,7 +175,7 @@ exec dpkg-buildpackage -b
 +	sed -i 's~/usr/lib/~/usr/share/~' qt-im/Makefile
 +	sed -i 's~/usr/$$(LIB)/~/usr/share/~' qt4-im/Makefile
 +	sed -i 's~lib64~lib64foo~' configure
-+	./configure --prefix=/usr --use_i18n=Y --use_qt3=Y
++	./configure --prefix=/usr --use_i18n=N --use_qt3=Y
 +
 +override_dh_auto_clean:
 +	$(MAKE) clean

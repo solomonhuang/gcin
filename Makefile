@@ -222,7 +222,6 @@ install:
 	fi
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install
-	$(MAKE) -C man install
 	if [ $(USE_I18N) = 'Y' ]; then $(MAKE) -C po install; fi
 
 clean:
@@ -235,7 +234,6 @@ clean:
 	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im clean; fi
 	$(MAKE) -C qt-im clean
 	$(MAKE) -C qt4-im clean
-	$(MAKE) -C man clean
 	$(MAKE) -C menu clean
 	$(MAKE) -C po clean
 	rm -f *.o *.E *.db *.pico *.so config.mak tags $(PROGS) gcin-nocur $(PROGS_CV) \

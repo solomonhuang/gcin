@@ -491,6 +491,7 @@ void create_win0()
 #endif
   gwin0 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin0), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW(gwin0), FALSE);
 #if WIN32
   set_no_focus(gwin0);
 #endif

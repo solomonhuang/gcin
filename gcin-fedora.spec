@@ -122,7 +122,6 @@ fi
 %{_datadir}/gcin/
 %{_datadir}/icons/gcin/
 %{_datadir}/icons/gcin*.png
-%{_mandir}/*/*
 %{_libdir}/gcin/*
 
 %files gtk2
