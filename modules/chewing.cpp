@@ -201,6 +201,7 @@ module_init_win (GCIN_module_main_functions *pFuncs)
 
     g_pWinChewing = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_has_resize_grip (GTK_WINDOW (g_pWinChewing), FALSE);
+    gtk_window_set_resizable(GTK_WINDOW(g_pWinChewing), FALSE);
 
     gtk_window_set_default_size (GTK_WINDOW (g_pWinChewing), 32, 12);
 

@@ -1170,6 +1170,8 @@ int module_init_win(GCIN_module_main_functions *funcs)
 
   win_anthy = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(win_anthy), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW(win_anthy), FALSE);
+
   gtk_window_set_default_size(GTK_WINDOW (win_anthy), 40, 50);
 
 

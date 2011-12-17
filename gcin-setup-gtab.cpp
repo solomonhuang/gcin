@@ -230,6 +230,17 @@ static GtkWidget *create_auto_select_by_phrase_opts()
 }
 
 
+int html_browser(char *fname);
+
+static gboolean cb_gtab_help( GtkWidget *widget,
+                                   GdkEvent  *event,
+                                   gpointer   data )
+{
+	html_browser("http://hyperrate.com/thread.php?tid=25947");
+}
+
+
+
 GtkWidget *create_en_pho_key_sel(char *s);
 
 void create_gtab_conf_window()
@@ -474,6 +485,15 @@ void create_gtab_conf_window()
 
   GTK_WIDGET_SET_FLAGS (button_ok, GTK_CAN_DEFAULT);
   gtk_widget_grab_default (button_ok);
+
+
+  GtkWidget *button_help = gtk_button_new_from_stock (GTK_STOCK_HELP);
+  gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_help, FALSE, FALSE, 0);
+
+  g_signal_connect (G_OBJECT (button_help), "clicked",
+                            G_CALLBACK (cb_gtab_help),
+                            G_OBJECT (gcin_gtab_conf_window));
+
 
   gtk_widget_show_all (gcin_gtab_conf_window);
 

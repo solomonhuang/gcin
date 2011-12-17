@@ -140,8 +140,7 @@ restart:
 }
 #endif
 
-
-
+int is_special_user;
 
 static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Display *dpy)
 {
@@ -162,6 +161,12 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   char *addr;
   Server_IP_port srv_ip_port;
   u_char *pp;
+
+  int uid = getuid();
+  if (uid > 0 && uid < 500) {
+    is_special_user = TRUE;
+//    return;
+  }
 #else
   HANDLE sockfd;
 #endif
@@ -183,6 +188,8 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
 
 #define MAX_TRY 3
   int loop;
+
+  if (!is_special_user)
   for(loop=0; loop < MAX_TRY; loop++) {
     if ((gcin_win=find_gcin_window(dpy))!=None || getenv("GCIN_IM_CLIENT_NO_AUTO_EXEC"))
       break;
@@ -372,7 +379,7 @@ next:
 
 static void validate_handle(GCIN_client_handle *gcin_ch)
 {
-  if (gcin_ch->fd > 0)
+  if (gcin_ch->fd > 0 || is_special_user)
     return;
 
   gcin_im_client_reopen(gcin_ch, gcin_ch->disp);
@@ -577,8 +584,8 @@ static int handle_write(GCIN_client_handle *handle, void *ptr, int n)
 
 void gcin_im_client_focus_in(GCIN_client_handle *handle)
 {
-  if (!handle)
-	  return;
+  if (!handle || is_special_user)
+    return;
 
   GCIN_req req;
 //  dbg("gcin_im_client_focus_in\n");
@@ -622,14 +629,16 @@ void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr)
   GCIN_req req;
   GCIN_reply reply;
 
-  if (!handle)
+  if (rstr)
+    *rstr = NULL;
+
+  if (!handle || is_special_user)
     return;
 
 #if DBG
   dbg("gcin_im_client_focus_out2\n");
 #endif
   handle->flag &= ~FLAG_GCIN_client_handle_has_focus;
-  *rstr = NULL;
 
   if (!gen_req(handle, GCIN_req_focus_out2, &req))
     return;
@@ -671,6 +680,10 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
   GCIN_req req;
 
   *rstr = NULL;
+
+  if (is_special_user) {
+      return 0;
+  }
 
   if (!gen_req(handle, event_type, &req))
     return 0;
@@ -753,7 +766,7 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
 
 void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y)
 {
-  if (!handle)
+  if (!handle || is_special_user)
     return;
 
 //  dbg("gcin_im_client_set_cursor_location %d   %d,%d\n", handle->flag, x, y);
@@ -777,8 +790,8 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y
 // in win32, if win is NULL, this means gcin_im_client_set_cursor_location(x,y) is screen position
 void gcin_im_client_set_window(GCIN_client_handle *handle, Window win)
 {
-  if (!handle)
-	  return;
+  if (!handle || is_special_user)
+    return;
 //  dbg("gcin_im_client_set_window %x\n", win);
 #if UNIX
   if (!win)
@@ -798,7 +811,7 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
   dbg("gcin_im_client_set_flags\n");
 #endif
 
-  if (!handle)
+  if (!handle || is_special_user)
     return;
 
   if (!gen_req(handle, GCIN_req_set_flags, &req))
@@ -831,7 +844,7 @@ void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_
 {
   GCIN_req req;
 
-  if (!handle)
+  if (!handle || is_special_user)
     return;
 
   if (!gen_req(handle, GCIN_req_set_flags, &req))
@@ -859,7 +872,7 @@ int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREE
     )
 {
   *str=NULL;
-  if (!handle)
+  if (!handle || is_special_user)
     return 0;
 
   int attN, tcursor, str_len;
@@ -936,8 +949,8 @@ err_ret:
 
 void gcin_im_client_reset(GCIN_client_handle *handle)
 {
-  if (!handle)
-	  return;
+  if (!handle || is_special_user)
+    return;
 
   GCIN_req req;
 #if DBG

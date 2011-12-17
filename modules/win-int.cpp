@@ -148,6 +148,8 @@ void create_win_intcode()
 
   gwin_int = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_int), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW(gwin_int), FALSE);
+
 #if WIN32
   gmf.mf_set_no_focus(gwin_int);
 #endif

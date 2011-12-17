@@ -162,13 +162,11 @@ static void shutdown_client(HANDLE fd)
   gcin_clients[idx].fd = NULL;
 #endif
 
-#if UNIX
+#if UNIX && 0
   int uid = getuid();
   struct passwd *pwd;
-  if ((pwd=getpwuid(uid)) &&
-      (!strcmp(pwd->pw_name, "gdm") || !strcmp(pwd->pw_name, "kdm"))) {
+  if (uid>0 && uid<500)
     exit(0);
-  }
 #endif
 #if UNIX
   close(fd);
