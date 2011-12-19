@@ -2,9 +2,9 @@
 倉頡 1 cj.gtab cj.png
 #標點倉頡 4 cj-punc.gtab cj-punc.png
 #輕鬆 2 ez7.gtab
-倉五 2 cj5.gtab cj5.png
 ###### 五四三倉頡會由詞庫自動選字  http://hyperrate.com/thread.php?tid=12828
 五四三倉頡 2 cj543.gtab cj5.png
+倉五 2 cj5.gtab cj5.png
 注音 3 !PHO juyin.png
 小鍵盤 , symbols.gtab symbols.png
 # ↓↓↓ ~/.gcin/symbol-table
@@ -16,6 +16,7 @@
 #大易 7 gdayi3.gtab dayi3.png
 小行列 8 ar30.gtab ar30.png
 行列 8 ar30-big.gtab ar30.png
+行列31 8 ar31.gtab ar30.png
 嘸蝦米 9 noseeing.gtab noseeing.png
 簡易 - simplex.gtab simplex.png
 標點簡易 - simplex-punc.gtab simplex.png

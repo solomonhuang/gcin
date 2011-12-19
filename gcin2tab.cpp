@@ -288,6 +288,11 @@ int main(int argc, char **argv)
       th.flag |= FLAG_GTAB_DISP_PARTIAL_MATCH;
       cmd_arg(&cmd, &arg);
     } else
+    if (sequ(cmd,"%flag_disp_full_match")) {
+      dbg("flag_disp_full_match\n");
+      th.flag |= FLAG_GTAB_DISP_FULL_MATCH;
+      cmd_arg(&cmd, &arg);
+    } else
       break;
   }
 

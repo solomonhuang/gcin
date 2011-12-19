@@ -119,10 +119,10 @@ void load_setttings()
 
   gtab_dup_select_bell = get_gcin_conf_int(GTAB_DUP_SELECT_BELL, 0);
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);
-  gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, GTAB_AUTO_SELECT_BY_PHRASE_AUTO);
-  gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, 1);
+  gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, GTAB_OPTION_AUTO);
+  gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, GTAB_OPTION_AUTO);
   gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 0);
-  gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, 1);
+  gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, GTAB_OPTION_AUTO);
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
   gtab_disp_im_name = get_gcin_conf_int(GTAB_DISP_IM_NAME, 1);
   gtab_invalid_key_in = get_gcin_conf_int(GTAB_INVALID_KEY_IN, 1);

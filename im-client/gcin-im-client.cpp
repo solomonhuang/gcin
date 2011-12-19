@@ -139,8 +139,9 @@ restart:
   return NULL;
 }
 #endif
-
+#if UNIX
 int is_special_user;
+#endif
 
 static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Display *dpy)
 {
@@ -165,7 +166,6 @@ static GCIN_client_handle *gcin_im_client_reopen(GCIN_client_handle *gcin_ch, Di
   int uid = getuid();
   if (uid > 0 && uid < 500) {
     is_special_user = TRUE;
-//    return;
   }
 #else
   HANDLE sockfd;
@@ -379,8 +379,12 @@ next:
 
 static void validate_handle(GCIN_client_handle *gcin_ch)
 {
-  if (gcin_ch->fd > 0 || is_special_user)
+  if (gcin_ch->fd > 0)
     return;
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   gcin_im_client_reopen(gcin_ch, gcin_ch->disp);
 }
@@ -397,7 +401,8 @@ GCIN_client_handle *gcin_im_client_open(Display *disp)
 void gcin_im_client_close(GCIN_client_handle *handle)
 {
   if (!handle)
-	  return;
+    return;
+
   if (handle->fd > 0)
 #if WIN32
     CloseHandle((HANDLE)handle->fd);
@@ -584,8 +589,12 @@ static int handle_write(GCIN_client_handle *handle, void *ptr, int n)
 
 void gcin_im_client_focus_in(GCIN_client_handle *handle)
 {
-  if (!handle || is_special_user)
+  if (!handle)
     return;
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   GCIN_req req;
 //  dbg("gcin_im_client_focus_in\n");
@@ -608,6 +617,10 @@ void gcin_im_client_focus_out(GCIN_client_handle *handle)
 {
   if (!handle)
     return;
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   GCIN_req req;
 //  dbg("gcin_im_client_focus_out\n");
@@ -632,8 +645,13 @@ void gcin_im_client_focus_out2(GCIN_client_handle *handle, char **rstr)
   if (rstr)
     *rstr = NULL;
 
-  if (!handle || is_special_user)
+  if (!handle)
     return;
+
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
 #if DBG
   dbg("gcin_im_client_focus_out2\n");
@@ -680,10 +698,10 @@ static int gcin_im_client_forward_key_event(GCIN_client_handle *handle,
   GCIN_req req;
 
   *rstr = NULL;
-
-  if (is_special_user) {
-      return 0;
-  }
+#if UNIX
+  if (is_special_user)
+    return 0;
+#endif
 
   if (!gen_req(handle, event_type, &req))
     return 0;
@@ -766,8 +784,12 @@ int gcin_im_client_forward_key_release(GCIN_client_handle *handle,
 
 void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y)
 {
-  if (!handle || is_special_user)
+  if (!handle)
     return;
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
 //  dbg("gcin_im_client_set_cursor_location %d   %d,%d\n", handle->flag, x, y);
 
@@ -790,10 +812,13 @@ void gcin_im_client_set_cursor_location(GCIN_client_handle *handle, int x, int y
 // in win32, if win is NULL, this means gcin_im_client_set_cursor_location(x,y) is screen position
 void gcin_im_client_set_window(GCIN_client_handle *handle, Window win)
 {
-  if (!handle || is_special_user)
+  if (!handle)
     return;
 //  dbg("gcin_im_client_set_window %x\n", win);
+
 #if UNIX
+  if (is_special_user)
+    return;
   if (!win)
     return;
 #endif
@@ -811,8 +836,13 @@ void gcin_im_client_set_flags(GCIN_client_handle *handle, int flags, int *ret_fl
   dbg("gcin_im_client_set_flags\n");
 #endif
 
-  if (!handle || is_special_user)
+  if (!handle)
     return;
+
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   if (!gen_req(handle, GCIN_req_set_flags, &req))
     return;
@@ -844,8 +874,13 @@ void gcin_im_client_clear_flags(GCIN_client_handle *handle, int flags, int *ret_
 {
   GCIN_req req;
 
-  if (!handle || is_special_user)
+  if (!handle)
     return;
+
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   if (!gen_req(handle, GCIN_req_set_flags, &req))
     return;
@@ -872,8 +907,13 @@ int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREE
     )
 {
   *str=NULL;
-  if (!handle || is_special_user)
+  if (!handle)
     return 0;
+
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   int attN, tcursor, str_len;
 #if DBG
@@ -949,8 +989,13 @@ err_ret:
 
 void gcin_im_client_reset(GCIN_client_handle *handle)
 {
-  if (!handle || is_special_user)
+  if (!handle)
     return;
+
+#if UNIX
+  if (is_special_user)
+    return;
+#endif
 
   GCIN_req req;
 #if DBG

@@ -5,6 +5,8 @@
 %endkey !/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 %space_style 2
 %keep_key_case
+%flag_disp_partial_match
+%flag_disp_full_match
 %keyname begin
 !	!
 /	/

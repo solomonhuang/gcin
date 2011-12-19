@@ -5,6 +5,8 @@
 %space_style 4
 #%keep_key_case
 %phase_auto_skip_endkey
+%flag_disp_partial_match
+%flag_disp_full_match
 %keyname begin
 a 1-
 b 5v

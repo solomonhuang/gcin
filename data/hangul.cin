@@ -3,6 +3,8 @@
 #%cncoding UTF-8
 %selkey 123456789
 %keep_key_case
+%flag_disp_partial_match
+%flag_disp_full_match
 %keyname begin
 A Ａ
 B Ｂ
@@ -6041,6 +6043,7 @@ ddoich 뙻
 ddoech 뙻
 Doich 뙻
 Doech 뙻
+
 ddoik 뙼
 ddoek 뙼
 Doik 뙼
@@ -10597,6 +10600,7 @@ Boaj 뽲
 Boaz 뽲
 Bwaj 뽲
 Bwaz 뽲
+
 bboach 뽳
 bbwach 뽳
 Boach 뽳
@@ -15952,6 +15956,7 @@ zeoilb 젧
 jels 젨
 jeoils 젨
 zels 젨
+
 zeoils 젨
 jelt 젩
 jeoilt 젩
@@ -25702,6 +25707,7 @@ puss 풌
 pung 풍
 puj 풎
 puz 풎
+
 puch 풏
 puk 풐
 put 풑

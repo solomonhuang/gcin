@@ -34,20 +34,13 @@ extern char **seltab;
 
 gboolean use_tsin_sel_win()
 {
-  return
-//  !gtab_pre_select && !gtab_disp_partial_match &&
-  gtab_vertical_select && gtab_phrase_pre_select;
-}
-
-static gboolean disp_partial_match_on()
-{
- return gtab_disp_partial_match || (cur_inmd->flag&FLAG_GTAB_DISP_PARTIAL_MATCH)!=0;
+  return  gtab_vertical_select && gtab_phrase_pre_select;
 }
 
 
-static gboolean gtab_pre_select_on()
+static gboolean gtab_pre_select_or_partial_on()
 {
- return gtab_pre_select || (cur_inmd->flag&FLAG_GTAB_DISP_PARTIAL_MATCH)!=0;
+ return gtab_pre_select_on() || (cur_inmd->flag&FLAG_GTAB_DISP_PARTIAL_MATCH)!=0;
 }
 
 gboolean same_query_show_pho_win()
@@ -749,7 +742,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
     } else {
       extern gboolean b_use_full_space;
 
-      if (!gtab_vertical_select && disp_partial_match_on()) {
+      if (!gtab_vertical_select && gtab_disp_partial_match_on()) {
          if (b_use_full_space)
            strcat(tt, _(_L(" 　 ")));
          else {
@@ -769,7 +762,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
   if (len && tt[len-1] == '\n')
     tt[len-1] = 0;
 
-  if (gtab_pre_select_on() || ggg.wild_mode || ggg.spc_pressed || ggg.last_full || force_disp) {
+  if (gtab_pre_select_or_partial_on() || ggg.wild_mode || ggg.spc_pressed || ggg.last_full || force_disp) {
     disp_gtab_sel(tt);
   }
 }
@@ -1054,7 +1047,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 shift_proc:
   if (shift_m && !strchr(cur_inmd->selkey, key) && !ggg.more_pg && key>=' ' && key < 0x7e &&
        key!='*' && (key!='?' || gtab_shift_phrase_key && !ggg.ci)) {
-    dbg("uuuuuuuuuu\n");
     if (gtab_shift_phrase_key) {
       if (tss.pre_selN && shift_char_proc(key, kbstate))
         return TRUE;
@@ -1451,7 +1443,7 @@ keypad_proc:
 #if 1 // for dayi, testcase :  6 space keypad6
       int vv = pselkey - cur_inmd->selkey;
       if (pselkey && tss.pre_selN && !ggg.gtab_buf_select && (tss.ctrl_pre_sel||
-          ((!inkey||ggg.spc_pressed||is_keypad)&&!gtab_disp_partial_match&&!gtab_pre_select))) {
+          ((!inkey||ggg.spc_pressed||is_keypad)&&! gtab_disp_partial_match_on() && !gtab_pre_select_on()))) {
         if (gtab_pre_select_idx(vv))
           return TRUE;
       } else
@@ -1481,7 +1473,7 @@ keypad_proc:
       }
 #endif
 
-//      dbg("iii %x sel1st_i:%d\n", pselkey, ggg.sel1st_i);
+//      dbg("iii %x sel1st_i:%d auto:%d\n", pselkey, ggg.sel1st_i, AUTO_SELECT_BY_PHRASE);
       if (seltab[ggg.sel1st_i][0] && !ggg.wild_mode &&
            (gtab_full_space_auto_first||ggg.spc_pressed||ggg.last_full) ) {
         if (AUTO_SELECT_BY_PHRASE && poo.same_pho_query_state != SAME_PHO_QUERY_gtab_input)
@@ -1723,12 +1715,12 @@ refill:
 
     int shiftb=(KEY_N - 1 -ggg.ci) * KeyBits;
 
-//    if (gtab_disp_partial_match)
+//    if (gtab_disp_partial_match_on)
     while((CONVT2(cur_inmd, j) & vmaskci)==ggg.kval && j<oE1) {
       int fff=cur_inmd->keycol[(CONVT2(cur_inmd, j)>>shiftb) & cur_inmd->kmask];
       u_char *tbl_ch = tblch(j);
 
-      if (disp_partial_match_on() && (!seltab[fff][0] || seltab_phrase[fff] ||
+      if (gtab_disp_partial_match_on() && (!seltab[fff][0] || seltab_phrase[fff] ||
            (bchcmp(seltab[fff], tbl_ch)>0 && fff > ggg.exa_match))) {
         seltab_phrase[fff] = load_seltab(j, fff);
         ggg.defselN++;
@@ -1831,7 +1823,7 @@ next_pg:
       return TRUE;
     } else
     if (!ggg.more_pg) {
-      if (gtab_dup_select_bell && (disp_partial_match_on() || gtab_pre_select_on())) {
+      if (gtab_dup_select_bell && (gtab_disp_partial_match_on() || gtab_pre_select_or_partial_on())) {
         if (ggg.spc_pressed || gtab_full_space_auto_first || ggg.last_full && gtab_press_full_auto_send)
           bell();
       }
@@ -1839,7 +1831,7 @@ next_pg:
   }
 
 Disp_opt:
-  if (disp_partial_match_on() || gtab_pre_select_on() || ((ggg.exa_match > 1 || ggg.more_pg) &&
+  if (gtab_disp_partial_match_on() || gtab_pre_select_or_partial_on() || ((ggg.exa_match > 1 || ggg.more_pg) &&
     (ggg.spc_pressed || gtab_press_full_auto_send ||
     (ggg.ci==cur_inmd->MaxPress && (_gtab_space_auto_first & GTAB_space_auto_first_full))) ) ) {
        disp_selection(phrase_selected);

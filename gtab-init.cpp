@@ -33,8 +33,28 @@ static char keyrow[]=
 gboolean gtab_phrase_on()
 {
   int val = cur_inmd && cur_inmd->DefChars >500 &&
-(gtab_auto_select_by_phrase==GTAB_AUTO_SELECT_BY_PHRASE_YES||
-(gtab_auto_select_by_phrase==GTAB_AUTO_SELECT_BY_PHRASE_AUTO&&(cur_inmd->flag&FLAG_AUTO_SELECT_BY_PHRASE)));
+(gtab_auto_select_by_phrase==GTAB_OPTION_YES||
+(gtab_auto_select_by_phrase==GTAB_OPTION_AUTO&&(cur_inmd->flag&FLAG_AUTO_SELECT_BY_PHRASE)));
+
+return val;
+}
+
+
+gboolean gtab_pre_select_on()
+{
+  int val = cur_inmd &&
+(gtab_pre_select==GTAB_OPTION_YES||
+(gtab_pre_select==GTAB_OPTION_AUTO&&(cur_inmd->flag&FLAG_GTAB_DISP_FULL_MATCH)));
+
+return val;
+}
+
+
+gboolean gtab_disp_partial_match_on()
+{
+  int val = cur_inmd &&
+(gtab_disp_partial_match==GTAB_OPTION_YES||
+(gtab_disp_partial_match==GTAB_OPTION_AUTO&&(cur_inmd->flag&FLAG_GTAB_DISP_PARTIAL_MATCH)));
 
 return val;
 }
