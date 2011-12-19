@@ -435,8 +435,9 @@ void create_win_sym()
 
   gwin_sym = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_sym), FALSE);
+#if UNIX
   gtk_window_set_resizable(GTK_WINDOW(gwin_sym), FALSE);
-
+#endif
 #if WIN32
   set_no_focus(gwin_sym);
 #endif

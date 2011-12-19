@@ -130,7 +130,7 @@ void load_setttings()
   gtab_hide_row2 = get_gcin_conf_int(GTAB_HIDE_ROW2, 0);
   gtab_in_row1 = get_gcin_conf_int(GTAB_IN_ROW1, 0);
   gtab_capslock_in_eng = get_gcin_conf_int(GTAB_CAPSLOCK_IN_ENG, 1);
-  gtab_vertical_select = get_gcin_conf_int(GTAB_VERTICAL_SELECT, 0);
+  gtab_vertical_select = get_gcin_conf_int(GTAB_VERTICAL_SELECT, GTAB_OPTION_AUTO);
   gtab_unique_auto_send = get_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND, 0);
   gtab_que_wild_card = get_gcin_conf_int(GTAB_QUE_WILD_CARD, 0);
   gtab_phrase_pre_select = get_gcin_conf_int(GTAB_PHRASE_PRE_SELECT, 1);

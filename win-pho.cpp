@@ -129,7 +129,9 @@ void create_win_pho()
   gwin_pho = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_default_size(GTK_WINDOW(gwin_pho), 1 ,1);
   gtk_window_set_has_resize_grip(GTK_WINDOW(gwin_pho), FALSE);
+#if UNIX
   gtk_window_set_resizable(GTK_WINDOW(gwin_pho), FALSE);
+#endif
 #if WIN32
   set_no_focus(gwin_pho);
 #endif
@@ -344,7 +346,7 @@ char *get_full_str();
 void win_pho_disp_half_full()
 {
   if (gcin_win_color_use)
-     gtk_label_set_markup(GTK_LABEL(label_pho), get_full_str()); 
+     gtk_label_set_markup(GTK_LABEL(label_pho), get_full_str());
   else
      gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
 

@@ -250,7 +250,7 @@ gcin.spec:	gcin.spec.in
 	rm -f $@
 	sed -e "s/__gcin_version__/$(GCIN_VERSION)/" < $< > $@
 
-gcin-fedora.spec:	gcin-fedora.spec.in
+gcin-fedora.spec:	gcin-fedora.spec.in VERSION.gcin
 	rm -f $@
 	sed -e "s/__gcin_version__/$(GCIN_VERSION)/" < $< > $@
 

@@ -912,7 +912,7 @@ int gcin_im_client_get_preedit(GCIN_client_handle *handle, char **str, GCIN_PREE
 
 #if UNIX
   if (is_special_user)
-    return;
+    return 0;
 #endif
 
   int attN, tcursor, str_len;

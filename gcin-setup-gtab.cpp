@@ -12,7 +12,7 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_shift_phrase_key,
                  *check_button_gtab_hide_row2,
                  *check_button_gtab_in_row1,
-                 *check_button_gtab_vertical_select,
+                 *opt_gtab_vertical_select,
                  *check_button_gtab_unique_auto_send,
                  *check_button_gtab_que_wild_card,
                  *check_button_gtab_phrase_pre_select;
@@ -86,9 +86,7 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_IN_ROW1,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_in_row1)));
 
-  save_gcin_conf_int(GTAB_VERTICAL_SELECT,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_vertical_select)));
-
+  save_menu_val(GTAB_VERTICAL_SELECT, opt_gtab_vertical_select);
 
   save_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send)));
@@ -238,7 +236,8 @@ static gboolean cb_gtab_help( GtkWidget *widget,
                                    GdkEvent  *event,
                                    gpointer   data )
 {
-	html_browser("http://hyperrate.com/thread.php?tid=25947");
+  html_browser("http://hyperrate.com/topic-files-dir/47/25947-m3_JEIC5FL/gtab_setting_help.html");
+  return TRUE;
 }
 
 
@@ -348,10 +347,7 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_gtab_l), hbox_gtab_vertical_select, FALSE, FALSE, 0);
   GtkWidget *label_gtab_vertical_select = gtk_label_new(_(_L("垂直選擇")));
   gtk_box_pack_start (GTK_BOX (hbox_gtab_vertical_select), label_gtab_vertical_select,  FALSE, FALSE, 0);
-  check_button_gtab_vertical_select = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_vertical_select), check_button_gtab_vertical_select,  FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_vertical_select),
-     gtab_vertical_select);
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_vertical_select), create_auto_select_by_phrase_opts(&opt_gtab_vertical_select, gtab_vertical_select),  FALSE, FALSE, 0);
 
   GtkWidget *hbox_gtab_press_full_auto_send = gtk_hbox_new (FALSE, SPC);
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_press_full_auto_send, FALSE, FALSE, 0);

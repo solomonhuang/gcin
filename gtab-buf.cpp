@@ -24,6 +24,7 @@ void inc_gtab_usecount(char *str), ClrSelArea();
 void lookup_gtabn(char *ch, char *out);
 char *htmlspecialchars(char *s, char out[]);
 void hide_gtab_pre_sel();
+gboolean gtab_vertical_select_on();
 
 extern gint64 key_press_time, key_press_time_ctrl;
 
@@ -1094,12 +1095,12 @@ void gtab_scan_pre_select(gboolean b_incr)
 
   for(i=0;i<tss.pre_selN; i++) {
     char ts[(MAX_PHRASE_LEN+3) * CH_SZ + 1];
-    char *br= (i < tss.pre_selN-1 && gtab_vertical_select)?"\n":"";
+    char *br= (i < tss.pre_selN-1 && gtab_vertical_select_on())?"\n":"";
 
     sprintf(ts, "<span foreground=\"%s\">%c</span>%s%s", gcin_sel_key_color,
       cur_inmd->selkey[i], tss.pre_sel[i].str, br);
     strcat(tt, ts);
-    if (!gtab_vertical_select && i < tss.pre_selN-1)
+    if (!gtab_vertical_select_on() && i < tss.pre_selN-1)
       strcat(tt, " ");
   }
 

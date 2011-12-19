@@ -5,6 +5,7 @@
 %space_style 4
 #%keep_key_case
 %flag_auto_select_by_phrase
+%flag_vertical_selection
 %endkey `\,'[]/.-;,./1234567890-()~!:
 %keyname begin
 a 日

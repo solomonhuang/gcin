@@ -59,6 +59,16 @@ gboolean gtab_disp_partial_match_on()
 return val;
 }
 
+
+gboolean gtab_vertical_select_on()
+{
+  int val = cur_inmd &&
+(gtab_vertical_select==GTAB_OPTION_YES||
+(gtab_vertical_select==GTAB_OPTION_AUTO&&(cur_inmd->flag&FLAG_GTAB_VERTICAL_SELECTION)));
+
+return val;
+}
+
 int key_col(char cha)
 {
   char *p = strchr(keyrow, cha);

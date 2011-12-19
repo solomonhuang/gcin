@@ -15,6 +15,7 @@
 
 extern gboolean test_mode;
 gboolean gtab_phrase_on();
+gboolean gtab_disp_partial_match_on(), gtab_vertical_select_on(), gtab_pre_select_on();
 void init_seltab(char ***p);
 
 extern gint64 key_press_time, key_press_time_ctrl;
@@ -34,7 +35,7 @@ extern char **seltab;
 
 gboolean use_tsin_sel_win()
 {
-  return  gtab_vertical_select && gtab_phrase_pre_select;
+  return  gtab_vertical_select_on() && gtab_phrase_pre_select;
 }
 
 
@@ -667,7 +668,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
   pgstr[0]=0;
   page_no_str(pgstr);
 
-  if (!gtab_vertical_select) {
+  if (!gtab_vertical_select_on()) {
     if (ggg.more_pg)
       set_page_label(pgstr);
     else
@@ -681,7 +682,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
   int ofs;
   if (!ggg.wild_mode && ggg.exa_match && (_gtab_space_auto_first & GTAB_space_auto_first_any)) {
     strcat(tt, htmlspecialchars(seltab[0], uu));
-    if (gtab_vertical_select)
+    if (gtab_vertical_select_on())
       strcat(tt, "\n");
     else
       strcat(tt, " ");
@@ -707,7 +708,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
       sprintf(www, "<span foreground=\"%s\">%s</span>", gcin_sel_key_color, htmlspecialchars(uu, vvv));
       strcat(tt, www);
 
-      if (gtab_vertical_select)
+      if (gtab_vertical_select_on())
         strcat(tt, " ");
 
       if (phrase_selected && i==ggg.sel1st_i) {
@@ -717,7 +718,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
       } else {
         char uu[MAX_CIN_PHR];
 
-        if (gtab_vertical_select) {
+        if (gtab_vertical_select_on()) {
           utf8cpy_bytes(uu, selback, 120);
           strcat(tt, uu);
         } else {
@@ -737,12 +738,12 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
         }
       }
 
-      if (gtab_vertical_select)
+      if (gtab_vertical_select_on())
         strcat(tt, "\n");
     } else {
       extern gboolean b_use_full_space;
 
-      if (!gtab_vertical_select && gtab_disp_partial_match_on()) {
+      if (!gtab_vertical_select_on() && gtab_disp_partial_match_on()) {
          if (b_use_full_space)
            strcat(tt, _(_L(" 　 ")));
          else {
@@ -752,7 +753,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
     }
   }
 
-  if (gtab_vertical_select && pgstr[0]) {
+  if (gtab_vertical_select_on() && pgstr[0]) {
     char tstr2[16];
     sprintf(tstr2, "(%s)", pgstr);
     strcat(tt, tstr2);

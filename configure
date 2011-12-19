@@ -163,8 +163,8 @@ fi
 
 
 LIB='lib'
-if [ -d /usr/lib64 -a -d /lib64 ]; then
-LIB='lib64'
+if [ -d /usr/lib64foo -a -d /lib64 ]; then
+LIB='lib64foo'
 fi
 
 QT_IM='N'
@@ -239,9 +239,16 @@ if [ $QT_IM = 'N' ]; then
 fi
 
 
+echo $QT4_IM
+
 if [ $QT4_IM = 'N' ]; then
   mv gcin.spec gcin.spec.tmp
   grep -v qt4/plugins/inputmethods gcin.spec.tmp > gcin.spec
+else
+  for i in /usr/share/qt4/bin/moc /usr/lib/qt4/bin/moc
+  do
+	[ -x $i ] && QT4_MOC=$i
+  done
 fi
 
 BUILD_MODULE='N'
@@ -302,6 +309,7 @@ echo "USE_ANTHY=$USE_ANTHY" >> config.mak
 echo "USE_CHEWING=$USE_CHEWING" >> config.mak
 echo "USE_GCB=$use_gcb" >> config.mak
 echo "BUILD_MODULE=$BUILD_MODULE" >> config.mak
+[ $QT4_IM = 'Y' ] && echo "QT4_MOC=$QT4_MOC" >> config.mak
 
 if [ $prefix = /usr/local ]; then
   echo "gcin_ld_run_path=$PWD:\$(gcinlibdir)" >> config.mak

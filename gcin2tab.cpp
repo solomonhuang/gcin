@@ -293,6 +293,11 @@ int main(int argc, char **argv)
       th.flag |= FLAG_GTAB_DISP_FULL_MATCH;
       cmd_arg(&cmd, &arg);
     } else
+    if (sequ(cmd,"%flag_vertical_selection")) {
+      dbg("flag_vertical_selection\n");
+      th.flag |= FLAG_GTAB_VERTICAL_SELECTION;
+      cmd_arg(&cmd, &arg);
+    } else
       break;
   }
 
