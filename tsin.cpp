@@ -1704,7 +1704,8 @@ tab_phrase_end:
 
            return 1;
          }
-         return 0;
+
+         return tss.c_len>0;
        }
 
        int N;

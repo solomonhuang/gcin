@@ -1,5 +1,5 @@
 Name:           gcin
-Version:        2.6.4
+Version:        2.6.5
 Release:        liu%{?dist}
 Summary:        Input method for Traditional Chinese
 

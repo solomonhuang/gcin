@@ -2,6 +2,9 @@
 %ename NewCJ3
 %cname 亂倉打鳥
 %selkey 123456789
+%flag_disp_partial_match
+%flag_disp_full_match
+%flag_vertical_selection
 %keyname begin
 '  、
 ,  ，
