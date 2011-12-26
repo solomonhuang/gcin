@@ -13,7 +13,7 @@ int left_right_button_tips;
 int gcin_im_toggle_keys, gcin_bell_off;
 int gcin_capslock_lower, gcin_eng_phrase_enabled, gcin_init_im_enabled;
 int gcin_win_sym_click_close, gcin_edit_display, gcin_win32_icon;
-int gcin_on_the_spot_key, gcin_tray_hf_win_kbm;
+int gcin_on_the_spot_key, gcin_tray_hf_win_kbm, gcin_punc_auto_send;
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -98,6 +98,8 @@ void load_setttings()
 #endif
 
   gcin_single_state = get_gcin_conf_int(GCIN_SINGLE_STATE, 0);
+  gcin_punc_auto_send = get_gcin_conf_int(GCIN_PUNC_AUTO_SEND, 1);
+
 
   get_gcin_conf_str(GCIN_STR_IM_CYCLE, &gcin_str_im_cycle, "1234567890-=[]\\");
   gcin_remote_client = get_gcin_conf_int(GCIN_REMOTE_CLIENT, 0);
@@ -121,7 +123,7 @@ void load_setttings()
   gtab_space_auto_first = get_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);
   gtab_auto_select_by_phrase = get_gcin_conf_int(GTAB_AUTO_SELECT_BY_PHRASE, GTAB_OPTION_AUTO);
   gtab_pre_select = get_gcin_conf_int(GTAB_PRE_SELECT, GTAB_OPTION_AUTO);
-  gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, 0);
+  gtab_press_full_auto_send = get_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND, GTAB_OPTION_AUTO);
   gtab_disp_partial_match = get_gcin_conf_int(GTAB_DISP_PARTIAL_MATCH, GTAB_OPTION_AUTO);
   gtab_disp_key_codes = get_gcin_conf_int(GTAB_DISP_KEY_CODES, 1);
   gtab_disp_im_name = get_gcin_conf_int(GTAB_DISP_IM_NAME, 1);
@@ -131,7 +133,7 @@ void load_setttings()
   gtab_in_row1 = get_gcin_conf_int(GTAB_IN_ROW1, 0);
   gtab_capslock_in_eng = get_gcin_conf_int(GTAB_CAPSLOCK_IN_ENG, 1);
   gtab_vertical_select = get_gcin_conf_int(GTAB_VERTICAL_SELECT, GTAB_OPTION_AUTO);
-  gtab_unique_auto_send = get_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND, 0);
+  gtab_unique_auto_send = get_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND, GTAB_OPTION_AUTO);
   gtab_que_wild_card = get_gcin_conf_int(GTAB_QUE_WILD_CARD, 0);
   gtab_phrase_pre_select = get_gcin_conf_int(GTAB_PHRASE_PRE_SELECT, 1);
   gtab_in_area_button = get_gcin_conf_int(GTAB_IN_AREA_BUTTON, 1);

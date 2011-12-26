@@ -331,3 +331,21 @@ void win32_init_win(GtkWidget *win)
 }
 #endif
 #endif
+
+
+void box_warn(char *fmt,...)
+{
+  va_list args;
+  char out[4096];
+
+  va_start(args, fmt);
+  vsprintf(out, fmt, args);
+  va_end(args);
+
+  GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE,
+                                   out);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}

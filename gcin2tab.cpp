@@ -298,6 +298,16 @@ int main(int argc, char **argv)
       th.flag |= FLAG_GTAB_VERTICAL_SELECTION;
       cmd_arg(&cmd, &arg);
     } else
+    if (sequ(cmd,"%flag_press_full_auto_send")) {
+      dbg("flag_press_full_auto_send\n");
+      th.flag |= FLAG_GTAB_PRESS_FULL_AUTO_SEND;
+      cmd_arg(&cmd, &arg);
+    } else
+    if (sequ(cmd,"%flag_unique_auto_send")) {
+      dbg("flag_unique_auto_send\n");
+      th.flag |= FLAG_GTAB_UNIQUE_AUTO_SEND;
+      cmd_arg(&cmd, &arg);
+    } else
       break;
   }
 

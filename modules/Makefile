@@ -34,3 +34,7 @@ install:
 
 clean:
 	rm -f *.pico *.so *.o
+.depend:
+	$(CCX) $(CFLAGS) -MM *.cpp > $@
+
+include .depend

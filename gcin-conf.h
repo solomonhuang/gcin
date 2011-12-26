@@ -28,7 +28,7 @@
 #define GCIN_ON_THE_SPOT_KEY "gcin-on-the-spot-key"
 #define GCIN_TRAY_HF_WIN_KBM "gcin-tray-hf-win-kbm"
 #define GCIN_SINGLE_STATE "gcin-single-state"
-
+#define GCIN_PUNC_AUTO_SEND "gcin-punc-auto-send"
 
 #define GCIN_IM_TOGGLE_KEYS "gcin-im-toggle-keys"
 #define DEFAULT_INPUT_METHOD "default-input-method"
@@ -122,6 +122,7 @@ extern int gtab_vertical_select, gtab_unique_auto_send;
 extern int tsin_buffer_size;
 extern int gcin_input_style, gcin_root_x, gcin_root_y, gcin_pop_up_win;
 extern int gcin_status_tray, gcin_tray_hf_win_kbm;
+extern int gcin_punc_auto_send;
 
 extern int tsin_phrase_pre_select;
 extern int tsin_chinese_english_toggle_key;

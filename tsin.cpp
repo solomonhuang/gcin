@@ -1243,7 +1243,7 @@ static gboolean pre_punctuation_sub(KeySym xkey, char shift_punc[], unich_t *cha
       keys[0]=0;
       utf8_pho_keys(pchar, keys);
       add_to_tsin_buf(pchar, &keys[0], 1);
-      if (tsin_cursor_end())
+      if (gcin_punc_auto_send && tsin_cursor_end())
         flush_tsin_buffer();
     }
     return 1;

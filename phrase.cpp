@@ -177,14 +177,14 @@ send_it:
 #if USE_TSIN
       if (current_method_type() == method_type_TSIN && current_CS->im_state == GCIN_STATE_CHINESE) {
         add_to_tsin_buf_str(str);
-        if (tsin_cursor_end())
+        if (gcin_punc_auto_send && tsin_cursor_end())
           flush_tsin_buffer();
       }
       else
 #endif
       if (gtab_phrase_on()) {
         insert_gbuf_nokey(str);
-        if (gtab_cursor_end())
+        if (gcin_punc_auto_send && gtab_cursor_end())
           output_gbuf();
       } else
         send_text(str);

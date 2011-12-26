@@ -5,6 +5,7 @@
 %keep_key_case
 %flag_disp_partial_match
 %flag_disp_full_match
+%flag_unique_auto_send
 %keyname begin
 A Ａ
 B Ｂ
@@ -6782,6 +6783,7 @@ Deuih 띟
 Duih 띟
 ddi 띠
 Di 띠
+
 ddig 띡
 Dig 띡
 ddigg 띢
@@ -7553,6 +7555,7 @@ rwel 뤨
 ruelg 뤩
 rwelg 뤩
 ruelm 뤪
+
 rwelm 뤪
 ruelb 뤫
 rwelb 뤫
@@ -10595,6 +10598,7 @@ Bwang 뽱
 bboaj 뽲
 bboaz 뽲
 bbwaj 뽲
+
 bbwaz 뽲
 Boaj 뽲
 Boaz 뽲

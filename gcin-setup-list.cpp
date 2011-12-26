@@ -35,6 +35,7 @@ static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
        *check_button_gcin_init_im_enabled,
        *check_button_gcin_eng_phrase_enabled,
        *check_button_gcin_win_sym_click_close;
+       *check_button_gcin_punc_auto_send;
 #if USE_GCB
 static GtkWidget *spinner_gcb_position_x, *spinner_gcb_position_y;
 static GtkWidget *spinner_gcb_history_n, *spinner_gcb_button_n;
@@ -274,6 +275,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   save_gcin_conf_int(GCIN_BELL_OFF,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off)));
+
+  save_gcin_conf_int(GCIN_PUNC_AUTO_SEND,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_punc_auto_send)));
 #if UNIX
   save_gcin_conf_int(GCIN_SINGLE_STATE,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gcin_single_state)));
@@ -658,7 +662,7 @@ void create_gtablist_window (void)
   gtk_window_set_position(GTK_WINDOW(gtablist_window), GTK_WIN_POS_MOUSE);
 
   gtk_window_set_has_resize_grip(GTK_WINDOW(gtablist_window), FALSE);
- gtk_window_set_title (GTK_WINDOW (gtablist_window), _(_L("輸入法選擇")));
+ gtk_window_set_title (GTK_WINDOW (gtablist_window), _(_L("gcin 輸入法選擇")));
   gtk_container_set_border_width (GTK_CONTAINER (gtablist_window), 1);
 
   g_signal_connect (G_OBJECT (gtablist_window), "destroy",
@@ -670,10 +674,6 @@ void create_gtablist_window (void)
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (gtablist_window), vbox);
-
-  gtk_box_pack_start (GTK_BOX (vbox),
-                      gtk_label_new (_(_L("gcin 輸入法選擇"))),
-                      FALSE, FALSE, 0);
 
   sw = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sw),
@@ -701,13 +701,23 @@ void create_gtablist_window (void)
 
   gtk_container_add (GTK_CONTAINER (sw), treeview);
 
+
+  GtkWidget *hpan= gtk_hpaned_new ();
+  gtk_box_pack_start (GTK_BOX (vbox), hpan, FALSE, FALSE, 0);
+
+
+  GtkWidget *vboxL = gtk_vbox_new (FALSE, 0);
+  GtkWidget *vboxR = gtk_vbox_new (FALSE, 0);
+  gtk_paned_pack1 (GTK_PANED (hpan), vboxL, TRUE, TRUE);
+  gtk_paned_pack2 (GTK_PANED (hpan), vboxR, TRUE, TRUE);
+
 #if UNIX
-  gtk_box_pack_start (GTK_BOX (vbox), create_im_toggle_keys(), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vboxL), create_im_toggle_keys(), FALSE, FALSE, 0);
 #endif
 
 #if UNIX
   GtkWidget *hbox_gcin_remote_client = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_remote_client, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX(vboxR), hbox_gcin_remote_client, FALSE, FALSE, 0);
   GtkWidget *label_gcin_remote_client = gtk_label_new(_(_L("遠端 client 程式支援 (port 9999-)")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_remote_client), label_gcin_remote_client,  FALSE, FALSE, 0);
   check_button_gcin_remote_client = gtk_check_button_new ();
@@ -717,7 +727,7 @@ void create_gtablist_window (void)
 
 
   GtkWidget *hbox_gcin_init_im_enabled = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_init_im_enabled, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX(vboxL), hbox_gcin_init_im_enabled, FALSE, FALSE, 0);
   GtkWidget *label_gcin_init_im_enabled = gtk_label_new(_(_L("直接進入中文輸入狀態(限非XIM)")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_init_im_enabled), label_gcin_init_im_enabled,  FALSE, FALSE, 0);
   check_button_gcin_init_im_enabled = gtk_check_button_new ();
@@ -728,7 +738,7 @@ void create_gtablist_window (void)
 
 
   GtkWidget *hbox_gcin_shift_space_eng_full = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_shift_space_eng_full, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vboxR), hbox_gcin_shift_space_eng_full, FALSE, FALSE, 0);
   GtkWidget *label_gcin_shift_space_eng_full = gtk_label_new(_(_L("shift-space 進入全形英文模式")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_shift_space_eng_full), label_gcin_shift_space_eng_full,  FALSE, FALSE, 0);
   check_button_gcin_shift_space_eng_full = gtk_check_button_new ();
@@ -738,7 +748,7 @@ void create_gtablist_window (void)
 
 #if UNIX
   GtkWidget *hbox_gcin_single_state = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_single_state, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vboxL), hbox_gcin_single_state, FALSE, FALSE, 0);
   GtkWidget *label_gcin_single_state = gtk_label_new(_(_L("不記憶個別程式的輸入法狀態")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_single_state), label_gcin_single_state,  FALSE, FALSE, 0);
   check_button_gcin_single_state = gtk_check_button_new ();
@@ -748,7 +758,7 @@ void create_gtablist_window (void)
 #endif
 
   GtkWidget *hbox_gcin_eng_phrase_enabled = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_eng_phrase_enabled, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vboxR), hbox_gcin_eng_phrase_enabled, FALSE, FALSE, 0);
   GtkWidget *label_gcin_eng_phrase_enabled = gtk_label_new(_(_L("英數狀態使用 alt-shift 片語")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_eng_phrase_enabled), label_gcin_eng_phrase_enabled,  FALSE, FALSE, 0);
   check_button_gcin_eng_phrase_enabled = gtk_check_button_new ();
@@ -757,7 +767,7 @@ void create_gtablist_window (void)
      gcin_eng_phrase_enabled);
 
   GtkWidget *hbox_phonetic_speak = gtk_hbox_new(FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_phonetic_speak , FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vboxL), hbox_phonetic_speak , FALSE, FALSE, 0);
   GtkWidget *label_phonetic_speak = gtk_label_new(_(_L("輸入時念出發音")));
   gtk_box_pack_start (GTK_BOX (hbox_phonetic_speak), label_phonetic_speak , FALSE, FALSE, 0);
   check_button_phonetic_speak = gtk_check_button_new ();
@@ -767,7 +777,7 @@ void create_gtablist_window (void)
 
 
   GtkWidget *hbox_gcin_win_sym_click_close = gtk_hbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox_gcin_win_sym_click_close, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vboxR), hbox_gcin_win_sym_click_close, FALSE, FALSE, 0);
   GtkWidget *label_gcin_win_sym_click_close = gtk_label_new(_(_L("符號視窗點選後自動關閉")));
   gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_win_sym_click_close,  FALSE, FALSE, 0);
   check_button_gcin_win_sym_click_close = gtk_check_button_new ();
@@ -775,12 +785,25 @@ void create_gtablist_window (void)
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_win_sym_click_close),
      gcin_win_sym_click_close);
 
+
+  GtkWidget *hbox_gcin_bell_off = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vboxR), hbox_gcin_bell_off, FALSE, FALSE, 0);
   GtkWidget *label_gcin_bell_off = gtk_label_new(_(_L("關閉鈴聲")));
-  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close), label_gcin_bell_off,  FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_bell_off), label_gcin_bell_off,  FALSE, FALSE, 0);
   check_button_gcin_bell_off = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gcin_win_sym_click_close),check_button_gcin_bell_off,  FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_bell_off),check_button_gcin_bell_off,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_bell_off),
      gcin_bell_off);
+
+
+  GtkWidget *hbox_gcin_punc_auto_send = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vboxL), hbox_gcin_punc_auto_send, FALSE, FALSE, 0);
+  GtkWidget *label_gcin_punc_auto_send = gtk_label_new(_(_L("結尾標點符號自動送出編輯區內容")));
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_punc_auto_send), label_gcin_punc_auto_send,  FALSE, FALSE, 0);
+  check_button_gcin_punc_auto_send = gtk_check_button_new ();
+  gtk_box_pack_start (GTK_BOX (hbox_gcin_punc_auto_send),check_button_gcin_punc_auto_send,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_punc_auto_send),
+     gcin_punc_auto_send);
 
 
 #if USE_GCB

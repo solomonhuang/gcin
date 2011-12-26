@@ -1734,7 +1734,7 @@ refill:
       j++;
     }
 
-    if (gtab_unique_auto_send) {
+    if (gtab_unique_auto_send_on()) {
       char *first_str=NULL;
       for(i=0; i < page_len(); i++) {
         if (!seltab[i][0])
@@ -1763,7 +1763,7 @@ next_pg:
 
     if (ggg.ci==cur_inmd->MaxPress)
       ggg.last_full=1;
-    int full_send = gtab_press_full_auto_send && ggg.last_full;
+    int full_send = gtab_press_full_auto_send_on() && ggg.last_full;
 
 //    dbg("flag %d\n",!(pendkey && (cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY)));
     if (AUTO_SELECT_BY_PHRASE && !(pendkey && (cur_inmd->flag&FLAG_PHRASE_AUTO_SKIP_ENDKEY))
@@ -1804,7 +1804,7 @@ next_pg:
 
 
     if (ggg.defselN==1 && !ggg.more_pg) {
-      if (ggg.spc_pressed || full_send || gtab_unique_auto_send) {
+      if (ggg.spc_pressed || full_send || gtab_unique_auto_send_on()) {
         if (AUTO_SELECT_BY_PHRASE && poo.same_pho_query_state != SAME_PHO_QUERY_gtab_input)
           insert_gbuf_cursor1_cond(seltab[0], ggg.kval, ggg.exa_match);
         else
@@ -1825,7 +1825,7 @@ next_pg:
     } else
     if (!ggg.more_pg) {
       if (gtab_dup_select_bell && (gtab_disp_partial_match_on() || gtab_pre_select_or_partial_on())) {
-        if (ggg.spc_pressed || gtab_full_space_auto_first || ggg.last_full && gtab_press_full_auto_send)
+        if (ggg.spc_pressed || gtab_full_space_auto_first || ggg.last_full && gtab_press_full_auto_send_on())
           bell();
       }
     }
@@ -1833,7 +1833,7 @@ next_pg:
 
 Disp_opt:
   if (gtab_disp_partial_match_on() || gtab_pre_select_or_partial_on() || ((ggg.exa_match > 1 || ggg.more_pg) &&
-    (ggg.spc_pressed || gtab_press_full_auto_send ||
+    (ggg.spc_pressed || gtab_press_full_auto_send_on() ||
     (ggg.ci==cur_inmd->MaxPress && (_gtab_space_auto_first & GTAB_space_auto_first_full))) ) ) {
        disp_selection(phrase_selected);
   }

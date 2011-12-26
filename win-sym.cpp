@@ -193,7 +193,7 @@ static void cb_button_sym(GtkButton *button, GtkWidget *label)
 #if USE_TSIN
   if (current_method_type() == method_type_TSIN && current_CS->im_state == GCIN_STATE_CHINESE) {
     add_to_tsin_buf_str(str);
-    if (tsin_cursor_end()) {
+    if (gcin_punc_auto_send && tsin_cursor_end()) {
       flush_tsin_buffer();
       output_buffer_call_back();
     } else {
@@ -204,7 +204,7 @@ static void cb_button_sym(GtkButton *button, GtkWidget *label)
 #endif
   if (gtab_phrase_on()) {
     insert_gbuf_nokey(str);
-    if (gtab_cursor_end()) {
+    if (gcin_punc_auto_send && gtab_cursor_end()) {
       output_gbuf();
       output_buffer_call_back();
     } else

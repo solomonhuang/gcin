@@ -19,16 +19,16 @@ GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile
   char *error;
 
   if (!(handle = dlopen(sofile, RTLD_LAZY))) {
-    if ((error = dlerror()) != NULL)  {
-      fprintf(stderr, "%s\n", error);
-    }
-    dbg("dlopen %s failed\n", sofile);
+    if ((error = dlerror()) != NULL)
+      box_warn(error);
     return NULL;
   }
 #else
   HMODULE handle = LoadLibraryA(sofile);
-  if (!handle)
+  if (!handle) {
+    box_warn("error %s", sys_err_strA());
     return NULL;
+  }
 #define dlsym GetProcAddress
 #endif
 

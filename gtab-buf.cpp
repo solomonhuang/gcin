@@ -572,7 +572,7 @@ GEDIT *insert_gbuf_cursor(char **sel, int selN, u_int64_t key, gboolean b_gtab_e
   pbuf->keysN=1;
   pbuf->flag = b_gtab_en_no_spc ? FLAG_CHPHO_GTAB_BUF_EN_NO_SPC:0;
 
-  if (ggg.gbufN==ggg.gbuf_cursor && selN==1 && strstr(_(auto_end_punch), sel[0])) {
+  if (gcin_punc_auto_send && ggg.gbufN==ggg.gbuf_cursor && selN==1 && strstr(_(auto_end_punch), sel[0])) {
     char_play(pbuf->ch);
     output_gbuf();
   } else {

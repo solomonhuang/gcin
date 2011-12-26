@@ -3,7 +3,7 @@
 
 
 static GtkWidget *check_button_gtab_dup_select_bell,
-                 *check_button_gtab_press_full_auto_send,
+                 *opt_gtab_press_full_auto_send,
                  *opt_gtab_pre_select,
                  *opt_gtab_disp_partial_match,
                  *check_button_gtab_disp_key_codes,
@@ -13,7 +13,7 @@ static GtkWidget *check_button_gtab_dup_select_bell,
                  *check_button_gtab_hide_row2,
                  *check_button_gtab_in_row1,
                  *opt_gtab_vertical_select,
-                 *check_button_gtab_unique_auto_send,
+                 *opt_gtab_unique_auto_send,
                  *check_button_gtab_que_wild_card,
                  *check_button_gtab_phrase_pre_select;
 
@@ -63,9 +63,6 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 
   save_menu_val(GTAB_PRE_SELECT, opt_gtab_pre_select);
 
-  save_gcin_conf_int(GTAB_PRESS_FULL_AUTO_SEND,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_press_full_auto_send)));
-
   save_menu_val(GTAB_DISP_PARTIAL_MATCH, opt_gtab_disp_partial_match);
 
   save_gcin_conf_int(GTAB_DISP_KEY_CODES,
@@ -88,9 +85,6 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
 
   save_menu_val(GTAB_VERTICAL_SELECT, opt_gtab_vertical_select);
 
-  save_gcin_conf_int(GTAB_UNIQUE_AUTO_SEND,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send)));
-
   save_gcin_conf_int(GTAB_QUE_WILD_CARD,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_gtab_que_wild_card)));
 
@@ -104,6 +98,10 @@ static gboolean cb_gtab_conf_ok( GtkWidget *widget,
   save_gcin_conf_int(GTAB_SPACE_AUTO_FIRST, spc_opts[idx].num);
 
   save_menu_val(GTAB_AUTO_SELECT_BY_PHRASE, opt_auto_select_by_phrase);
+
+  save_menu_val(GTAB_PRESS_FULL_AUTO_SEND, opt_gtab_press_full_auto_send);
+
+  save_menu_val(GTAB_UNIQUE_AUTO_SEND, opt_gtab_unique_auto_send);
 
   send_gcin_message(
 #if UNIX
@@ -353,10 +351,7 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_press_full_auto_send, FALSE, FALSE, 0);
   GtkWidget *label_gtab_gtab_press_full_auto_send = gtk_label_new(_(_L("按滿自動送字")));
   gtk_box_pack_start (GTK_BOX (hbox_gtab_press_full_auto_send), label_gtab_gtab_press_full_auto_send,  FALSE, FALSE, 0);
-  check_button_gtab_press_full_auto_send = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_press_full_auto_send), check_button_gtab_press_full_auto_send,  FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_press_full_auto_send),
-     gtab_press_full_auto_send);
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_press_full_auto_send), create_auto_select_by_phrase_opts(&opt_gtab_press_full_auto_send, gtab_press_full_auto_send),  FALSE, FALSE, 0);
 
 
   GtkWidget *hbox_gtab_auto_select_by_phrase = gtk_hbox_new (FALSE, SPC);
@@ -408,10 +403,7 @@ void create_gtab_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_gtab_r), hbox_gtab_unique_auto_send, FALSE, FALSE, 0);
   GtkWidget *label_gtab_unique_auto_send = gtk_label_new(_(_L("唯一選擇時自動送出")));
   gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send), label_gtab_unique_auto_send,  FALSE, FALSE, 0);
-  check_button_gtab_unique_auto_send = gtk_check_button_new ();
-  gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send), check_button_gtab_unique_auto_send,  FALSE, FALSE, 0);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gtab_unique_auto_send),
-     gtab_unique_auto_send);
+  gtk_box_pack_start (GTK_BOX (hbox_gtab_unique_auto_send),  create_auto_select_by_phrase_opts(&opt_gtab_unique_auto_send, gtab_unique_auto_send),  FALSE, FALSE, 0);
 
 
   GtkWidget *hbox_gtab_que_wild_card = gtk_hbox_new (FALSE, SPC);

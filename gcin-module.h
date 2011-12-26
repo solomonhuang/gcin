@@ -29,6 +29,7 @@ typedef struct {
   void (*mf_set_no_focus)(GtkWidget *win);
 
   gint64 (*mf_current_time)();
+  void (*mf_box_warn)(char *fmt,...);
 
   void (*mf_exec_gcin_setup)();
   gboolean (*mf_gcin_edit_display_ap_only)();
@@ -47,7 +48,6 @@ typedef struct {
 
   int *mf_gcin_pop_up_win;
   int *mf_gcin_font_size, *mf_gcin_win_color_use;
-  int *mf_gtab_press_full_auto_send;
   char **mf_gcin_win_color_fg, **mf_pho_selkey, **mf_tsin_cursor_color;
   gboolean *mf_force_show;
   int *mf_win_x, *mf_win_y, *mf_win_xl, *mf_win_yl, *mf_dpy_xl, *mf_dpy_yl;

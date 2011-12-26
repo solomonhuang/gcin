@@ -69,6 +69,26 @@ gboolean gtab_vertical_select_on()
 return val;
 }
 
+
+gboolean gtab_press_full_auto_send_on()
+{
+  int val = cur_inmd &&
+(gtab_press_full_auto_send==GTAB_OPTION_YES||
+(gtab_press_full_auto_send==GTAB_OPTION_AUTO&&(cur_inmd->flag&FLAG_GTAB_PRESS_FULL_AUTO_SEND)));
+
+return val;
+}
+
+
+gboolean gtab_unique_auto_send_on()
+{
+  int val = cur_inmd &&
+(gtab_unique_auto_send==GTAB_OPTION_YES||
+(gtab_unique_auto_send==GTAB_OPTION_AUTO&&(cur_inmd->flag&FLAG_GTAB_UNIQUE_AUTO_SEND)));
+
+return val;
+}
+
 int key_col(char cha)
 {
   char *p = strchr(keyrow, cha);

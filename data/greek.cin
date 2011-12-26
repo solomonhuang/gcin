@@ -6,6 +6,8 @@
 %keep_key_case
 %flag_disp_partial_match
 %flag_disp_full_match
+%flag_press_full_auto_send
+%flag_unique_auto_send
 %keyname begin
 a	a
 b	b

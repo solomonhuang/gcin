@@ -4,6 +4,7 @@
 %endkey 0123456789abcdefghijklmnopqrstuvwxyz`-=[]\;',./
 %space_style 2
 %keep_key_case
+%flag_press_full_auto_send
 %keyname begin
 `	ё
 1	┌

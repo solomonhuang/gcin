@@ -1151,18 +1151,13 @@ int module_init_win(GCIN_module_main_functions *funcs)
     return TRUE;
 
   if (anthy_init() == -1) {
-    GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                     GTK_MESSAGE_ERROR,
-                                     GTK_BUTTONS_CLOSE,
-                                     "Cannot init anthy. incompatible anthy.so ?");
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
+    gmf.mf_box_warn("anthy_init() failed. Anthy not installed or incompatible anthy.so ?");
     return FALSE;
   }
 
   ac = anthy_create_context();
   if (!ac) {
-    printf("anthy_create_context err\n");
+    gmf.mf_box_warn("anthy_create_context error");
     return FALSE;
   }
 

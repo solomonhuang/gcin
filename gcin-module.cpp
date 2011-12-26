@@ -68,7 +68,6 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_gcin_pop_up_win = &gcin_pop_up_win;
   func->mf_gcin_font_size = &gcin_font_size;
   func->mf_gcin_win_color_fg = &gcin_win_color_fg;
-  func->mf_gtab_press_full_auto_send = &gtab_press_full_auto_send;
 
   func->mf_gcin_win_color_use = &gcin_win_color_use;
   func->mf_tsin_cursor_color = &tsin_cursor_color;
@@ -81,6 +80,7 @@ void init_GCIN_module_main_functions(GCIN_module_main_functions *func)
   func->mf_dpy_xl = &dpy_xl;
   func->mf_dpy_yl = &dpy_yl;
   func->mf_pho_chars = pho_chars;
+  func->mf_box_warn = box_warn;
 
 #if WIN32
   func->mf_test_mode = &test_mode;
