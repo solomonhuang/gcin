@@ -23,10 +23,10 @@ export GTK_IM_MODULE=gcin
 #export GTK_IM_MODULE=xim
 #sleep 5; gcin-message -text 'abcde' -duration 5000;
 #gedit a.txt
-leafpad
+#leafpad
 #google-chrome
 #pcmanx
-#firefox
+firefox
 #gnome-terminal
 #mozilla-thunderbird
 #~/eclipse/eclipse

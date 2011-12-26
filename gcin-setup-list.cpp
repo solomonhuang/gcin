@@ -443,15 +443,6 @@ add_columns (GtkTreeView *treeview)
                                                "editable", COLUMN_EDITABLE,
                                                NULL);
 
-  renderer = gtk_cell_renderer_text_new ();
-  g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_FILE);
-
-  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, _(_L("檔案名")), renderer,
-                                               "text", COLUMN_FILE,
-                                               "editable", COLUMN_EDITABLE,
-                                               NULL);
-
   // cycle column
   renderer = gtk_cell_renderer_toggle_new ();
   g_signal_connect (G_OBJECT (renderer), "toggled",
@@ -461,7 +452,7 @@ add_columns (GtkTreeView *treeview)
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),-1,
 #if UNIX
-	  _(_L("Ctrl-Shift 循環")),
+	  _(_L("Ctrl-Shift\n循環")),
 #else
 	  _(_L("Ctrl-Shift 循環\n需關閉Windows按鍵")),
 #endif
@@ -477,7 +468,7 @@ add_columns (GtkTreeView *treeview)
   g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
 
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                                               -1, _(_L("第一次內定")),
+                                               -1, _(_L("第一次\n內定")),
 
                                                renderer,
                                                "active", COLUMN_DEFAULT_INMD,
@@ -495,6 +486,16 @@ add_columns (GtkTreeView *treeview)
                                                renderer,
                                                "active", COLUMN_USE,
                                                NULL);
+
+  renderer = gtk_cell_renderer_text_new ();
+  g_object_set_data (G_OBJECT (renderer), "column", (gint *)COLUMN_FILE);
+
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
+                                               -1, _(_L("檔案名")), renderer,
+                                               "text", COLUMN_FILE,
+                                               "editable", COLUMN_EDITABLE,
+                                               NULL);
+
 }
 
 
@@ -892,7 +893,7 @@ void create_gtablist_window (void)
     gtk_grid_attach_next_to (GTK_BOX (hbox), button2, button, GTK_POS_RIGHT, 1, 1);
 #endif
 #if UNIX
-  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 620, 450);
+  gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 480, 450);
 #else
   gtk_window_set_default_size (GTK_WINDOW (gtablist_window), 680, 450);
 #endif
