@@ -34,7 +34,7 @@ static GtkWidget *opt_im_toggle_keys, *check_button_gcin_remote_client,
        *check_button_gcin_shift_space_eng_full,
        *check_button_gcin_init_im_enabled,
        *check_button_gcin_eng_phrase_enabled,
-       *check_button_gcin_win_sym_click_close;
+       *check_button_gcin_win_sym_click_close,
        *check_button_gcin_punc_auto_send;
 #if USE_GCB
 static GtkWidget *spinner_gcb_position_x, *spinner_gcb_position_y;

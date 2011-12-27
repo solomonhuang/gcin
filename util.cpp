@@ -183,23 +183,26 @@ void __gcin_dbg_(char *format, ...) {
 
 char *err_strA(DWORD dw)
 {
-	static char msgstr[256];
+	WCHAR msgstr[128];
+	static char msg8[256];
     LPVOID lpMsgBuf;
 
-    FormatMessageA(
+    FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
         dw,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPSTR) &lpMsgBuf,
+        (LPWSTR) &lpMsgBuf,
         0, NULL );
 
     // Display the error message and exit the process
 
-    StringCchPrintfA(msgstr, ARRAYSIZE(msgstr), "%d: %s", dw, lpMsgBuf);
-	return msgstr;
+    StringCchPrintfW(msgstr, ARRAYSIZE(msgstr), L"%d: %s", dw, lpMsgBuf);
+
+	utf16_to_8(msgstr, msg8, sizeof(msg8));
+	return msg8;
 }
 
 
@@ -332,7 +335,7 @@ void win32_init_win(GtkWidget *win)
 #endif
 #endif
 
-
+#if !GCIN_IME
 void box_warn(char *fmt,...)
 {
   va_list args;
@@ -349,3 +352,4 @@ void box_warn(char *fmt,...)
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
 }
+#endif

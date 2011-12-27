@@ -15,7 +15,7 @@
 
 extern gboolean test_mode;
 gboolean gtab_phrase_on();
-gboolean gtab_disp_partial_match_on(), gtab_vertical_select_on(), gtab_pre_select_on();
+gboolean gtab_disp_partial_match_on(), gtab_vertical_select_on(), gtab_pre_select_on(), gtab_unique_auto_send_on(), gtab_press_full_auto_send_on();
 void init_seltab(char ***p);
 
 extern gint64 key_press_time, key_press_time_ctrl;

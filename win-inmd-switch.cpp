@@ -8,7 +8,7 @@ gboolean init_in_method(int in_no);
 void cb_update_menu_select(GtkWidget  *item,  gpointer data)
 {
    if (!current_CS)
-	   return;
+     return;
 
    int idx=GPOINTER_TO_INT(data);
 

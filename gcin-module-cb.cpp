@@ -7,6 +7,8 @@
 #include "win1.h"
 #include "gcin-module.h"
 #include "gcin-module-cb.h"
+#include "util.h"
+
 
 #if UNIX
 #include <dlfcn.h>
@@ -26,7 +28,7 @@ GCIN_module_callback_functions *init_GCIN_module_callback_functions(char *sofile
 #else
   HMODULE handle = LoadLibraryA(sofile);
   if (!handle) {
-    box_warn("error %s", sys_err_strA());
+    box_warn("LoadLibraryA %s error %s", sofile, sys_err_strA());
     return NULL;
   }
 #define dlsym GetProcAddress
