@@ -92,7 +92,7 @@ void load_setttings()
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
   gcin_tray_hf_win_kbm = get_gcin_conf_int(GCIN_TRAY_HF_WIN_KBM, 0);
 #if UNIX
-  gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 0);
+  gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 1);
 #else
   gcin_init_im_enabled = true;
 #endif
@@ -202,6 +202,7 @@ void load_setttings()
 
   char phokbm[MAX_GCIN_STR];
 #define ASDF "asdfghjkl;"
+#define N1234 "123456789"
 
 #if DEBUG
   char *gcin_pho_kbm = getenv("GCIN_PHO_KBM");
@@ -210,7 +211,7 @@ void load_setttings()
   else
 #endif
   {
-    char *kbm_str = is_chs?"pinyin "ASDF" 1 1":"zo "ASDF" 1 1";
+    char *kbm_str = is_chs?"pinyin "N1234" 1 1":"zo "N1234" 1 1";
     get_gcin_conf_fstr(PHONETIC_KEYBOARD, phokbm, kbm_str);
   }
 

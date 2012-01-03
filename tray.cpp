@@ -270,7 +270,9 @@ static MITEM mitems[] = {
 #endif
   {N_("正→簡體"), NULL, cb_trad2sim, NULL},
   {N_("簡→正體"), NULL, cb_sim2trad, NULL},
+#if 0
   {N_("選擇輸入法"), NULL, cb_inmd_menu, NULL},
+#endif
   {N_("小鍵盤"), NULL, kbm_toggle_, NULL},
   {N_("简体输出"), NULL, cb_trad_sim_toggle_, &gb_output},
   {NULL, NULL, NULL, NULL}
@@ -296,7 +298,11 @@ tray_button_press_event_cb (GtkWidget * button, GdkEventButton * event, gpointer
       if (event->state & GDK_SHIFT_MASK)
         inmd_switch_popup_handler(NULL, (GdkEvent *)event);
       else
+#if 0
         toggle_im_enabled();
+#else
+        inmd_popup_tray();
+#endif
       break;
     case 2:
 #if 0

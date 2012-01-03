@@ -984,6 +984,12 @@ gboolean init_in_method(int in_no)
 
       break;
     }
+    case method_type_EN:
+    {
+      if (current_CS && current_CS->im_state==GCIN_STATE_CHINESE)
+        toggle_im_enabled();
+      return TRUE;
+    }
     default:
       init_gtab(in_no);
       if (!inmd[in_no].DefChars)

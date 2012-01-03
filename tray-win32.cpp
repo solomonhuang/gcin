@@ -48,12 +48,13 @@ void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer dat)
   phonetic_speak= gtk_check_menu_item_get_active(checkmenuitem);
 }
 
+#if 0
 void show_inmd_menu();
-
 void cb_inmd_menu(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   show_inmd_menu();
 }
+#endif
 
 void close_all_clients();
 void do_exit();
@@ -124,7 +125,7 @@ static MITEM mitems_main[] = {
   {N_(_L("重新執行gcin")), GTK_STOCK_QUIT, restart_gcin},
   {N_(_L("念出發音")), NULL, cb_tog_phospeak, &phonetic_speak},
   {N_(_L("小鍵盤")), NULL, kbm_toggle_, &win_kbm_on},
-#if UNIX
+#if UNIX && 0
   {N_(_L("選擇輸入法")), GTK_STOCK_INDEX, cb_inmd_menu, NULL},
 #endif
   {NULL}
@@ -238,7 +239,7 @@ void inmd_popup_tray();
 
 static void cb_activate(GtkStatusIcon *status_icon, gpointer user_data)
 {
-#if UNIX
+#if UNIX && 0
 //  dbg("cb_activate\n");
   toggle_im_enabled();
 

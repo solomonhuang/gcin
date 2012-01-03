@@ -90,7 +90,7 @@ void destroy_inmd_menu()
   menu = NULL;
 }
 
-#if WIN32
+#if WIN32 || 1
 void inmd_popup_tray()
 {
   if (!menu)

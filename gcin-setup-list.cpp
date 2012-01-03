@@ -14,6 +14,8 @@ struct {
   { NULL, 0},
 };
 
+extern char *default_input_method_str;
+
 #if USE_GCB
 unich_t *gcb_pos[] = {
 N_(_L("左下")), N_(_L("左上")), N_(_L("右下")), N_(_L("右上"))
@@ -231,10 +233,8 @@ static void cb_ok (GtkWidget *button, gpointer data)
     pinmd->disabled = !use;
   } while (gtk_tree_model_iter_next(model, &iter));
 
-  char tt[128];
-  tt[0]=inmd[default_input_method].key_ch;
-  tt[1]=0;
-  save_gcin_conf_str(DEFAULT_INPUT_METHOD, tt);
+  dbg("default_input_method_str %s\n",default_input_method_str);
+  save_gcin_conf_str(DEFAULT_INPUT_METHOD, default_input_method_str);
 
   int idx;
 #if UNIX
@@ -247,10 +247,11 @@ static void cb_ok (GtkWidget *button, gpointer data)
   free(gcin_str_im_cycle);
 
   int i;
+  char tt[512];
   int ttN=0;
   for(i=0;i<inmdN;i++) {
     if (inmd[i].in_cycle) {
-      dbg("in %d %c\n", i, inmd[i].key_ch);
+//      dbg("in %d %c\n", i, inmd[i].key_ch);
       tt[ttN++]=inmd[i].key_ch;
     }
   }
@@ -375,8 +376,14 @@ static gboolean toggled_default_inmd(GtkCellRendererToggle *cell, gchar *path_st
   gtk_tree_model_get_iter (model, &iter, path);
   char *key;
   gtk_tree_model_get (model, &iter, COLUMN_KEY, &key, -1);
-  default_input_method = gcin_switch_keys_lookup(key[0]);
-  dbg("default_input_method %d '%c'\n", default_input_method, key[0]);
+  char *file;
+  gtk_tree_model_get (model, &iter, COLUMN_FILE, &file, -1);
+  char tt[128];
+  sprintf(tt, "%s %s", key, file);
+  free(default_input_method_str);
+  default_input_method_str = strdup(tt);
+  dbg("default_input_method_str %s\n", default_input_method_str);
+//  default_input_method = gcin_switch_keys_lookup(key[0]);
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_DEFAULT_INMD, TRUE, -1);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_USE, TRUE, -1);
@@ -399,15 +406,18 @@ static gboolean toggled_use(GtkCellRendererToggle *cell, gchar *path_string, gpo
   gtk_tree_model_get (model, &iter, COLUMN_CYCLE, &cycle, -1);
   gtk_tree_model_get (model, &iter, COLUMN_DEFAULT_INMD, &default_inmd, -1);
   gtk_tree_model_get (model, &iter, COLUMN_USE, &use, -1);
-  gboolean must_on = cycle || default_inmd;
+  use=!use;
+  gboolean must_on = default_inmd;
   dbg("toggle %d %d %d\n", cycle, default_inmd, use);
 
-  if (must_on && use) {
-//    dbg("must_on\n");
+  if (must_on && !use) {
     return TRUE;
   }
 
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_USE, !use, -1);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_USE, use, -1);
+  if (!use)
+    gtk_list_store_set (GTK_LIST_STORE (model), &iter, COLUMN_CYCLE, FALSE, -1);
+
   gtk_tree_path_free (path);
 
   return TRUE;
