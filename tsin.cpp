@@ -1494,6 +1494,19 @@ void open_select_pho()
   get_sel_pho();
   tss.sel_pho=1;
   tss.pho_menu_idx = tss.current_page = 0;
+
+  int idx = tss.c_idx==tss.c_len?tss.c_len-1:tss.c_idx;
+
+  tss.pho_menu_idx = phrase_count;
+  if (phrase_count < phkbm.selkeyN-1) {
+	char *p = pho_idx_str(tss.startf);
+	if (utf8_eq(p, tss.chpho[idx].ch))
+      tss.pho_menu_idx++;
+  }
+
+  if (tss.pho_menu_idx>=phkbm.selkeyN)
+    tss.pho_menu_idx = phkbm.selkeyN - 1;
+
   disp_current_sel_page();
 }
 

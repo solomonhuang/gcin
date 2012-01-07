@@ -243,7 +243,7 @@ void open_xim()
           IMFilterEventMask,      KeyPressMask|KeyReleaseMask,
           IMOnKeysList, &triggerKeys,
           NULL)) == NULL) {
-          p_err("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
+          p_err_no_alert("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
           xim_arr[0].xim_server_name);
   }
 }

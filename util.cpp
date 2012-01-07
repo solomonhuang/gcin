@@ -42,6 +42,26 @@ void p_err(char *fmt,...)
 #endif
 }
 
+void p_err_no_alert(char *fmt,...)
+{
+  va_list args;
+  char out[4096];
+
+  va_start(args, fmt);
+  vsprintf(out, fmt, args);
+  va_end(args);
+
+  fprintf(stderr, "%s\n", out);
+
+#if DEBUG && 1
+  abort();
+#else
+  if (getenv("GCIN_ERR_COREDUMP"))
+    abort();
+  exit(-1);
+#endif
+}
+
 #if !CLIENT_LIB || DEBUG
 static void init_out_fp()
 {
@@ -335,7 +355,7 @@ void win32_init_win(GtkWidget *win)
 #endif
 #endif
 
-#if !GCIN_IME
+#if !GCIN_IME && !CLIENT_LIB
 void box_warn(char *fmt,...)
 {
   va_list args;

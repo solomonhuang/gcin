@@ -9,7 +9,7 @@ static char *wselkey;
 static int wselkeyN;
 //Window xwin1;
 
-#define SELEN (12)
+#define SELEN (15)
 
 static GtkWidget *labels_sele[SELEN], *labels_seleR[SELEN];
 static GtkWidget *eve_sele[SELEN], *eve_seleR[SELEN];
@@ -413,6 +413,7 @@ void change_win1_font()
       gtk_widget_override_color(labels_seleR[i], GTK_STATE_FLAG_NORMAL, gcin_win_color_use?&rgbfg:NULL);
 #endif
     change_win_bg(eve_sele[i]);
+
     if (eve_seleR[i])
       change_win_bg(eve_seleR[i]);
   }
