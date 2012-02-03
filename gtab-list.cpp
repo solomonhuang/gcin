@@ -88,7 +88,6 @@ void load_gtab_list(gboolean skip_disabled)
     bzero(pinmd, sizeof(INMD));
     pinmd->key_ch = key[0];
 
-    pinmd->in_cycle = strchr(gcin_str_im_cycle, key[0]) != NULL;
 //    dbg("%d %d '%c'\n",inmdN, pinmd->in_cycle, pinmd->key_ch);
 
 
@@ -118,9 +117,15 @@ void load_gtab_list(gboolean skip_disabled)
       for(i=0; method_codes[i].id; i++)
         if (!strcmp(file, method_codes[i].id))
           break;
-      if (method_codes[i].id)
+      if (method_codes[i].id) {
         pinmd->method_type = method_codes[i].method_type;
+      }
     }
+
+    pinmd->in_cycle =
+       strchr(gcin_str_im_cycle, key[0]) != NULL &&
+       pinmd->method_type != method_type_SYMBOL_TABLE &&
+       pinmd->method_type != method_type_EN;
 
     if (name[0]=='!') {
       name++;

@@ -178,6 +178,7 @@ static void shutdown_client(HANDLE fd)
 
 void message_cb(char *message);
 void save_CS_temp_to_current();
+void disp_tray_icon();
 
 
 #if UNIX
@@ -248,6 +249,9 @@ void process_client_req(HANDLE fd)
       save_CS_temp_to_current();
       init_state_chinese(cs);
       cs->in_method = default_input_method;
+#if TRAY_ENABLED && UNIX
+      disp_tray_icon();
+#endif
     }
   }
 
