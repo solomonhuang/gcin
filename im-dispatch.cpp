@@ -244,12 +244,18 @@ void process_client_req(HANDLE fd)
     if (new_cli)
 #endif
     {
-      current_CS = cs;
-      dbg("new_cli default_input_method:%d\n", default_input_method);
-      save_CS_temp_to_current();
+      dbg("new_cli default_input_method:%d cs:%x\n", default_input_method, cs);
+#if UNIX
+      if (!current_CS)
+#endif
+	  {
+        current_CS = cs;
+        save_CS_temp_to_current();
+      }
+
       init_state_chinese(cs);
-      cs->in_method = default_input_method;
-#if TRAY_ENABLED && UNIX
+
+#if UNIX
       disp_tray_icon();
 #endif
     }
@@ -360,7 +366,9 @@ void process_client_req(HANDLE fd)
 #if DBG
       dbg_time("GCIN_req_focus_in  %x %d %d\n",cs, cs->spot_location.x, cs->spot_location.y);
 #endif
-//      current_CS = cs;
+#if 1
+      current_CS = cs;
+#endif
       gcin_FocusIn(cs);
       break;
     case GCIN_req_focus_out:
@@ -397,8 +405,8 @@ void process_client_req(HANDLE fd)
       break;
 #endif
     case GCIN_req_set_cursor_location:
-#if DBG
-      dbg_time("set_cursor_location %x %d %d\n", cs,
+#if DBG || 0
+      dbg_time("set_cursor_location %p %d %d\n", cs,
          cs->spot_location.x, cs->spot_location.y);
 #endif
       update_in_win_pos();

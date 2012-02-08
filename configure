@@ -163,8 +163,8 @@ fi
 
 
 LIB='lib'
-if [ -d /usr/lib64foo -a -d /lib64 ]; then
-LIB='lib64foo'
+if [ -d /usr/lib64 -a -d /lib64 ]; then
+LIB='lib64'
 fi
 
 QT_IM='N'

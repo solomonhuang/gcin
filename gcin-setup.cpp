@@ -297,6 +297,15 @@ static void cb_ts_import_sys()
 #endif
 }
 
+static void cb_ts_contribute()
+{
+#if UNIX
+  system(GCIN_BIN_DIR"/ts-contribute &");
+#else
+  win32exec("ts-contribute.exe");
+#endif
+}
+
 
 static void cb_alt_shift()
 {
@@ -1167,7 +1176,13 @@ static void create_main_win()
   gtk_box_pack_start (GTK_BOX (vbox_ts), button_ts_import_sys, TRUE, TRUE, 0);
   g_signal_connect (G_OBJECT (button_ts_import_sys), "clicked",
                     G_CALLBACK (cb_ts_import_sys), NULL);
+
+  GtkWidget *button_ts_contribute = gtk_button_new_with_label(_(_L("貢獻選擇的詞庫")));
+  gtk_box_pack_start (GTK_BOX (vbox_ts), button_ts_contribute, TRUE, TRUE, 0);
+  g_signal_connect (G_OBJECT (button_ts_contribute), "clicked",
+                    G_CALLBACK (cb_ts_contribute), NULL);
   }
+
 
   GtkWidget *button_about = gtk_button_new_with_label(_(_L("關於 gcin")));
   gtk_box_pack_start (GTK_BOX (vbox), button_about, TRUE, TRUE, 0);

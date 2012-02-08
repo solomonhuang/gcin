@@ -151,5 +151,6 @@ void get_gcin_conf_str(char *name, char **rstr, char *default_str);
 void get_gcin_conf_fstr(char *name, char rstr[], char *default_str);
 void save_gcin_conf_str(char *name, char *str);
 void save_gcin_conf_int(char *name, int val);
+int get_gcin_conf_int(char *name, int default_value);
 void load_setttings();
 

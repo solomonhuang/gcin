@@ -1543,6 +1543,10 @@ int feedkey_pp(KeySym xkey, int kbstate)
 
   if (caps_eng_tog) {
     gboolean new_tsin_pho_mode =!(kbstate&LockMask);
+#if UNIX
+    if (xkey == XK_Caps_Lock)
+      new_tsin_pho_mode = !new_tsin_pho_mode; // X11 caplock is not on/off immediately
+#endif
     if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
       close_selection_win();
       tsin_set_eng_ch(new_tsin_pho_mode);

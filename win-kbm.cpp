@@ -305,7 +305,7 @@ static void move_win_kbm()
     }
   } else {
     ox = dpy_xl - width;
-    oy = dpy_yl - height - 16;
+    oy = dpy_yl - height - 31;
   }
 
   gtk_window_move(GTK_WINDOW(gwin_kbm), ox, oy);

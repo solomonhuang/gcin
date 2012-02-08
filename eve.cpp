@@ -551,7 +551,7 @@ void move_IC_in_win(ClientState *cs)
    Window inpwin = cs->client_win;
 #if UNIX
    if (!inpwin) {
-     dbg("no inpwin\n");
+     dbg("no inpwin %p\n", cs);
      return;
    }
 #endif
@@ -709,11 +709,13 @@ void set_tsin_pho_mode0(ClientState *cs);
 
 void init_state_chinese(ClientState *cs)
 {
+  dbg("init_state_chinese %p\n",cs);
+
   cs->im_state = GCIN_STATE_CHINESE;
   set_tsin_pho_mode0(cs);
   if (!cs->in_method)
 #if UNIX
-    init_in_method(default_input_method);
+    init_in_method2(cs, default_input_method);
 #else
   if (!last_input_method)
     last_input_method = default_input_method;
@@ -915,45 +917,43 @@ void update_win_kbm_inited()
     update_win_kbm();
 }
 
-gboolean init_in_method(int in_no)
+gboolean init_in_method2(ClientState *cs, int in_no)
 {
+  dbg("init_in_method %p %d\n", cs, in_no);
   gboolean init_im = !(cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM));
 
   if (in_no < 0)
     return FALSE;
 
-  check_CS();
-
-
-  if (current_CS->in_method != in_no) {
+  if (cs==current_CS && cs->in_method != in_no) {
     if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM)) {
       if (current_method_type() == method_type_TSIN) {
         flush_tsin_buffer();
       } else
         output_gbuf();
 
-      hide_in_win(current_CS);
+      hide_in_win(cs);
     }
 
     if (cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM))
       hide_win_kbm();
   }
 
-
-  reset_current_in_win_xy();
+  if (cs==current_CS)
+    reset_current_in_win_xy();
 
 //  dbg("switch init_in_method %x %d\n", current_CS, in_no);
-  set_tsin_pho_mode0(current_CS);
+  set_tsin_pho_mode0(cs);
   tsin_set_win1_cb();
 
   switch (inmd[in_no].method_type) {
     case method_type_PHO:
-      current_CS->in_method = in_no;
+      cs->in_method = in_no;
       init_tab_pho();
       break;
     case method_type_TSIN:
       set_wselkey(pho_selkey);
-      current_CS->in_method = in_no;
+      cs->in_method = in_no;
       init_tab_pp(init_im);
       break;
     case method_type_SYMBOL_TABLE:
@@ -975,9 +975,10 @@ gboolean init_in_method(int in_no)
       }
 
       if (inmd[in_no].mod_cb_funcs->module_init_win(&gmf)) {
-        current_CS->in_method = in_no;
+        cs->in_method = in_no;
         module_cb()->module_show_win();
-        set_wselkey(pho_selkey);
+        if (cs==current_CS)
+          set_wselkey(pho_selkey);
       } else {
         return FALSE;
       }
@@ -986,15 +987,17 @@ gboolean init_in_method(int in_no)
     }
     case method_type_EN:
     {
-      if (current_CS && current_CS->im_state==GCIN_STATE_CHINESE)
+      if (cs==current_CS && current_CS->im_state==GCIN_STATE_CHINESE)
         toggle_im_enabled();
       return TRUE;
     }
-    default:
+    case method_type_GTAB:
+    {
+      dbg("method_type_GTAB\n");
       init_gtab(in_no);
       if (!inmd[in_no].DefChars)
         return FALSE;
-      current_CS->in_method = in_no;
+      cs->in_method = in_no;
       if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM))
         show_win_gtab();
       else {
@@ -1004,28 +1007,38 @@ gboolean init_in_method(int in_no)
 
       set_gtab_input_method_name(inmd[in_no].cname);
       break;
+    }
+    default:
+      dbg("unknown\n");
+      return FALSE;
   }
 #if WIN32
-  if (current_CS && current_CS->in_method != last_input_method)
+  if (cs==current_CS && current_CS->in_method != last_input_method)
     last_input_method = current_CS->in_method;
 #endif
 
+  if (cs==current_CS) {
 #if TRAY_ENABLED
-  disp_tray_icon();
+    disp_tray_icon();
 #endif
 
-  if (inmd[current_CS->in_method].selkey) {
-    set_wselkey(inmd[current_CS->in_method].selkey);
-    gtab_set_win1_cb();
-//    dbg("aa selkey %s\n", inmd[current_CS->in_method].selkey);
+    if (inmd[current_CS->in_method].selkey) {
+      set_wselkey(inmd[current_CS->in_method].selkey);
+      gtab_set_win1_cb();
+  //    dbg("aa selkey %s\n", inmd[current_CS->in_method].selkey);
+    }
+    update_in_win_pos();
+    update_win_kbm_inited();
   }
-
-  update_in_win_pos();
-  update_win_kbm_inited();
 
   return TRUE;
 }
 
+gboolean init_in_method(int in_no)
+{
+  check_CS();
+  return init_in_method2(current_CS, in_no);
+}
 
 static void cycle_next_in_method()
 {
@@ -1101,13 +1114,12 @@ void create_win_sym(), win_kbm_disp_caplock();
 #if !GTK_CHECK_VERSION(2,16,0)
 gboolean get_caps_lock_state()
 {
-	XkbStateRec states;
+  XkbStateRec states;
 
-	if (XkbGetState(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), XkbUseCoreKbd, &states) == Success)
-	{
-		if (states.locked_mods & LockMask) return TRUE;
-	}
-	return FALSE;
+  if (XkbGetState(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), XkbUseCoreKbd, &states) == Success) {
+    if (states.locked_mods & LockMask) return TRUE;
+  }
+  return FALSE;
 }
 #endif
 
@@ -1304,8 +1316,10 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       if (!module_cb())
         return FALSE;
       return module_cb()->module_feedkey(keysym, kev_state);
-    default:
+    case method_type_GTAB:
       return feedkey_gtab(keysym, kev_state);
+    default:
+      dbg("ProcessKeyPress unknown current_CS:%x %d\n", current_CS, current_method_type());
   }
 
   return FALSE;
@@ -1347,7 +1361,7 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
       if (!module_cb())
         return FALSE;
       return module_cb()->module_feedkey_release(keysym, kev_state);
-    default:
+    case method_type_GTAB:
       return feedkey_gtab_release(keysym, kev_state);
   }
 
@@ -1409,13 +1423,10 @@ void gcin_reset();
 
 int gcin_FocusIn(ClientState *cs)
 {
-//  dbg("gcin_FocusIn\n");
+  dbg("gcin_FocusIn %x\n", cs);
   Window win = cs->client_win;
-
-#if UNIX && 0
-  if (skip_window(win))
+  if (!win)
     return FALSE;
-#endif
 
   reset_current_in_win_xy();
 
@@ -1499,11 +1510,9 @@ int gcin_FocusOut(ClientState *cs)
   if (cs != current_CS)
      return FALSE;
 
-#if UNIX && 0
-//  dbg("gcin_FocusOut\n");
-  if (skip_window(cs->client_win))
+  if (!cs->client_win)
     return FALSE;
-#endif
+
   if (t - last_focus_out_time < 100000) {
     last_focus_out_time = t;
     return FALSE;
@@ -1575,7 +1584,7 @@ void gcin_reset()
 #if 1
   if (!current_CS)
     return;
-//  dbg("gcin_reset\n");
+  dbg("gcin_reset\n");
 
   switch(current_method_type()) {
     case method_type_PHO:

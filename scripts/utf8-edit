@@ -2,7 +2,7 @@
 
 PATH=$PATH:/opt/gnome/bin:/usr/local/bin
 
-for i in madedit gedit leafpad l3afpad kedit kate gvim
+for i in madedit gedit leafpad l3afpad kedit kate kwrite gvim
 do
   which $i >& /dev/null
   if [ $? = 0 ]; then

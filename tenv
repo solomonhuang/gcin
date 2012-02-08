@@ -32,3 +32,4 @@ leafpad
 #~/eclipse/eclipse
 #/usr/lib/qt4/bin/qtconfig
 pkill gcin.test
+pkill leafpad

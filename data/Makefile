@@ -11,7 +11,8 @@ DATA=pho.tab2 tsin32.idx NewCJ3.gtab \
      ibm.kbm tsin32 hsu.kbm pho-huge.tab2 simplex.gtab symbols.gtab russian.gtab \
      greek.gtab cj-punc.gtab latin-letters.gtab tsin-1.src pin-juyin.xlt \
      t2s.dat s2t.dat cj543.gtab s-tsin32 s-tsin32.idx s-pho.tab2 s-pho-huge.tab2 \
-     pinyin-no-tone.kbm simplex-punc.gtab hangul.gtab ar33.gtab
+     pinyin-no-tone.kbm simplex-punc.gtab hangul.gtab ar33.gtab array-symbols.gtab \
+     vocabulary.gtab
 
 DATAKEEP=symbol-table gtab.list phrase.table phrase-ctrl.table
 

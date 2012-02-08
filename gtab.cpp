@@ -536,18 +536,25 @@ static u_int64_t vmask64_7[]=
 
 #define KEY_N (cur_inmd->max_keyN)
 
-static gboolean load_seltab(int tblidx, int seltabidx)
+
+static gboolean tblidx_to_str(int tblidx, char out[])
 {
   u_char *tbl_ch = tblch(tblidx);
   if (tbl_ch[0] < 0x80) {
-    load_phr(tblidx, seltab[seltabidx]);
+    load_phr(tblidx, out);
     return TRUE;
   }
 
-  int len = u8cpy(seltab[seltabidx], (char *)tbl_ch);
-  seltab[seltabidx][len] = 0;
+  int len = u8cpy(out, (char *)tbl_ch);
+  out[len] = 0;
 
   return FALSE;
+}
+
+
+static gboolean load_seltab(int tblidx, int seltabidx)
+{
+  return tblidx_to_str(tblidx, seltab[seltabidx]);
 }
 
 
@@ -625,39 +632,9 @@ static void page_no_str(char tstr[])
 
 char *htmlspecialchars(char *s, char out[])
 {
-  struct {
-    char c;
-    char *str;
-  } chs[]= {{'>',"gt"}, {'<',"lt"}, {'&',"amp"}
-#if 0
-  , {' ',"nbsp"}
-#endif
-  };
-  int chsN=sizeof(chs)/sizeof(chs[0]);
-
-  int outn=0;
-  while (*s) {
-    int sz = utf8_sz(s);
-    int i;
-    for(i=0; i<chsN; i++)
-      if (chs[i].c==*s)
-        break;
-    if (i==chsN) {
-      memcpy(&out[outn],s, sz);
-      outn+=sz;
-      s+=sz;
-    }
-    else {
-      out[outn++]='&';
-      int len=strlen(chs[i].str);
-      memcpy(&out[outn], chs[i].str, len);
-      outn+=len;
-      out[outn++]=';';
-      s++;
-    }
-  }
-
-  out[outn]=0;
+  char *tstr=g_markup_escape_text(s, -1);
+  strcpy(out, tstr);
+  g_free(tstr);
   return out;
 }
 
@@ -675,7 +652,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
       clear_page_label();
   }
 
-  char tt[1024];
+  char tt[4096];
   tt[0]=0;
   char uu[MAX_CIN_PHR];
 
@@ -722,19 +699,7 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
           utf8cpy_bytes(uu, selback, 120);
           strcat(tt, uu);
         } else {
-          char *p = selback;
-
-          static char *skip[]={"http://", "ftp://", "https://", NULL};
-
-          int j;
-          for(j=0; skip[j]; j++)
-            if (!strncmp(seltab[i], skip[j], strlen(skip[j]))) {
-              p+=strlen(skip[j]);
-              break;
-            }
-
-          utf8cpy_bytes(uu, p, 6 * 3);
-          strcat(strcat(tt, uu), " ");
+          strcat(strcat(tt, selback), " ");
         }
       }
 
@@ -954,6 +919,7 @@ gboolean win_sym_page_up(), win_sym_page_down();
 u_int64_t vmaskci;
 gboolean gtab_pre_select_idx(int c);
 void save_CS_current_to_temp();
+void disp_tray_icon();
 
 gboolean feedkey_gtab(KeySym key, int kbstate)
 {
@@ -975,12 +941,16 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (!cur_inmd)
     return 0;
-
+#if UNIX
+  if (key == XK_Caps_Lock)
+    capslock_on = !capslock_on; // X11 caplock is not on/off immediately
+#endif
   if (caps_eng_tog) {
     gboolean new_tsin_pho_mode =!capslock_on;
     if (current_CS->tsin_pho_mode != new_tsin_pho_mode) {
       current_CS->tsin_pho_mode = new_tsin_pho_mode;
       save_CS_current_to_temp();
+      disp_tray_icon();
     }
   }
 
@@ -1022,6 +992,9 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
     if (capslock_on && gcin_capslock_lower)
       case_inverse((KeySym *)&key, shift_m);
+
+    if (current_CS->b_half_full_char)
+      return full_char_proc(key);
 
     if (ggg.gbufN)
       insert_gbuf_cursor_char(key);
@@ -1092,6 +1065,8 @@ shift_proc:
       if (ggg.ci==1 && cur_inmd->use_quick) {
         int i;
         clr_seltab();
+
+        if (ggg.inch[0]-1 <MAX_GTAB_QUICK_KEYS)
         for(i=0;i<cur_inmd->M_DUP_SEL;i++)
           utf8cpy(seltab[i], (char *)cur_inmd->qkeys->quick1[ggg.inch[0]-1][i]);
 
@@ -1102,6 +1077,8 @@ shift_proc:
       if (ggg.ci==2 && cur_inmd->use_quick) {
         int i;
         clr_seltab();
+
+        if (ggg.inch[0]-1 <MAX_GTAB_QUICK_KEYS && ggg.inch[1]-1<MAX_GTAB_QUICK_KEYS)
         for(i=0;i<cur_inmd->M_DUP_SEL;i++)
           utf8cpy(seltab[i], (char *)cur_inmd->qkeys->quick2[ggg.inch[0]-1][ggg.inch[1]-1][i]);
 
@@ -1523,23 +1500,27 @@ keypad_proc:
         if (cur_inmd->use_quick && !pendkey) {
           if (ggg.ci==1) {
             int i;
-            for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
-              utf8cpy(seltab[i], (char *)&cur_inmd->qkeys->quick1[inkey-1][i]);
-            }
 
-            ggg.defselN=cur_inmd->M_DUP_SEL;
-            DispInArea();
-            goto Disp_opt;
+            if (inkey-1<MAX_GTAB_QUICK_KEYS) {
+              for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
+                utf8cpy(seltab[i], (char *)&cur_inmd->qkeys->quick1[inkey-1][i]);
+              }
+              ggg.defselN=cur_inmd->M_DUP_SEL;
+              DispInArea();
+              goto Disp_opt;
+            }
           } else
           if (ggg.ci==2 && !pselkey) {
-            int i;
-            for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
-              utf8cpy(seltab[i], (char *)&cur_inmd->qkeys->quick2[ggg.inch[0]-1][inkey-1][i]);
-            }
+            if (ggg.inch[0]-1 <MAX_GTAB_QUICK_KEYS && inkey-1<MAX_GTAB_QUICK_KEYS) {
+              int i;
+              for(i=0;i < cur_inmd->M_DUP_SEL; i++) {
+                utf8cpy(seltab[i], (char *)&cur_inmd->qkeys->quick2[ggg.inch[0]-1][inkey-1][i]);
+              }
 
-            ggg.defselN=cur_inmd->M_DUP_SEL;
-            DispInArea();
-            goto Disp_opt;
+              ggg.defselN=cur_inmd->M_DUP_SEL;
+              DispInArea();
+              goto Disp_opt;
+            }
           }
         }
       } else
@@ -1723,6 +1704,7 @@ refill:
 
       if (gtab_disp_partial_match_on() && (!seltab[fff][0] || seltab_phrase[fff] ||
            (bchcmp(seltab[fff], tbl_ch)>0 && fff > ggg.exa_match))) {
+
         seltab_phrase[fff] = load_seltab(j, fff);
         ggg.defselN++;
       }
@@ -1733,6 +1715,35 @@ refill:
 #endif
       j++;
     }
+
+#if 1
+	j=ggg.S1;
+	if (gtab_disp_partial_match_on())
+    while((CONVT2(cur_inmd, j) & vmaskci)==ggg.kval && j<oE1) {
+	  char jstr[512];
+	  tblidx_to_str(j, jstr);
+
+	  int fff;
+	  for(fff=0;fff<page_len();fff++)
+		 if (!strcmp(seltab[fff], jstr))
+			goto nextj;
+
+	  for(fff=0;fff<page_len();fff++) {
+         if (!seltab[fff][0]) {
+           seltab_phrase[fff] = load_seltab(j, fff);
+           ggg.defselN++;
+           break;
+		 }
+	  }
+
+      match_cnt++;
+#if 0
+      dbg("jj %d", fff); utf8_putchar(seltab[fff]); dbg("\n");
+#endif
+nextj:
+      j++;
+    }
+#endif
 
     if (gtab_unique_auto_send_on()) {
       char *first_str=NULL;

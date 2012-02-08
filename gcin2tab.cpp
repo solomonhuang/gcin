@@ -349,6 +349,9 @@ int main(int argc, char **argv)
       if (sequ(cmd,"%quick")) break;
       k=kno[mtolower(cmd[0])]-1;
 
+      if (k>=MAX_GTAB_QUICK_KEYS)
+        p_err("%d only key index < %d is allowed to used as %quick", lineno, MAX_GTAB_QUICK_KEYS);
+
       int N = 0;
       char *p = arg;
 
@@ -360,6 +363,10 @@ int main(int argc, char **argv)
       } else
       if (strlen(cmd)==2) {
         int k1=kno[mtolower(cmd[1])]-1;
+
+        if (k1>=MAX_GTAB_QUICK_KEYS)
+          p_err("%d only key index < %d is allowed to used as %quick", lineno, MAX_GTAB_QUICK_KEYS);
+
         while (*p) {
           char tp[4];
           int len=u8cpy(tp, p);

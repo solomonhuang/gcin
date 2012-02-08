@@ -103,7 +103,7 @@ extern FILE *fph;
 
 void load_ts_phrase()
 {
-  FILE *fp = fph;
+  FILE *fp = tsin_hand.fph;
 
   int i;
   for(i=0; i < phraseN; i++)

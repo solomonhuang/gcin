@@ -23,7 +23,7 @@ OBJS_TSLEARN=tslearn.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho
 OBJS_TS_EDIT=ts-edit.o util.o gcin-conf.o pho-util.o tsin-util.o gcin-send.o pho-sym.o \
              table-update.o locale.o gcin-settings.o gcin-common.o gcin-icon.o pho-dbg.o  \
              pho2pinyin.o pinyin.o lang.o gtab-list.o gtab-init.o fullchar.o \
-             gtab-tsin-fname.o unix-exec.o gtab-util.o
+             gtab-tsin-fname.o unix-exec.o gtab-util.o ts-upload.o ts-download.o
 
 OBJS_JUYIN_LEARN=juyin-learn.o locale.o util.o pho-util.o pho-sym.o pho2pinyin.o \
                  gcin-settings.o gcin-conf.o table-update.o pinyin.o gcin-icon.o pho-dbg.o
@@ -35,7 +35,7 @@ pinyin.o pho2pinyin.o pho-dbg.o
 OBJS_phoa2d=phoa2d.o pho-sym.o gcin-send.o gcin-conf.o locale.o pho-lookup.o util.o pho-dbg.o
 OBJS_kbmcv=kbmcv.o pho-sym.o util.o locale.o
 OBJS_tsd2a32=tsd2a32.o pho-sym.o pho-dbg.o locale.o util.o gtab-dbg.o pho2pinyin.o \
-	gcin-conf.o pinyin.o
+	gcin-conf.o pinyin.o tsin-util.o lang.o unix-exec.o
 OBJS_gcin2tab=gcin2tab.o gtab-util.o util.o locale.o
 OBJS_gtab_merge=gtab-merge.o gtab-util.o util.o locale.o
 OBJS_gcin_tools=gcin-setup.o gcin-conf.o util.o gcin-send.o gcin-settings.o html-browser.o \
@@ -82,7 +82,7 @@ OBJ_IMSRV=im-addr.o im-dispatch.o im-srv.o gcin-crypt.o
 
 PROGS=gcin tsd2a32 tsa2d32 phoa2d phod2a tslearn gcin-tools gcin2tab \
 	juyin-learn sim2trad gcin-gb-toggle gcin-message gtab-merge \
-	gcin-kbm-toggle tsin2gtab-phrase gcin-exit ts-edit
+	gcin-kbm-toggle tsin2gtab-phrase gcin-exit ts-edit ts-contribute
 PROGS_SYM=trad2sim
 PROGS_CV=kbmcv pin-juyin
 
@@ -112,6 +112,9 @@ tslearn:        $(OBJS_TSLEARN)
 
 ts-edit:        $(OBJS_TS_EDIT)
 	$(CCLD) $(gcc_ld_run_path) -o $@ $(OBJS_TS_EDIT) -L./im-client -lgcin-im-client $(LDFLAGS)
+
+ts-contribute:	ts-edit
+	ln -s $< $@
 
 juyin-learn:        $(OBJS_JUYIN_LEARN)
 	$(CCLD) -o $@ $(OBJS_JUYIN_LEARN) $(LDFLAGS)

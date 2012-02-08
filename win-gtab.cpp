@@ -103,12 +103,18 @@ void gtab_disp_empty(char *tt, int N)
 {
   int i;
 
-  if (!need_label_edit())
+  if (N < 1)
+    N = 1;
+
+  if (!need_label_edit() && gcin_pop_up_win)
     return;
 
   for (i=0;i < N; i++)
-//    strcat(tt, _(_L("﹍")));
+#if 0
+    strcat(tt, _(_L("﹍")));
+#else
     strcat(tt, _(_L("　")));
+#endif
 }
 
 void clear_gtab_in_area()
@@ -197,6 +203,7 @@ void change_gtab_font_size()
 }
 
 void show_win_gtab();
+gboolean gtab_vertical_select_on();
 
 void disp_gtab_sel(char *s)
 {
@@ -213,12 +220,13 @@ void disp_gtab_sel(char *s)
     return;
 #endif
 
-  if (!s[0])
-    gtk_widget_hide(label_gtab_sele);
+  if (!s[0] && (gcin_pop_up_win||gtab_vertical_select_on()))
+      gtk_widget_hide(label_gtab_sele);
   else {
     if (gwin_gtab && !GTK_WIDGET_VISIBLE(gwin_gtab))
        show_win_gtab();
-    gtk_widget_show(label_gtab_sele);
+    if (s[0])
+      gtk_widget_show(label_gtab_sele);
   }
 
 //  dbg("disp_gtab_sel '%s'\n", s);

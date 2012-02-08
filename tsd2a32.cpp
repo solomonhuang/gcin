@@ -17,6 +17,20 @@ char *phokey2pinyin(phokey_t k);
 gboolean is_pinyin_kbm();
 char *sys_err_strA();
 void init_TableDir();
+extern char *tsin32_f;
+void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i, gboolean read_only);
+
+void swap_ptr(char **a, char **b)
+{
+  char *t;
+  t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void set_is_chs();
+gboolean tsin_seek_ex(TSIN_HANDLE *ptsin_hand, void *pho, int plen, int *r_sti, int *r_edi, char *tone_mask);
+void load_tsin_entry_ex(TSIN_HANDLE *ptsin_hand, int idx, char *len, usecount_t *usecount, void *pho, u_char *ch);
 
 int main(int argc, char **argv)
 {
@@ -25,15 +39,19 @@ int main(int argc, char **argv)
   char clen;
   usecount_t usecount;
   gboolean pr_usecount = TRUE;
-  char *fname;
+#define MAX_MINUS_FILES 16
+  char *fnames_minus[MAX_MINUS_FILES];
+  int fnames_minusN = 0;
+  gboolean binary_out = FALSE;
+  char *fname = NULL;
   char *fname_out = NULL;
+  char *fname_out_save = NULL;
+  char fname_tmp[128];
+  char ts_user_fname[128];
+
 
   gtk_init(&argc, &argv);
 
-  if (argc <= 1) {
-    printf("%s: file name expected\n", argv[0]);
-    exit(1);
-  }
 
   init_TableDir();
 
@@ -45,8 +63,18 @@ int main(int argc, char **argv)
       pr_usecount = FALSE;
       b_pinyin = FALSE;
     } else
+    if (!strcmp(argv[i], "-minus")) {
+      if (i==argc-1 || argv[i+1][0]=='-')
+        p_err("-o need minus file name");
+      fnames_minus[fnames_minusN++] = argv[i+1];
+      i+=2;
+    } else
+    if (!strcmp(argv[i], "-b")) {
+      i++;
+      binary_out = TRUE;
+    } else
     if (!strcmp(argv[i], "-o")) {
-      if (i==argc-1)
+      if (i==argc-1 || argv[i+1][0]=='-')
         p_err("-o need out file name");
         fname_out = argv[i+1];
         i+=2;
@@ -54,16 +82,56 @@ int main(int argc, char **argv)
       fname = argv[i++];
   }
 
+  for(i=0;i<fnames_minusN;i++)
+    dbg(" %s\n", fnames_minus[i]);
+
+
+  TSIN_HANDLE tsin_hands[MAX_MINUS_FILES];
+
+  bzero(&tsin_hands, sizeof(tsin_hands));
+
+#if 0
+  fnames_minusN = 1;
+#endif
+
+  if (fnames_minusN) {
+    set_is_chs();
+
+    for(i=0;i<fnames_minusN;i++) {
+      dbg("fnames_minus %s\n", fnames_minus[i]);
+      load_tsin_db_ex(&tsin_hands[i], fnames_minus[i], FALSE, TRUE);
+    }
+
+    if (!fname) {
+      get_gcin_user_fname(tsin32_f, ts_user_fname);
+      fname = ts_user_fname;
+    }
+  }
+
+#if 0
+  fnames_minusN = 1;
+#endif
+
+  if (!fname)
+    p_err("%s: tsin32 file name expected\n", argv[0]);
+
+
+  if (binary_out) {
+    get_gcin_user_fname("tsd2a_tmp", fname_tmp);
+    fname_out_save = fname_out;
+    fname_out = fname_tmp;
+  }
+
   FILE *fp_out;
 
   if (!fname_out) {
     fp_out = stdout;
   } else {
-    dbg("%s use %s\n", argv[0], fname_out);
+    dbg("output file %s\n", fname_out);
+
     fp_out = fopen(fname_out, "w");
     if (!fp_out)
       p_err("cannot create %s\n", fname_out);
-
   }
 
   if (b_pinyin)
@@ -117,7 +185,7 @@ int main(int argc, char **argv)
       fread(phbuf64, 8, clen, fp);
 
 
-    char tt[512];
+    char tt[MAX_PHRASE_STR_LEN];
     int ttlen=0;
     tt[0]=0;
     for(i=0;i<clen;i++) {
@@ -142,8 +210,41 @@ int main(int argc, char **argv)
     if (is_deleted)
       continue;
 
-    fprintf(fp_out, "%s ", tt);
+    gboolean minus_found = FALSE;
+    if (fnames_minusN) {
+      int f;
+      for(f=0; f <fnames_minusN;f++) {
+        int sti, edi;
+        if (tsin_seek_ex(&tsin_hands[f], phbuf, clen, &sti, &edi, NULL)) {
+          int k;
+          for (k=sti; k < edi; k++) {
+            char klen;
+            usecount_t kuse;
+            phokey_t ph_k[MAX_PHRASE_LEN];
+            char str_k[MAX_PHRASE_STR_LEN];
 
+            load_tsin_entry_ex(&tsin_hands[f], k, &klen, &kuse, ph_k, (unsigned char *)str_k);
+            if (klen != clen)
+              continue;
+            if (memcmp(phbuf, ph_k, sizeof(phokey_t) * clen))
+              continue;
+            if (memcmp(phbuf, ph_k, sizeof(phokey_t) * clen))
+              continue;
+            if (!utf8_str_eq(str_k, str_k, clen))
+              continue;
+
+            minus_found = TRUE;
+            goto fou;
+          }
+        }
+      }
+    }
+
+fou:
+    if (minus_found)
+      continue;
+
+    fprintf(fp_out, "%s ", tt);
     for(i=0;i<clen;i++) {
       if (phsz==2) {
         if (b_pinyin) {
@@ -174,6 +275,17 @@ int main(int argc, char **argv)
 stop:
   fclose(fp);
   fclose(fp_out);
+
+  if (binary_out) {
+
+#if UNIX
+    putenv("GCIN_NO_RELOAD=");
+    unix_exec(GCIN_BIN_DIR"/tsa2d32 %s %s", fname_out, fname_out_save);
+#else
+    _putenv("GCIN_NO_RELOAD=Y");
+    win32exec_va("tsa2d32", fname_out, fname_out_save, NULL);
+#endif
+  }
 
   exit(0);
 }

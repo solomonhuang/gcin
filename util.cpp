@@ -243,9 +243,12 @@ void p_err(char *format, ...) {
 #endif
 	char tt[512];
 	vsprintf_s(tt, sizeof(tt), format, ap);
-	char exe[512];
-	GetModuleFileNameA(NULL, exe, sizeof(exe));
-	MessageBoxA(NULL, tt, exe, MB_OK);
+	WCHAR exe[512];
+	GetModuleFileNameW(NULL, exe, ARRAYSIZE(exe));
+
+	WCHAR u16[512];
+	utf8_to_16(tt, u16, ARRAYSIZE(u16));
+	MessageBoxW(NULL, u16, exe, MB_OK);
 	exit(0);
 	va_end(ap);
 

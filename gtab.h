@@ -17,9 +17,11 @@ typedef struct {
   u_char ch[CH_SZ];
 } ITEM64;
 
+#define MAX_GTAB_QUICK_KEYS 46
+
 typedef struct {
-  char quick1[46][10][CH_SZ];
-  char quick2[46][46][10][CH_SZ];
+  char quick1[MAX_GTAB_QUICK_KEYS][10][CH_SZ];
+  char quick2[MAX_GTAB_QUICK_KEYS][MAX_GTAB_QUICK_KEYS][10][CH_SZ];
 } QUICK_KEYS;
 
 

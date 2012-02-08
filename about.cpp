@@ -15,57 +15,27 @@ void align_with_ui_window(GtkWidget *win);
 int html_browser(char *fname);
 
 
-static void callback_forum( GtkWidget *widget, gpointer   data)
-{
 #if WIN32
 #define FURL "http://hyperrate.com/dir.php?eid=215"
-	ShellExecuteA(NULL, "open", FURL, NULL, NULL, SW_SHOWNORMAL);
 #else
 #define FURL "http://hyperrate.com/dir.php?eid=67"
-	html_browser(FURL);
 #endif
-}
 
 #define LOG_URL "http://www.csie.nctu.edu.tw/~cp76/gcin/download/Changelog.html"
-
-static void callback_changelog( GtkWidget *widget, gpointer   data)
-{
-#if WIN32
-	ShellExecuteA(NULL, "open", LOG_URL, NULL, NULL, SW_SHOWNORMAL);
-#else
-	html_browser(LOG_URL);
-#endif
-}
-
 #define ET26_URL "http://hyperrate.com/thread.php?tid=22661"
-static void callback_et26( GtkWidget *widget, gpointer   data)
-{
-#if WIN32
-	ShellExecuteA(NULL, "open", ET26_URL, NULL, NULL, SW_SHOWNORMAL);
-#else
-	html_browser(ET26_URL);
-#endif
-}
-
 #define PUNC_URL "http://hyperrate.com/thread.php?tid=19444#19444"
-static void callback_punc( GtkWidget *widget, gpointer   data)
+#define ADD_PHRASE_URL "http://hyperrate.com/thread.php?tid=23991#23991"
+#define SPLIT_PHRASE_URL "http://hyperrate.com/thread.php?tid=26361"
+
+static void callback_url( GtkWidget *widget, gpointer   data)
 {
 #if WIN32
-	ShellExecuteA(NULL, "open", PUNC_URL, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecuteA(NULL, "open", (char *)data, NULL, NULL, SW_SHOWNORMAL);
 #else
-	html_browser(PUNC_URL);
+	html_browser(data);
 #endif
 }
 
-#define ADD_PHRASE_URL "http://hyperrate.com/thread.php?tid=23991#23991"
-static void callback_add_phrase( GtkWidget *widget, gpointer   data)
-{
-#if WIN32
-	ShellExecuteA(NULL, "open", ADD_PHRASE_URL, NULL, NULL, SW_SHOWNORMAL);
-#else
-	html_browser(PUNC_URL);
-#endif
-}
 
 
 void sys_icon_fname(char *iconame, char fname[]);
@@ -88,7 +58,7 @@ void create_about_window()
 
     gtk_window_set_title (GTK_WINDOW (about_window), _(_L("關於 gcin")));
 
-    /* It's a good idea to do this for all windows. */
+
     g_signal_connect (G_OBJECT (about_window), "destroy",
 	              G_CALLBACK (callback_close), NULL);
 
@@ -112,21 +82,22 @@ void create_about_window()
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 3);
 
 // this doesn't work on win32
-#if GTK_CHECK_VERSION(2,18,9) && UNIX
-   char tmp[512];
+#if GTK_CHECK_VERSION(2,18,9) && UNIX && 1
+   char tmp[1024];
    sprintf(tmp, "<a href='http://hyperrate.com/dir.php?eid=67'>%s</a>\n"
                 "<a href='http://hyperrate.com/dir.php?eid=215'>%s</a>\n"
                 "<a href='"LOG_URL"'>%s</a>\n"
                 "<a href='"ET26_URL"'>%s</a>\n"
                 "<a href='"PUNC_URL"'>%s</a>\n"
                 "<a href='"ADD_PHRASE_URL"'>%s</a>\n"
-                ,
+                "<a href='"SPLIT_PHRASE_URL"'>%s</a>\n",
                 _(_L("前往 gcin 討論區")),
                 _(_L("gcin也有 Windows版")),
                 _(_L("gcin改變記錄")),
                 _(_L("推薦使用26鍵的注音鍵盤")),
                 _(_L("使用詞音輸入標點符號")),
-                _(_L("如何新增詞"))
+                _(_L("如何新增詞")),
+                _(_L("如何手動斷詞"))
 
           );
    GtkWidget *label = gtk_label_new(tmp);
@@ -136,27 +107,32 @@ void create_about_window()
     GtkWidget *button_forum = gtk_button_new_with_label(_(_L("討論區")));
     gtk_box_pack_start(GTK_BOX(vbox), button_forum, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_forum), "clicked",
-		      G_CALLBACK (callback_forum), NULL);
+		      G_CALLBACK (callback_url), FURL);
+
     GtkWidget *button_changelog = gtk_button_new_with_label(_(_L("gcin改變記錄")));
     gtk_box_pack_start(GTK_BOX(vbox), button_changelog, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_changelog), "clicked",
-		      G_CALLBACK (callback_changelog), NULL);
+		      G_CALLBACK (callback_url), LOG_URL);
 
     GtkWidget *button_et26 = gtk_button_new_with_label(_(_L("推薦使用26鍵的注音鍵盤")));
     gtk_box_pack_start(GTK_BOX(vbox), button_et26, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_et26), "clicked",
-		      G_CALLBACK (callback_et26), NULL);
+		      G_CALLBACK (callback_url), ET26_URL);
 
     GtkWidget *button_punc = gtk_button_new_with_label(_(_L("使用詞音輸入標點符號")));
     gtk_box_pack_start(GTK_BOX(vbox), button_punc, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_punc), "clicked",
-		      G_CALLBACK (callback_punc), NULL);
+		      G_CALLBACK (callback_url), PUNC_URL);
 
     GtkWidget *button_add_phrase = gtk_button_new_with_label(_(_L("如何新增詞")));
     gtk_box_pack_start(GTK_BOX(vbox), button_add_phrase, FALSE, FALSE, 0);
     g_signal_connect (G_OBJECT (button_add_phrase), "clicked",
-		      G_CALLBACK (callback_add_phrase), NULL);
+		      G_CALLBACK (callback_url), ADD_PHRASE_URL);
 
+    GtkWidget *button_split_phrase = gtk_button_new_with_label(_(_L("如何手動斷詞")));
+    gtk_box_pack_start(GTK_BOX(vbox), button_split_phrase, FALSE, FALSE, 0);
+    g_signal_connect (G_OBJECT (button_split_phrase), "clicked",
+		      G_CALLBACK (callback_url), SPLIT_PHRASE_URL);
 
 #endif
 

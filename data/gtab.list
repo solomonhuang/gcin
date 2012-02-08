@@ -1,9 +1,9 @@
 EN e !EN gcin-tray.png
 
 #####符號輸出類#########
-# ↓↓↓ ~/.gcin/symbol-tableq
+# ↓↓↓ ~/.gcin/symbol-table
 符號表 4 !SYMBOL_TABLE symbol_table.png
-小鍵盤 , symbols.gtab symbols.png
+符號小鍵盤 , symbols.gtab symbols.png
 
 #####注音/拼音類#########
 注音 3 !PHO juyin.png
@@ -19,7 +19,7 @@ EN e !EN gcin-tray.png
 亂倉打鳥 \ NewCJ3.gtab NewCJ3.png
 五四三倉頡 2 cj543.gtab cj543.png
 #五四三倉頡會由詞庫自動選字  http://hyperrate.com/thread.php?tid=12828
-簡易 - simplex.gtab simplex.png
+速成/簡易 - simplex.gtab simplex.png
 標點簡易 - simplex-punc.gtab simplex-punc.png
 
 #####大易類#########
@@ -30,6 +30,7 @@ EN e !EN gcin-tray.png
 行列 8 ar30.gtab ar30.png
 行列大字集 8 ar30-big.gtab ar30-big.png
 行列33 8 ar33.gtab ar33.png
+行列符號 8 array-symbols.gtab ar30-big.png
 
 #####其他類#########
 嘸蝦米 9 noseeing.gtab noseeing.png
@@ -42,5 +43,6 @@ EN e !EN gcin-tray.png
 hangul / hangul.gtab hangul.png
 greek ` greek.gtab greek.png
 latin-letters [ latin-letters.gtab latin-letters.png
+En-words [ vocabulary.gtab latin-letters.png
 russian ? russian.gtab russian.png
 ### russian by yuriy

@@ -1,5 +1,3 @@
-extern int phcount;
-extern int hashidx[];
 //extern int *phidx;
 //extern FILE *fph;
 
@@ -49,3 +47,13 @@ typedef struct PRE_SEL {
 
 extern gboolean tsin_is_gtab;
 extern int ph_key_sz;
+
+
+typedef struct {
+FILE *fph, *fp_phidx;
+int phcount;
+int a_phcount;
+int hashidx[TSIN_HASH_N];
+} TSIN_HANDLE;
+
+extern TSIN_HANDLE tsin_hand;

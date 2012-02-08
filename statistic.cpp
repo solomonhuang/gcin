@@ -26,6 +26,9 @@ void disp_stat()
 
   sprintf(tt, _(_L("1,3,5分鐘\n%d,%d,%d/分")), get_ch_count(1), get_ch_count(3), get_ch_count(5));
   gtk_label_set_text(GTK_LABEL(label_disp), tt);
+#if WIN32
+  gtk_window_present(GTK_WINDOW(gwin_stat));
+#endif
 }
 
 void add_ch_time()

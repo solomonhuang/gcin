@@ -117,9 +117,14 @@ void load_gtab_list(gboolean skip_disabled)
       for(i=0; method_codes[i].id; i++)
         if (!strcmp(file, method_codes[i].id))
           break;
+
       if (method_codes[i].id) {
         pinmd->method_type = method_codes[i].method_type;
-      }
+      } else
+      if (strstr(file,".gtab"))
+        pinmd->method_type = method_type_GTAB;
+      else
+        p_err("unknown file type %s", file);
     }
 
     pinmd->in_cycle =

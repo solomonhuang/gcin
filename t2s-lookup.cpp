@@ -37,6 +37,11 @@ static int translate(char *fname, char *str, int strN, char **out)
 {
   char fullname[128];
 
+  if (!strN) {
+    *out = strdup(str);
+    return 0;
+  }
+
   get_sys_table_file_name(fname, fullname);
 
   if ((fp=fopen(fullname, "rb"))==NULL)
@@ -59,8 +64,10 @@ static int translate(char *fname, char *str, int strN, char **out)
   }
 
   fclose(fp);
+
   *out = op;
   op[opN]=0;
+
   return opN;
 }
 
