@@ -165,6 +165,8 @@ fi
 LIB='lib'
 if [ -d /usr/lib64 -a -d /lib64 ]; then
 LIB='lib64'
+# for fedora 64bit
+GTK_QUERY_IM_64='-64'
 fi
 
 QT_IM='N'
@@ -236,6 +238,11 @@ sed -e "s/__gcin_version__/$GCIN_VERSION/" < gcin.spec.in > gcin.spec
 if [ $QT_IM = 'N' ]; then
   mv gcin.spec gcin.spec.tmp
   grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
+else
+  for i in /usr/share/qt/bin/moc /usr/lib/qt/bin/moc /usr/lib64/qt/bin/moc
+  do
+    [ -x $i ] && QT_MOC=$i && echo "QT_MOC=$QT_MOC"
+  done
 fi
 
 
@@ -247,7 +254,7 @@ if [ $QT4_IM = 'N' ]; then
 else
   for i in /usr/share/qt4/bin/moc /usr/lib/qt4/bin/moc /usr/lib64/qt4/bin/moc
   do
-	[ -x $i ] && QT4_MOC=$i
+    [ -x $i ] && QT4_MOC=$i && echo "QT4_MOC=$QT4_MOC"
   done
 fi
 
@@ -309,7 +316,9 @@ echo "USE_ANTHY=$USE_ANTHY" >> config.mak
 echo "USE_CHEWING=$USE_CHEWING" >> config.mak
 echo "USE_GCB=$use_gcb" >> config.mak
 echo "BUILD_MODULE=$BUILD_MODULE" >> config.mak
+echo "GTK_QUERY_IM_64=$GTK_QUERY_IM_64" >> config.mak
 [ $QT4_IM = 'Y' ] && echo "QT4_MOC=$QT4_MOC" >> config.mak
+[ $QT_IM = 'Y' ] && echo "QT_MOC=$QT_MOC" >> config.mak
 
 if [ $prefix = /usr/local ]; then
   echo "gcin_ld_run_path=$PWD:\$(gcinlibdir)" >> config.mak

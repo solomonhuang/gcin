@@ -355,6 +355,7 @@ static GtkWidget *spinner_gcin_font_size, *spinner_gcin_font_size_tsin_presel,
                  *spinner_gcin_font_size_win_kbm_en,
                  *spinner_gcin_font_size_tsin_pho_in, *spinner_gcin_font_size_gtab_in, *spinner_root_style_x,
                  *spinner_root_style_y, *font_sel;
+static GdkColor tsin_cursor_gcolor;
 
 static GtkWidget *label_win_color_test, *event_box_win_color_test;
 
@@ -437,10 +438,14 @@ static gboolean cb_appearance_conf_ok( GtkWidget *widget,
   cstr = gtk_color_selection_palette_to_string(&gcin_sel_key_gcolor, 1);
   dbg("selkey color %s\n", cstr);
   save_gcin_conf_str(GCIN_SEL_KEY_COLOR, cstr);
+  g_free(cstr);
 
   int idx = gtk_combo_box_get_active (GTK_COMBO_BOX (opt_gcin_edit_display));
   save_gcin_conf_int(GCIN_EDIT_DISPLAY, edit_disp[idx].keynum);
 
+  cstr = gtk_color_selection_palette_to_string(&tsin_cursor_gcolor, 1);
+  dbg("color %s\n", cstr);
+  save_gcin_conf_str(TSIN_CURSOR_COLOR, cstr);
   g_free(cstr);
 
 
@@ -666,6 +671,45 @@ static gboolean cb_gcin_win_color_use(GtkToggleButton *togglebutton, gpointer us
   return TRUE;
 }
 
+static GtkWidget *da_cursor;
+static void cb_save_tsin_cursor_color(GtkWidget *widget, gpointer user_data)
+{
+  GtkColorSelectionDialog *color_selector = (GtkColorSelectionDialog *)user_data;
+  gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(color_selector)), &tsin_cursor_gcolor);
+
+#if !GTK_CHECK_VERSION(2,91,6)
+  gtk_widget_modify_bg(da_cursor, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+#else
+  GdkRGBA rgbbg;
+  gdk_rgba_parse(&rgbbg, gdk_color_to_string(&tsin_cursor_gcolor));
+  gtk_widget_override_background_color(da_cursor, GTK_STATE_FLAG_NORMAL, &rgbbg);
+#endif
+}
+
+static gboolean cb_tsin_cursor_color( GtkWidget *widget, gpointer   data )
+{
+   GtkWidget *color_selector = gtk_color_selection_dialog_new (_(_L("編輯區游標的顏色")));
+
+   gtk_color_selection_set_current_color(
+           GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_selector))),
+           &tsin_cursor_gcolor);
+
+   gtk_widget_show((GtkWidget*)color_selector);
+#if 1
+   if (gtk_dialog_run(GTK_DIALOG(color_selector)) == GTK_RESPONSE_OK)
+     cb_save_tsin_cursor_color((GtkWidget *)color_selector, (gpointer) color_selector);
+   gtk_widget_destroy((GtkWidget *)color_selector);
+#endif
+   return TRUE;
+}
+
+static gboolean cb_appearance_help( GtkWidget *widget,
+                                   GdkEvent  *event,
+                                   gpointer   data )
+{
+  html_browser("http://hyperrate.com/topic-files-dir/48/26548-L0IuDjFh0n/appearance_setting_help.html");
+  return TRUE;
+}
 
 void create_appearance_conf_window()
 {
@@ -908,6 +952,27 @@ void create_appearance_conf_window()
 
   disp_fg_bg_color();
 
+
+  GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_(_L("詞音游標的顏色")));
+  gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_cursor_color, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_cursor_color), 1);
+  GtkWidget *button_tsin_cursor_color = gtk_button_new();
+  g_signal_connect (G_OBJECT (button_tsin_cursor_color), "clicked",
+                    G_CALLBACK (cb_tsin_cursor_color), G_OBJECT (gcin_kbm_window));
+  da_cursor =  gtk_drawing_area_new();
+  gtk_container_add (GTK_CONTAINER (button_tsin_cursor_color), da_cursor);
+  gdk_color_parse(tsin_cursor_color, &tsin_cursor_gcolor);
+#if !GTK_CHECK_VERSION(2,91,6)
+  gtk_widget_modify_bg(da_cursor, GTK_STATE_NORMAL, &tsin_cursor_gcolor);
+#else
+  GdkRGBA rgbbg;
+  gdk_rgba_parse(&rgbbg, gdk_color_to_string(&tsin_cursor_gcolor));
+  gtk_widget_override_background_color(da_cursor, GTK_STATE_FLAG_NORMAL, &rgbbg);
+#endif
+  gtk_widget_set_size_request(da_cursor, 16, 2);
+  gtk_container_add (GTK_CONTAINER (frame_tsin_cursor_color), button_tsin_cursor_color);
+
+
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
   gtk_grid_set_column_homogeneous(GTK_GRID(hbox_cancel_ok), TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
@@ -941,6 +1006,13 @@ void create_appearance_conf_window()
 
   GTK_WIDGET_SET_FLAGS (button_close, GTK_CAN_DEFAULT);
   gtk_widget_grab_default (button_close);
+
+  GtkWidget *button_help = gtk_button_new_from_stock (GTK_STOCK_HELP);
+  gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_help, FALSE, FALSE, 0);
+
+  g_signal_connect (G_OBJECT (button_help), "clicked",
+                            G_CALLBACK (cb_appearance_help),
+                            G_OBJECT (gcin_appearance_conf_window));
 
   gtk_widget_show_all (gcin_appearance_conf_window);
 

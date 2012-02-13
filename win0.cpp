@@ -368,25 +368,6 @@ static void raw_move(int x, int y)
 //  dbg("gwin0:%x raw_move %d,%d\n", gwin0, x, y);
 }
 
-#if 0
-void compact_win0_x()
-{
-#if WIN32
-  if (test_mode)
-    return;
-#endif
-  if (!gwin0)
-    return;
-
-  gtk_window_resize(GTK_WINDOW(gwin0), 1, 1);
-  raw_move(best_win_x, best_win_y);
-#if WIN32
-  if (!timeout_handle)
-	timeout_handle = g_timeout_add(50, timeout_minimize_win0, NULL);
-#endif
-}
-#endif
-
 void compact_win0()
 {
 #if WIN32
@@ -437,12 +418,6 @@ void move_win0(int x, int y)
 //  dbg("move_win0 %d %d\n",x,y);
   win_x = x;
   win_y = y;
-
-#if WIN32 && 0
-  if (gwin1 && GTK_WIDGET_VISIBLE(gwin1)) {
-    gtk_window_move(GTK_WINDOW(gwin1), x, y);
-  }
-#endif
 
   move_win_sym();
 }
@@ -660,7 +635,7 @@ void show_win0()
 #endif
 
 #if _DEBUG && 1
-	dbg("show_win0 pop:%d in:%d for:%d \n", gcin_pop_up_win, tsin_has_input(), force_show);
+	dbg("show_win0 pop:%d in:%d for:%d win_xy:%d,%d\n", gcin_pop_up_win, tsin_has_input(), force_show, win_x, win_y);
 #endif
   create_win0();
   create_win0_gui();

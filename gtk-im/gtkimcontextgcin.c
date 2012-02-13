@@ -142,7 +142,7 @@ get_im (GtkIMContextGCIN *context_xim)
     return;
 
   if (!context_xim->gcin_ch) {
-    if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY())))
+    if (!(context_xim->gcin_ch = gcin_im_client_open(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()))))
       perror("cannot open gcin_ch");
 #if 1
     context_xim->timeout_handle = 0;

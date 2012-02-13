@@ -12,7 +12,7 @@ static GtkWidget **buttonArr;
 static gchar **buttonStr;
 static int maxButtonStrlen=9;
 // static GdkAtom atom_cutbuffer0;
-static char geomstr[5];
+static char *geomstr;
 static GtkWidget *snoop_button;
 #if !GTK_CHECK_VERSION(2,12,0)
 static GtkTooltips *button_bar_tips;
@@ -331,14 +331,18 @@ void gcb_main()
   old_gcb_position_x = gcb_position_x;
   old_gcb_position_y = gcb_position_y;
 
-  if (mainwin)
+  if (mainwin) {
     gtk_widget_destroy(mainwin);
+    mainwin = NULL;
+  }
 #if 0
   if (button_bar_tips)
     gtk_widget_destroy(button_bar_tips);
 #endif
-  if (hist_window)
+  if (hist_window) {
     gtk_widget_destroy(hist_window);
+    hist_window = NULL;
+  }
 
   if (!gcb_enabled)
     return;
@@ -346,9 +350,10 @@ void gcb_main()
 //  printf("gcb_position:%d\n", gcb_position);
 
   static char geo[][2]={{0,0},{'+','-'},{'+','+'},{'-','-'},{'-','+'}};
-  sprintf(geomstr, "%c%d%c%d",
+  g_free(geomstr);
+  geomstr = g_strdup_printf("%c%d%c%d",
   geo[gcb_position][0], gcb_position_x, geo[gcb_position][1], gcb_position_y);
-//  puts(geomstr);
+  dbg("geomstr %s\n", geomstr);
 
   if (!buttonArr) {
     buttonArr=(GtkWidget**)g_malloc(gcb_button_n * sizeof(GtkWidget *));

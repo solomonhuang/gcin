@@ -12,7 +12,7 @@ all:	libqgcin.so
 .cpp.E:
 	$(CXX) -E $(CFLAGS) $(INCS) $< > $@
 .h.o:
-	/usr/lib/$(QT)/bin/moc $< -o $<_moc.cpp
+	$(QT_MOC) $< -o $<_moc.cpp
 	$(CXX) -c -pipe $(CXXFLAGS) $(INCS) $<_moc.cpp -o $@
 
 libqgcin.so: $(OBJS)

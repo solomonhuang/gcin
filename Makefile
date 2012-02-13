@@ -195,6 +195,7 @@ ibin:	gcin-nocur
 	install $(PROGS) $(bindir); \
 	cp gcin-nocur $(bindir)/gcin; \
 	rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim
+	rm -f $(bindir)/ts-contribute; ln -sf ts-edit $(bindir)/ts-contribute
 	install $(GCIN_SO) $(gcinlibdir)
 
 install:
@@ -217,11 +218,13 @@ install:
 	   install -m 644 README.html Changelog.html $(DOC_DIR); \
 	   install $(PROGS) $(bindir); \
 	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim; \
+	   rm -f $(bindir)/ts-contribute; ln -sf ts-edit $(bindir)/ts-contribute; \
 	else \
 	   install -d $(DOC_DIR_i); \
 	   install -m 644 README.html Changelog.html $(DOC_DIR_i); \
 	   install -s $(PROGS) $(bindir); \
 	   rm -f $(bindir)/trad2sim; ln -sf sim2trad $(bindir)/trad2sim; \
+	   rm -f $(bindir)/ts-contribute; ln -sf ts-edit $(bindir)/ts-contribute; \
 	fi
 	$(MAKE) -C scripts install
 	$(MAKE) -C menu install

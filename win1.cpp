@@ -213,6 +213,11 @@ void init_tsin_selection_win()
   create_win1_gui();
 }
 
+static void minimize_win1()
+{
+  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
+}
+
 void clear_sele()
 {
   int i;
@@ -228,7 +233,7 @@ void clear_sele()
 
   gtk_widget_hide(arrow_up);
   gtk_widget_hide(arrow_down);
-  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
+  minimize_win1();
 #if WIN32
   gdk_flush();
 #endif
@@ -279,17 +284,6 @@ void set_sele_text(int tN, int i, char *text, int len)
   gtk_label_set_markup(GTK_LABEL(labels_sele[i]), tt);
 }
 
-#if WIN32
-static int timeout_handle;
-gboolean timeout_minimize_win1(gpointer data)
-{
-  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
-  gtk_window_present(GTK_WINDOW(gwin1));
-  timeout_handle = 0;
-  return FALSE;
-}
-#endif
-
 void raise_tsin_selection_win()
 {
   if (gwin1 && GTK_WIDGET_VISIBLE(gwin1))
@@ -297,17 +291,37 @@ void raise_tsin_selection_win()
 }
 
 
+#if WIN32 && 0
+static int timeout_handle;
+gboolean timeout_minimize_win1(gpointer data)
+{
+  gtk_widget_show(gwin1);
+  minimize_win1();
+  raise_tsin_selection_win();
+  timeout_handle = 0;
+  return FALSE;
+}
+#endif
+
+#if WIN32
+#include <gdk/gdkwin32.h>
+void set_win_pos_size(GtkWidget *win, int x, int y, int xl, int yl)
+{
+  dbg("set_win_size %d,%d %d %d\n", x, y, xl, yl);
+  HWND hwnd=(HWND)gdk_win32_drawable_get_handle(win->window);
+#if 1
+  SetWindowPos(hwnd, HWND_TOP, x, y, xl, yl, SWP_SHOWWINDOW);
+#else
+  MoveWindow(hwnd, x, y, xl, yl, false);
+#endif
+}
+#endif
+
 void getRootXY(Window win, int wx, int wy, int *tx, int *ty);
 void disp_selections(int x, int y)
 {
   if (!gwin1)
     p_err("disp_selections !gwin1");
-
-#if WIN32
-  if (!GTK_WIDGET_VISIBLE(gwin1)) {
-    gtk_widget_show(gwin1);
-  }
-#endif
 
   if (y < 0) {
 	 int tx;
@@ -316,7 +330,6 @@ void disp_selections(int x, int y)
 	 else
 		 y = win_y + win_yl;
   }
-
 
   int win1_xl, win1_yl;
   get_win_size(gwin1, &win1_xl, &win1_yl);
@@ -334,18 +347,26 @@ void disp_selections(int x, int y)
     y = win_y - win1_yl;
 
   gtk_window_move(GTK_WINDOW(gwin1), x, y);
-#if WIN32
-  if (!timeout_handle)
-    timeout_handle = g_timeout_add(50, timeout_minimize_win1, NULL);
-#endif
 
-#if UNIX
+#if WIN32 && 1
   if (!GTK_WIDGET_VISIBLE(gwin1)) {
     gtk_widget_show(gwin1);
   }
 #endif
-#if WIN32
-  raise_tsin_selection_win();
+
+#if WIN32 && 1
+#if 0
+  if (!timeout_handle)
+    timeout_handle = g_timeout_add(100, timeout_minimize_win1, NULL);
+#endif
+  set_win_pos_size(gwin1, x, y, win1_xl, win1_yl);
+  gtk_window_present(GTK_WINDOW(gwin1));
+#endif
+
+#if UNIX || 0
+  if (!GTK_WIDGET_VISIBLE(gwin1)) {
+    gtk_widget_show(gwin1);
+  }
 #endif
 }
 
@@ -353,7 +374,7 @@ void hide_selections_win()
 {
   if (!gwin1)
     return;
-#if WIN32
+#if WIN32 && 0
   if (timeout_handle) {
 	  g_source_remove(timeout_handle);
 	  timeout_handle = 0;
@@ -361,7 +382,7 @@ void hide_selections_win()
 #endif
 
 #if WIN32
-  gtk_window_resize(GTK_WINDOW(gwin1), 1, 1);
+  minimize_win1();
 #endif
   gtk_widget_hide(gwin1);
 }
