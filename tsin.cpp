@@ -1523,6 +1523,24 @@ static void tsin_create_win_save_phrase(int idx0, int len)
   create_win_save_phrase(wsp, len);
 }
 
+void tsin_sel_cursor_LR(gboolean is_inc)
+{
+  is_inc ^= pho_candicate_R2L;
+  int N;
+  N = phrase_count + pho_count - tss.current_page;
+  if (N > phkbm.selkeyN)
+    N = phkbm.selkeyN;
+
+  if (is_inc) {
+    tss.pho_menu_idx = (tss.pho_menu_idx+1) % N;
+  } else {
+    tss.pho_menu_idx--;
+    if (tss.pho_menu_idx < 0)
+      tss.pho_menu_idx = N-1;
+  }
+
+  disp_current_sel_page();
+}
 
 int feedkey_pp(KeySym xkey, int kbstate)
 {
@@ -1657,12 +1675,20 @@ int feedkey_pp(KeySym xkey, int kbstate)
 #if UNIX
      case XK_KP_Left:
 #endif
-        return cursor_left();
+        if (tss.sel_pho) {
+          tsin_sel_cursor_LR(FALSE);
+          return TRUE;
+        } else
+          return cursor_left();
      case XK_Right:
 #if UNIX
      case XK_KP_Right:
 #endif
-        return cursor_right();
+        if (tss.sel_pho) {
+          tsin_sel_cursor_LR(TRUE);
+          return TRUE;
+        } else
+          return cursor_right();
      case XK_Caps_Lock:
         if (caps_eng_tog) {
 #if 0
@@ -1729,9 +1755,8 @@ tab_phrase_end:
        N = phrase_count + pho_count - tss.current_page;
        if (N > phkbm.selkeyN)
          N = phkbm.selkeyN;
-       tss.pho_menu_idx--;
-       if (tss.pho_menu_idx < 0)
-         tss.pho_menu_idx = N-1;
+       if (tss.pho_menu_idx >=pho_candicate_col_N)
+         tss.pho_menu_idx-=pho_candicate_col_N;
        disp_current_sel_page();
        return 1;
      case XK_Prior:
@@ -1796,7 +1821,8 @@ change_char:
            int N = phrase_count + pho_count - tss.current_page;
            if (N > phkbm.selkeyN)
              N = phkbm.selkeyN;
-           tss.pho_menu_idx = (tss.pho_menu_idx+1) % N;
+           if (tss.pho_menu_idx+pho_candicate_col_N < N)
+             tss.pho_menu_idx = tss.pho_menu_idx+pho_candicate_col_N;
            disp_current_sel_page();
          }
        }

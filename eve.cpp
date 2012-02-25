@@ -727,6 +727,7 @@ void init_state_chinese(ClientState *cs)
 
 gboolean output_gbuf();
 void update_win_kbm();
+void flush_edit_buffer();
 
 void toggle_im_enabled()
 {
@@ -745,15 +746,7 @@ void toggle_im_enabled()
         return;
       }
 
-      if (current_method_type() == method_type_TSIN) {
-#if USE_TSIN
-        flush_tsin_buffer();
-#endif
-      }
-      else {
-        output_gbuf();
-        reset_gtab_all();
-      }
+      flush_edit_buffer();
 
       hide_in_win(current_CS);
 #if 0
@@ -927,10 +920,7 @@ gboolean init_in_method2(ClientState *cs, int in_no)
 
   if (cs==current_CS && cs->in_method != in_no) {
     if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM)) {
-      if (current_method_type() == method_type_TSIN) {
-        flush_tsin_buffer();
-      } else
-        output_gbuf();
+      flush_edit_buffer();
 
       hide_in_win(cs);
     }
@@ -1658,12 +1648,6 @@ void flush_edit_buffer()
       output_gbuf();
 //      dbg("metho %d\n", current_CS->in_method);
   }
-#if 0
-  dbg("output_bufferN:%d\n", output_bufferN);
-  if (output_bufferN) {
-    output_buffer_call_back();
-  }
-#endif
 }
 
 #if WIN32

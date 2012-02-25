@@ -25,7 +25,7 @@ static int *ts_gtab_hash;
 
 void get_gcin_user_or_sys_fname(char *name, char fname[]);
 
-void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i, gboolean read_only)
+void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i, gboolean read_only, gboolean use_idx)
 {
   char tsidxfname[512];
   char *fmod = read_only?"rb":"rb+";
@@ -41,18 +41,19 @@ void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i,
 
   FILE *fp_phidx = ptsin_hand->fp_phidx, *fph = ptsin_hand->fph;
 
-  if ((fp_phidx=fopen(tsidxfname, fmod))==NULL) {
-    p_err("load_tsin_db0 A Cannot open '%s'\n", tsidxfname);
-  }
-  ptsin_hand->fp_phidx = fp_phidx;
+  if (use_idx) {
+    if ((fp_phidx=fopen(tsidxfname, fmod))==NULL) {
+      p_err("load_tsin_db_ex A Cannot open '%s'\n", tsidxfname);
+    }
+    ptsin_hand->fp_phidx = fp_phidx;
 
-
-  fread(&ptsin_hand->phcount,4,1, fp_phidx);
+    fread(&ptsin_hand->phcount,4,1, fp_phidx);
+    fread(&ptsin_hand->hashidx,1,sizeof(ptsin_hand->hashidx), fp_phidx);
 #if     0
   printf("phcount:%d\n",phcount);
 #endif
-  ptsin_hand->a_phcount=ptsin_hand->phcount+256;
-  fread(&ptsin_hand->hashidx,1,sizeof(ptsin_hand->hashidx), fp_phidx);
+    ptsin_hand->a_phcount=ptsin_hand->phcount+256;
+  }
 
 
   if (fph)
@@ -88,7 +89,7 @@ void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i,
 
 void load_tsin_db0(char *infname, gboolean is_gtab_i)
 {
-  load_tsin_db_ex(&tsin_hand, infname, is_gtab_i, FALSE);
+  load_tsin_db_ex(&tsin_hand, infname, is_gtab_i, FALSE, TRUE);
 }
 
 void free_tsin_ex(TSIN_HANDLE *ptsin_hand)

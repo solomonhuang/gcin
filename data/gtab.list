@@ -8,7 +8,7 @@ EN e !EN gcin-tray.png
 #####注音/拼音類#########
 注音 3 !PHO juyin.png
 詞音/拼音 6 !TSIN tsin.png
-新酷音 [ chewing-module.so chewing.png
+!新酷音 [ chewing-module.so chewing.png
 #拼音 5 pinyin.gtab pinyin.png
 # gtab 拼音現在不用了，改用詞音的拼音
 
@@ -30,7 +30,7 @@ EN e !EN gcin-tray.png
 行列 8 ar30.gtab ar30.png
 行列大字集 8 ar30-big.gtab ar30-big.png
 行列33 8 ar33.gtab ar33.png
-行列符號 8 array-symbols.gtab ar30-big.png
+行列符號 8 array-symbols.gtab array-symbols.png
 
 #####其他類#########
 嘸蝦米 9 noseeing.gtab noseeing.png
@@ -39,10 +39,10 @@ EN e !EN gcin-tray.png
 #輕鬆 2 ez7.gtab
 
 #####外語類#########
-日本anthy = anthy-module.so kana-nippon.png
+!日本anthy = anthy-module.so kana-nippon.png
 hangul / hangul.gtab hangul.png
 greek ` greek.gtab greek.png
 latin-letters [ latin-letters.gtab latin-letters.png
-En-words [ vocabulary.gtab latin-letters.png
+En-words [ vocabulary.gtab vocabulary.png
 russian ? russian.gtab russian.png
 ### russian by yuriy

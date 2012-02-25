@@ -2,7 +2,7 @@
 rm -fr debian
 patch -p1 < $0
 chmod 755 debian/rules
-sed -i "s#9-9#`cat VERSION.gcin | sed -e 's/.pre/~pre/' -e 's/$/-2/'`#" debian/changelog
+sed -i "s#9-9#`cat VERSION.gcin | sed -e 's/.pre/~pre/' -e 's/$/-0/'`#" debian/changelog
 exec dpkg-buildpackage -b
 --- a/debian/changelog
 +++ b/debian/changelog

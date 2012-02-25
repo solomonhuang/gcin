@@ -30,6 +30,7 @@ void init_TableDir();
 void init_gtab(int inmdno);
 gboolean init_tsin_table_fname(INMD *p, char *fname);
 void load_tsin_db0(char *infname, gboolean is_gtab_i);
+void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i, gboolean read_only, gboolean use_idx);
 
 GtkWidget *vbox_top;
 INMD *pinmd;
@@ -566,9 +567,9 @@ void do_exit()
 {
   send_gcin_message(
 #if UNIX
-	  dpy,
+    dpy,
 #endif
-	  RELOAD_TSIN_DB);
+     RELOAD_TSIN_DB);
 
   exit(0);
 }
@@ -760,11 +761,14 @@ int main(int argc, char **argv)
 
   char gcin_dir[512];
   get_gcin_dir(gcin_dir);
+
+  if (argc < 2) {
 #if UNIX
   chdir(gcin_dir);
 #else
   _chdir(gcin_dir);
 #endif
+  }
 
 #if GCIN_i18n_message
   bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
@@ -781,8 +785,12 @@ int main(int argc, char **argv)
     pho_load();
     if (b_contrib) {
       load_tsin_contrib();
-    } else
-      load_tsin_db();
+    } else {
+      if (argc > 1)
+        load_tsin_db_ex(&tsin_hand, argv[1], FALSE, FALSE, FALSE);
+      else
+        load_tsin_db();
+    }
 
     ph_key_sz = 2;
   } else

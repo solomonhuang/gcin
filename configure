@@ -239,9 +239,12 @@ if [ $QT_IM = 'N' ]; then
   mv gcin.spec gcin.spec.tmp
   grep -v qt3/plugins/inputmethods gcin.spec.tmp > gcin.spec
 else
-  for i in /usr/share/qt/bin/moc /usr/lib/qt/bin/moc /usr/lib64/qt/bin/moc
+  for i in /usr/share/qt/bin/moc /usr/lib/qt/bin/moc /usr/lib64/qt/bin/moc /usr/lib/qt3/bin/moc /usr/share/qt3/bin/moc
   do
-    [ -x $i ] && QT_MOC=$i && echo "QT_MOC=$QT_MOC"
+    [ ! -x $i ] && continue
+    QT_MOC=$i
+    echo "QT_MOC=$QT_MOC"
+    break;
   done
 fi
 

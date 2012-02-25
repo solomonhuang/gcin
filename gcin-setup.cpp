@@ -865,7 +865,7 @@ void create_appearance_conf_window()
 
   GtkWidget *hbox_gcin_inner_frame = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX(vbox_top), hbox_gcin_inner_frame, FALSE, FALSE, 0);
-  GtkWidget *label_gcin_inner_frame = gtk_label_new(_(_L("顯示內框")));
+  GtkWidget *label_gcin_inner_frame = gtk_label_new(_(_L("顯示邊框線")));
   gtk_box_pack_start (GTK_BOX(hbox_gcin_inner_frame), label_gcin_inner_frame, FALSE, FALSE, 0);
   check_button_gcin_inner_frame = gtk_check_button_new ();
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_gcin_inner_frame),
@@ -953,7 +953,7 @@ void create_appearance_conf_window()
   disp_fg_bg_color();
 
 
-  GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_(_L("詞音游標的顏色")));
+  GtkWidget *frame_tsin_cursor_color = gtk_frame_new(_(_L("游標的顏色")));
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_tsin_cursor_color, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_cursor_color), 1);
   GtkWidget *button_tsin_cursor_color = gtk_button_new();
