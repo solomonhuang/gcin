@@ -242,7 +242,7 @@ clean:
 	$(MAKE) -C qt4-im clean
 	$(MAKE) -C menu clean
 	$(MAKE) -C po clean
-	rm -f *.o *.E *.db *.pico *.so config.mak tags $(PROGS) gcin-nocur $(PROGS_CV) \
+	rm -fr *.o *.E *.db *.pico *.so config.mak tags $(PROGS) gcin-nocur $(PROGS_CV) \
 	$(DATA) .depend gcin.spec trad2sim gcin.spec.tmp gcin.log
 	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' -o -name 'vgcore.*' ')' -exec rm {} \;
 

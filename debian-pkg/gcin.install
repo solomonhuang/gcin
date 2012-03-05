@@ -1,0 +1,11 @@
+usr/bin
+usr/lib/gtk-2.0
+usr/lib/gcin/gcin1.so
+usr/lib/gcin/gcin2.so
+usr/lib/gcin/intcode-module.so
+usr/lib/gcin/libgcin-im-client.so
+usr/lib/gcin/libgcin-im-client.so.1
+usr/lib/gcin/libgcin-im-client.so.1.2.5
+usr/share/applications
+debian/im-switch/gcin etc/X11/xinit/xinput.d
+debian/gcin.xpm usr/share/pixmaps

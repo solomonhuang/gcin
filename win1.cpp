@@ -237,7 +237,9 @@ void clear_sele()
 #if WIN32
   gdk_flush();
 #endif
+#if 0
   hide_selections_win();
+#endif
 }
 
 char *htmlspecialchars(char *s, char out[]);
@@ -372,6 +374,7 @@ void disp_selections(int x, int y)
 
 void hide_selections_win()
 {
+//  dbg("hide_selections_win\n");
   if (!gwin1)
     return;
 #if WIN32 && 0

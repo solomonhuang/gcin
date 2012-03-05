@@ -1,0 +1,15 @@
+?package(gcin): \
+	icon="/usr/share/pixmaps/gcin.xpm" \
+	title="gcin" \
+	longtitle="gcin common input method" \
+	needs="x11" \
+	section="Applications/System/Language Environment" \
+	command="/usr/bin/gcin"
+
+?package(gcin): \
+	icon="/usr/share/pixmaps/gcin.xpm" \
+	title="gcin-tools" \
+	longtitle="Configuration tools for gcin input method platform" \
+	needs="x11" \
+	section="Applications/System/Language Environment" \
+	command="/usr/bin/gcin-tools"

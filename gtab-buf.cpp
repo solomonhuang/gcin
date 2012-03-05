@@ -1132,7 +1132,7 @@ gboolean gtab_pre_select_idx(int c)
   gbuf[ggg.gbufN-1].flag |= FLAG_CHPHO_PHRASE_TAIL;
 
   hide_gtab_pre_sel();
-  if (gcin_edit_display_ap_only())
+  if (gcin_edit_display_ap_only() && gcin_on_the_spot_key)
     hide_win_gtab();
 
   return TRUE;

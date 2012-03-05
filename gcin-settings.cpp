@@ -92,7 +92,7 @@ void load_setttings()
   gcin_eng_phrase_enabled = get_gcin_conf_int(GCIN_ENG_PHRASE_ENABLED, 1);
   gcin_tray_hf_win_kbm = get_gcin_conf_int(GCIN_TRAY_HF_WIN_KBM, 0);
 #if UNIX
-  gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 1);
+  gcin_init_im_enabled = get_gcin_conf_int(GCIN_INIT_IM_ENABLED, 0);
 #else
   gcin_init_im_enabled = true;
 #endif

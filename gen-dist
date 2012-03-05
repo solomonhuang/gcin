@@ -9,6 +9,7 @@ cd $GCIN_VERSION
 rm -f gcin-version.h
 make gcin-version.h
 make clean
+rm -fr debian
 cd ..
 
 if [ -x /usr/local/bin/tsd2a32 ]; then
@@ -32,4 +33,4 @@ cd
 
 export GCIN_USE_XIM=Y
 
-rpm -bb gcin.spec
+#rpm -bb gcin.spec

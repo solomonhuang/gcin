@@ -909,6 +909,7 @@ void disp_pre_sel_page()
 
 static void close_selection_win()
 {
+//  dbg("close_selection_win\n");
   hide_selections_win();
   tss.current_page=tss.sel_pho=tss.ctrl_pre_sel = 0;
   tss.pre_selN = 0;

@@ -1,0 +1,404 @@
+Format: http://dep.debian.net/deps/dep5
+Upstream-Name: gcin
+Upstream-Contact: Edward Der-Hua Liu <cp76@csie.nctu.edu.tw>
+Source: http://www.csie.nctu.edu.tw/~cp76/gcin/download/
+Comment:
+ Dayi input method is removed because it is dfsg non-free. (See #652553)
+
+Files: *
+Copyright: 2011-2012 Edward Der-Hua Liu
+License: LGPL-2.1
+
+Files: debian/*
+Copyright: 2009 Wen-Yen Chuang 
+           2011 Kan-Ru Chen
+           2011-2012 Yao Wei
+License: GPL-2+
+
+Files: eggtrayicon.cpp eggtrayicon.h
+Copyright: 2002 Anders Carlsson
+License: LGPL-2.1+
+
+Files: data/jyutping.cin
+Copyright: 2001 Linguistic Society of Hong Kong
+License: jyutping
+ This cin file is originally converted from the "phrase box" file 
+ available on the Linguistic Society of Hong Kong's website: 
+ http://www.hku.hk/linguist/lshk/
+ .
+ You are free to use and redistribute this file; the author only wishes 
+ you keep the following notice intact:
+ .
+ "The copyright of the Jyutping phrase box belongs to the Linguistic 
+ Society of Hong Kong.  We would like to thank the Jyutping Group of the 
+ Linguistic Society of Hong Kong for permission to use the electronic file 
+ in our research and/or product development."
+ .
+ For more information about the Jyutping system, visit the above website.  
+ The romanisation system is a little bit different from common Hong Kong 
+ usage, but this system is a lot more systematic.
+
+Files: data/ar30.cin data/ar30-big.cin ./data/ar33.cin
+Copyright: 2010-2012 Ming-Te Liao
+License: ar30
+ Array Input Method Public License
+ .
+ 1. OBJECTS
+ .
+ Specification, design, and user interaction behavior designed for Array 
+ Input Method. All mapping tables and related information for Array Input 
+ Method.
+ .
+ 2. GRANTING
+ .
+ License is granted, free of charge, to everyone if the conditions 
+ described in PERMISSION AND RESPONSIBILITY are met.
+ .
+ 3. PERMISSION AND RESPONSIBILITY
+ .
+   A. Permission:
+ .
+     1. Grant of copyright license
+ .
+     Subject to the terms and conditions of this License, every one is 
+     granted a perpetual, worldwide, non-exclusive, no-charge, 
+     royalty-free, irrevocable copyright license to reproduce, prepare 
+     Derivative Works of, publicly display, publicly perform, sub-license, 
+     and distribute the Work and such Derivative Works.
+ .
+     2. Grant of patent license
+ .
+     No patent is issued for Array Input Method. And the inventor will 
+     never claim patents for Array Input Method.
+ .
+   B. Responsibility:
+ .
+     1. Licensee may choose to offer, and charge a fee for, acceptance of 
+     support, warranty, indemnity, or other liability obligations and/or 
+     rights consistent with this License. However, in accepting such 
+     obligations, licensee may act only on his own behalf and on his sole 
+     responsibility, not on behalf of anyone else, and only if the 
+     licensee agrees to indemnify, defend, and hold everyone else harmless 
+     for any liability incurred by, or claims asserted against, such 
+     everyone else by reason of licensee's accepting any such warranty or 
+     additional liability.
+ .
+ 4. CLAIM FROM LICENSOR
+ .
+ This license is issued by the original inventor and copyright holder of 
+ Array Input Method, who owns the full and original rights to the Array 
+ Input Method. This license is the formal license for Array Input Method.  
+ A licensee does not need to request additional license documentation from 
+ the licensor.
+
+Files: gtk-im/gtkimcontextgcin.c gtk-im/gtkimcontextgcin.h
+       gtk-im/imgcin.c gtk3-im/gtkimcontextgcin.c
+       gtk3-im/gtkimcontextgcin.h gtk3-im/imgcin.c
+Copyright: 2000 Red Hat, Inc.
+License: LGPL-2.1+
+
+Files: qt-im/qgcininputcontext.h qt-im/qgcininputcontextplugin.h
+       qt-im/qgcininputcontextplugin_my.cpp
+Copyright: 2004 immodule for Qt Project.
+License: GPL-2 or QPL-1
+
+Files: IC.cpp IC.h IMdkit/include/IMdkit.h IMdkit/include/Xi18n.h
+       IMdkit/lib/IMConn.c IMdkit/lib/IMMethod.c IMdkit/lib/IMValues.c
+       IMdkit/lib/Xi18n.h IMdkit/lib/Xi18nX.h IMdkit/lib/XimFunc.h
+       IMdkit/lib/i18nAttr.c IMdkit/lib/i18nClbk.c IMdkit/lib/i18nIc.c
+       IMdkit/lib/i18nMethod.c IMdkit/lib/i18nPtHdr.c IMdkit/lib/i18nUtil.c
+       IMdkit/lib/i18nX.c
+Copyright: 1993-1994 Hewlett-Packard Company
+           1994-1995 Sun Microsystems, Inc.
+License: IMdkit
+ Permission to use, copy, modify, distribute, and sell this software and 
+ its documentation for any purpose is hereby granted without fee, provided 
+ that the above copyright notice appear in all copies and that both that 
+ copyright notice and this permission notice appear in supporting 
+ documentation, and that the name of Sun Microsystems, Inc.  and 
+ Hewlett-Packard not be used in advertising or publicity pertaining to 
+ distribution of the software without specific, written prior permission.  
+ Sun Microsystems, Inc. and Hewlett-Packard make no representations about 
+ the suitability of this software for any purpose. It is provided "as is" 
+ without express or implied warranty.
+ .
+ SUN MICROSYSTEMS INC. AND HEWLETT-PACKARD COMPANY DISCLAIMS ALL 
+ WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES 
+ OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL SUN MICROSYSTEMS, INC. 
+ AND HEWLETT-PACKARD COMPANY BE LIABLE FOR ANY SPECIAL, INDIRECT OR 
+ CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
+ USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
+ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+ PERFORMANCE OF THIS SOFTWARE.
+
+Files: IMdkit/lib/FrameMgr.c IMdkit/lib/FrameMgr.h
+Copyright: 1993-1994 Digital Equipment Corporation
+License: FrameMgr
+ Permission to use, copy, modify, and distribute this software and its 
+ documentation for any purpose and without fee is hereby granted, provided 
+ that the above copyright notice appear in all copies and that both that 
+ copyright notice and this permission notice appear in supporting 
+ documentation, and that the names of Digital or MIT not be used in 
+ advertising or publicity pertaining to distribution of the software 
+ without specific, written prior permission.  
+ .
+ DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING 
+ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL 
+ DIGITAL BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR 
+ ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, 
+ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, 
+ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS 
+ SOFTWARE.
+
+Files: IMdkit/lib/i18nIMProto.c
+Copyright: 1993-1994 Digital Equipment Corporation
+           1993-1994 Hewlett-Packard Company
+           1994-1995 Sun Microsystems, Inc.
+License: i18nIMProto
+ Permission to use, copy, modify, and distribute this software and its 
+ documentation for any purpose and without fee is hereby granted, provided 
+ that the above copyright notice appear in all copies and that both that 
+ copyright notice and this permission notice appear in supporting 
+ documentation, and that the names of Digital or MIT not be used in 
+ advertising or publicity pertaining to distribution of the software 
+ without specific, written prior permission.  
+ .
+ DIGITAL AND HEWLETT-PACKARD COMPANY DISCLAIMS ALL WARRANTIES WITH REGARD 
+ TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+ FITNESS, IN NO EVENT SHALL DIGITAL AND HEWLETT-PACKARD COMPANY BE LIABLE 
+ FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES 
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
+ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Files: IMdkit/include/XimProto.h
+Copyright: 1992-1994 FUJITSU LIMITED
+License: XimProto
+ Permission to use, copy, modify, distribute, and sell this software and 
+ its documentation for any purpose is hereby granted without fee, provided 
+ that the above copyright notice appear in all copies and that both that 
+ copyright notice and this permission notice appear in supporting 
+ documentation, and that the name of FUJITSU LIMITED not be used in 
+ advertising or publicity pertaining to distribution of the software 
+ without specific, written prior permission.  FUJITSU LIMITED makes no 
+ representations about the suitability of this software for any purpose. 
+ It is provided "as is" without express or implied warranty.
+ .
+ FUJITSU LIMITED DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, 
+ INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO 
+ EVENT SHALL FUJITSU LIMITED BE LIABLE FOR ANY SPECIAL, INDIRECT OR 
+ CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
+ USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
+ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+ PERFORMANCE OF THIS SOFTWARE.
+
+Files: IMdkit/lib/Xtrans.h
+Copyright: 1993-1994 X Consortium
+           1993-1994 NCR Corporation
+License: Xtrans
+ Permission is hereby granted, free of charge, to any person obtaining a 
+ copy of this software and associated documentation files (the 
+ "Software"), to deal in the Software without restriction, including 
+ without limitation the rights to use, copy, modify, merge, publish, 
+ distribute, sublicense, and/or sell copies of the Software, and to 
+ permit persons to whom the Software is furnished to do so, subject to 
+ the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included 
+ in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  
+ IN NO EVENT SHALL THE X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR 
+ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+ OTHER DEALINGS IN THE SOFTWARE.
+ .
+ Except as contained in this notice, the name of the X Consortium shall 
+ not be used in advertising or otherwise to promote the sale, use or 
+ other dealings in this Software without prior written authorization from 
+ the X Consortium.
+ .
+ Permission to use, copy, modify, and distribute this software and its 
+ documentation for any purpose and without fee is hereby granted, 
+ provided that the above copyright notice appear in all copies and that 
+ both that copyright notice and this permission notice appear in 
+ supporting documentation, and that the name NCR not be used in 
+ advertising or publicity pertaining to distribution of the software 
+ without specific, written prior permission.  NCR makes no 
+ representations about the suitability of this software for any purpose.  
+ It is provided "as is" without express or implied warranty.
+ .
+ NCR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL 
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL NCR 
+ BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY 
+ DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER 
+ IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING 
+ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+License: LGPL-2.1
+ This package is free software; you can redistribute it and/or modify it 
+ under the terms of the GNU Lesser General Public License as published by 
+ the Free Software Foundation; version 2.1 of the License.
+ .
+ This package is distributed in the hope that it will be useful, but 
+ WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General 
+ Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public License 
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU Lesser General Public 
+ License version 2.1 can be found in "/usr/share/common-licenses/LGPL-2.1".
+
+License: LGPL-2.1+
+ This package is free software; you can redistribute it and/or modify it 
+ under the terms of the GNU Lesser General Public License as published by 
+ the Free Software Foundation; either version 2.1 of the License, or (at 
+ your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful, but 
+ WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General 
+ Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public License 
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU Lesser General Public 
+ License version 2.1 can be found in "/usr/share/common-licenses/LGPL-2.1".
+
+License: GPL-2
+ This package is free software; you can redistribute it and/or modify it 
+ under the terms of the GNU General Public License as published by the 
+ Free Software Foundation; version 2 of the License.
+ .
+ This package is distributed in the hope that it will be useful, but 
+ WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General 
+ Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along 
+ with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General Public license 
+ version 2 can be found in "/usr/share/common-licenses/GPL-2".
+
+License: GPL-2+
+ This package is free software; you can redistribute it and/or modify it 
+ under the terms of the GNU General Public License as published by the 
+ Free Software Foundation; either version 2 of the License, or (at your 
+ option) any later version.
+ .
+ This package is distributed in the hope that it will be useful, but 
+ WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+ Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along 
+ with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General Public License 
+ version 2 can be found in "/usr/share/common-licenses/GPL-2".
+
+License: QPL-1
+ THE Q PUBLIC LICENSE version 1.0
+ .
+ Copyright (C) 1999-2000 Trolltech AS, Norway.
+ Everyone is permitted to copy and distribute this license document.
+ The intent of this license is to establish freedom to share and change
+ the software regulated by this license under the open source model.
+ .
+ This license applies to any software containing a notice placed by the
+ copyright holder saying that it may be distributed under the terms of the
+ Q Public License version 1.0. Such software is herein referred to as the
+ Software. This license covers modification and distribution of the
+ Software, use of third-party application programs based on the Software,
+ and development of free software which uses the Software.
+ .
+ Granted Rights
+ .
+ 1. You are granted the non-exclusive rights set forth in this license
+ provided you agree to and comply with any and all conditions in this
+ license. Whole or partial distribution of the Software, or software items
+ that link with the Software, in any form signifies acceptance of this
+ license.
+ .
+ 2. You may copy and distribute the Software in unmodified form provided
+ that the entire package, including - but not restricted to - copyright,
+ trademark notices and disclaimers, as released by the initial developer
+ of the Software, is distributed.
+ .
+ 3. You may make modifications to the Software and distribute your
+ modifications, in a form that is separate from the Software, such as
+ patches. The following restrictions apply to modifications:
+ .
+   a. Modifications must not alter or remove any copyright notices in the
+   Software.
+ .
+   b. When modifications to the Software are released under this license,
+   a non-exclusive royalty-free right is granted to the initial developer
+   of the Software to distribute your modification in future versions of
+   the Software provided such versions remain available under these terms
+   in addition to any other license(s) of the initial developer.
+ .
+ 4. You may distribute machine-executable forms of the Software or
+ machine-executable forms of modified versions of the Software, provided
+ that you meet these restrictions:
+ .
+   a. You must include this license document in the distribution.
+ .
+   b. You must ensure that all recipients of the machine-executable forms 
+   are also able to receive the complete machine-readable source code to 
+   the distributed Software, including all modifications, without any 
+   charge beyond the costs of data transfer, and place prominent notices 
+   in the distribution explaining this.
+ .
+   c. You must ensure that all modifications included in the
+   machine-executable forms are available under the terms of this license.
+ .
+ 5. You may use the original or modified versions of the Software to
+ compile, link and run application programs legally developed by you or
+ by others.
+ .
+ 6. You may develop application programs, reusable components and other
+ software items that link with the original or modified versions of the
+ Software. These items, when distributed, are subject to the following
+ requirements:
+ .
+   a. You must ensure that all recipients of machine-executable forms of
+   these items are also able to receive and use the complete
+   machine-readable source code to the items without any charge beyond the
+   costs of data transfer.
+ .
+   b. You must explicitly license all recipients of your items to use and
+   re-distribute original and modified versions of the items in both
+   machine-executable and source code forms. The recipients must be able
+   to do so without any charges whatsoever, and they must be able to
+   re-distribute to anyone they choose.
+ .
+   c. If the items are not available to the general public, and the
+   initial developer of the Software requests a copy of the items, then
+   you must supply one.
+ .
+ Limitations of Liability
+ .
+ In no event shall the initial developers or copyright holders be liable
+ for any damages whatsoever, including - but not restricted to - lost
+ revenue or profits or other direct, indirect, special, incidental or
+ consequential damages, even if they have been advised of the possibility
+ of such damages, except to the extent invariable law, if any, provides
+ otherwise.
+ .
+ No Warranty
+ .
+ The Software and this license document are provided AS IS with NO
+ WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE.
+ .
+ Choice of Law
+ .
+ This license is governed by the Laws of Norway. Disputes shall be settled
+ by Oslo City Court.

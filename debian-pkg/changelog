@@ -1,0 +1,386 @@
+gcin (2.7.5+eliu-0) unstable; urgency=low
+
+  * for Ubuntu 11.10
+  * For zh_TW, increase priority of gcin to 70, otherwise gcin cannot be selected.
+  * missing gtk-query-immodules-3.0 in gcin.postinst
+  * im-switch/gcin:    export QT4_IM_MODULE=gcin
+
+ -- Edward Liu  <eliu@hyperrate.com>  Sun, 4 Mar 2012 14:00:00 +0800
+
+gcin (2.7.3+dfsg-1) unstable; urgency=low
+
+  * Imported Upstream version 2.7.3
+  * debian/control:
+    - fix upgrading from gcin issues. (Closes: #659790)
+    - fix description on packages.
+  * debian/man: merged upstream.
+
+ -- Yao Wei (魏銘廷) <mwei@lxde.org>  Sun, 12 Feb 2012 16:05:38 +0800
+
+gcin (2.7.2+dfsg-1) unstable; urgency=low
+
+  [ Yao Wei (魏銘廷) ]
+  * Reupload to Debian. (Closes: #658449)
+  * Imported Upstream version 2.7.2
+  * Removed Dayi input method for DFSG compliance.
+  * Remove all patches for cleanness.
+  * Make debian/copyright DEP-5 compliant.
+
+ -- Yao Wei (魏銘廷) <mwei@lxde.org>  Sat, 04 Feb 2012 10:56:38 +0800
+
+gcin (1.5.8-1) unstable; urgency=low
+
+  * New upstream release.
+  * Stop build Qt3 immodule. (Closes: #604350)
+  * debian/gcin-ext.1: merged upstream.
+  * debian/patches/008_add_shebang_to_scripts.diff: merged.
+  * debian/patches/009_add_tsin2gtab_phrase_manpage.diff: merged.
+
+ -- Kan-Ru Chen <koster@debian.org>  Mon, 28 Feb 2011 15:35:50 +0800
+
+gcin (1.5.7~pre13-1) experimental; urgency=low
+
+  * New snapshot.
+  * Update debian/watch to match debian version scheme.
+
+ -- Kan-Ru Chen <koster@debian.org>  Tue, 30 Nov 2010 10:44:06 +0800
+
+gcin (1.5.7~pre12-1) experimental; urgency=low
+
+  * New snapshot.
+  * Refresh patches.
+  * debian/patches/008_add_shebang_to_scripts.diff,
+    debian/patches/009_add_tsin2gtab_phrase_manpage.diff: New.
+  * debian/gcin-exit.1: New.
+  * Updated Standards-Version to 3.9.1, no changes needed.
+  
+ -- Kan-Ru Chen <koster@debian.org>  Mon, 29 Nov 2010 22:06:56 +0800
+
+gcin (1.4.6-3) unstable; urgency=low
+
+  * Fix FTBFS with gtk2 2.20 due to deprecated Gtk+ macros. (Closes: #577377)
+  * Bump libgtk2.0-dev build-deps to 2.20.0.
+  * Disable --new_gtk_im. Too unstable with mozilla browser.
+  * Add back README.html.
+  * Update im-switch script also checks qt4 path.
+  * Update Maintainer, Vcs-Git and Vcs-Browser. Migrating to DD account.
+
+ -- Kan-Ru Chen <koster@debian.org>  Wed, 05 May 2010 00:20:58 +0800
+
+gcin (1.4.6-2) unstable; urgency=low
+
+  * Fix FTBFS with gtk2 2.19 due to deprecated Gtk+ macros
+    GTK_WIDGET_APP_PAINTABLE and GTK_WIDGET_NO_WINDOW. (Closes: #569246)
+    (LP: #520148)
+  * Updated Standards-Version to 3.8.4, no changes needed.
+
+ -- Kan-Ru Chen <koster@debian.org.tw>  Sat, 27 Feb 2010 17:24:34 +0800
+
+gcin (1.4.6-1) unstable; urgency=low
+
+  * New upstream release
+    This version fixed FTBFS with binutils-gold. (Closes: #554417)
+  * Switched to dpkg-source 3.0 (quilt) format
+  * Use modern debhelper style
+  * Updated Standards-Version to 3.8.3
+  * Updated copyright information
+  * Acknowledge NMU - Thanks Stefano
+
+ -- Kan-Ru Chen <koster@debian.org.tw>  Sun, 10 Jan 2010 16:49:29 +0800
+
+gcin (1.4.5-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Add missing #include to fix FTBFS with gcc 4.4, patch by Martin
+    Michlmayr. (Closes: #531715)
+  * gcin-qt{3,4}-immodule: add lintian overrides for shlib-defines-rpath,
+    this is needed to get the package pass through auto-REJECT. Rationale:
+    rpath is appropriate here, the packages use private shlibs.
+
+ -- Stefano Zacchiroli <zack@debian.org>  Sat, 26 Dec 2009 10:13:19 +0100
+
+gcin (1.4.5-1) unstable; urgency=low
+
+  * New Upstream Version
+  * Wrokaround dh_gtkmodules bug.
+  * Bump Standards-Versions to 3.8.1, no changes needed.
+
+ -- Kanru Chen <koster@debian.org.tw>  Tue, 12 May 2009 11:35:18 +0800
+
+gcin (1.4.5~pre2-1) unstable; urgency=low
+
+  * [811fc3b] New Upstream version 1.4.5.pre2
+  * [86b0996] Update patches.
+              - fix_gdm_crash_498619.diff: Dropped, fixed up stream.  
+              - fix_QT_detection.diff: Split into two patches.
+              - fix_anthy_error_message.diff: Added.
+  * [dfa7a85] Enable anthy.
+
+ -- Kanru Chen <koster@debian.org.tw>  Tue, 03 Mar 2009 14:33:40 +0800
+
+gcin (1.4.2-2) unstable; urgency=low
+
+  * Upload to unstable
+  * [ef36b0e] New maintainer (Closes: #505501)
+  * [4861a1e] Replace dh_clean -k with dh_prep.
+  * [5b60cca] Add Vcs-Git and Vcs-Browser field.
+  * [5dafdd8] Add README.source
+  * [63892e6] Add patch ld_only_link_needed.diff
+  * [a848d1e] Fix the bug causing gdm crashes. (Closes: #498619)
+  * [326815b] Update patch descriptions.
+
+ -- Kanru Chen <koster@debian.org.tw>  Sat, 06 Dec 2008 14:58:33 +0800
+
+gcin (1.4.2-1) experimental; urgency=low
+
+  * New upstream release
+  * New package gcin-dev
+  * Make gcin-qt3-immodule a versionised dependency on gcin
+  * Drop fix_desktop_file_categories.diff because upstream has merged it
+  * Bump Standards-Versions to 3.8.0
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Thu,  1 Aug 2008 18:45:44 +0800
+
+gcin (1.4.0-1) unstable; urgency=low
+
+  * New upstream release
+    This release fixes FTBFS on ia64 architecture. (Closes: #480520)
+  * Update copyright information
+  * Migrate from dpatch to quilt
+    Drop 20_fix-manpages.dpatch and 40_fix_FTBFS_on_sparc_hppa_ia64.dpatch
+    because upstream has merged them.
+  * Install AUTHORS file to /usr/share/doc/gcin
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Tue, 20 May 2008 14:57:12 +0800
+
+gcin (1.3.9-1) unstable; urgency=low
+
+  * New upstream release
+  * Update symlinks for new manpages
+  * Enable i18n
+  * Refresh 10_fix-directory-structure.dpatch
+  * Add 20_fix-manpages.dpatch to prevent lintian warnings
+  * Include /usr/share/dpatch/dpatch.make to make debian/rules simpler
+  * Add Depends ${misc:Depends} for gcin-qt3-immodule
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Wed,  7 May 2008 21:39:20 +0800
+
+gcin (1.3.4-3) unstable; urgency=low
+
+  * Fix FTBFS on hppa, ia64, and sparc architectures (Closes: #406036)
+  * Disable binary stripping in upstream's Makefile (Closes: #436914)
+  * Auto-detect GTK+ module ABI version (Closes: #419366, #420504)
+  * Update debian/copyright to machine-readable format
+  * Make libgcin-im-client.so a private library
+  * Bump Standards-Version to 3.7.3
+  * Fix typos in package description
+  * Clean up debian/rules
+  * Make lintian quiet
+    - set Build-Depends libgtk2.0-dev >= 2.10.1
+    - move Homepage in package description to source stanza
+    - replace all "GTK" with "GTK+" in package descriptions
+    - replace all "##DP" with "## DP:" in debian/patches/*
+    - update debian/gcin.menu
+    - add 50_fix-desktop-file-categories.dpatch to match latest .desktop file
+      policy
+    - do not use -$(MAKE) in debian/rules so that other error messages from the
+      clean rule will still be caught
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sun, 27 Apr 2008 15:32:36 +0800
+
+gcin (1.3.4-2) unstable; urgency=low
+
+  The "Nobuta power! Cyuunyuu!" Release.
+
+  * Update for GTK+ 2.10. (Closes: #419293)
+  * debian/control:
+    - bump up the libgtk2.0-dev build-dep to >= 2.10.1-1.
+    - remove dependency for libgtk2.0-bin
+  * debian/gcin.postinst:
+    debian/gcin.postrm:
+    - remove update-gtk-immodules
+  * debian/rules:
+    - call dh_gtkmodules with LD_LIBRARY_PATH.
+    - remove scripts for GTK+ version detection.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sun, 15 Apr 2007 00:42:03 +0800
+
+gcin (1.3.4-1) unstable; urgency=low
+
+  The "Maki Horikita" Release.
+
+  * New upstream release.
+  * debian/patches:
+    - modify 10_fix-directory-structure.dpatch to cope with upstream's
+      changes.
+    - modify 30_disable_rpath_for_gtk-im.dpatch to prevent fuzz during patching.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Tue, 10 Apr 2007 21:42:40 +0800
+
+gcin (1.3.3-2) unstable; urgency=low
+
+  * Move from experimental to unstable.
+    This version(1.3.3) has fixed FTBFS on GNU/kFreeBSD. (Closes: #414406)
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Mon,  9 Apr 2007 01:44:27 +0800
+
+gcin (1.3.3-1) experimental; urgency=low
+
+  * New upstream release.
+  * debian/patches:
+    - modify 10_fix-directory-structure.dpatch to cope with upstream's
+      changes.
+    - remove 40_fix_build_failure_in_big-endian_arch.dpatch because upstream
+      had fixed this bug.
+    - merge 50_fix-FTBFS-on-systems-with-lib64-directory.dpatch into
+      10_fix-directory-structure.dpatch.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sun, 28 Jan 2007 22:51:32 +0800
+
+gcin (1.3.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Set fallback option for im-switch. (Closes: #400374)
+  * Fix gcin's postrm script so that it can be removed cleanly when
+    libgtk2.0-bin is already removed. (This is scim's Ubuntu bug #52087)
+  * debian/patches:
+    - remove 20_fix-glibc2.4-with-amd64.dpatch because upstream had fixed this
+      bug.
+    - add 20_fix_installation_path_for_im-client.dpatch and
+      40_fix_build_failure_in_big-endian_arch.dpatch.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Mon,  4 Dec 2006 20:28:58 +0800
+
+gcin (1.3.0.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches:
+    - apply 50_fix-FTBFS-on-systems-with-lib64-directory.dpatch written by
+      Ming Hua <minghua@ubuntu.com>. (Closes: #399800)
+    - remove 40_make_noseeing-inst_a_shell_script.dpatch because upstream had
+      fixed this bug.
+    - modify 10_fix-directory-structure.dpatch to cope with upstream's
+      changes.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Wed, 22 Nov 2006 20:09:43 +0800
+
+gcin (1.2.9-1) unstable; urgency=low
+
+  * First upload to Debian (Closes: #355849)
+  * debian/control:
+    - gcin have to depend on libgtk2.0-bin, to be compatible with Debian's new
+      GTK+2 packages.
+    - moved im-switch from Depends to Recommends for gcin
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sat, 18 Nov 2006 22:43:12 +0800
+
+gcin (1.2.9-0ubuntu1) feisty; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    - let dh_makeshlibs process gcin-qt3-immodule's dependency.
+  * debian/copyright:
+    - Qt immodule's license is GPL version 2, not LGPL.
+  * debian/patches
+    - fixed built problem with glibc 2.4 under AMD64/EM64T architecture.
+    - disabled rpath
+    - modify 10_fix-directory-structure.dpatch to cope with upstream's
+      change.
+  * debian/rules:
+    - configured with --new_gtk_im=Y. This option supports Mozilla 1.8.0 and
+      newer releases' OverTheSpot for inputmethods.
+    - remove /usr/share/control-center-2.0. It is nonsense for Ubuntu.
+    - enabled dh_makeshlibs since upstream supports library soname.
+  * debian/watch:
+    - updated upstream's download page.
+  * Bumped Standards-Version to 3.7.2
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sat, 18 Nov 2006 20:15:42 +0800
+
+gcin (1.2.5-0ubuntu1) edgy; urgency=low
+
+  * New upstream release.
+  * Removed 20_fix-gcin-setup-parsing-error.dpatch, because upstream have
+    fixed this bug.
+  * debian/install:
+    - removed lines about manpages, because upstream have fixed this problem.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sat,  9 Sep 2006 23:02:35 +0800
+
+gcin (1.2.3-0ubuntu1) edgy; urgency=low
+
+  * New upstream release
+  * Fixed gcin-setup's parsing error. This patch was released by upstream.
+  * Modified 10_fix-directory-structure.dpatch to prevent Hunk during patching.
+  * Installed new version manpages. Upstream misplaced those two files in
+    wrong directory.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sat,  2 Sep 2006 04:50:52 +0800
+
+gcin (1.2.2-0ubuntu1) edgy; urgency=low
+
+  * New upstream release
+  * debian/patches/10_fix-directory-structure.dpatch:
+    - modify 10_fix-directory-structure.dpatch to cope with upstream's
+      change.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Thu, 17 Aug 2006 20:25:12 +0800
+
+gcin (1.2.1-0ubuntu1) edgy; urgency=low
+
+  * New upstream release
+  * debian/control:
+    - remove GTK 2.10 specific dependency for backporting edgy to dapper
+  * debian/rules:
+    - check GTK version and install the GTK immodule into correct path
+  * debian/patches/10_fix-directory-structure.dpatch:
+    - remove fixes for GTK installation path since it was done within
+      debian/rules
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Thu, 10 Aug 2006 19:27:33 +0800
+
+gcin (1.2.0-0ubuntu4) edgy; urgency=low
+
+  * debian/control:
+    - require GTK 2.10 since 10_fix-directory-structure.dpatch for the path
+
+ -- Sebastien Bacher <seb128@canonical.com>  Thu,  3 Aug 2006 14:31:54 +0200
+
+gcin (1.2.0-0ubuntu3) edgy; urgency=low
+
+  * debian/patches/10_fix-directory-structure.dpatch:
+    - updated for GTK 2.10
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed,  2 Aug 2006 22:49:05 +0200
+
+gcin (1.2.0-0ubuntu2) edgy; urgency=low
+
+  * Rebuild for GTK 2.10
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed,  2 Aug 2006 22:27:56 +0200
+
+gcin (1.2.0-0ubuntu1) edgy; urgency=low
+
+  * New upstream release
+  * Modify 10_fix-directory-structure.dpatch to prevent Hunk during patching.
+  * Modify im-switch script, enable QT3 immodule automatically.
+  * Remove m17n-env script, because dapper and later releases no longer needs
+    it.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Fri,  2 Jun 2006 19:13:54 +0800
+
+gcin (1.1.9-0ubuntu1) dapper; urgency=low
+
+  * New upstream release
+  * Modify 10_fix-directory-structure.dpatch to prevent Hunk during patching.
+  * Modify descriptions in control file.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Mon,  1 May 2006 16:01:52 +0800
+
+gcin (1.1.8-0ubuntu1) dapper; urgency=low
+
+  * Initial release
+  * Applied 10_fix-directory-structure.dpatch to fix configuration and
+    installation paths.
+
+ -- Wen-Yen Chuang <caleb@calno.com>  Sat, 15 Apr 2006 21:35:29 +0800
