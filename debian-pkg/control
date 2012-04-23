@@ -37,7 +37,7 @@ Description: icons and scripts for gcin
  things.
 
 Package: gcin-tables
-Architecture: any
+Architecture: all
 Depends: ${misc:Depends}
 Replaces: gcin (<< 2.7.2+dfsg-1)
 Breaks: gcin (<< 2.7.2+dfsg-1)

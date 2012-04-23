@@ -148,7 +148,7 @@ void load_setttings()
   tsin_tab_phrase_end = get_gcin_conf_int(TSIN_TAB_PHRASE_END, 1);
   tsin_tail_select_key = get_gcin_conf_int(TSIN_TAIL_SELECT_KEY, 0);
   tsin_buffer_editing_mode = get_gcin_conf_int(TSIN_BUFFER_EDITING_MODE, 1);
-  tsin_use_pho_near = get_gcin_conf_int(TSIN_USE_PHO_NEAR, 1);
+  tsin_use_pho_near = get_gcin_conf_int(TSIN_USE_PHO_NEAR, 0);
 
   phonetic_char_dynamic_sequence = get_gcin_conf_int(PHONETIC_CHAR_DYNAMIC_SEQUENCE, 1);
   phonetic_huge_tab = get_gcin_conf_int(PHONETIC_HUGE_TAB, 0);

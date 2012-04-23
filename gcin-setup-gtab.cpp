@@ -263,7 +263,6 @@ void create_gtab_conf_window()
   gtk_container_set_border_width (GTK_CONTAINER (gcin_gtab_conf_window), 3);
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 10);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (gcin_gtab_conf_window), vbox_top);
 
   GtkWidget *hbox_lr = gtk_hbox_new (FALSE, 10);
@@ -274,7 +273,6 @@ void create_gtab_conf_window()
   gtk_container_set_border_width (GTK_CONTAINER (frame_gtab_l), 5);
   gtk_box_pack_start (GTK_BOX (hbox_lr), frame_gtab_l, FALSE, FALSE, 0);
   GtkWidget *vbox_gtab_l = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_gtab_l), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_gtab_l), vbox_gtab_l);
   gtk_container_set_border_width (GTK_CONTAINER (vbox_gtab_l), 10);
 
@@ -283,7 +281,6 @@ void create_gtab_conf_window()
   gtk_container_set_border_width (GTK_CONTAINER (frame_gtab_r), 5);
   gtk_box_pack_start (GTK_BOX (hbox_lr), frame_gtab_r, FALSE, FALSE, 0);
   GtkWidget *vbox_gtab_r = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_gtab_r), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_gtab_r), vbox_gtab_r);
   gtk_container_set_border_width (GTK_CONTAINER (vbox_gtab_r), 10);
 
@@ -424,7 +421,6 @@ void create_gtab_conf_window()
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
-  gtk_grid_set_column_homogeneous(GTK_GRID(hbox_cancel_ok), TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
 
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
@@ -438,17 +434,11 @@ void create_gtab_conf_window()
                             G_OBJECT (gcin_gtab_conf_window));
 
   GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-#if !GTK_CHECK_VERSION(2,91,2)
+
   if (button_order)
     gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 0);
   else
     gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 0);
-#else
-  if (button_order)
-    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_ok, button_cancel, GTK_POS_LEFT, 1, 1);
-  else
-    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_ok, button_cancel, GTK_POS_RIGHT, 1, 1);
-#endif
 
   g_signal_connect_swapped (G_OBJECT (button_ok), "clicked",
                             G_CALLBACK (cb_gtab_conf_ok),

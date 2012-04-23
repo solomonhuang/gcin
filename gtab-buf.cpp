@@ -986,11 +986,12 @@ void save_gtab_buf_phrase(KeySym key)
 
 gboolean save_gtab_buf_shift_enter()
 {
-	int N = ggg.gbufN - ggg.gbuf_cursor;
+	int start = ggg.gbufN == ggg.gbuf_cursor ? 0:ggg.gbuf_cursor;
+	int N = ggg.gbufN - start;
 	if (!N)
 		return 0;
 
-	save_gtab_buf_phrase_idx(ggg.gbuf_cursor, N);
+	save_gtab_buf_phrase_idx(start, N);
 	gbuf_cursor_end();
 	return 1;
 }

@@ -173,8 +173,7 @@ void create_win_pho_gui_simple()
     return;
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
-
+ 
   GtkWidget *event_box_pho;
   if (gtab_in_area_button)
 	event_box_pho = gtk_button_new();

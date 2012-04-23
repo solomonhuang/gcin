@@ -1160,6 +1160,7 @@ void toggle_symbol_table()
 
 void destroy_phrase_save_menu();
 int gcin_switch_keys_lookup(int key);
+gboolean b_menu_key_pressed;
 
 // return TRUE if the key press is processed
 gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
@@ -1189,6 +1190,19 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
     force_preedit=0;
     return 1;
   }
+
+#if 1
+  // Chrome win32 has this problem
+  if (keysym==XK_Menu) {
+    b_menu_key_pressed = TRUE;
+  } else {
+    gboolean old_pressed = b_menu_key_pressed;
+    b_menu_key_pressed = FALSE;
+    if (old_pressed && strchr("utcpda", keysym))
+      return FALSE;
+  }
+#endif
+
 
   if (keysym == XK_space) {
 #if 0

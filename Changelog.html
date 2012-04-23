@@ -2,6 +2,18 @@
 <html lang="zh-tw"><head>
 <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>Changlog</title><meta content="Edward Liu" name="author"></head><body style="outline-color: navy ! important; outline-style: dashed ! important; outline-width: 2px ! important;">** UTF-8 encoding **<br>
 <span style="color: rgb(234, 0, 0);">不反對 copy gcin 的 source code，但是可不可以 copy 的「有品」一些？請說明哪些改進/功能是從 gcin 的 source 來的。</span><br>
+2.7.6<br>
+- 修改 debian-pkg，符合 i386 &amp; amd64 的 .so PATH<br>
+- fedora.spec gtk2 install 的問題<br>
+- ./gen-deb 在 debian 等沒有 gtk3 無法 build 的問題，感謝 coolcd 提供 sed 的建議。<br>
+- 檢查詞音資料庫是否有被更改，有則 reload 以避免資料毀損。<br>
+- Chrome win32 會把 menu key 送給 gcin 處理，造成 cptau 等 copy/paste
+commands&nbsp; 無法使用。現在有 menu 時，gcin 會忽略 &amp; 忽略接下來 cptau 等
+key。AP 比較合理的做法是自己處理，不要送給 IM。<br>
+- <a href="http://hyperrate.com/thread.php?tid=26881">編輯區的結尾</a>按 Shift-Enter 會把全部的內容加入詞庫。<br>
+- 修正了用 gtk3 時 gcb、 詞音、gcin-tools 字顯示的問題<br>
+- 現在改成如果有 gtk3，則內定用 gtk3。在 ubuntu 11.10 用 gtk3 有比 gtk2 更精簡好看。<br>
+<br>
 2.7.5<br>
 - 詞音選字用上下鍵 window 會閃爍的問題。<br>
 - gen-deb 改用 Yao Wei (魏銘廷) 提供的 debian package 並加上一些 ubuntu 11.10 的相關 bug fix<br>

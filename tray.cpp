@@ -367,10 +367,10 @@ gboolean create_tray(gpointer data)
 //  gtk_event_box_set_visible_window (event_box, FALSE);
   gtk_container_add (GTK_CONTAINER (egg_tray_icon), event_box);
 #if GTK_CHECK_VERSION(2,12,0)
-  gtk_widget_set_tooltip_text (event_box, _("左:中英切換 中:小鍵盤 右:選項"));
+  gtk_widget_set_tooltip_text (event_box, _("左:選擇輸入法 中:小鍵盤 右:選項"));
 #else
   GtkTooltips *tips = gtk_tooltips_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, _("左:中英切換 中:小鍵盤 右:選項"), NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), event_box, _("左:選擇輸入法換 中:小鍵盤 右:選項"), NULL);
 #endif
 
   g_signal_connect (G_OBJECT (event_box), "button-press-event",

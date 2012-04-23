@@ -35,7 +35,7 @@ extern "C" {
 extern GType gtk_type_im_context_gcin;
 
 #define GTK_TYPE_IM_CONTEXT_GCIN              gtk_type_im_context_gcin
-#define GTK_IM_CONTEXT_GCIN(obj)              (GTK_CHECK_CAST ((obj), GTK_TYPE_IM_CONTEXT_GCIN, GtkIMContextGCIN))
+#define GTK_IM_CONTEXT_GCIN(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_IM_CONTEXT_GCIN, GtkIMContextGCIN))
 #define GTK_IM_CONTEXT_GCIN_CLASS(klass)      (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_IM_CONTEXT_GCIN, GtkIMContextGCINClass))
 #define GTK_IS_IM_CONTEXT_GCIN(obj)           (GTK_CHECK_TYPE ((obj), GTK_TYPE_IM_CONTEXT_GCIN))
 #define GTK_IS_IM_CONTEXT_GCIN_CLASS(klass)   (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_IM_CONTEXT_GCIN))

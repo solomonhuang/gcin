@@ -4,6 +4,7 @@ OBJS = imgcin.o gtkimcontextgcin.o
 GTK3IM=gtk-3.0/immodules
 GTKINC=`pkg-config --cflags gtk+-3.0`
 LDFLAGS=`pkg-config --libs gtk+-3.0`
+LDFLAGS+='-Wl,--as-needed'
 IMMODULES=$(libdir)/$(GTK3IM)
 IMMODULES_LOCAL=/usr/$(LIB)/$(GTK3IM)
 

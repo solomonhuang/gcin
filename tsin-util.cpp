@@ -8,6 +8,7 @@
 #include "gtab.h"
 #include "gst.h"
 #include "lang.h"
+#include <sys/stat.h>
 
 //int hashidx[TSIN_HASH_N];
 TSIN_HANDLE tsin_hand;
@@ -19,11 +20,21 @@ static int tsin_hash_shift;
 #define PHIDX_SKIP  (sizeof(tsin_hand.phcount) + sizeof(tsin_hand.hashidx))
 
 char *current_tsin_fname;
+time_t current_modify_time;
 int ts_gtabN;
 static int *ts_gtab_hash;
 #define HASHN 256
 
 void get_gcin_user_or_sys_fname(char *name, char fname[]);
+
+
+static void get_modify_time(TSIN_HANDLE *ptsin_hand)
+{
+  struct stat st;
+  if (!fstat(fileno(ptsin_hand->fph), &st)) {
+    ptsin_hand->modify_time = st.st_mtime;
+  }
+}
 
 void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i, gboolean read_only, gboolean use_idx)
 {
@@ -67,6 +78,9 @@ void load_tsin_db_ex(TSIN_HANDLE *ptsin_hand, char *infname, gboolean is_gtab_i,
 
   free(current_tsin_fname);
   current_tsin_fname = strdup(infname);
+
+
+  get_modify_time(ptsin_hand);
 
   if (is_gtab_i) {
     TSIN_GTAB_HEAD head;
@@ -229,8 +243,20 @@ void inc_dec_tsin_use_count(void *pho, char *ch, int N);
 
 static gboolean saved_phrase;
 
+
+static void reload_if_modified()
+{
+  struct stat st;
+  if (fstat(fileno(tsin_hand.fph), &st) || tsin_hand.modify_time != st.st_mtime) {
+    reload_tsin_db();
+  }
+}
+
+
 gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usecount)
 {
+  reload_if_modified();
+
   int mid, ord = 0, ph_ofs, hashno;
   u_char tbuf[MAX_PHRASE_LEN*(sizeof(u_int64_t)+CH_SZ) + 1 + sizeof(usecount_t)],
          sbuf[MAX_PHRASE_LEN*(sizeof(u_int64_t)+CH_SZ) + 1 + sizeof(usecount_t)];
@@ -319,6 +345,9 @@ gboolean save_phrase_to_db(void *phkeys, char *utf8str, int len, usecount_t usec
   fwrite(&tsin_hand.phcount, sizeof(tsin_hand.phcount), 1, tsin_hand.fp_phidx);
   fwrite(&tsin_hand.hashidx,sizeof(tsin_hand.hashidx),1, tsin_hand.fp_phidx);
   fflush(tsin_hand.fp_phidx);
+
+
+  get_modify_time(&tsin_hand);
 
 //  dbg("ofs %d\n", get_phidx(mid));
 
@@ -602,6 +631,8 @@ void inc_dec_tsin_use_count(void *pho, char *ch, int N)
 {
   int sti, edi;
 
+  reload_if_modified();
+
 //  dbg("inc_dec_tsin_use_count '%s'\n", ch);
 
   if (!tsin_seek(pho, N, &sti, &edi, NULL))
@@ -653,4 +684,7 @@ void inc_dec_tsin_use_count(void *pho, char *ch, int N)
       fflush(tsin_hand.fph);
     }
   }
+
+
+  get_modify_time(&tsin_hand);
 }

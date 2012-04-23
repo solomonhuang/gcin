@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     set_is_chs();
 
     for(i=0;i<fnames_minusN;i++) {
-      dbg("fnames_minus %s\n", fnames_minus[i]);
+      dbg("fnames_minus %d] %s\n", i, fnames_minus[i]);
       load_tsin_db_ex(&tsin_hands[i], fnames_minus[i], FALSE, TRUE, TRUE);
     }
 

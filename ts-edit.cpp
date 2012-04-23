@@ -598,27 +598,33 @@ gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 //  dbg("key_press_event %x\n", event->keyval);
   switch (event->keyval) {
     case GDK_Up:
+    case GDK_KP_Up:
       if (page_ofs>0)
         page_ofs--;
       break;
     case GDK_Down:
+    case GDK_KP_Down:
       if (page_ofs<tsN-1)
         page_ofs++;
       break;
+    case GDK_KP_Page_Up:
     case GDK_Page_Up:
       page_ofs -= PAGE_LEN;
       if (page_ofs < 0)
         page_ofs = 0;
       break;
+    case GDK_KP_Page_Down:
     case GDK_Page_Down:
       page_ofs += PAGE_LEN;
       if (page_ofs>= tsN)
         page_ofs = tsN-1;
       break;
     case GDK_Home:
+    case GDK_KP_Home:
       page_ofs = 0;
       break;
     case GDK_End:
+    case GDK_KP_End:
       page_ofs = tsN - PAGE_LEN;
       break;
   }
@@ -735,6 +741,9 @@ static void cb_button_download(GtkButton *button, gpointer user_data)
   disp_page();
 }
 
+// will be dropped in gtk3.0 ?
+GtkWidget *gtk_vscrollbar_new (GtkAdjustment *adjustment);
+
 int main(int argc, char **argv)
 {
 #if WIN32
@@ -826,7 +835,6 @@ int main(int argc, char **argv)
   set_window_gcin_icon(mainwin);
 
   vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER(mainwin), vbox_top);
 
   GtkWidget *hbox_page = gtk_hbox_new (FALSE, 0);

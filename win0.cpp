@@ -131,7 +131,6 @@ static void create_char(int index)
 
     gtk_box_pack_start (GTK_BOX (hbox_edit), event_box, FALSE, FALSE, 0);
     GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
     gtk_container_add(GTK_CONTAINER(event_box), vbox);
 
     GtkWidget *label = gtk_label_new(NULL);
@@ -177,6 +176,11 @@ void disp_char(int index, char *ch)
       gtk_label_set_text(GTK_LABEL(label), ch);
     }
   }
+
+#if GTK_CHECK_VERSION(3,0,0)
+    // bug in gtk3
+    set_label_font_size(label, gcin_font_size);
+#endif
 
   get_win0_geom();
   if (win_x + win_xl >= dpy_xl)
@@ -527,7 +531,6 @@ static void create_win0_gui()
     return;
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_set_border_width (GTK_CONTAINER (gwin0), 0);
 
   if (gcin_inner_frame) {

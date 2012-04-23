@@ -244,7 +244,7 @@ clean:
 	$(MAKE) -C po clean
 	rm -fr *.o *.E *.db *.pico *.so config.mak tags $(PROGS) gcin-nocur $(PROGS_CV) \
 	$(DATA) .depend gcin.spec trad2sim gcin.spec.tmp gcin.log
-	find . '(' -name '.ted*' -o -name '*~' -o -name 'core.*' -o -name 'vgcore.*' ')' -exec rm {} \;
+	find . '(' -name '.ted*' -o -name '*~' -o -name 'core*' -o -name 'vgcore.*' ')' -exec rm {} \;
 
 .depend:
 	$(CCX) $(CFLAGS) -MM *.cpp > $@

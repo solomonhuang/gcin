@@ -1637,7 +1637,8 @@ int feedkey_pp(KeySym xkey, int kbstate)
         if (shift_m) {
           if (!tss.c_len)
             return 0;
-          tsin_create_win_save_phrase(tss.c_idx,  tss.c_len - tss.c_idx);
+		  int start = tss.c_len == tss.c_idx?0:tss.c_idx;
+          tsin_create_win_save_phrase(start,  tss.c_len - start);
           move_cursor_end();
           return 1;
         } else {

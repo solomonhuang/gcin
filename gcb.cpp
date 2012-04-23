@@ -73,12 +73,11 @@ static void update_hist_button()
 
 static void show_hist_window()
 {
-  gtk_window_parse_geometry(GTK_WINDOW(hist_window),geomstr);
-
   update_hist_button();
 
   gtk_window_resize(GTK_WINDOW(hist_window), 1, 1);
-  gtk_widget_show (hist_window);
+  gtk_widget_show_all (hist_window);
+  gtk_window_parse_geometry(GTK_WINDOW(hist_window),geomstr);
   gtk_window_present(GTK_WINDOW(hist_window));
 }
 
@@ -402,9 +401,9 @@ void gcb_main()
 
   hbox = gtk_hbox_new (FALSE, 1);
   gtk_container_add (GTK_CONTAINER(mainwin), hbox);
-
+#if 0
   gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
-
+#endif
   for(i=0;i<gcb_button_n;i++) {
     buttonArr[i] = gtk_button_new_with_label ("---");
 //    gtk_container_set_border_width(GTK_CONTAINER(buttonArr[i]),0);
@@ -423,7 +422,6 @@ void gcb_main()
   }
 
   vbox = gtk_vbox_new (FALSE, 1);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER(hist_window), vbox);
 
   for(i=0;i<gcb_history_n;i++) {
@@ -450,13 +448,20 @@ void gcb_main()
 #endif
 
 
-  gtk_widget_show_all(hbox);
-  gtk_widget_show (vbox);
-  gtk_widget_show (mainwin);
+//  gtk_widget_show_all(hbox);
+//  gtk_widget_show (vbox);
+  gtk_widget_show_all (mainwin);
 
+#if 0
+  gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
+#endif
 
   pclipboard_prim = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
   pclipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+
+#if 0
+  gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
+#endif
 
   set_snoop_button(buttonArr[0]);
   get_selection(pclipboard);
@@ -464,9 +469,12 @@ void gcb_main()
   gtk_container_set_border_width(GTK_CONTAINER(hbox),0);
   gtk_container_set_border_width(GTK_CONTAINER(mainwin),0);
 
-  gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
 #if GTK_CHECK_VERSION(2,6,0)
   g_signal_connect(pclipboard, "owner-change", G_CALLBACK (cb_owner_change), NULL);
   g_signal_connect(pclipboard_prim, "owner-change", G_CALLBACK (cb_owner_change), NULL);
+#endif
+
+#if 1
+  gtk_window_parse_geometry(GTK_WINDOW(mainwin),geomstr);
 #endif
 }

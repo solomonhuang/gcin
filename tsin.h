@@ -54,6 +54,7 @@ FILE *fph, *fp_phidx;
 int phcount;
 int a_phcount;
 int hashidx[TSIN_HASH_N];
+time_t modify_time;
 } TSIN_HANDLE;
 
 extern TSIN_HANDLE tsin_hand;

@@ -1,7 +1,7 @@
 include ../config.mak
 QT=qt4
 QTIM=$(QT)/plugins/inputmethods
-IMMODULES=$(libdir)/$(QTIM)
+IMMODULES=$(libdir)/$(DEB_BUILD_MULTIARCH)/$(QTIM)
 
 INCS=-I../im-client -I/usr/include/X11 `pkg-config QtCore QtGui --cflags`
 CXXFLAGS=$(OPTFLAGS) $(INCS) -Wall -D_REENTRANT -DUNIX=1 -fPIC  -DQT4 -DQT_SHARED \

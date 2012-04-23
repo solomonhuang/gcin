@@ -734,7 +734,6 @@ void create_appearance_conf_window()
   gtk_container_set_border_width (GTK_CONTAINER (gcin_appearance_conf_window), 3);
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (gcin_appearance_conf_window), vbox_top);
 
   GtkWidget *hbox_gcin_font_size = gtk_hbox_new (FALSE, 10);
@@ -832,7 +831,6 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_root_style, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_root_style), 3);
   GtkWidget *vbox_root_style = gtk_vbox_new (FALSE, 10);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_root_style), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_root_style), vbox_root_style);
 
   GtkWidget *hbox_root_style_use = gtk_hbox_new (FALSE, 10);
@@ -901,7 +899,6 @@ void create_appearance_conf_window()
   gtk_box_pack_start (GTK_BOX (vbox_top), frame_win_color, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (frame_win_color), 1);
   GtkWidget *vbox_win_color = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_win_color), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_win_color), vbox_win_color);
 
   GtkWidget *hbox_win_color_use = gtk_hbox_new (FALSE, 10);
@@ -974,7 +971,7 @@ void create_appearance_conf_window()
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
-  gtk_grid_set_column_homogeneous(GTK_GRID(hbox_cancel_ok), TRUE);
+//  gtk_grid_set_column_homogeneous(GTK_GRID(hbox_cancel_ok), TRUE);
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok, FALSE, FALSE, 0);
 
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
@@ -988,17 +985,11 @@ void create_appearance_conf_window()
                             G_OBJECT (gcin_appearance_conf_window));
 
   GtkWidget *button_close = gtk_button_new_from_stock (GTK_STOCK_OK);
-#if !GTK_CHECK_VERSION(2,91,2)
+
   if (button_order)
     gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
   else
     gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_close, TRUE, TRUE, 0);
-#else
-  if (button_order)
-    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_close, button_cancel, GTK_POS_LEFT, 1, 1);
-  else
-    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_close, button_cancel, GTK_POS_RIGHT, 1, 1);
-#endif
 
   g_signal_connect_swapped (G_OBJECT (button_close), "clicked",
                             G_CALLBACK (cb_appearance_conf_ok),
@@ -1130,7 +1121,6 @@ static void create_main_win()
   set_window_gcin_icon(main_window);
 
   GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (main_window), vbox);
 
   GtkWidget *button_kbm = gtk_button_new_with_label(_(_L("gcin 注音/詞音/拼音 設定")));
@@ -1216,7 +1206,6 @@ static void create_main_win()
                   G_CALLBACK (expander_callback), NULL);
 
   GtkWidget *vbox_ts = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_ts), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (expander_ts), vbox_ts);
 
 

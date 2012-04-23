@@ -1,2 +1,8 @@
-cp -a debian-pkg debian
+if [ ! -f ./config.mak ]; then
+  echo "Please run ./configure with your QT/GTK options"
+  exit
+fi
+rm -fr debian
+#cp -a debian-pkg debian
+make -f make.debian
 dpkg-buildpackage -b

@@ -41,13 +41,8 @@
 #define GDK_DISPLAY() GDK_DISPLAY_XDISPLAY(gdk_display_get_default())
 #endif
 
+
 #if GTK_CHECK_VERSION(2,90,0)
-#undef GTK_CHECK_CAST
-#define GTK_CHECK_CAST G_TYPE_CHECK_INSTANCE_CAST
-#undef GDK_DRAWABLE_XID
-#define GDK_DRAWABLE_XID GDK_WINDOW_XID
-#undef GDK_DRAWABLE_XDISPLAY
-#define GDK_DRAWABLE_XDISPLAY GDK_WINDOW_XDISPLAY
 #define gtk_hseparator_new() gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)
 #define gtk_vseparator_new() gtk_separator_new(GTK_ORIENTATION_VERTICAL)
 #endif
@@ -56,11 +51,6 @@
 #define gdk_error_trap_pop_ignored gdk_error_trap_pop
 #define gtk_widget_get_preferred_size(x,y,z) gtk_widget_size_request(x,z)
 #define gtk_widget_set_halign(x,y);
-#endif
-
-#if GTK_CHECK_VERSION(2,91,0)
-#define GTK_OBJECT
-#define gdk_drawable_get_screen gdk_window_get_screen
 #endif
 
 #if !GTK_CHECK_VERSION(2,91,1)
@@ -72,16 +62,6 @@
 #if !GTK_CHECK_VERSION(2,91,2)
 #define gtk_grid_set_column_homogeneous(x,y);
 #define gtk_grid_set_row_homogeneous(x,y);
-#define gtk_orientable_set_orientation(x,y);
-#endif
-
-#if GTK_CHECK_VERSION(2,91,2)
-#undef GTK_BOX
-#define GTK_BOX GTK_GRID
-#define gtk_hbox_new(x,y) gtk_grid_new()
-#define gtk_vbox_new(x,y) gtk_grid_new()
-#define gtk_box_pack_end(v,w,x,y,z) gtk_container_add(GTK_CONTAINER(v),w)
-#define gtk_box_pack_start(v,w,x,y,z) gtk_container_add(GTK_CONTAINER(v),w)
 #endif
 
 #ifndef GTK_COMBO_BOX_TEXT
@@ -102,9 +82,16 @@
 #define GDK_WINDOW_XWINDOW GDK_WINDOW_XID
 #endif
 
+#if 0
 #if GTK_CHECK_VERSION(3,3,2)
 #undef      GTK_TABLE
 #define     GTK_TABLE GTK_GRID
 #define     gtk_table_attach_defaults(u,v,w,x,y,z) gtk_grid_attach(u,v,w,y,1,1)
 #define     gtk_table_new(x,y,z) gtk_grid_new()
 #endif
+#endif
+
+GtkWidget *         gtk_hbox_new                        (gboolean homogeneous,
+                                                         gint spacing);
+GtkWidget *         gtk_vbox_new                        (gboolean homogeneous,
+                                                         gint spacing);

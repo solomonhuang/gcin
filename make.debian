@@ -1,0 +1,15 @@
+include config.mak
+
+debian:
+	cp -a debian-pkg debian
+ifeq ($(USE_ANTHY),N)
+	cd ./debian; \
+	sed -e '/^Package: gcin-anthy/,/anthy in gcin.$$/d' control > control.tmp; \
+	mv control.tmp control
+endif
+ifeq ($(GTK3_IM),N)
+	cd ./debian; \
+	sed -e '/^Package: gcin-gtk3-immodule/,/ for gcin.$$/d' control > control.tmp; \
+	mv control.tmp control
+endif
+	

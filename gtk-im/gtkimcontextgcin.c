@@ -24,9 +24,10 @@
 //#include "gtkintl.h"
 #include <gtk/gtk.h>
 #if !GTK_CHECK_VERSION(3,0,0)
-#include "gtk/gtklabel.h"
-#include "gtk/gtksignal.h"
-#include "gtk/gtkwindow.h"
+#include <gtk/gtklabel.h>
+#include <gtk/gtksignal.h>
+#include <gtk/gtkwindow.h>
+#include <gdk/gdk.h>
 #endif
 #include "gtkimcontextgcin.h"
 // #include "gcin.h"  // for debug only
@@ -34,6 +35,12 @@
 #include <X11/keysym.h>
 
 #define DBG 0
+
+
+#if !GTK_CHECK_VERSION(3,0,0)
+#define gdk_window_get_screen gdk_drawable_get_screen
+#endif
+
 
 typedef struct _GtkGCINInfo GtkGCINInfo;
 
@@ -126,6 +133,7 @@ static void gcin_display_closed (GdkDisplay *display,
 }
 #endif
 
+GdkScreen *gdk_window_get_screen (GdkWindow *window);
 
 static void
 get_im (GtkIMContextGCIN *context_xim)
@@ -133,7 +141,7 @@ get_im (GtkIMContextGCIN *context_xim)
   GdkWindow *client_window = context_xim->client_window;
   if (!client_window)
     return;
-  GdkScreen *screen = gdk_drawable_get_screen (client_window);
+  GdkScreen *screen = gdk_window_get_screen (client_window);
   if (!screen)
     return;
 
@@ -249,7 +257,7 @@ static void set_ic_client_window (GtkIMContextGCIN *context_xim,
   if (context_xim->client_window) {
     get_im (context_xim);
     if (context_xim->gcin_ch) {
-      gcin_im_client_set_window(context_xim->gcin_ch, GDK_DRAWABLE_XID(client_window));
+      gcin_im_client_set_window(context_xim->gcin_ch, GDK_WINDOW_XID(client_window));
     }
   }
 }
@@ -323,9 +331,9 @@ gtk_im_context_gcin_filter_keypress (GtkIMContext *context,
   xevent.type = (event->type == GDK_KEY_PRESS) ? KeyPress : KeyRelease;
   xevent.serial = 0;            /* hope it doesn't matter */
   xevent.send_event = event->send_event;
-  xevent.display = GDK_DRAWABLE_XDISPLAY (event->window);
-  xevent.window = GDK_DRAWABLE_XID (event->window);
-  xevent.root = GDK_DRAWABLE_XID (root_window);
+  xevent.display = GDK_WINDOW_XDISPLAY (event->window);
+  xevent.window = GDK_WINDOW_XID (event->window);
+  xevent.root = GDK_WINDOW_XID (root_window);
   xevent.subwindow = xevent.window;
   xevent.time = event->time;
   xevent.x = xevent.x_root = 0;

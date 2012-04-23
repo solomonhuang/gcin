@@ -92,9 +92,9 @@ done
 echo "prefix: $prefix"
 
 for i in gtk+-3.0 gtk+-2.0
-do
+do 
   echo -n ".... Testing $i : "
-  GTKINC=`pkg-config --cflags $i 2>/dev/null`
+  GTKINC=`pkg-config --cflags $i`
 
   if [ $? != 0 ]; then
     echo "not found"
@@ -102,7 +102,7 @@ do
   fi
 
   GTKLDFLAGS=`pkg-config --libs $i`
-  if [ $? = 0 ]; then
+  if [ $? == 0 ]; then
     GTK=$i
     echo "found"
     break
@@ -117,8 +117,6 @@ if [ $GTK = '' ]; then
 fi
 
 echo "$GTK will be used."
-echo "GTKINC: $GTKINC"
-echo "GTKLDFLAGS: $GTKLDFLAGS"
 
 ## problem in MacOS, by candyz
 if [ $MAC_OS = 1 ]; then

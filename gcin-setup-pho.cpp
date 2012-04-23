@@ -372,7 +372,6 @@ GtkWidget *create_en_pho_key_sel(char *s)
 {
 GtkWidget *frame_tsin_sw = gtk_frame_new(s);
   GtkWidget *vbox_tsin_sw = gtk_vbox_new(FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_tsin_sw), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_tsin_sw), vbox_tsin_sw);
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_sw), 1);
   gtk_container_add (GTK_CONTAINER (vbox_tsin_sw), create_eng_ch_opts());
@@ -413,7 +412,6 @@ void create_kbm_window()
   gtk_container_set_border_width (GTK_CONTAINER (gcin_kbm_window), 1);
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 3);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (gcin_kbm_window), vbox_top);
 
 
@@ -422,12 +420,9 @@ void create_kbm_window()
 
 
   GtkWidget *vbox_l = gtk_vbox_new (FALSE, 3);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_l), GTK_ORIENTATION_VERTICAL);
   gtk_box_pack_start (GTK_BOX (hbox_lr), vbox_l, TRUE, TRUE, 10);
 
   GtkWidget *vbox_r = gtk_vbox_new (FALSE, 3);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_r), GTK_ORIENTATION_VERTICAL);
-  gtk_grid_set_row_homogeneous(GTK_GRID(vbox_r), TRUE);
   gtk_box_pack_start (GTK_BOX (hbox_lr), vbox_r, TRUE, TRUE, 10);
 
 
@@ -443,7 +438,6 @@ void create_kbm_window()
   gtk_container_set_border_width (GTK_CONTAINER (frame_tsin_space_opt), 1);
 
   GtkWidget *box_tsin_space_opt = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(box_tsin_space_opt), GTK_ORIENTATION_VERTICAL);
   gtk_container_add (GTK_CONTAINER (frame_tsin_space_opt), box_tsin_space_opt);
   gtk_container_set_border_width (GTK_CONTAINER (box_tsin_space_opt), 1);
 
@@ -591,7 +585,7 @@ void create_kbm_window()
 
 
   GtkWidget *hbox_cancel_ok = gtk_hbox_new (FALSE, 10);
-  gtk_grid_set_column_homogeneous(GTK_GRID(hbox_cancel_ok), TRUE);
+
   gtk_box_pack_start (GTK_BOX (vbox_top), hbox_cancel_ok , FALSE, FALSE, 5);
   GtkWidget *button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   if (button_order)
@@ -599,17 +593,11 @@ void create_kbm_window()
   else
     gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_cancel, TRUE, TRUE, 0);
   GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-#if !GTK_CHECK_VERSION(2,91,2)
+
   if (button_order)
     gtk_box_pack_end (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
   else
     gtk_box_pack_start (GTK_BOX (hbox_cancel_ok), button_ok, TRUE, TRUE, 5);
-#else
-  if (button_order)
-    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_ok, button_cancel, GTK_POS_LEFT, 1, 1);
-  else
-    gtk_grid_attach_next_to (GTK_BOX (hbox_cancel_ok), button_ok, button_cancel, GTK_POS_RIGHT, 1, 1);
-#endif
 
   g_signal_connect (G_OBJECT (button_cancel), "clicked",
                             G_CALLBACK (close_kbm_window),

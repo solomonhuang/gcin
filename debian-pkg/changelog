@@ -1,4 +1,4 @@
-gcin (2.7.5+eliu-0) unstable; urgency=low
+gcin (2.7.6+eliu-0) unstable; urgency=low
 
   * for Ubuntu 11.10
   * For zh_TW, increase priority of gcin to 70, otherwise gcin cannot be selected.

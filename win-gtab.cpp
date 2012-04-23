@@ -59,7 +59,10 @@ void disp_gtab(char *str)
     else
       win_gtab_disp_half_full();
   }
-
+#if GTK_CHECK_VERSION(2,91,6)
+  // bug in gtk3
+  set_label_font_size(label_gtab, gcin_font_size_gtab_in);
+#endif
   adj_gtab_win_pos();
 }
 
@@ -413,6 +416,10 @@ void disp_label_edit(char *str)
     return;
 
   show_hide_label_edit();
+#if GTK_CHECK_VERSION(2,91,6)
+  // bug in gtk3
+  set_label_font_size(label_edit, gcin_font_size);
+#endif
 
   gtk_label_set_markup(GTK_LABEL(label_edit), str);
 }
@@ -475,7 +482,6 @@ void create_win_gtab_gui_simple()
   last_cursor_off = FALSE;
 
   GtkWidget *vbox_top = gtk_vbox_new (FALSE, 0);
-  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox_top), GTK_ORIENTATION_VERTICAL);
 
   GtkWidget *event_box_gtab;
   if (gtab_in_area_button) {
@@ -580,7 +586,7 @@ void create_win_gtab_gui_simple()
   //  dbg("gtk_label_new label_input_method_name\n");
 
     gtk_container_add (GTK_CONTAINER (gtab_in_area_button?event_box_input_method_name:frame_input_method_name), label_input_method_name);
-    g_signal_connect_swapped (GTK_OBJECT (event_box_input_method_name), "button-press-event",
+    g_signal_connect_swapped (G_OBJECT (event_box_input_method_name), "button-press-event",
           G_CALLBACK (inmd_switch_popup_handler), NULL);
 
     box_gtab_im_name = event_box_input_method_name;
